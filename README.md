@@ -4,10 +4,10 @@ This is The Machine. The Machine is a degenerate. The Machine wants to help you 
 
 The Machine currently offers betting analysis for the following sports and leagues:
 
-# Baseball
+## Baseball
   - Major League Baseball
   
-# Soccer
+## Soccer
   - Major League Soccer
   - English Premier League
   - German Bundesliga
