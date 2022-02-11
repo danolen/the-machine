@@ -1,0 +1,61 @@
+Jul 14
+
+Depth Chart updates through July 14
+
+Jul 11
+
+Depth Chart updates through July 11
+
+
+Jul 05
+
+Depth Chart updates through July 4
+
+Mar 26
+
+Depth Chart updates through March 26
+
+Mar 06
+
+Depth Chart updates through March 06
+
+Mar 02
+
+Depth Chart updates through March 01
+
+Feb 28
+
+Adjusted SB and CS projections
+
+Feb 23
+
+Depth Chart updates through February 23
+
+Feb 09 
+
+Added Shun Yamaguchi & Brett Honeywell to pitching projections
+Added Darin Ruf to hitter projections
+Adjusted projections for NPB/KBO pitchers 
+Added pitching columns: holds, hbp, first_name, last_name  
+Added batting columns: ab, games*, hits, hbp, total bases, first_name, last_name 
+
+*some oddities in the non-DC players, will be fixed in a later version 
+
+
+Feb 07 
+Pitchers added: ~ 4000
+Batters added: none 
+
+Feb 06
+Added "mlbid" field to both reports
+Broke slash line out into three fields for batters
+Brett Gardner added
+Curtis Granderson dropped 
+GB percentage for pitchers re-formatted as a % 
+Various number formatting clean-ups
+Split pitchers and hitters into separate files
+Added tabs for PECOTA Percentiles in each
+
+
+Feb 05
+initial release
