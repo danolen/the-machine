@@ -456,7 +456,7 @@ upcoming <- fixtures %>%
   mutate(xG = 0, Home_Score = 0, Away_Score = 0, xG.1 = 0)
 
 scores <- fixtures %>%
-  filter(is.na(xG) == FALSE & xG != "") %>% # is.na(Home_Score) == FALSE & Home_Score != ""
+  filter(is.na(xG) == FALSE & xG != "" & is.na(Home_Score) == FALSE & Home_Score != "") %>%
   arrange(Date, Time)
 
 scores$xG <- as.numeric(scores$xG)
@@ -464,7 +464,15 @@ scores$Home_Score <- as.numeric(scores$Home_Score)
 scores$Away_Score <- as.numeric(scores$Away_Score)
 scores$xG.1 <- as.numeric(scores$xG.1)
 
-scores <- rbind(scores, upcoming)
+scores <- bind_rows(scores, upcoming)
+
+metrics <- scores %>%
+  group_by(Home, League, Season) %>%
+  dplyr::mutate(HomexGHome = cumsum(xG) - xG,
+                HomeGHome = cumsum(Home_Score) - Home_Score,
+                HomexGAHome = cumsum(xG.1) - xG.1,
+                HomeGAHome = cumsum(Away_Score) - Away_Score,
+                HomeGPHome = row_number() - 1)
 
 averageif<-function(df,id,year,tiime,valuestoaverage, new_column_name){
   df<- df[order(df[id],df[tiime]),]
