@@ -1,9 +1,7 @@
 ### Soccer betting model
 
 library("pacman")
-p_load("tidyverse", "rvest", "xml2", "readr", "janitor", "lubridate", "plyr", "h2o")
-
-# Get xGoals data from FBRef.com
+p_load("rvest", "xml2", "readr", "janitor", "lubridate", "plyr", "tidyverse", "caret")
 
 urls <- c("https://fbref.com/en/comps/9/schedule/Premier-League-Scores-and-Fixtures",
           "https://fbref.com/en/comps/9/10728/schedule/2020-2021-Premier-League-Scores-and-Fixtures", 
@@ -30,7 +28,7 @@ urls <- c("https://fbref.com/en/comps/9/schedule/Premier-League-Scores-and-Fixtu
           "https://fbref.com/en/comps/13/3243/schedule/2019-2020-Ligue-1-Scores-and-Fixtures",
           "https://fbref.com/en/comps/13/2104/schedule/2018-2019-Ligue-1-Scores-and-Fixtures",
           "https://fbref.com/en/comps/13/1632/schedule/2017-2018-Ligue-1-Scores-and-Fixtures",
-          "https://fbref.com/en/comps/22/schedule/Major-League-Soccer-Scores-and-Fixtures",
+          "https://fbref.com/en/comps/22/11006/schedule/2021-Major-League-Soccer-Scores-and-Fixtures",
           "https://fbref.com/en/comps/22/10090/schedule/2020-Major-League-Soccer-Scores-and-Fixtures",
           "https://fbref.com/en/comps/22/2798/schedule/2019-Major-League-Soccer-Scores-and-Fixtures",
           "https://fbref.com/en/comps/22/1759/schedule/2018-Major-League-Soccer-Scores-and-Fixtures",
@@ -464,69 +462,91 @@ scores$Home_Score <- as.numeric(scores$Home_Score)
 scores$Away_Score <- as.numeric(scores$Away_Score)
 scores$xG.1 <- as.numeric(scores$xG.1)
 
-scores <- bind_rows(scores, upcoming)
+scores <- bind_rows(scores, upcoming) 
 
-metrics <- scores %>%
-  group_by(Home, League, Season) %>%
-  dplyr::mutate(HomexGHome = cumsum(xG) - xG,
-                HomeGHome = cumsum(Home_Score) - Home_Score,
-                HomexGAHome = cumsum(xG.1) - xG.1,
-                HomeGAHome = cumsum(Away_Score) - Away_Score,
-                HomeGPHome = row_number() - 1)
+home <- scores %>% 
+  mutate(ID = gsub(" ", "", gsub("[[:punct:]]","",paste0(Home, Away, Date, Time)), fixed = TRUE)) %>% 
+  select(ID, Date, Day, Time, League, Season, Home, Away, xG:xG.1) %>% 
+  mutate(Home_or_Away = "Home") %>% 
+  select(ID:Away, Home_or_Away, xG, xG.1, Home_Score, Away_Score) %>% 
+  rename(Team = Home,
+         Opponent = Away,
+         xGA = xG.1,
+         Goals = Home_Score,
+         GoalsAllowed = Away_Score)
 
-averageif<-function(df,id,year,tiime,valuestoaverage, new_column_name){
-  df<- df[order(df[id],df[tiime]),]
-  z<-dim(df)[2]+1
-  df[,z]<-0;colnames(df)[z]<-new_column_name
-  n<-dim(df)[1]
-  for(i in 1:n){
-    df[i,z]<-mean(df[df[,id]==df[i,id]&df[,year]==df[i,year]&df[,tiime]<df[i,tiime],valuestoaverage])
-  }
-  return(df)
-}
+away <- scores %>% 
+  mutate(ID = gsub(" ", "", gsub("[[:punct:]]","",paste0(Home, Away, Date, Time)), fixed = TRUE)) %>% 
+  select(ID, Date, Day, Time, League, Season, Away, Home, xG:xG.1) %>% 
+  mutate(Home_or_Away = "Away") %>% 
+  select(ID:Home, Home_or_Away, xG.1, xG, Away_Score, Home_Score) %>% 
+  rename(Team = Away,
+         Opponent = Home,
+         xG = xG.1,
+         xGA = xG,
+         Goals = Away_Score,
+         GoalsAllowed = Home_Score)
 
-scores <- averageif(scores, 'Home', 'Season', 'Date', 'xG', 'HomexGHome') %>%
-  averageif('Home', 'Season', 'Date', 'xG.1', 'HomexGAHome') %>%
-  averageif('Away', 'Season', 'Date', 'xG.1', 'AwayxGAway') %>%
-  averageif('Away', 'Season', 'Date', 'xG', 'AwayxGAAway')
-  
-scores$League <- as.factor(scores$League)
+metrics <- bind_rows(home, away) %>% 
+  arrange(Date, Time, League, ID) %>% 
+  mutate(Team = trimws(case_when(League %in% c('UCL', 'UEL') & Home_or_Away == "Home" ~ substr(Team, 1, nchar(Team)-3),
+                                 League %in% c('UCL', 'UEL') & Home_or_Away == "Away" ~ substr(Team, 4, nchar(Team)),
+                                 TRUE ~ Team), which = c("both"))) %>% 
+  group_by(Team, League, Season, Home_or_Away) %>% 
+  mutate(SplitxG = cumsum(xG) - xG,
+         SplitxGA = cumsum(xGA) - xGA,
+         SplitGoals = cumsum(Goals) - Goals,
+         SplitGoalsAllowed = cumsum(GoalsAllowed) - GoalsAllowed,
+         SplitGP = row_number() - 1,
+         SplitxG_roll4 = (lag(xG,1)+lag(xG,2)+lag(xG,3)+lag(xG,4))/4,
+         SplitxGA_roll4 = (lag(xGA,1)+lag(xGA,2)+lag(xGA,3)+lag(xGA,4))/4,
+         SplitGoals_roll4 = (lag(Goals,1)+lag(Goals,2)+lag(Goals,3)+lag(Goals,4))/4,
+         SplitGoalsAllowed_roll4 = (lag(GoalsAllowed,1)+lag(GoalsAllowed,2)+lag(GoalsAllowed,3)+lag(GoalsAllowed,4))/4) %>% 
+  group_by(Team, League, Season) %>% 
+  mutate(SeasonxG = cumsum(xG) - xG,
+         SeasonxGA = cumsum(xGA) - xGA,
+         SeasonGoals = cumsum(Goals) - Goals,
+         SeasonGoalsAllowed = cumsum(GoalsAllowed) - GoalsAllowed,
+         SeasonGP = row_number() - 1,
+         SeasonxG_roll4 = (lag(xG,1)+lag(xG,2)+lag(xG,3)+lag(xG,4))/4,
+         SeasonxGA_roll4 = (lag(xGA,1)+lag(xGA,2)+lag(xGA,3)+lag(xGA,4))/4,
+         SeasonGoals_roll4 = (lag(Goals,1)+lag(Goals,2)+lag(Goals,3)+lag(Goals,4))/4,
+         SeasonGoalsAllowed_roll4 = (lag(GoalsAllowed,1)+lag(GoalsAllowed,2)+lag(GoalsAllowed,3)+lag(GoalsAllowed,4))/4) %>% 
+  ungroup() %>% 
+  mutate(SplitxG = SplitxG / SplitGP,
+         SplitxGA = SplitxGA / SplitGP,
+         SplitGoals = SplitGoals / SplitGP,
+         SplitGoalsAllowed = SplitGoalsAllowed / SplitGP,
+         SeasonxG = SeasonxG / SeasonGP,
+         SeasonxGA = SeasonxGA / SeasonGP,
+         SeasonGoals = SeasonGoals / SeasonGP,
+         SeasonGoalsAllowed = SeasonGoalsAllowed / SeasonGP) %>% 
+  replace(is.na(.), 0)
 
-train <- filter(scores, Date < today)
-upcoming_games <- filter(scores, Date >= today)
+train_df <- metrics %>% 
+  left_join(metrics, by = c("ID" = "ID", "Opponent" = "Team"), suffix = c("", "_Opp")) %>% 
+  select(-(Date_Opp:GoalsAllowed_Opp))
 
-x_home <- c('HomexGHome', 'AwayxGAAway', 'League')
-x_away <- c('AwayxGAway', 'HomexGAHome', 'League')
-y_home <- 'Home_Score'
-y_away <- 'Away_Score'
+train <- train_df %>% 
+  filter(SeasonGP != 0 & SeasonGP_Opp != 0 & !(Season %in% c('2021-2022', '2021')))
+test <- train_df %>% 
+  filter(SeasonGP != 0 & SeasonGP_Opp != 0 & (Season %in% c('2021-2022', '2021')) & Date < Sys.Date() - 1)
+upcoming_games <- filter(train_df, Date >= today - 1)
 
-h2o.init()
+set.seed(1234)
+gbm_mod <- train(Goals ~ . -ID -Date -Day -Time -League -Season -Team -Opponent -xG -xGA -GoalsAllowed,
+                 data = train,
+                 method = "gbm",
+                 trControl = trainControl(method = "repeatedcv",
+                                          number = 10))
 
-train <- as.h2o(train)
 
-home_model <- h2o.automl(x = x_home, y = y_home,
-                         training_frame = train,
-                         nfolds = 10)
-home_lb <- home_model@leaderboard
-home_leader <- home_model@leader
-saved_path_home <- h2o.saveModel(object = home_leader, path = getwd(), force = TRUE)
-print(saved_path_home) # Save this somewhere
-# C:\\Users\\danie\\Desktop\\Sports Stuff\\Soccer Betting\\StackedEnsemble_AllModels_AutoML_20210713_170146
-# RMSE (10/14): 1.255557
-# RMSE (11/15): 1.253940
 
-away_model <- h2o.automl(x = x_away, y = y_away,
-                         training_frame = train,
-                         nfolds = 10)
-away_lb <- away_model@leaderboard
-away_leader <- away_model@leader
-saved_path_away <- h2o.saveModel(object = away_leader, path = getwd(), force = TRUE)
-print(saved_path_away) # Save this somewhere
-# C:\\Users\\danie\\Desktop\\Sports Stuff\\Soccer Betting\\StackedEnsemble_AllModels_AutoML_20210713_173827
-# RMSE (10/14): 1.132495
-# RMSE (11/15): 1.133055
 
-h2o.shutdown(prompt = FALSE)
+
+
+
+
 
 
 
