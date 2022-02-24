@@ -539,7 +539,72 @@ gbm_mod <- train(Goals ~ . -ID -Date -Day -Time -League -Season -Team -Opponent 
                  method = "gbm",
                  trControl = trainControl(method = "repeatedcv",
                                           number = 10))
+set.seed(1234)
+cub_mod <- train(Goals ~ . -ID -Date -Day -Time -League -Season -Team -Opponent -xG -xGA -GoalsAllowed,
+                 data = train,
+                 method = "cubist",
+                 trControl = trainControl(method = "repeatedcv",
+                                          number = 10),
+                 tuneGrid = expand.grid(.committees=20,
+                                        .neighbors=9))
+set.seed(1234)
+rf_mod <- train(Goals ~ . -ID -Date -Day -Time -League -Season -Team -Opponent -xG -xGA -GoalsAllowed,
+                 data = train,
+                 method = "ranger",
+                 trControl = trainControl(method = "repeatedcv",
+                                          number = 10),
+                 tuneGrid = expand.grid(.mtry = c(12,18,24),
+                                        .splitrule = c("variance", "extratrees"),
+                                        .min.node.size = c(5,10)))
+set.seed(1234)
+svm_mod <- train(Goals ~ . -ID -Date -Day -Time -League -Season -Team -Opponent -xG -xGA -GoalsAllowed,
+                data = train,
+                method = "svmRadial",
+                trControl = trainControl(method = "repeatedcv",
+                                         number = 10),
+                tuneLength = 15,
+                preProc = c("center", "scale"))
+set.seed(1234)
+ctree_mod <- train(Goals ~ . -ID -Date -Day -Time -League -Season -Team -Opponent -xG -xGA -GoalsAllowed,
+                 data = train,
+                 method = "ctree",
+                 trControl = trainControl(method = "repeatedcv",
+                                          number = 10),
+                 tuneLength = 10)
+set.seed(1234)
+pls_mod <- train(Goals ~ . -ID -Date -Day -Time -League -Season -Team -Opponent -xG -xGA -GoalsAllowed,
+                 data = train,
+                 method = "pls",
+                 trControl = trainControl(method = "repeatedcv",
+                                          number = 10),
+                 tuneLength = 15,
+                 preProc = c("center", "scale"))
+set.seed(1234)
+lm_mod <- train(Goals ~ . -ID -Date -Day -Time -League -Season -Team -Opponent -xG -xGA -GoalsAllowed,
+                 data = train,
+                 method = "lm",
+                 trControl = trainControl(method = "repeatedcv",
+                                          number = 10))
+set.seed(1234)
+allResamples <- resamples(list("GBM" = gbm_mod,
+                               "Cubist" = cub_mod,
+                               "RF" = rf_mod,
+                               "SVM" = svm_mod,
+                               "CTree" = ctree_mod,
+                               "PLS" = pls_mod,
+                               "LM" = lm_mod))
 
+parallelplot(allResamples, metric = "RMSE")
+parallelplot(allResamples)
+parallelplot(allResamples, metric = "Rsquared")
+
+saveRDS(gbm_mod, "train_gbm.rds")
+saveRDS(cub_mod, "train_cub.rds")
+saveRDS(rf_mod, "train_rf.rds")
+saveRDS(svm_mod, "train_svm.rds")
+saveRDS(ctree_mod, "train_ctree.rds")
+saveRDS(pls_mod, "train_pls.rds")
+saveRDS(lm_mod, "train_lm.rds")
 
 
 
