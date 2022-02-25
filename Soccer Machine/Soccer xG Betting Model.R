@@ -528,19 +528,42 @@ train_df <- metrics %>%
   select(-(Date_Opp:GoalsAllowed_Opp))
 
 train <- train_df %>% 
-  filter(SeasonGP > 3 & SeasonGP_Opp > 3 & !(Season %in% c('2021-2022', '2021')))
-test <- train_df %>% 
-  filter(SeasonGP > 3 & SeasonGP_Opp > 3 & (Season %in% c('2021-2022', '2021')) & Date < Sys.Date() - 1)
-upcoming_games <- filter(train_df, Date >= today - 1)
+  filter(SeasonGP > 3 & SeasonGP_Opp > 3 & !(Season %in% c('2021-2022', '2021')))%>% 
+  select(-ID,
+         -Date,
+         -Day,
+         -Time, 
+         -Team,
+         -Opponent,
+         -xG,
+         -xGA,
+         -GoalsAllowed)
+test <- train_df %>%
+  filter(SeasonGP > 3 & SeasonGP_Opp > 3 & (Season %in% c('2021-2022', '2021')) & Date < today) %>% 
+  select(-ID,
+         -Date,
+         -Day,
+         -Time, 
+         -Team,
+         -Opponent,
+         -xG,
+         -xGA,
+         -GoalsAllowed)
+set.seed(1234)
+picked <- sample(seq_len(nrow(test)), 1500)
+add <- test[-picked,]
+test <- test[picked,]
+train <- bind_rows(train, add)
+upcoming_games <- filter(train_df, Date >= today)
 
 set.seed(1234)
-gbm_mod <- train(Goals ~ . -ID -Date -Day -Time -Team -Opponent -xG -xGA -GoalsAllowed,
+gbm_mod <- train(Goals ~ .,
                  data = train,
                  method = "gbm",
                  trControl = trainControl(method = "repeatedcv",
                                           number = 10))
 set.seed(1234)
-cub_mod <- train(Goals ~ . -ID -Date -Day -Time -Team -Opponent -xG -xGA -GoalsAllowed,
+cub_mod <- train(Goals ~ .,
                  data = train,
                  method = "cubist",
                  trControl = trainControl(method = "repeatedcv",
@@ -548,7 +571,7 @@ cub_mod <- train(Goals ~ . -ID -Date -Day -Time -Team -Opponent -xG -xGA -GoalsA
                  tuneGrid = expand.grid(.committees=20,
                                         .neighbors=9))
 set.seed(1234)
-rf_mod <- train(Goals ~ . -ID -Date -Day -Time -Team -Opponent -xG -xGA -GoalsAllowed,
+rf_mod <- train(Goals ~ .,
                  data = train,
                  method = "ranger",
                  trControl = trainControl(method = "repeatedcv",
@@ -557,7 +580,7 @@ rf_mod <- train(Goals ~ . -ID -Date -Day -Time -Team -Opponent -xG -xGA -GoalsAl
                                         .splitrule = c("variance", "extratrees"),
                                         .min.node.size = c(5,10)))
 # set.seed(1234)
-# svm_mod <- train(Goals ~ . -ID -Date -Day -Time -Team -Opponent -xG -xGA -GoalsAllowed,
+# svm_mod <- train(Goals ~ .,
 #                 data = train,
 #                 method = "svmRadial",
 #                 trControl = trainControl(method = "repeatedcv",
@@ -565,14 +588,14 @@ rf_mod <- train(Goals ~ . -ID -Date -Day -Time -Team -Opponent -xG -xGA -GoalsAl
 #                 tuneLength = 10,
 #                 preProc = c("center", "scale"))
 set.seed(1234)
-ctree_mod <- train(Goals ~ . -ID -Date -Day -Time -Team -Opponent -xG -xGA -GoalsAllowed,
+ctree_mod <- train(Goals ~ .,
                  data = train,
                  method = "ctree",
                  trControl = trainControl(method = "repeatedcv",
                                           number = 10),
                  tuneLength = 10)
 set.seed(1234)
-pls_mod <- train(Goals ~ . -ID -Date -Day -Time -Team -Opponent -xG -xGA -GoalsAllowed,
+pls_mod <- train(Goals ~ .,
                  data = train,
                  method = "pls",
                  trControl = trainControl(method = "repeatedcv",
@@ -580,7 +603,7 @@ pls_mod <- train(Goals ~ . -ID -Date -Day -Time -Team -Opponent -xG -xGA -GoalsA
                  tuneLength = 15,
                  preProc = c("center", "scale"))
 set.seed(1234)
-lm_mod <- train(Goals ~ . -ID -Date -Day -Time -Team -Opponent -xG -xGA -GoalsAllowed,
+lm_mod <- train(Goals ~ .,
                  data = train,
                  method = "lm",
                  trControl = trainControl(method = "repeatedcv",
@@ -641,11 +664,16 @@ test_performance$pls_G <- predict(pls_mod, test_performance)
 test_performance$lm_G <- predict(lm_mod, test_performance)
 test_performance <- test_performance %>% 
   mutate(equal_weight = (gbm_G + cub_G + rf_G + ctree_G + pls_G + lm_G) / 6)
-ens_lm <- lm(Goals ~ gbm_G + cub_G + rf_G + ctree_G + pls_G + lm_G, test_performance)
-summary(ens_lm)
 test_performance$linear_weight <- predict(ens_lm, test_performance)
 
 summary(test_performance %>% select(Goals, gbm_G:linear_weight))
 
-
+RMSE(test_performance$gbm_G, test_performance$Goals)
+RMSE(test_performance$cub_G, test_performance$Goals)
+RMSE(test_performance$rf_G, test_performance$Goals)
+RMSE(test_performance$ctree_G, test_performance$Goals)
+RMSE(test_performance$pls_G, test_performance$Goals)
+RMSE(test_performance$lm_G, test_performance$Goals)
+RMSE(test_performance$equal_weight, test_performance$Goals)
+RMSE(test_performance$linear_weight, test_performance$Goals)
 
