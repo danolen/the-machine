@@ -526,42 +526,45 @@ metrics <- bind_rows(home, away) %>%
 train_df <- metrics %>% 
   left_join(metrics, by = c("ID" = "ID", "Opponent" = "Team"), suffix = c("", "_Opp")) %>% 
   select(-(Date_Opp:GoalsAllowed_Opp)) %>% 
-  mutate(Win = case_when(Goals > GoalsAllowed ~ 1,
-                         TRUE ~ 0),
-         Draw = case_when(Goals == GoalsAllowed ~ 1,
-                          TRUE ~ 0),
-         WinMinus1.5 = case_when(Goals - 1.5 > GoalsAllowed ~ 1,
-                                 TRUE ~ 0),
-         WinMinus2.5 = case_when(Goals - 2.5 > GoalsAllowed ~ 1,
-                                 TRUE ~ 0),
-         WinMinus3.5 = case_when(Goals - 3.5 > GoalsAllowed ~ 1,
-                                 TRUE ~ 0),
-         WinPlus0.5 = case_when(Goals - 0.5 > GoalsAllowed ~ 1,
-                                TRUE ~ 0),
-         WinPlus1.5 = case_when(Goals - 1.5 > GoalsAllowed ~ 1,
-                                TRUE ~ 0),
-         WinPlus2.5 = case_when(Goals - 2.5 > GoalsAllowed ~ 1,
-                                TRUE ~ 0),
-         WinPlus3.5 = case_when(Goals - 3.5 > GoalsAllowed ~ 1,
-                                TRUE ~ 0),
-         TotalOver1.5 = case_when(Goals + GoalsAllowed > 1.5 ~ 1,
-                                  TRUE ~ 0),
-         TotalOver2.5 = case_when(Goals + GoalsAllowed > 2.5 ~ 1,
-                                  TRUE ~ 0),
-         TotalOver3.5 = case_when(Goals + GoalsAllowed > 3.5 ~ 1,
-                                  TRUE ~ 0),
-         TotalOver4.5 = case_when(Goals + GoalsAllowed > 4.5 ~ 1,
-                                  TRUE ~ 0),
-         BTTS = case_when(Goals > 0 & GoalsAllowed > 0 ~ 1,
-                          TRUE ~ 0),
-         TTOver0.5 = case_when(Goals > 0 ~ 1,
-                               TRUE ~ 0),
-         TTOver1.5 = case_when(Goals > 1 ~ 1,
-                               TRUE ~ 0),
-         TTOver2.5 = case_when(Goals > 2 ~ 1,
-                               TRUE ~ 0),
-         TTOver3.5 = case_when(Goals > 3 ~ 1,
-                               TRUE ~ 0))
+  mutate(Outcome = as.factor(case_when(Goals > GoalsAllowed ~ 'Win',
+                                       Goals == GoalsAllowed ~ 'Draw',
+                                       TRUE ~ 'Lose')),
+         # Win = as.factor(case_when(Goals > GoalsAllowed ~ 1,
+         #                 TRUE ~ 0)),
+         # Draw = as.factor(case_when(Goals == GoalsAllowed ~ 1,
+         #                  TRUE ~ 0)),
+         WinMinus1.5 = as.factor(case_when(Goals - 1.5 > GoalsAllowed ~ 1,
+                                 TRUE ~ 0)),
+         WinMinus2.5 = as.factor(case_when(Goals - 2.5 > GoalsAllowed ~ 1,
+                                 TRUE ~ 0)),
+         WinMinus3.5 = as.factor(case_when(Goals - 3.5 > GoalsAllowed ~ 1,
+                                 TRUE ~ 0)),
+         WinPlus0.5 = as.factor(case_when(Goals - 0.5 > GoalsAllowed ~ 1,
+                                TRUE ~ 0)),
+         WinPlus1.5 = as.factor(case_when(Goals - 1.5 > GoalsAllowed ~ 1,
+                                TRUE ~ 0)),
+         WinPlus2.5 = as.factor(case_when(Goals - 2.5 > GoalsAllowed ~ 1,
+                                TRUE ~ 0)),
+         WinPlus3.5 = as.factor(case_when(Goals - 3.5 > GoalsAllowed ~ 1,
+                                TRUE ~ 0)),
+         TotalOver1.5 = as.factor(case_when(Goals + GoalsAllowed > 1.5 ~ 1,
+                                  TRUE ~ 0)),
+         TotalOver2.5 = as.factor(case_when(Goals + GoalsAllowed > 2.5 ~ 1,
+                                  TRUE ~ 0)),
+         TotalOver3.5 = as.factor(case_when(Goals + GoalsAllowed > 3.5 ~ 1,
+                                  TRUE ~ 0)),
+         TotalOver4.5 = as.factor(case_when(Goals + GoalsAllowed > 4.5 ~ 1,
+                                  TRUE ~ 0)),
+         BTTS = as.factor(case_when(Goals > 0 & GoalsAllowed > 0 ~ 1,
+                          TRUE ~ 0)),
+         TTOver0.5 = as.factor(case_when(Goals > 0 ~ 1,
+                               TRUE ~ 0)),
+         TTOver1.5 = as.factor(case_when(Goals > 1 ~ 1,
+                               TRUE ~ 0)),
+         TTOver2.5 = as.factor(case_when(Goals > 2 ~ 1,
+                               TRUE ~ 0)),
+         TTOver3.5 = as.factor(case_when(Goals > 3 ~ 1,
+                               TRUE ~ 0)))
 
 train <- train_df %>% 
   filter(SeasonGP > 3 & SeasonGP_Opp > 3 & !(Season %in% c('2021-2022', '2021')))%>% 
@@ -725,6 +728,7 @@ train_prob <- train_df %>%
          -Opponent,
          -xG,
          -xGA,
+         -Goals,
          -GoalsAllowed)
 test_prob <- train_df %>%
   filter(SeasonGP > 3 & SeasonGP_Opp > 3 & (Season %in% c('2021-2022', '2021')) & Date < today) %>% 
@@ -736,11 +740,41 @@ test_prob <- train_df %>%
          -Opponent,
          -xG,
          -xGA,
+         -Goals,
          -GoalsAllowed)
 set.seed(1234)
-picked_prob <- sample(seq_len(nrow(test)), 1500)
-add_prob <- test[-picked,]
-test_prob <- test[picked,]
-train_prob <- bind_rows(train, add)
+picked_prob <- sample(seq_len(nrow(test_prob)), 1500)
+add_prob <- test_prob[-picked_prob,]
+test_prob <- test_prob[picked_prob,]
+train_prob <- bind_rows(train_prob, add_prob)
 upcoming_games_prob <- filter(train_df, Date >= today)
+
+Outcome_df <- train_prob %>% 
+  filter(Home_or_Away == "Home") %>% 
+  select(-Home_or_Away, -(WinMinus1.5:TTOver3.5))
+
+set.seed(1234)
+win_glm <- train(Outcome ~ .,
+                 data = Outcome_df,
+                 method = "glm",
+                 family = "binomial",
+                 trControl = trainControl(method = "repeatedcv",
+                                          number = 10))
+set.seed(1234)
+win_gbm <- train(Outcome ~ .,
+                 data = Outcome_df,
+                 method = "gbm",
+                 trControl = trainControl(method = "repeatedcv",
+                                          number = 10))
+set.seed(1234)
+win_rf <- train(Outcome ~ .,
+                data = Outcome_df,
+                method = "ranger",
+                trControl = trainControl(method = "repeatedcv",
+                                         number = 10),
+                tuneGrid = expand.grid(.mtry = c(10,15,20),
+                                       .splitrule = c("gini", "extratrees"),
+                                       .min.node.size = c(5,10)))
+
+Outcome_df$preds <- predict(win_gbm, Outcome_df, type = "prob")
 
