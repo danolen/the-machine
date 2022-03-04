@@ -1,7 +1,12 @@
 ### Soccer betting model
-
-library("pacman")
-p_load("rvest", "xml2", "readr", "janitor", "lubridate", "plyr", "tidyverse", "caret")
+library(rvest)
+library(xml2)
+library(readr)
+library(janitor)
+library(lubridate)
+library(plyr)
+library(tidyverse)
+library(caret)
 
 urls <- c("https://fbref.com/en/comps/9/schedule/Premier-League-Scores-and-Fixtures",
           "https://fbref.com/en/comps/9/10728/schedule/2020-2021-Premier-League-Scores-and-Fixtures", 
@@ -529,20 +534,30 @@ train_df <- metrics %>%
   mutate(Outcome = as.factor(case_when(Goals > GoalsAllowed ~ 'Win',
                                        Goals == GoalsAllowed ~ 'Draw',
                                        TRUE ~ 'Lose')),
-         # Win = as.factor(case_when(Goals > GoalsAllowed ~ 1,
-         #                 TRUE ~ 0)),
-         # Draw = as.factor(case_when(Goals == GoalsAllowed ~ 1,
-         #                  TRUE ~ 0)),
-         WinMinus1.5 = as.factor(case_when(Goals - 1.5 > GoalsAllowed ~ 1,
-                                 TRUE ~ 0)),
-         WinMinus2.5 = as.factor(case_when(Goals - 2.5 > GoalsAllowed ~ 1,
-                                 TRUE ~ 0)),
-         WinMinus3.5 = as.factor(case_when(Goals - 3.5 > GoalsAllowed ~ 1,
-                                 TRUE ~ 0)),
-         WinPlus0.5 = as.factor(case_when(Goals - 0.5 > GoalsAllowed ~ 1,
-                                TRUE ~ 0)),
-         WinPlus1.5 = as.factor(case_when(Goals - 1.5 > GoalsAllowed ~ 1,
-                                TRUE ~ 0)),
+         Minus0.5 = as.factor(case_when(Goals - 0.5 > GoalsAllowed ~ "Win",
+                                        TRUE ~ "Lose")),
+         Minus1 = as.factor(case_when(Goals - 1 > GoalsAllowed ~ "Win",
+                                      Goals - 1 == GoalsAllowed ~ "Push",
+                                      TRUE ~ "Lose")),
+         Minus1.5 = as.factor(case_when(Goals - 1.5 > GoalsAllowed ~ "Win",
+                                        TRUE ~ "Lose")),
+         Minus2 = as.factor(case_when(Goals - 2 > GoalsAllowed ~ "Win",
+                                      Goals - 2 == GoalsAllowed ~ "Push",
+                                      TRUE ~ "Lose")),
+         Minus2.5 = as.factor(case_when(Goals - 2.5 > GoalsAllowed ~ "Win",
+                                        TRUE ~ "Lose")),
+         Minus3 = as.factor(case_when(Goals - 3 > GoalsAllowed ~ "Win",
+                                      Goals - 3 == GoalsAllowed ~ "Push",
+                                      TRUE ~ "Lose")),
+         Minus3.5 = as.factor(case_when(Goals - 3.5 > GoalsAllowed ~ "Win",
+                                           TRUE ~ "Push")),
+         Plus0.5 = as.factor(case_when(Goals + 0.5 > GoalsAllowed ~ "Win",
+                                       TRUE ~ "Lose")),
+         Plus1 = as.factor(case_when(Goals + 1 > GoalsAllowed ~ "Win",
+                                     Goals + 1 == GoalsAllowed ~ "Push",
+                                     TRUE ~ "Lose")),
+         Plus1.5 = as.factor(case_when(Goals + 1.5 > GoalsAllowed ~ 1,
+                                       TRUE ~ 0)),
          WinPlus2.5 = as.factor(case_when(Goals - 2.5 > GoalsAllowed ~ 1,
                                 TRUE ~ 0)),
          WinPlus3.5 = as.factor(case_when(Goals - 3.5 > GoalsAllowed ~ 1,
@@ -597,26 +612,27 @@ test <- test[picked,]
 train <- bind_rows(train, add)
 upcoming_games <- filter(train_df, Date >= today)
 
+fitControl <- trainControl(method = "repeatedcv",
+                           number = 10,
+                           allowParallel = TRUE)
+
 set.seed(1234)
 gbm_mod <- train(Goals ~ .,
                  data = train,
                  method = "gbm",
-                 trControl = trainControl(method = "repeatedcv",
-                                          number = 10))
+                 trControl = fitControl)
 set.seed(1234)
 cub_mod <- train(Goals ~ .,
                  data = train,
                  method = "cubist",
-                 trControl = trainControl(method = "repeatedcv",
-                                          number = 10),
+                 trControl = fitControl,
                  tuneGrid = expand.grid(.committees=20,
                                         .neighbors=9))
 set.seed(1234)
 rf_mod <- train(Goals ~ .,
                  data = train,
                  method = "ranger",
-                 trControl = trainControl(method = "repeatedcv",
-                                          number = 10),
+                 trControl = fitControl,
                  tuneGrid = expand.grid(.mtry = c(10,15,20),
                                         .splitrule = c("variance", "extratrees"),
                                         .min.node.size = c(5,10)))
@@ -624,31 +640,27 @@ rf_mod <- train(Goals ~ .,
 # svm_mod <- train(Goals ~ .,
 #                 data = train,
 #                 method = "svmRadial",
-#                 trControl = trainControl(method = "repeatedcv",
-#                                          number = 10),
+#                 trControl = fitControl,
 #                 tuneLength = 10,
 #                 preProc = c("center", "scale"))
 set.seed(1234)
 ctree_mod <- train(Goals ~ .,
                  data = train,
                  method = "ctree",
-                 trControl = trainControl(method = "repeatedcv",
-                                          number = 10),
+                 trControl = fitControl,
                  tuneLength = 10)
 set.seed(1234)
 pls_mod <- train(Goals ~ .,
                  data = train,
                  method = "pls",
-                 trControl = trainControl(method = "repeatedcv",
-                                          number = 10),
+                 trControl = fitControl,
                  tuneLength = 15,
                  preProc = c("center", "scale"))
 set.seed(1234)
 lm_mod <- train(Goals ~ .,
                  data = train,
                  method = "lm",
-                 trControl = trainControl(method = "repeatedcv",
-                                          number = 10))
+                 trControl = fitControl)
 set.seed(1234)
 allResamples <- resamples(list("GBM" = gbm_mod,
                                "Cubist" = cub_mod,
@@ -754,27 +766,25 @@ Outcome_df <- train_prob %>%
   select(-Home_or_Away, -(WinMinus1.5:TTOver3.5))
 
 set.seed(1234)
-win_glm <- train(Outcome ~ .,
+outcome_glm <- train(Outcome ~ .,
                  data = Outcome_df,
                  method = "glm",
                  family = "binomial",
-                 trControl = trainControl(method = "repeatedcv",
-                                          number = 10))
+                 trControl = fitControl)
 set.seed(1234)
-win_gbm <- train(Outcome ~ .,
+outcome_gbm <- train(Outcome ~ .,
                  data = Outcome_df,
                  method = "gbm",
-                 trControl = trainControl(method = "repeatedcv",
-                                          number = 10))
+                 trControl = fitControl)
 set.seed(1234)
-win_rf <- train(Outcome ~ .,
+outcome_rf <- train(Outcome ~ .,
                 data = Outcome_df,
                 method = "ranger",
-                trControl = trainControl(method = "repeatedcv",
-                                         number = 10),
+                trControl = fitControl,
                 tuneGrid = expand.grid(.mtry = c(10,15,20),
                                        .splitrule = c("gini", "extratrees"),
                                        .min.node.size = c(5,10)))
 
-Outcome_df$preds <- predict(win_gbm, Outcome_df, type = "prob")
+Outcome_df$preds <- predict(outcome_gbm, Outcome_df, type = "prob")
 
+saveRDS(outcome_gbm, "outcome_gbm.rds")
