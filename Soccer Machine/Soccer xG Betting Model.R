@@ -7,6 +7,9 @@ library(lubridate)
 library(plyr)
 library(tidyverse)
 library(caret)
+library(parallel)
+library(doParallel)
+library(beepr)
 
 urls <- c("https://fbref.com/en/comps/9/schedule/Premier-League-Scores-and-Fixtures",
           "https://fbref.com/en/comps/9/10728/schedule/2020-2021-Premier-League-Scores-and-Fixtures", 
@@ -550,36 +553,60 @@ train_df <- metrics %>%
                                       Goals - 3 == GoalsAllowed ~ "Push",
                                       TRUE ~ "Lose")),
          Minus3.5 = as.factor(case_when(Goals - 3.5 > GoalsAllowed ~ "Win",
-                                           TRUE ~ "Push")),
+                                        TRUE ~ "Lose")),
          Plus0.5 = as.factor(case_when(Goals + 0.5 > GoalsAllowed ~ "Win",
                                        TRUE ~ "Lose")),
          Plus1 = as.factor(case_when(Goals + 1 > GoalsAllowed ~ "Win",
                                      Goals + 1 == GoalsAllowed ~ "Push",
                                      TRUE ~ "Lose")),
-         Plus1.5 = as.factor(case_when(Goals + 1.5 > GoalsAllowed ~ 1,
-                                       TRUE ~ 0)),
-         WinPlus2.5 = as.factor(case_when(Goals - 2.5 > GoalsAllowed ~ 1,
-                                TRUE ~ 0)),
-         WinPlus3.5 = as.factor(case_when(Goals - 3.5 > GoalsAllowed ~ 1,
-                                TRUE ~ 0)),
-         TotalOver1.5 = as.factor(case_when(Goals + GoalsAllowed > 1.5 ~ 1,
-                                  TRUE ~ 0)),
-         TotalOver2.5 = as.factor(case_when(Goals + GoalsAllowed > 2.5 ~ 1,
-                                  TRUE ~ 0)),
-         TotalOver3.5 = as.factor(case_when(Goals + GoalsAllowed > 3.5 ~ 1,
-                                  TRUE ~ 0)),
-         TotalOver4.5 = as.factor(case_when(Goals + GoalsAllowed > 4.5 ~ 1,
-                                  TRUE ~ 0)),
-         BTTS = as.factor(case_when(Goals > 0 & GoalsAllowed > 0 ~ 1,
-                          TRUE ~ 0)),
-         TTOver0.5 = as.factor(case_when(Goals > 0 ~ 1,
-                               TRUE ~ 0)),
-         TTOver1.5 = as.factor(case_when(Goals > 1 ~ 1,
-                               TRUE ~ 0)),
-         TTOver2.5 = as.factor(case_when(Goals > 2 ~ 1,
-                               TRUE ~ 0)),
-         TTOver3.5 = as.factor(case_when(Goals > 3 ~ 1,
-                               TRUE ~ 0)))
+         Plus1.5 = as.factor(case_when(Goals + 1.5 > GoalsAllowed ~ "Win",
+                                       TRUE ~ "Lose")),
+         Plus2 = as.factor(case_when(Goals + 2 > GoalsAllowed ~ "Win",
+                                     Goals + 2 == GoalsAllowed ~ "Push",
+                                     TRUE ~ "Lose")),
+         Plus2.5 = as.factor(case_when(Goals - 2.5 > GoalsAllowed ~ "Win",
+                                       TRUE ~ "Lose")),
+         Plus3 = as.factor(case_when(Goals + 3 > GoalsAllowed ~ "Win",
+                                     Goals + 3 == GoalsAllowed ~ "Push",
+                                     TRUE ~ "Lose")),
+         Plus3.5 = as.factor(case_when(Goals - 3.5 > GoalsAllowed ~ "Win",
+                                       TRUE ~ "Lose")),
+         Total1.5 = as.factor(case_when(Goals + GoalsAllowed > 1.5 ~ "Over",
+                                        TRUE ~ "Under")),
+         Total2 = as.factor(case_when(Goals + GoalsAllowed > 2 ~ "Over",
+                                       Goals + GoalsAllowed == 2 ~ "Push",
+                                       TRUE ~ "Under")),
+         Total2.5 = as.factor(case_when(Goals + GoalsAllowed > 2.5 ~ "Over",
+                                        TRUE ~ "Under")),
+         Total3 = as.factor(case_when(Goals + GoalsAllowed > 3 ~ "Over",
+                                       Goals + GoalsAllowed == 3 ~ "Push",
+                                       TRUE ~ "Under")),
+         Total3.5 = as.factor(case_when(Goals + GoalsAllowed > 3.5 ~ "Over",
+                                        TRUE ~ "Under")),
+         Total4 = as.factor(case_when(Goals + GoalsAllowed > 4 ~ "Over",
+                                       Goals + GoalsAllowed == 4 ~ "Push",
+                                       TRUE ~ "Under")),
+         Total4.5 = as.factor(case_when(Goals + GoalsAllowed > 4.5 ~ "Over",
+                                        TRUE ~ "Under")),
+         BTTS = as.factor(case_when(Goals > 0 & GoalsAllowed > 0 ~ "Yes",
+                          TRUE ~ "No")),
+         TT0.5 = as.factor(case_when(Goals > 0.5 ~ "Over",
+                                     TRUE ~ "Under")),
+         TT1 = as.factor(case_when(Goals > 1 ~ "Over",
+                                   Goals == 1 ~ "Push",
+                                   TRUE ~ "Under")),
+         TT1.5 = as.factor(case_when(Goals > 1.5 ~ "Over",
+                                     TRUE ~ "Under")),
+         TT2 = as.factor(case_when(Goals > 2 ~ "Over",
+                                   Goals == 2 ~ "Push",
+                                   TRUE ~ "Under")),
+         TT2.5 = as.factor(case_when(Goals > 2.5 ~ "Over",
+                                     TRUE ~ "Under")),
+         TT3 = as.factor(case_when(Goals > 3 ~ "Over",
+                                   Goals == 3 ~ "Push",
+                                   TRUE ~ "Under")),
+         TT3.5 = as.factor(case_when(Goals > 3.5 ~ "Over",
+                                     TRUE ~ "Under")))
 
 train <- train_df %>% 
   filter(SeasonGP > 3 & SeasonGP_Opp > 3 & !(Season %in% c('2021-2022', '2021')))%>% 
@@ -592,7 +619,7 @@ train <- train_df %>%
          -xG,
          -xGA,
          -GoalsAllowed,
-         -(Win:TTOver3.5))
+         -(Outcome:TT3.5))
 test <- train_df %>%
   filter(SeasonGP > 3 & SeasonGP_Opp > 3 & (Season %in% c('2021-2022', '2021')) & Date < today) %>% 
   select(-ID,
@@ -604,13 +631,17 @@ test <- train_df %>%
          -xG,
          -xGA,
          -GoalsAllowed,
-         -(Win:TTOver3.5))
+         -(Outcome:TT3.5))
 set.seed(1234)
 picked <- sample(seq_len(nrow(test)), 1500)
 add <- test[-picked,]
 test <- test[picked,]
 train <- bind_rows(train, add)
 upcoming_games <- filter(train_df, Date >= today)
+
+intervalStart <- Sys.time()
+cluster <- makeCluster(detectCores() - 1)
+registerDoParallel(cluster)
 
 fitControl <- trainControl(method = "repeatedcv",
                            number = 10,
@@ -636,13 +667,6 @@ rf_mod <- train(Goals ~ .,
                  tuneGrid = expand.grid(.mtry = c(10,15,20),
                                         .splitrule = c("variance", "extratrees"),
                                         .min.node.size = c(5,10)))
-# set.seed(1234)
-# svm_mod <- train(Goals ~ .,
-#                 data = train,
-#                 method = "svmRadial",
-#                 trControl = fitControl,
-#                 tuneLength = 10,
-#                 preProc = c("center", "scale"))
 set.seed(1234)
 ctree_mod <- train(Goals ~ .,
                  data = train,
@@ -661,11 +685,17 @@ lm_mod <- train(Goals ~ .,
                  data = train,
                  method = "lm",
                  trControl = fitControl)
+
+beep(8)
+
+stopCluster(cluster)
+intervalEnd <- Sys.time()
+paste("Model training process took",intervalEnd - intervalStart,attr(intervalEnd - intervalStart,"units"))
+
 set.seed(1234)
 allResamples <- resamples(list("GBM" = gbm_mod,
                                "Cubist" = cub_mod,
                                "RF" = rf_mod,
-                               #"SVM" = svm_mod,
                                "CTree" = ctree_mod,
                                "PLS" = pls_mod,
                                "LM" = lm_mod))
@@ -677,7 +707,6 @@ parallelplot(allResamples, metric = "Rsquared")
 saveRDS(gbm_mod, "train_gbm.rds")
 saveRDS(cub_mod, "train_cub.rds")
 saveRDS(rf_mod, "train_rf.rds")
-#saveRDS(svm_mod, "train_svm.rds")
 saveRDS(ctree_mod, "train_ctree.rds")
 saveRDS(pls_mod, "train_pls.rds")
 saveRDS(lm_mod, "train_lm.rds")
