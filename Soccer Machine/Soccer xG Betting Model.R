@@ -7,10 +7,12 @@ library(lubridate)
 library(plyr)
 library(tidyverse)
 library(caret)
+library(caretEnsemble)
 library(parallel)
 library(doParallel)
 library(beepr)
 
+intervalStart <- Sys.time()
 urls <- c("https://fbref.com/en/comps/9/schedule/Premier-League-Scores-and-Fixtures",
           "https://fbref.com/en/comps/9/10728/schedule/2020-2021-Premier-League-Scores-and-Fixtures", 
           "https://fbref.com/en/comps/9/3232/schedule/2019-2020-Premier-League-Scores-and-Fixtures",
@@ -445,6 +447,9 @@ UEL_18_19 <- urls[[37]] %>%
   filter(Home_Score != "") %>%
   mutate(League = "UEL", Season = "2018-2019")
 
+intervalEnd <- Sys.time()
+paste("Web scraping took",intervalEnd - intervalStart,attr(intervalEnd - intervalStart,"units"))
+
 fixtures <- rbind(epl_21_22, epl_20_21, epl_19_20, epl_18_19, epl_17_18,
                   laliga_21_22, laliga_20_21, laliga_19_20, laliga_18_19, laliga_17_18,
                   bundes_21_22, bundes_20_21, bundes_19_20, bundes_18_19, bundes_17_18,
@@ -690,7 +695,7 @@ beep(8)
 
 stopCluster(cluster)
 intervalEnd <- Sys.time()
-paste("Model training process took",intervalEnd - intervalStart,attr(intervalEnd - intervalStart,"units"))
+paste("Goals regression model training took",intervalEnd - intervalStart,attr(intervalEnd - intervalStart,"units"))
 
 set.seed(1234)
 allResamples <- resamples(list("GBM" = gbm_mod,
@@ -704,12 +709,12 @@ parallelplot(allResamples, metric = "RMSE")
 parallelplot(allResamples)
 parallelplot(allResamples, metric = "Rsquared")
 
-saveRDS(gbm_mod, "train_gbm.rds")
-saveRDS(cub_mod, "train_cub.rds")
-saveRDS(rf_mod, "train_rf.rds")
-saveRDS(ctree_mod, "train_ctree.rds")
-saveRDS(pls_mod, "train_pls.rds")
-saveRDS(lm_mod, "train_lm.rds")
+saveRDS(gbm_mod, "Soccer Machine/train_gbm.rds")
+saveRDS(cub_mod, "Soccer Machine/train_cub.rds")
+saveRDS(rf_mod, "Soccer Machine/train_rf.rds")
+saveRDS(ctree_mod, "Soccer Machine/train_ctree.rds")
+saveRDS(pls_mod, "Soccer Machine/train_pls.rds")
+saveRDS(lm_mod, "Soccer Machine/train_lm.rds")
 
 performance <- train
 
@@ -720,12 +725,21 @@ performance$ctree_G <- predict(ctree_mod, performance)
 performance$pls_G <- predict(pls_mod, performance)
 performance$lm_G <- predict(lm_mod, performance)
 performance <- performance %>% 
-  mutate(equal_weight = (gbm_G + cub_G + rf_G + ctree_G + pls_G + lm_G) / 6)
+  mutate(equal_weight = (gbm_G + cub_G + rf_G + ctree_G + pls_G + lm_G) / 6,
+         equal_weight2 = (gbm_G + cub_G + rf_G + pls_G + lm_G) / 5,
+         equal_weight3 = (gbm_G + cub_G + rf_G + pls_G) / 4,
+         rf_equal = (rf_G + equal_weight3) / 2)
 ens_lm <- lm(Goals ~ gbm_G + cub_G + rf_G + ctree_G + pls_G + lm_G, performance)
 summary(ens_lm)
+ens_lm2 <- lm(Goals ~ gbm_G + cub_G + rf_G + pls_G + lm_G, performance)
+summary(ens_lm2)
+ens_lm3 <- lm(Goals ~ gbm_G + cub_G + rf_G + pls_G, performance)
+summary(ens_lm3)
 performance$linear_weight <- predict(ens_lm, performance)
+performance$linear_weight2 <- predict(ens_lm2, performance)
+performance$linear_weight3 <- predict(ens_lm3, performance)
 
-summary(performance %>% select(Goals, gbm_G:linear_weight))
+summary(performance %>% select(Goals, gbm_G:linear_weight3))
 
 RMSE(performance$gbm_G, performance$Goals)
 RMSE(performance$cub_G, performance$Goals)
@@ -734,7 +748,12 @@ RMSE(performance$ctree_G, performance$Goals)
 RMSE(performance$pls_G, performance$Goals)
 RMSE(performance$lm_G, performance$Goals)
 RMSE(performance$equal_weight, performance$Goals)
+RMSE(performance$equal_weight2, performance$Goals)
+RMSE(performance$equal_weight3, performance$Goals)
+RMSE(performance$rf_equal, performance$Goals)
 RMSE(performance$linear_weight, performance$Goals)
+RMSE(performance$linear_weight2, performance$Goals)
+RMSE(performance$linear_weight3, performance$Goals)
 
 test_performance <- test
 
@@ -745,10 +764,15 @@ test_performance$ctree_G <- predict(ctree_mod, test_performance)
 test_performance$pls_G <- predict(pls_mod, test_performance)
 test_performance$lm_G <- predict(lm_mod, test_performance)
 test_performance <- test_performance %>% 
-  mutate(equal_weight = (gbm_G + cub_G + rf_G + ctree_G + pls_G + lm_G) / 6)
+  mutate(equal_weight = (gbm_G + cub_G + rf_G + ctree_G + pls_G + lm_G) / 6,
+         equal_weight2 = (gbm_G + cub_G + rf_G + pls_G + lm_G) / 5,
+         equal_weight3 = (gbm_G + cub_G + rf_G + pls_G) / 4,
+         rf_equal = (rf_G + equal_weight3) / 2)
 test_performance$linear_weight <- predict(ens_lm, test_performance)
+test_performance$linear_weight2 <- predict(ens_lm2, test_performance)
+test_performance$linear_weight3 <- predict(ens_lm3, test_performance)
 
-summary(test_performance %>% select(Goals, gbm_G:linear_weight))
+summary(test_performance %>% select(Goals, gbm_G:linear_weight3))
 
 RMSE(test_performance$gbm_G, test_performance$Goals)
 RMSE(test_performance$cub_G, test_performance$Goals)
@@ -757,7 +781,12 @@ RMSE(test_performance$ctree_G, test_performance$Goals)
 RMSE(test_performance$pls_G, test_performance$Goals)
 RMSE(test_performance$lm_G, test_performance$Goals)
 RMSE(test_performance$equal_weight, test_performance$Goals)
+RMSE(test_performance$equal_weight2, test_performance$Goals)
+RMSE(test_performance$equal_weight3, test_performance$Goals)
+RMSE(test_performance$rf_equal, test_performance$Goals)
 RMSE(test_performance$linear_weight, test_performance$Goals)
+RMSE(test_performance$linear_weight2, test_performance$Goals)
+RMSE(test_performance$linear_weight3, test_performance$Goals)
 
 train_prob <- train_df %>% 
   filter(SeasonGP > 3 & SeasonGP_Opp > 3 & !(Season %in% c('2021-2022', '2021')))%>% 
@@ -792,28 +821,183 @@ upcoming_games_prob <- filter(train_df, Date >= today)
 
 Outcome_df <- train_prob %>% 
   filter(Home_or_Away == "Home") %>% 
-  select(-Home_or_Away, -(WinMinus1.5:TTOver3.5))
+  select(-Home_or_Away, -(Minus0.5:TT3.5))
 
-set.seed(1234)
-outcome_glm <- train(Outcome ~ .,
-                 data = Outcome_df,
-                 method = "glm",
-                 family = "binomial",
-                 trControl = fitControl)
+intervalStart <- Sys.time()
+cluster <- makeCluster(detectCores() - 1)
+registerDoParallel(cluster)
+
+fitControl <- trainControl(method = "repeatedcv",
+                           number = 10,
+                           allowParallel = TRUE)
+
 set.seed(1234)
 outcome_gbm <- train(Outcome ~ .,
                  data = Outcome_df,
                  method = "gbm",
                  trControl = fitControl)
 set.seed(1234)
-outcome_rf <- train(Outcome ~ .,
-                data = Outcome_df,
-                method = "ranger",
-                trControl = fitControl,
-                tuneGrid = expand.grid(.mtry = c(10,15,20),
-                                       .splitrule = c("gini", "extratrees"),
-                                       .min.node.size = c(5,10)))
+outcome_pls <- train(Outcome ~ .,
+                     data = Outcome_df,
+                     method = "pls",
+                     trControl = fitControl,
+                     tuneLength = 15,
+                     preProc = c("center", "scale"))
+set.seed(1234)
+outcome_xgbLin <- train(Outcome ~ .,
+                      data = Outcome_df,
+                      method = "xgbLinear",
+                      trControl = fitControl)
+set.seed(1234)
+outcome_xgbTree <- train(Outcome ~ .,
+                      data = Outcome_df,
+                      method = "xgbTree",
+                      trControl = fitControl)
 
-Outcome_df$preds <- predict(outcome_gbm, Outcome_df, type = "prob")
+beep(8)
 
-saveRDS(outcome_gbm, "outcome_gbm.rds")
+stopCluster(cluster)
+intervalEnd <- Sys.time()
+paste("Outcome classification model training took",intervalEnd - intervalStart,attr(intervalEnd - intervalStart,"units"))
+
+set.seed(1234)
+allResamples_prob <- resamples(list("GBM" = outcome_gbm,
+                               "PLS" = outcome_pls,
+                               "xgbLin" = outcome_xgbLin,
+                               "xgbTree" = outcome_xgbTree))
+
+parallelplot(allResamples_prob)
+
+saveRDS(outcome_gbm, "Soccer Machine/outcome_gbm.rds")
+saveRDS(outcome_pls, "Soccer Machine/outcome_pls.rds")
+saveRDS(outcome_xgbLin, "Soccer Machine/outcome_xgbLin.rds")
+saveRDS(outcome_xgbTree, "Soccer Machine/outcome_xgbTree.rds")
+
+Outcome_df$gbm <- predict(outcome_gbm, Outcome_df, type = "prob")
+Outcome_df$pls <- predict(outcome_pls, Outcome_df, type = "prob")
+Outcome_df$xgbLin <- predict(outcome_xgbLin, Outcome_df, type = "prob")
+Outcome_df$xgbTree <- predict(outcome_xgbTree, Outcome_df, type = "prob")
+Outcome_df <- Outcome_df %>% 
+  mutate(equal_weight = (gbm + pls + xgbLin + xgbTree) / 4)
+
+Outcome_test <- test_prob %>% 
+  filter(Home_or_Away == "Home") %>% 
+  select(-Home_or_Away, -(Minus0.5:TT3.5))
+
+Outcome_test$gbm <- predict(outcome_gbm, Outcome_test, type = "prob")
+Outcome_test$pls <- predict(outcome_pls, Outcome_test, type = "prob")
+Outcome_test$xgbLin <- predict(outcome_xgbLin, Outcome_test, type = "prob")
+Outcome_test$xgbTree <- predict(outcome_xgbTree, Outcome_test, type = "prob")
+Outcome_test <- Outcome_test %>% 
+  mutate(equal_weight = (gbm + pls + xgbLin + xgbTree) / 4,
+         gbm_win = round_any(gbm$Win, 0.05, floor),
+         gbm_draw = round_any(gbm$Draw, 0.05, floor),
+         gbm_lose = round_any(gbm$Lose, 0.05, floor),
+         pls_win = round_any(pls$Win, 0.05, floor),
+         pls_draw = round_any(pls$Draw, 0.05, floor),
+         pls_lose = round_any(pls$Lose, 0.05, floor),
+         xgbLin_win = round_any(xgbLin$Win, 0.05, floor),
+         xgbLin_draw = round_any(xgbLin$Draw, 0.05, floor),
+         xgbLin_lose = round_any(xgbLin$Lose, 0.05, floor),
+         xgbTree_win = round_any(xgbTree$Win, 0.05, floor),
+         xgbTree_draw = round_any(xgbTree$Draw, 0.05, floor),
+         xgbTree_lose = round_any(xgbTree$Lose, 0.05, floor),
+         equal_weight_win = round_any(equal_weight$Win, 0.05, floor),
+         equal_weight_draw = round_any(equal_weight$Draw, 0.05, floor),
+         equal_weight_lose = round_any(equal_weight$Lose, 0.05, floor),
+         Win = case_when(Outcome == "Win" ~ 1, TRUE ~ 0),
+         Draw = case_when(Outcome == "Draw" ~ 1, TRUE ~ 0),
+         Lose = case_when(Outcome == "Lose" ~ 1, TRUE ~ 0))
+
+Outcome_test %>% group_by(equal_weight_win) %>% 
+  summarise(hit_rate = mean(Win),
+            games = n())
+
+Minus0.5_df <- train_prob %>% 
+  filter(Home_or_Away == "Home") %>% 
+  select(-Home_or_Away, -Outcome, -(Minus1:TT3.5))
+
+intervalStart <- Sys.time()
+cluster <- makeCluster(detectCores() - 1)
+registerDoParallel(cluster)
+
+fitControl <- trainControl(method = "repeatedcv",
+                           number = 10,
+                           allowParallel = TRUE)
+
+set.seed(1234)
+minus0.5_gbm <- train(Minus0.5 ~ .,
+                     data = Minus0.5_df,
+                     method = "gbm",
+                     trControl = fitControl)
+set.seed(1234)
+minus0.5_pls <- train(Minus0.5 ~ .,
+                     data = Minus0.5_df,
+                     method = "pls",
+                     trControl = fitControl,
+                     tuneLength = 15,
+                     preProc = c("center", "scale"))
+set.seed(1234)
+minus0.5_xgbLin <- train(Minus0.5 ~ .,
+                        data = Minus0.5_df,
+                        method = "xgbLinear",
+                        trControl = fitControl)
+set.seed(1234)
+minus0.5_xgbTree <- train(Minus0.5 ~ .,
+                         data = Minus0.5_df,
+                         method = "xgbTree",
+                         trControl = fitControl)
+
+beep(8)
+
+stopCluster(cluster)
+intervalEnd <- Sys.time()
+paste("Outcome classification model training took",intervalEnd - intervalStart,attr(intervalEnd - intervalStart,"units"))
+
+set.seed(1234)
+allResamples_prob <- resamples(list("GBM" = minus0.5_gbm,
+                                    "PLS" = minus0.5_pls,
+                                    "xgbLin" = minus0.5_xgbLin,
+                                    "xgbTree" = minus0.5_xgbTree))
+
+parallelplot(allResamples_prob)
+
+saveRDS(minus0.5_gbm, "Soccer Machine/minus0.5_gbm.rds")
+saveRDS(minus0.5_pls, "Soccer Machine/minus0.5_pls.rds")
+saveRDS(minus0.5_xgbLin, "Soccer Machine/minus0.5_xgbLin.rds")
+saveRDS(minus0.5_xgbTree, "Soccer Machine/minus0.5_xgbTree.rds")
+
+Minus0.5_df$gbm <- predict(minus0.5_gbm, Minus0.5_df, type = "prob")
+Minus0.5_df$pls <- predict(minus0.5_pls, Minus0.5_df, type = "prob")
+Minus0.5_df$xgbLin <- predict(minus0.5_xgbLin, Minus0.5_df, type = "prob")
+Minus0.5_df$xgbTree <- predict(minus0.5_xgbTree, Minus0.5_df, type = "prob")
+Minus0.5_df <- Minus0.5_df %>% 
+  mutate(equal_weight = (gbm + pls + xgbLin + xgbTree) / 4)
+
+Minus0.5_test <- test_prob %>% 
+  filter(Home_or_Away == "Home") %>% 
+  select(-Home_or_Away, -Outcome, -(Minus1:TT3.5))
+
+Minus0.5_test$gbm <- predict(minus0.5_gbm, Minus0.5_test, type = "prob")
+Minus0.5_test$pls <- predict(minus0.5_pls, Minus0.5_test, type = "prob")
+Minus0.5_test$xgbLin <- predict(minus0.5_xgbLin, Minus0.5_test, type = "prob")
+Minus0.5_test$xgbTree <- predict(minus0.5_xgbTree, Minus0.5_test, type = "prob")
+Minus0.5_test <- Minus0.5_test %>% 
+  mutate(equal_weight = (gbm + pls + xgbLin + xgbTree) / 4,
+         gbm_win = round_any(gbm$Win, 0.05, floor),
+         gbm_lose = round_any(gbm$Lose, 0.05, floor),
+         pls_win = round_any(pls$Win, 0.05, floor),
+         pls_lose = round_any(pls$Lose, 0.05, floor),
+         xgbLin_win = round_any(xgbLin$Win, 0.05, floor),
+         xgbLin_lose = round_any(xgbLin$Lose, 0.05, floor),
+         xgbTree_win = round_any(xgbTree$Win, 0.05, floor),
+         xgbTree_lose = round_any(xgbTree$Lose, 0.05, floor),
+         equal_weight_win = round_any(equal_weight$Win, 0.05, floor),
+         equal_weight_lose = round_any(equal_weight$Lose, 0.05, floor),
+         Win = case_when(Minus0.5 == "Win" ~ 1, TRUE ~ 0),
+         Lose = case_when(Minus0.5 == "Lose" ~ 1, TRUE ~ 0))
+
+Minus0.5_test %>% group_by(equal_weight_win) %>% 
+  summarise(hit_rate = mean(Win),
+            games = n())
+
