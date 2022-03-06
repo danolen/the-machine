@@ -569,12 +569,12 @@ train_df <- metrics %>%
          Plus2 = as.factor(case_when(Goals + 2 > GoalsAllowed ~ "Win",
                                      Goals + 2 == GoalsAllowed ~ "Push",
                                      TRUE ~ "Lose")),
-         Plus2.5 = as.factor(case_when(Goals - 2.5 > GoalsAllowed ~ "Win",
+         Plus2.5 = as.factor(case_when(Goals + 2.5 > GoalsAllowed ~ "Win",
                                        TRUE ~ "Lose")),
          Plus3 = as.factor(case_when(Goals + 3 > GoalsAllowed ~ "Win",
                                      Goals + 3 == GoalsAllowed ~ "Push",
                                      TRUE ~ "Lose")),
-         Plus3.5 = as.factor(case_when(Goals - 3.5 > GoalsAllowed ~ "Win",
+         Plus3.5 = as.factor(case_when(Goals + 3.5 > GoalsAllowed ~ "Win",
                                        TRUE ~ "Lose")),
          Total1.5 = as.factor(case_when(Goals + GoalsAllowed > 1.5 ~ "Over",
                                         TRUE ~ "Under")),
@@ -844,12 +844,7 @@ outcome_pls <- train(Outcome ~ .,
                      tuneLength = 15,
                      preProc = c("center", "scale"))
 set.seed(1234)
-outcome_xgbLin <- train(Outcome ~ .,
-                      data = Outcome_df,
-                      method = "xgbLinear",
-                      trControl = fitControl)
-set.seed(1234)
-outcome_xgbTree <- train(Outcome ~ .,
+outcome_xgb <- train(Outcome ~ .,
                       data = Outcome_df,
                       method = "xgbTree",
                       trControl = fitControl)
@@ -863,22 +858,13 @@ paste("Outcome classification model training took",intervalEnd - intervalStart,a
 set.seed(1234)
 allResamples_prob <- resamples(list("GBM" = outcome_gbm,
                                "PLS" = outcome_pls,
-                               "xgbLin" = outcome_xgbLin,
-                               "xgbTree" = outcome_xgbTree))
+                               "XGB" = outcome_xgb))
 
 parallelplot(allResamples_prob)
 
 saveRDS(outcome_gbm, "Soccer Machine/outcome_gbm.rds")
 saveRDS(outcome_pls, "Soccer Machine/outcome_pls.rds")
-saveRDS(outcome_xgbLin, "Soccer Machine/outcome_xgbLin.rds")
-saveRDS(outcome_xgbTree, "Soccer Machine/outcome_xgbTree.rds")
-
-Outcome_df$gbm <- predict(outcome_gbm, Outcome_df, type = "prob")
-Outcome_df$pls <- predict(outcome_pls, Outcome_df, type = "prob")
-Outcome_df$xgbLin <- predict(outcome_xgbLin, Outcome_df, type = "prob")
-Outcome_df$xgbTree <- predict(outcome_xgbTree, Outcome_df, type = "prob")
-Outcome_df <- Outcome_df %>% 
-  mutate(equal_weight = (gbm + pls + xgbLin + xgbTree) / 4)
+saveRDS(outcome_xgb, "Soccer Machine/outcome_xgb.rds")
 
 Outcome_test <- test_prob %>% 
   filter(Home_or_Away == "Home") %>% 
@@ -886,32 +872,13 @@ Outcome_test <- test_prob %>%
 
 Outcome_test$gbm <- predict(outcome_gbm, Outcome_test, type = "prob")
 Outcome_test$pls <- predict(outcome_pls, Outcome_test, type = "prob")
-Outcome_test$xgbLin <- predict(outcome_xgbLin, Outcome_test, type = "prob")
-Outcome_test$xgbTree <- predict(outcome_xgbTree, Outcome_test, type = "prob")
+Outcome_test$xgb <- predict(outcome_xgb, Outcome_test, type = "prob")
 Outcome_test <- Outcome_test %>% 
-  mutate(equal_weight = (gbm + pls + xgbLin + xgbTree) / 4,
-         gbm_win = round_any(gbm$Win, 0.05, floor),
-         gbm_draw = round_any(gbm$Draw, 0.05, floor),
-         gbm_lose = round_any(gbm$Lose, 0.05, floor),
-         pls_win = round_any(pls$Win, 0.05, floor),
-         pls_draw = round_any(pls$Draw, 0.05, floor),
-         pls_lose = round_any(pls$Lose, 0.05, floor),
-         xgbLin_win = round_any(xgbLin$Win, 0.05, floor),
-         xgbLin_draw = round_any(xgbLin$Draw, 0.05, floor),
-         xgbLin_lose = round_any(xgbLin$Lose, 0.05, floor),
-         xgbTree_win = round_any(xgbTree$Win, 0.05, floor),
-         xgbTree_draw = round_any(xgbTree$Draw, 0.05, floor),
-         xgbTree_lose = round_any(xgbTree$Lose, 0.05, floor),
-         equal_weight_win = round_any(equal_weight$Win, 0.05, floor),
-         equal_weight_draw = round_any(equal_weight$Draw, 0.05, floor),
-         equal_weight_lose = round_any(equal_weight$Lose, 0.05, floor),
-         Win = case_when(Outcome == "Win" ~ 1, TRUE ~ 0),
-         Draw = case_when(Outcome == "Draw" ~ 1, TRUE ~ 0),
-         Lose = case_when(Outcome == "Lose" ~ 1, TRUE ~ 0))
+  mutate(equal_weight = (gbm + pls + xgb) / 3)
 
-Outcome_test %>% group_by(equal_weight_win) %>% 
-  summarise(hit_rate = mean(Win),
-            games = n())
+confusionMatrix(data = predict(outcome_gbm, Outcome_test), reference = Outcome_test$Outcome)
+confusionMatrix(data = predict(outcome_pls, Outcome_test), reference = Outcome_test$Outcome)
+confusionMatrix(data = predict(outcome_xgb, Outcome_test), reference = Outcome_test$Outcome)
 
 Minus0.5_df <- train_prob %>% 
   filter(Home_or_Away == "Home") %>% 
@@ -938,12 +905,7 @@ minus0.5_pls <- train(Minus0.5 ~ .,
                      tuneLength = 15,
                      preProc = c("center", "scale"))
 set.seed(1234)
-minus0.5_xgbLin <- train(Minus0.5 ~ .,
-                        data = Minus0.5_df,
-                        method = "xgbLinear",
-                        trControl = fitControl)
-set.seed(1234)
-minus0.5_xgbTree <- train(Minus0.5 ~ .,
+minus0.5_xgb <- train(Minus0.5 ~ .,
                          data = Minus0.5_df,
                          method = "xgbTree",
                          trControl = fitControl)
@@ -952,27 +914,18 @@ beep(8)
 
 stopCluster(cluster)
 intervalEnd <- Sys.time()
-paste("Outcome classification model training took",intervalEnd - intervalStart,attr(intervalEnd - intervalStart,"units"))
+paste("Minus0.5 classification model training took",intervalEnd - intervalStart,attr(intervalEnd - intervalStart,"units"))
 
 set.seed(1234)
 allResamples_prob <- resamples(list("GBM" = minus0.5_gbm,
                                     "PLS" = minus0.5_pls,
-                                    "xgbLin" = minus0.5_xgbLin,
-                                    "xgbTree" = minus0.5_xgbTree))
+                                    "XGB" = minus0.5_xgb))
 
 parallelplot(allResamples_prob)
 
 saveRDS(minus0.5_gbm, "Soccer Machine/minus0.5_gbm.rds")
 saveRDS(minus0.5_pls, "Soccer Machine/minus0.5_pls.rds")
-saveRDS(minus0.5_xgbLin, "Soccer Machine/minus0.5_xgbLin.rds")
-saveRDS(minus0.5_xgbTree, "Soccer Machine/minus0.5_xgbTree.rds")
-
-Minus0.5_df$gbm <- predict(minus0.5_gbm, Minus0.5_df, type = "prob")
-Minus0.5_df$pls <- predict(minus0.5_pls, Minus0.5_df, type = "prob")
-Minus0.5_df$xgbLin <- predict(minus0.5_xgbLin, Minus0.5_df, type = "prob")
-Minus0.5_df$xgbTree <- predict(minus0.5_xgbTree, Minus0.5_df, type = "prob")
-Minus0.5_df <- Minus0.5_df %>% 
-  mutate(equal_weight = (gbm + pls + xgbLin + xgbTree) / 4)
+saveRDS(minus0.5_xgb, "Soccer Machine/minus0.5_xgb.rds")
 
 Minus0.5_test <- test_prob %>% 
   filter(Home_or_Away == "Home") %>% 
@@ -980,24 +933,809 @@ Minus0.5_test <- test_prob %>%
 
 Minus0.5_test$gbm <- predict(minus0.5_gbm, Minus0.5_test, type = "prob")
 Minus0.5_test$pls <- predict(minus0.5_pls, Minus0.5_test, type = "prob")
-Minus0.5_test$xgbLin <- predict(minus0.5_xgbLin, Minus0.5_test, type = "prob")
-Minus0.5_test$xgbTree <- predict(minus0.5_xgbTree, Minus0.5_test, type = "prob")
+Minus0.5_test$xgb <- predict(minus0.5_xgb, Minus0.5_test, type = "prob")
 Minus0.5_test <- Minus0.5_test %>% 
-  mutate(equal_weight = (gbm + pls + xgbLin + xgbTree) / 4,
-         gbm_win = round_any(gbm$Win, 0.05, floor),
-         gbm_lose = round_any(gbm$Lose, 0.05, floor),
-         pls_win = round_any(pls$Win, 0.05, floor),
-         pls_lose = round_any(pls$Lose, 0.05, floor),
-         xgbLin_win = round_any(xgbLin$Win, 0.05, floor),
-         xgbLin_lose = round_any(xgbLin$Lose, 0.05, floor),
-         xgbTree_win = round_any(xgbTree$Win, 0.05, floor),
-         xgbTree_lose = round_any(xgbTree$Lose, 0.05, floor),
-         equal_weight_win = round_any(equal_weight$Win, 0.05, floor),
-         equal_weight_lose = round_any(equal_weight$Lose, 0.05, floor),
-         Win = case_when(Minus0.5 == "Win" ~ 1, TRUE ~ 0),
-         Lose = case_when(Minus0.5 == "Lose" ~ 1, TRUE ~ 0))
+  mutate(equal_weight = (gbm + pls + xgb) / 3)
 
-Minus0.5_test %>% group_by(equal_weight_win) %>% 
-  summarise(hit_rate = mean(Win),
-            games = n())
+confusionMatrix(data = predict(minus0.5_gbm, Minus0.5_test), reference = Minus0.5_test$Minus0.5)
+confusionMatrix(data = predict(minus0.5_pls, Minus0.5_test), reference = Minus0.5_test$Minus0.5)
+confusionMatrix(data = predict(minus0.5_xgb, Minus0.5_test), reference = Minus0.5_test$Minus0.5)
+
+Minus1_df <- train_prob %>% 
+  filter(Home_or_Away == "Home") %>% 
+  select(-Home_or_Away, -(Outcome:Minus0.5), -(Minus1.5:TT3.5))
+
+intervalStart <- Sys.time()
+cluster <- makeCluster(detectCores() - 1)
+registerDoParallel(cluster)
+
+fitControl <- trainControl(method = "repeatedcv",
+                           number = 10,
+                           allowParallel = TRUE)
+
+set.seed(1234)
+minus1_gbm <- train(Minus1 ~ .,
+                      data = Minus1_df,
+                      method = "gbm",
+                      trControl = fitControl)
+set.seed(1234)
+minus1_pls <- train(Minus1 ~ .,
+                      data = Minus1_df,
+                      method = "pls",
+                      trControl = fitControl,
+                      tuneLength = 15,
+                      preProc = c("center", "scale"))
+set.seed(1234)
+minus1_xgb <- train(Minus1 ~ .,
+                          data = Minus1_df,
+                          method = "xgbTree",
+                          trControl = fitControl)
+
+beep(8)
+
+stopCluster(cluster)
+intervalEnd <- Sys.time()
+paste("Minus1 classification model training took",intervalEnd - intervalStart,attr(intervalEnd - intervalStart,"units"))
+
+set.seed(1234)
+allResamples_prob <- resamples(list("GBM" = minus1_gbm,
+                                    "PLS" = minus1_pls,
+                                    "XGB" = minus1_xgb))
+
+parallelplot(allResamples_prob)
+
+saveRDS(minus1_gbm, "Soccer Machine/minus1_gbm.rds")
+saveRDS(minus1_pls, "Soccer Machine/minus1_pls.rds")
+saveRDS(minus1_xgb, "Soccer Machine/minus1_xgb.rds")
+
+Minus1_test <- test_prob %>% 
+  filter(Home_or_Away == "Home") %>% 
+  select(-Home_or_Away, -(Outcome:Minus0.5), -(Minus1.5:TT3.5))
+
+Minus1_test$gbm <- predict(minus1_gbm, Minus1_test, type = "prob")
+Minus1_test$pls <- predict(minus1_pls, Minus1_test, type = "prob")
+Minus1_test$xgb <- predict(minus1_xgb, Minus1_test, type = "prob")
+Minus1_test <- Minus1_test %>% 
+  mutate(equal_weight = (gbm + pls + xgb) / 3)
+
+confusionMatrix(data = predict(minus1_gbm, Minus1_test), reference = Minus1_test$Minus1)
+confusionMatrix(data = predict(minus1_pls, Minus1_test), reference = Minus1_test$Minus1)
+confusionMatrix(data = predict(minus1_xgb, Minus1_test), reference = Minus1_test$Minus1)
+
+Minus1.5_df <- train_prob %>% 
+  filter(Home_or_Away == "Home") %>% 
+  select(-Home_or_Away, -(Outcome:Minus1), -(Minus2:TT3.5))
+
+intervalStart <- Sys.time()
+cluster <- makeCluster(detectCores() - 1)
+registerDoParallel(cluster)
+
+fitControl <- trainControl(method = "repeatedcv",
+                           number = 10,
+                           allowParallel = TRUE)
+
+set.seed(1234)
+minus1.5_gbm <- train(Minus1.5 ~ .,
+                    data = Minus1.5_df,
+                    method = "gbm",
+                    trControl = fitControl)
+set.seed(1234)
+minus1.5_pls <- train(Minus1.5 ~ .,
+                    data = Minus1.5_df,
+                    method = "pls",
+                    trControl = fitControl,
+                    tuneLength = 15,
+                    preProc = c("center", "scale"))
+set.seed(1234)
+minus1.5_xgb <- train(Minus1.5 ~ .,
+                        data = Minus1.5_df,
+                        method = "xgbTree",
+                        trControl = fitControl)
+
+beep(8)
+
+stopCluster(cluster)
+intervalEnd <- Sys.time()
+paste("Minus1.5 classification model training took",intervalEnd - intervalStart,attr(intervalEnd - intervalStart,"units"))
+
+set.seed(1234)
+allResamples_prob <- resamples(list("GBM" = minus1.5_gbm,
+                                    "PLS" = minus1.5_pls,
+                                    "XGB" = minus1.5_xgb))
+
+parallelplot(allResamples_prob)
+
+saveRDS(minus1.5_gbm, "Soccer Machine/minus1.5_gbm.rds")
+saveRDS(minus1.5_pls, "Soccer Machine/minus1.5_pls.rds")
+saveRDS(minus1.5_xgb, "Soccer Machine/minus1.5_xgb.rds")
+
+Minus1.5_test <- test_prob %>% 
+  filter(Home_or_Away == "Home") %>% 
+  select(-Home_or_Away, -(Outcome:Minus1), -(Minus2:TT3.5))
+
+Minus1.5_test$gbm <- predict(minus1.5_gbm, Minus1.5_test, type = "prob")
+Minus1.5_test$pls <- predict(minus1.5_pls, Minus1.5_test, type = "prob")
+Minus1.5_test$xgb <- predict(minus1.5_xgb, Minus1.5_test, type = "prob")
+Minus1.5_test <- Minus1.5_test %>% 
+  mutate(equal_weight = (gbm + pls + xgb) / 3)
+
+confusionMatrix(data = predict(minus1.5_gbm, Minus1.5_test), reference = Minus1.5_test$Minus1.5)
+confusionMatrix(data = predict(minus1.5_pls, Minus1.5_test), reference = Minus1.5_test$Minus1.5)
+confusionMatrix(data = predict(minus1.5_xgb, Minus1.5_test), reference = Minus1.5_test$Minus1.5)
+
+Minus2_df <- train_prob %>% 
+  filter(Home_or_Away == "Home") %>% 
+  select(-Home_or_Away, -(Outcome:Minus1.5), -(Minus2.5:TT3.5))
+
+intervalStart <- Sys.time()
+cluster <- makeCluster(detectCores() - 1)
+registerDoParallel(cluster)
+
+fitControl <- trainControl(method = "repeatedcv",
+                           number = 10,
+                           allowParallel = TRUE)
+
+set.seed(1234)
+minus2_gbm <- train(Minus2 ~ .,
+                    data = Minus2_df,
+                    method = "gbm",
+                    trControl = fitControl)
+set.seed(1234)
+minus2_pls <- train(Minus2 ~ .,
+                    data = Minus2_df,
+                    method = "pls",
+                    trControl = fitControl,
+                    tuneLength = 15,
+                    preProc = c("center", "scale"))
+set.seed(1234)
+minus2_xgb <- train(Minus2 ~ .,
+                    data = Minus2_df,
+                    method = "xgbTree",
+                    trControl = fitControl)
+
+beep(8)
+
+stopCluster(cluster)
+intervalEnd <- Sys.time()
+paste("Minus2 classification model training took",intervalEnd - intervalStart,attr(intervalEnd - intervalStart,"units"))
+
+set.seed(1234)
+allResamples_prob <- resamples(list("GBM" = minus2_gbm,
+                                    "PLS" = minus2_pls,
+                                    "XGB" = minus2_xgb))
+
+parallelplot(allResamples_prob)
+
+saveRDS(minus2_gbm, "Soccer Machine/minus2_gbm.rds")
+saveRDS(minus2_pls, "Soccer Machine/minus2_pls.rds")
+saveRDS(minus2_xgb, "Soccer Machine/minus2_xgb.rds")
+
+Minus2_test <- test_prob %>% 
+  filter(Home_or_Away == "Home") %>% 
+  select(-Home_or_Away, -(Outcome:Minus1.5), -(Minus2.5:TT3.5))
+
+Minus2_test$gbm <- predict(minus2_gbm, Minus2_test, type = "prob")
+Minus2_test$pls <- predict(minus2_pls, Minus2_test, type = "prob")
+Minus2_test$xgb <- predict(minus2_xgb, Minus2_test, type = "prob")
+Minus2_test <- Minus2_test %>% 
+  mutate(equal_weight = (gbm + pls + xgb) / 3)
+
+confusionMatrix(data = predict(minus2_gbm, Minus2_test), reference = Minus2_test$Minus2)
+confusionMatrix(data = predict(minus2_pls, Minus2_test), reference = Minus2_test$Minus2)
+confusionMatrix(data = predict(minus2_xgb, Minus2_test), reference = Minus2_test$Minus2)
+
+Minus2.5_df <- train_prob %>% 
+  filter(Home_or_Away == "Home") %>% 
+  select(-Home_or_Away, -(Outcome:Minus2), -(Minus3:TT3.5))
+
+intervalStart <- Sys.time()
+cluster <- makeCluster(detectCores() - 1)
+registerDoParallel(cluster)
+
+fitControl <- trainControl(method = "repeatedcv",
+                           number = 10,
+                           allowParallel = TRUE)
+
+set.seed(1234)
+minus2.5_gbm <- train(Minus2.5 ~ .,
+                      data = Minus2.5_df,
+                      method = "gbm",
+                      trControl = fitControl)
+set.seed(1234)
+minus2.5_pls <- train(Minus2.5 ~ .,
+                      data = Minus2.5_df,
+                      method = "pls",
+                      trControl = fitControl,
+                      tuneLength = 15,
+                      preProc = c("center", "scale"))
+set.seed(1234)
+minus2.5_xgb <- train(Minus2.5 ~ .,
+                      data = Minus2.5_df,
+                      method = "xgbTree",
+                      trControl = fitControl)
+
+beep(8)
+
+stopCluster(cluster)
+intervalEnd <- Sys.time()
+paste("Minus2.5 classification model training took",intervalEnd - intervalStart,attr(intervalEnd - intervalStart,"units"))
+
+set.seed(1234)
+allResamples_prob <- resamples(list("GBM" = minus2.5_gbm,
+                                    "PLS" = minus2.5_pls,
+                                    "XGB" = minus2.5_xgb))
+
+parallelplot(allResamples_prob)
+
+saveRDS(minus2.5_gbm, "Soccer Machine/minus2.5_gbm.rds")
+saveRDS(minus2.5_pls, "Soccer Machine/minus2.5_pls.rds")
+saveRDS(minus2.5_xgb, "Soccer Machine/minus2.5_xgb.rds")
+
+Minus2.5_test <- test_prob %>% 
+  filter(Home_or_Away == "Home") %>% 
+  select(-Home_or_Away, -(Outcome:Minus2), -(Minus3:TT3.5))
+
+Minus2.5_test$gbm <- predict(minus2.5_gbm, Minus2.5_test, type = "prob")
+Minus2.5_test$pls <- predict(minus2.5_pls, Minus2.5_test, type = "prob")
+Minus2.5_test$xgb <- predict(minus2.5_xgb, Minus2.5_test, type = "prob")
+Minus2.5_test <- Minus2.5_test %>% 
+  mutate(equal_weight = (gbm + pls + xgb) / 3)
+
+confusionMatrix(data = predict(minus2.5_gbm, Minus2.5_test), reference = Minus2.5_test$Minus2.5)
+confusionMatrix(data = predict(minus2.5_pls, Minus2.5_test), reference = Minus2.5_test$Minus2.5)
+confusionMatrix(data = predict(minus2.5_xgb, Minus2.5_test), reference = Minus2.5_test$Minus2.5)
+
+Minus3_df <- train_prob %>% 
+  filter(Home_or_Away == "Home") %>% 
+  select(-Home_or_Away, -(Outcome:Minus2.5), -(Minus3.5:TT3.5))
+
+intervalStart <- Sys.time()
+cluster <- makeCluster(detectCores() - 1)
+registerDoParallel(cluster)
+
+fitControl <- trainControl(method = "repeatedcv",
+                           number = 10,
+                           allowParallel = TRUE)
+
+set.seed(1234)
+minus3_gbm <- train(Minus3 ~ .,
+                    data = Minus3_df,
+                    method = "gbm",
+                    trControl = fitControl)
+set.seed(1234)
+minus3_pls <- train(Minus3 ~ .,
+                    data = Minus3_df,
+                    method = "pls",
+                    trControl = fitControl,
+                    tuneLength = 15,
+                    preProc = c("center", "scale"))
+set.seed(1234)
+minus3_xgb <- train(Minus3 ~ .,
+                    data = Minus3_df,
+                    method = "xgbTree",
+                    trControl = fitControl)
+
+beep(8)
+
+stopCluster(cluster)
+intervalEnd <- Sys.time()
+paste("Minus3 classification model training took",intervalEnd - intervalStart,attr(intervalEnd - intervalStart,"units"))
+
+set.seed(1234)
+allResamples_prob <- resamples(list("GBM" = minus3_gbm,
+                                    "PLS" = minus3_pls,
+                                    "XGB" = minus3_xgb))
+
+parallelplot(allResamples_prob)
+
+saveRDS(minus3_gbm, "Soccer Machine/minus3_gbm.rds")
+saveRDS(minus3_pls, "Soccer Machine/minus3_pls.rds")
+saveRDS(minus3_xgb, "Soccer Machine/minus3_xgb.rds")
+
+Minus3_test <- test_prob %>% 
+  filter(Home_or_Away == "Home") %>% 
+  select(-Home_or_Away, -(Outcome:Minus2.5), -(Minus3.5:TT3.5))
+
+Minus3_test$gbm <- predict(minus3_gbm, Minus3_test, type = "prob")
+Minus3_test$pls <- predict(minus3_pls, Minus3_test, type = "prob")
+Minus3_test$xgb <- predict(minus3_xgb, Minus3_test, type = "prob")
+Minus3_test <- Minus3_test %>% 
+  mutate(equal_weight = (gbm + pls + xgb) / 3)
+
+confusionMatrix(data = predict(minus3_gbm, Minus3_test), reference = Minus3_test$Minus3)
+confusionMatrix(data = predict(minus3_pls, Minus3_test), reference = Minus3_test$Minus3)
+confusionMatrix(data = predict(minus3_xgb, Minus3_test), reference = Minus3_test$Minus3)
+
+Minus3.5_df <- train_prob %>% 
+  filter(Home_or_Away == "Home") %>% 
+  select(-Home_or_Away, -(Outcome:Minus3), -(Plus0.5:TT3.5))
+
+intervalStart <- Sys.time()
+cluster <- makeCluster(detectCores() - 1)
+registerDoParallel(cluster)
+
+fitControl <- trainControl(method = "repeatedcv",
+                           number = 10,
+                           allowParallel = TRUE)
+
+set.seed(1234)
+minus3.5_gbm <- train(Minus3.5 ~ .,
+                      data = Minus3.5_df,
+                      method = "gbm",
+                      trControl = fitControl)
+set.seed(1234)
+minus3.5_pls <- train(Minus3.5 ~ .,
+                      data = Minus3.5_df,
+                      method = "pls",
+                      trControl = fitControl,
+                      tuneLength = 15,
+                      preProc = c("center", "scale"))
+set.seed(1234)
+minus3.5_xgb <- train(Minus3.5 ~ .,
+                      data = Minus3.5_df,
+                      method = "xgbTree",
+                      trControl = fitControl)
+
+beep(8)
+
+stopCluster(cluster)
+intervalEnd <- Sys.time()
+paste("Minus3.5 classification model training took",intervalEnd - intervalStart,attr(intervalEnd - intervalStart,"units"))
+
+set.seed(1234)
+allResamples_prob <- resamples(list("GBM" = minus3.5_gbm,
+                                    "PLS" = minus3.5_pls,
+                                    "XGB" = minus3.5_xgb))
+
+parallelplot(allResamples_prob)
+
+saveRDS(minus3.5_gbm, "Soccer Machine/minus3.5_gbm.rds")
+saveRDS(minus3.5_pls, "Soccer Machine/minus3.5_pls.rds")
+saveRDS(minus3.5_xgb, "Soccer Machine/minus3.5_xgb.rds")
+
+Minus3.5_test <- test_prob %>% 
+  filter(Home_or_Away == "Home") %>% 
+  select(-Home_or_Away, -(Outcome:Minus3), -(Plus0.5:TT3.5))
+
+Minus3.5_test$gbm <- predict(minus3.5_gbm, Minus3.5_test, type = "prob")
+Minus3.5_test$pls <- predict(minus3.5_pls, Minus3.5_test, type = "prob")
+Minus3.5_test$xgb <- predict(minus3.5_xgb, Minus3.5_test, type = "prob")
+Minus3.5_test <- Minus3.5_test %>% 
+  mutate(equal_weight = (gbm + pls + xgb) / 3)
+
+confusionMatrix(data = predict(minus3.5_gbm, Minus3.5_test), reference = Minus3.5_test$Minus3.5)
+confusionMatrix(data = predict(minus3.5_pls, Minus3.5_test), reference = Minus3.5_test$Minus3.5)
+confusionMatrix(data = predict(minus3.5_xgb, Minus3.5_test), reference = Minus3.5_test$Minus3.5)
+
+Plus0.5_df <- train_prob %>% 
+  filter(Home_or_Away == "Home") %>% 
+  select(-Home_or_Away, -(Outcome:Minus3.5), -(Plus1:TT3.5))
+
+intervalStart <- Sys.time()
+cluster <- makeCluster(detectCores() - 1)
+registerDoParallel(cluster)
+
+fitControl <- trainControl(method = "repeatedcv",
+                           number = 10,
+                           allowParallel = TRUE)
+
+set.seed(1234)
+plus0.5_gbm <- train(Plus0.5 ~ .,
+                      data = Plus0.5_df,
+                      method = "gbm",
+                      trControl = fitControl)
+set.seed(1234)
+plus0.5_pls <- train(Plus0.5 ~ .,
+                      data = Plus0.5_df,
+                      method = "pls",
+                      trControl = fitControl,
+                      tuneLength = 15,
+                      preProc = c("center", "scale"))
+set.seed(1234)
+plus0.5_xgb <- train(Plus0.5 ~ .,
+                      data = Plus0.5_df,
+                      method = "xgbTree",
+                      trControl = fitControl)
+
+beep(8)
+
+stopCluster(cluster)
+intervalEnd <- Sys.time()
+paste("Plus0.5 classification model training took",intervalEnd - intervalStart,attr(intervalEnd - intervalStart,"units"))
+
+set.seed(1234)
+allResamples_prob <- resamples(list("GBM" = plus0.5_gbm,
+                                    "PLS" = plus0.5_pls,
+                                    "XGB" = plus0.5_xgb))
+
+parallelplot(allResamples_prob)
+
+saveRDS(plus0.5_gbm, "Soccer Machine/plus0.5_gbm.rds")
+saveRDS(plus0.5_pls, "Soccer Machine/plus0.5_pls.rds")
+saveRDS(plus0.5_xgb, "Soccer Machine/plus0.5_xgb.rds")
+
+Plus0.5_test <- test_prob %>% 
+  filter(Home_or_Away == "Home") %>% 
+  select(-Home_or_Away, -(Outcome:Minus3.5), -(Plus1:TT3.5))
+
+Plus0.5_test$gbm <- predict(plus0.5_gbm, Plus0.5_test, type = "prob")
+Plus0.5_test$pls <- predict(plus0.5_pls, Plus0.5_test, type = "prob")
+Plus0.5_test$xgb <- predict(plus0.5_xgb, Plus0.5_test, type = "prob")
+Plus0.5_test <- Plus0.5_test %>% 
+  mutate(equal_weight = (gbm + pls + xgb) / 3)
+
+confusionMatrix(data = predict(plus0.5_gbm, Plus0.5_test), reference = Plus0.5_test$Plus0.5)
+confusionMatrix(data = predict(plus0.5_pls, Plus0.5_test), reference = Plus0.5_test$Plus0.5)
+confusionMatrix(data = predict(plus0.5_xgb, Plus0.5_test), reference = Plus0.5_test$Plus0.5)
+
+Plus1_df <- train_prob %>% 
+  filter(Home_or_Away == "Home") %>% 
+  select(-Home_or_Away, -(Outcome:Plus0.5), -(Plus1.5:TT3.5))
+
+intervalStart <- Sys.time()
+cluster <- makeCluster(detectCores() - 1)
+registerDoParallel(cluster)
+
+fitControl <- trainControl(method = "repeatedcv",
+                           number = 10,
+                           allowParallel = TRUE)
+
+set.seed(1234)
+plus1_gbm <- train(Plus1 ~ .,
+                    data = Plus1_df,
+                    method = "gbm",
+                    trControl = fitControl)
+set.seed(1234)
+plus1_pls <- train(Plus1 ~ .,
+                    data = Plus1_df,
+                    method = "pls",
+                    trControl = fitControl,
+                    tuneLength = 15,
+                    preProc = c("center", "scale"))
+set.seed(1234)
+plus1_xgb <- train(Plus1 ~ .,
+                    data = Plus1_df,
+                    method = "xgbTree",
+                    trControl = fitControl)
+
+beep(8)
+
+stopCluster(cluster)
+intervalEnd <- Sys.time()
+paste("Plus1 classification model training took",intervalEnd - intervalStart,attr(intervalEnd - intervalStart,"units"))
+
+set.seed(1234)
+allResamples_prob <- resamples(list("GBM" = plus1_gbm,
+                                    "PLS" = plus1_pls,
+                                    "XGB" = plus1_xgb))
+
+parallelplot(allResamples_prob)
+
+saveRDS(plus1_gbm, "Soccer Machine/plus1_gbm.rds")
+saveRDS(plus1_pls, "Soccer Machine/plus1_pls.rds")
+saveRDS(plus1_xgb, "Soccer Machine/plus1_xgb.rds")
+
+Plus1_test <- test_prob %>% 
+  filter(Home_or_Away == "Home") %>% 
+  select(-Home_or_Away, -(Outcome:Plus0.5), -(Plus1.5:TT3.5))
+
+Plus1_test$gbm <- predict(plus1_gbm, Plus1_test, type = "prob")
+Plus1_test$pls <- predict(plus1_pls, Plus1_test, type = "prob")
+Plus1_test$xgb <- predict(plus1_xgb, Plus1_test, type = "prob")
+Plus1_test <- Plus1_test %>% 
+  mutate(equal_weight = (gbm + pls + xgb) / 3)
+
+confusionMatrix(data = predict(plus1_gbm, Plus1_test), reference = Plus1_test$Plus1)
+confusionMatrix(data = predict(plus1_pls, Plus1_test), reference = Plus1_test$Plus1)
+confusionMatrix(data = predict(plus1_xgb, Plus1_test), reference = Plus1_test$Plus1)
+
+Plus1.5_df <- train_prob %>% 
+  filter(Home_or_Away == "Home") %>% 
+  select(-Home_or_Away, -(Outcome:Plus1), -(Plus2:TT3.5))
+
+intervalStart <- Sys.time()
+cluster <- makeCluster(detectCores() - 1)
+registerDoParallel(cluster)
+
+fitControl <- trainControl(method = "repeatedcv",
+                           number = 10,
+                           allowParallel = TRUE)
+
+set.seed(1234)
+plus1.5_gbm <- train(Plus1.5 ~ .,
+                      data = Plus1.5_df,
+                      method = "gbm",
+                      trControl = fitControl)
+set.seed(1234)
+plus1.5_pls <- train(Plus1.5 ~ .,
+                      data = Plus1.5_df,
+                      method = "pls",
+                      trControl = fitControl,
+                      tuneLength = 15,
+                      preProc = c("center", "scale"))
+set.seed(1234)
+plus1.5_xgb <- train(Plus1.5 ~ .,
+                      data = Plus1.5_df,
+                      method = "xgbTree",
+                      trControl = fitControl)
+
+beep(8)
+
+stopCluster(cluster)
+intervalEnd <- Sys.time()
+paste("Plus1.5 classification model training took",intervalEnd - intervalStart,attr(intervalEnd - intervalStart,"units"))
+
+set.seed(1234)
+allResamples_prob <- resamples(list("GBM" = plus1.5_gbm,
+                                    "PLS" = plus1.5_pls,
+                                    "XGB" = plus1.5_xgb))
+
+parallelplot(allResamples_prob)
+
+saveRDS(plus1.5_gbm, "Soccer Machine/plus1.5_gbm.rds")
+saveRDS(plus1.5_pls, "Soccer Machine/plus1.5_pls.rds")
+saveRDS(plus1.5_xgb, "Soccer Machine/plus1.5_xgb.rds")
+
+Plus1.5_test <- test_prob %>% 
+  filter(Home_or_Away == "Home") %>% 
+  select(-Home_or_Away, -(Outcome:Plus1), -(Plus2:TT3.5))
+
+Plus1.5_test$gbm <- predict(plus1.5_gbm, Plus1.5_test, type = "prob")
+Plus1.5_test$pls <- predict(plus1.5_pls, Plus1.5_test, type = "prob")
+Plus1.5_test$xgb <- predict(plus1.5_xgb, Plus1.5_test, type = "prob")
+Plus1.5_test <- Plus1.5_test %>% 
+  mutate(equal_weight = (gbm + pls + xgb) / 3)
+
+confusionMatrix(data = predict(plus1.5_gbm, Plus1.5_test), reference = Plus1.5_test$Plus1.5)
+confusionMatrix(data = predict(plus1.5_pls, Plus1.5_test), reference = Plus1.5_test$Plus1.5)
+confusionMatrix(data = predict(plus1.5_xgb, Plus1.5_test), reference = Plus1.5_test$Plus1.5)
+
+Plus2_df <- train_prob %>% 
+  filter(Home_or_Away == "Home") %>% 
+  select(-Home_or_Away, -(Outcome:Plus1.5), -(Plus2.5:TT3.5))
+
+intervalStart <- Sys.time()
+cluster <- makeCluster(detectCores() - 1)
+registerDoParallel(cluster)
+
+fitControl <- trainControl(method = "repeatedcv",
+                           number = 10,
+                           allowParallel = TRUE)
+
+set.seed(1234)
+plus2_gbm <- train(Plus2 ~ .,
+                    data = Plus2_df,
+                    method = "gbm",
+                    trControl = fitControl)
+set.seed(1234)
+plus2_pls <- train(Plus2 ~ .,
+                    data = Plus2_df,
+                    method = "pls",
+                    trControl = fitControl,
+                    tuneLength = 15,
+                    preProc = c("center", "scale"))
+set.seed(1234)
+plus2_xgb <- train(Plus2 ~ .,
+                    data = Plus2_df,
+                    method = "xgbTree",
+                    trControl = fitControl)
+
+beep(8)
+
+stopCluster(cluster)
+intervalEnd <- Sys.time()
+paste("Plus2 classification model training took",intervalEnd - intervalStart,attr(intervalEnd - intervalStart,"units"))
+
+set.seed(1234)
+allResamples_prob <- resamples(list("GBM" = plus2_gbm,
+                                    "PLS" = plus2_pls,
+                                    "XGB" = plus2_xgb))
+
+parallelplot(allResamples_prob)
+
+saveRDS(plus2_gbm, "Soccer Machine/plus2_gbm.rds")
+saveRDS(plus2_pls, "Soccer Machine/plus2_pls.rds")
+saveRDS(plus2_xgb, "Soccer Machine/plus2_xgb.rds")
+
+Plus2_test <- test_prob %>% 
+  filter(Home_or_Away == "Home") %>% 
+  select(-Home_or_Away, -(Outcome:Plus1.5), -(Plus2.5:TT3.5))
+
+Plus2_test$gbm <- predict(plus2_gbm, Plus2_test, type = "prob")
+Plus2_test$pls <- predict(plus2_pls, Plus2_test, type = "prob")
+Plus2_test$xgb <- predict(plus2_xgb, Plus2_test, type = "prob")
+Plus2_test <- Plus2_test %>% 
+  mutate(equal_weight = (gbm + pls + xgb) / 3)
+
+confusionMatrix(data = predict(plus2_gbm, Plus2_test), reference = Plus2_test$Plus2)
+confusionMatrix(data = predict(plus2_pls, Plus2_test), reference = Plus2_test$Plus2)
+confusionMatrix(data = predict(plus2_xgb, Plus2_test), reference = Plus2_test$Plus2)
+
+Plus2.5_df <- train_prob %>% 
+  filter(Home_or_Away == "Home") %>% 
+  select(-Home_or_Away, -(Outcome:Plus2), -(Plus3:TT3.5))
+
+intervalStart <- Sys.time()
+cluster <- makeCluster(detectCores() - 1)
+registerDoParallel(cluster)
+
+fitControl <- trainControl(method = "repeatedcv",
+                           number = 10,
+                           allowParallel = TRUE)
+
+set.seed(1234)
+plus2.5_gbm <- train(Plus2.5 ~ .,
+                      data = Plus2.5_df,
+                      method = "gbm",
+                      trControl = fitControl)
+set.seed(1234)
+plus2.5_pls <- train(Plus2.5 ~ .,
+                      data = Plus2.5_df,
+                      method = "pls",
+                      trControl = fitControl,
+                      tuneLength = 15,
+                      preProc = c("center", "scale"))
+set.seed(1234)
+plus2.5_xgb <- train(Plus2.5 ~ .,
+                      data = Plus2.5_df,
+                      method = "xgbTree",
+                      trControl = fitControl)
+
+beep(8)
+
+stopCluster(cluster)
+intervalEnd <- Sys.time()
+paste("Plus2.5 classification model training took",intervalEnd - intervalStart,attr(intervalEnd - intervalStart,"units"))
+
+set.seed(1234)
+allResamples_prob <- resamples(list("GBM" = plus2.5_gbm,
+                                    "PLS" = plus2.5_pls,
+                                    "XGB" = plus2.5_xgb))
+
+parallelplot(allResamples_prob)
+
+saveRDS(plus2.5_gbm, "Soccer Machine/plus2.5_gbm.rds")
+saveRDS(plus2.5_pls, "Soccer Machine/plus2.5_pls.rds")
+saveRDS(plus2.5_xgb, "Soccer Machine/plus2.5_xgb.rds")
+
+Plus2.5_test <- test_prob %>% 
+  filter(Home_or_Away == "Home") %>% 
+  select(-Home_or_Away, -(Outcome:Plus2), -(Plus3:TT3.5))
+
+Plus2.5_test$gbm <- predict(plus2.5_gbm, Plus2.5_test, type = "prob")
+Plus2.5_test$pls <- predict(plus2.5_pls, Plus2.5_test, type = "prob")
+Plus2.5_test$xgb <- predict(plus2.5_xgb, Plus2.5_test, type = "prob")
+Plus2.5_test <- Plus2.5_test %>% 
+  mutate(equal_weight = (gbm + pls + xgb) / 3)
+
+confusionMatrix(data = predict(plus2.5_gbm, Plus2.5_test), reference = Plus2.5_test$Plus2.5)
+confusionMatrix(data = predict(plus2.5_pls, Plus2.5_test), reference = Plus2.5_test$Plus2.5)
+confusionMatrix(data = predict(plus2.5_xgb, Plus2.5_test), reference = Plus2.5_test$Plus2.5)
+
+Plus3_df <- train_prob %>% 
+  filter(Home_or_Away == "Home") %>% 
+  select(-Home_or_Away, -(Outcome:Plus2.5), -(Plus3.5:TT3.5))
+
+intervalStart <- Sys.time()
+cluster <- makeCluster(detectCores() - 1)
+registerDoParallel(cluster)
+
+fitControl <- trainControl(method = "repeatedcv",
+                           number = 10,
+                           allowParallel = TRUE)
+
+set.seed(1234)
+plus3_gbm <- train(Plus3 ~ .,
+                    data = Plus3_df,
+                    method = "gbm",
+                    trControl = fitControl)
+set.seed(1234)
+plus3_pls <- train(Plus3 ~ .,
+                    data = Plus3_df,
+                    method = "pls",
+                    trControl = fitControl,
+                    tuneLength = 15,
+                    preProc = c("center", "scale"))
+set.seed(1234)
+plus3_xgb <- train(Plus3 ~ .,
+                    data = Plus3_df,
+                    method = "xgbTree",
+                    trControl = fitControl)
+
+beep(8)
+
+stopCluster(cluster)
+intervalEnd <- Sys.time()
+paste("Plus3 classification model training took",intervalEnd - intervalStart,attr(intervalEnd - intervalStart,"units"))
+
+set.seed(1234)
+allResamples_prob <- resamples(list("GBM" = plus3_gbm,
+                                    "PLS" = plus3_pls,
+                                    "XGB" = plus3_xgb))
+
+parallelplot(allResamples_prob)
+
+saveRDS(plus3_gbm, "Soccer Machine/plus3_gbm.rds")
+saveRDS(plus3_pls, "Soccer Machine/plus3_pls.rds")
+saveRDS(plus3_xgb, "Soccer Machine/plus3_xgb.rds")
+
+Plus3_test <- test_prob %>% 
+  filter(Home_or_Away == "Home") %>% 
+  select(-Home_or_Away, -(Outcome:Plus2.5), -(Plus3.5:TT3.5))
+
+Plus3_test$gbm <- predict(plus3_gbm, Plus3_test, type = "prob")
+Plus3_test$pls <- predict(plus3_pls, Plus3_test, type = "prob")
+Plus3_test$xgb <- predict(plus3_xgb, Plus3_test, type = "prob")
+Plus3_test <- Plus3_test %>% 
+  mutate(equal_weight = (gbm + pls + xgb) / 3)
+
+confusionMatrix(data = predict(plus3_gbm, Plus3_test), reference = Plus3_test$Plus3)
+confusionMatrix(data = predict(plus3_pls, Plus3_test), reference = Plus3_test$Plus3)
+confusionMatrix(data = predict(plus3_xgb, Plus3_test), reference = Plus3_test$Plus3)
+
+Plus3.5_df <- train_prob %>% 
+  filter(Home_or_Away == "Home") %>% 
+  select(-Home_or_Away, -(Outcome:Plus3), -(Total1.5:TT3.5))
+
+intervalStart <- Sys.time()
+cluster <- makeCluster(detectCores() - 1)
+registerDoParallel(cluster)
+
+fitControl <- trainControl(method = "repeatedcv",
+                           number = 10,
+                           allowParallel = TRUE)
+
+set.seed(1234)
+plus3.5_gbm <- train(Plus3.5 ~ .,
+                      data = Plus3.5_df,
+                      method = "gbm",
+                      trControl = fitControl)
+set.seed(1234)
+plus3.5_pls <- train(Plus3.5 ~ .,
+                      data = Plus3.5_df,
+                      method = "pls",
+                      trControl = fitControl,
+                      tuneLength = 15,
+                      preProc = c("center", "scale"))
+set.seed(1234)
+plus3.5_xgb <- train(Plus3.5 ~ .,
+                      data = Plus3.5_df,
+                      method = "xgbTree",
+                      trControl = fitControl)
+
+beep(8)
+
+stopCluster(cluster)
+intervalEnd <- Sys.time()
+paste("Plus3.5 classification model training took",intervalEnd - intervalStart,attr(intervalEnd - intervalStart,"units"))
+
+set.seed(1234)
+allResamples_prob <- resamples(list("GBM" = plus3.5_gbm,
+                                    "PLS" = plus3.5_pls,
+                                    "XGB" = plus3.5_xgb))
+
+parallelplot(allResamples_prob)
+
+saveRDS(plus3.5_gbm, "Soccer Machine/plus3.5_gbm.rds")
+saveRDS(plus3.5_pls, "Soccer Machine/plus3.5_pls.rds")
+saveRDS(plus3.5_xgb, "Soccer Machine/plus3.5_xgb.rds")
+
+Plus3.5_test <- test_prob %>% 
+  filter(Home_or_Away == "Home") %>% 
+  select(-Home_or_Away, -(Outcome:Plus3), -(Total1.5:TT3.5))
+
+Plus3.5_test$gbm <- predict(plus3.5_gbm, Plus3.5_test, type = "prob")
+Plus3.5_test$pls <- predict(plus3.5_pls, Plus3.5_test, type = "prob")
+Plus3.5_test$xgb <- predict(plus3.5_xgb, Plus3.5_test, type = "prob")
+Plus3.5_test <- Plus3.5_test %>% 
+  mutate(equal_weight = (gbm + pls + xgb) / 3)
+
+confusionMatrix(data = predict(plus3.5_gbm, Plus3.5_test), reference = Plus3.5_test$Plus3.5)
+confusionMatrix(data = predict(plus3.5_pls, Plus3.5_test), reference = Plus3.5_test$Plus3.5)
+confusionMatrix(data = predict(plus3.5_xgb, Plus3.5_test), reference = Plus3.5_test$Plus3.5)
+
+
+
+
+
 
