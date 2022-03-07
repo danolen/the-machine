@@ -11,6 +11,7 @@ library(caretEnsemble)
 library(parallel)
 library(doParallel)
 library(beepr)
+#library(worldfootballR)
 
 intervalStart <- Sys.time()
 urls <- c("https://fbref.com/en/comps/9/schedule/Premier-League-Scores-and-Fixtures",
@@ -1733,6 +1734,924 @@ Plus3.5_test <- Plus3.5_test %>%
 confusionMatrix(data = predict(plus3.5_gbm, Plus3.5_test), reference = Plus3.5_test$Plus3.5)
 confusionMatrix(data = predict(plus3.5_pls, Plus3.5_test), reference = Plus3.5_test$Plus3.5)
 confusionMatrix(data = predict(plus3.5_xgb, Plus3.5_test), reference = Plus3.5_test$Plus3.5)
+
+Total1.5_df <- train_prob %>% 
+  filter(Home_or_Away == "Home") %>% 
+  select(-Home_or_Away, -(Outcome:Plus3.5), -(Total2:TT3.5))
+
+intervalStart <- Sys.time()
+cluster <- makeCluster(detectCores() - 1)
+registerDoParallel(cluster)
+
+fitControl <- trainControl(method = "repeatedcv",
+                           number = 10,
+                           allowParallel = TRUE)
+
+set.seed(1234)
+total1.5_gbm <- train(Total1.5 ~ .,
+                      data = Total1.5_df,
+                      method = "gbm",
+                      trControl = fitControl)
+set.seed(1234)
+total1.5_pls <- train(Total1.5 ~ .,
+                      data = Total1.5_df,
+                      method = "pls",
+                      trControl = fitControl,
+                      tuneLength = 15,
+                      preProc = c("center", "scale"))
+set.seed(1234)
+total1.5_xgb <- train(Total1.5 ~ .,
+                      data = Total1.5_df,
+                      method = "xgbTree",
+                      trControl = fitControl)
+
+beep(8)
+
+stopCluster(cluster)
+intervalEnd <- Sys.time()
+paste("Total1.5 classification model training took",intervalEnd - intervalStart,attr(intervalEnd - intervalStart,"units"))
+
+set.seed(1234)
+allResamples_prob <- resamples(list("GBM" = total1.5_gbm,
+                                    "PLS" = total1.5_pls,
+                                    "XGB" = total1.5_xgb))
+
+parallelplot(allResamples_prob)
+
+saveRDS(total1.5_gbm, "Soccer Machine/total1.5_gbm.rds")
+saveRDS(total1.5_pls, "Soccer Machine/total_pls.rds")
+saveRDS(total1.5_xgb, "Soccer Machine/total1.5_xgb.rds")
+
+Total1.5_test <- test_prob %>% 
+  filter(Home_or_Away == "Home") %>% 
+  select(-Home_or_Away, -(Outcome:Plus3.5), -(Total2:TT3.5))
+
+Total1.5_test$gbm <- predict(total1.5_gbm, Total1.5_test, type = "prob")
+Total1.5_test$pls <- predict(total1.5_pls, Total1.5_test, type = "prob")
+Total1.5_test$xgb <- predict(total1.5_xgb, Total1.5_test, type = "prob")
+Total1.5_test <- Total1.5_test %>% 
+  mutate(equal_weight = (gbm + pls + xgb) / 3)
+
+confusionMatrix(data = predict(total1.5_gbm, Total1.5_test), reference = Total1.5_test$Total1.5)
+confusionMatrix(data = predict(total1.5_pls, Total1.5_test), reference = Total1.5_test$Total1.5)
+confusionMatrix(data = predict(total1.5_xgb, Total1.5_test), reference = Total1.5_test$Total1.5)
+
+Total2_df <- train_prob %>% 
+  filter(Home_or_Away == "Home") %>% 
+  select(-Home_or_Away, -(Outcome:Total1.5), -(Total2.5:TT3.5))
+
+intervalStart <- Sys.time()
+cluster <- makeCluster(detectCores() - 1)
+registerDoParallel(cluster)
+
+fitControl <- trainControl(method = "repeatedcv",
+                           number = 10,
+                           allowParallel = TRUE)
+
+set.seed(1234)
+total2_gbm <- train(Total2 ~ .,
+                    data = Total2_df,
+                    method = "gbm",
+                    trControl = fitControl)
+set.seed(1234)
+total2_pls <- train(Total2 ~ .,
+                    data = Total2_df,
+                    method = "pls",
+                    trControl = fitControl,
+                    tuneLength = 15,
+                    preProc = c("center", "scale"))
+set.seed(1234)
+total2_xgb <- train(Total2 ~ .,
+                    data = Total2_df,
+                    method = "xgbTree",
+                    trControl = fitControl)
+
+beep(8)
+
+stopCluster(cluster)
+intervalEnd <- Sys.time()
+paste("Total2 classification model training took",intervalEnd - intervalStart,attr(intervalEnd - intervalStart,"units"))
+
+set.seed(1234)
+allResamples_prob <- resamples(list("GBM" = total2_gbm,
+                                    "PLS" = total2_pls,
+                                    "XGB" = total2_xgb))
+
+parallelplot(allResamples_prob)
+
+saveRDS(total2_gbm, "Soccer Machine/total2_gbm.rds")
+saveRDS(total2_pls, "Soccer Machine/total2_pls.rds")
+saveRDS(total2_xgb, "Soccer Machine/total2_xgb.rds")
+
+Total2_test <- test_prob %>% 
+  filter(Home_or_Away == "Home") %>% 
+  select(-Home_or_Away, -(Outcome:Total1.5), -(Total2.5:TT3.5))
+
+Total2_test$gbm <- predict(total2_gbm, Total2_test, type = "prob")
+Total2_test$pls <- predict(total2_pls, Total2_test, type = "prob")
+Total2_test$xgb <- predict(total2_xgb, Total2_test, type = "prob")
+Total2_test <- Total2_test %>% 
+  mutate(equal_weight = (gbm + pls + xgb) / 3)
+
+confusionMatrix(data = predict(total2_gbm, Total2_test), reference = Total2_test$Total2)
+confusionMatrix(data = predict(total2_pls, Total2_test), reference = Total2_test$Total2)
+confusionMatrix(data = predict(total2_xgb, Total2_test), reference = Total2_test$Total2)
+
+Total2.5_df <- train_prob %>% 
+  filter(Home_or_Away == "Home") %>% 
+  select(-Home_or_Away, -(Outcome:Total2), -(Total3:TT3.5))
+
+intervalStart <- Sys.time()
+cluster <- makeCluster(detectCores() - 1)
+registerDoParallel(cluster)
+
+fitControl <- trainControl(method = "repeatedcv",
+                           number = 10,
+                           allowParallel = TRUE)
+
+set.seed(1234)
+total2.5_gbm <- train(Total2.5 ~ .,
+                      data = Total2.5_df,
+                      method = "gbm",
+                      trControl = fitControl)
+set.seed(1234)
+total2.5_pls <- train(Total2.5 ~ .,
+                      data = Total2.5_df,
+                      method = "pls",
+                      trControl = fitControl,
+                      tuneLength = 15,
+                      preProc = c("center", "scale"))
+set.seed(1234)
+total2.5_xgb <- train(Total2.5 ~ .,
+                      data = Total2.5_df,
+                      method = "xgbTree",
+                      trControl = fitControl)
+
+beep(8)
+
+stopCluster(cluster)
+intervalEnd <- Sys.time()
+paste("Total2.5 classification model training took",intervalEnd - intervalStart,attr(intervalEnd - intervalStart,"units"))
+
+set.seed(1234)
+allResamples_prob <- resamples(list("GBM" = total2.5_gbm,
+                                    "PLS" = total2.5_pls,
+                                    "XGB" = total2.5_xgb))
+
+parallelplot(allResamples_prob)
+
+saveRDS(total2.5_gbm, "Soccer Machine/total2.5_gbm.rds")
+saveRDS(total2.5_pls, "Soccer Machine/total2.5_pls.rds")
+saveRDS(total2.5_xgb, "Soccer Machine/total2.5_xgb.rds")
+
+Total2.5_test <- test_prob %>% 
+  filter(Home_or_Away == "Home") %>% 
+  select(-Home_or_Away, -(Outcome:Total2), -(Total3:TT3.5))
+
+Total2.5_test$gbm <- predict(total2.5_gbm, Total2.5_test, type = "prob")
+Total2.5_test$pls <- predict(total2.5_pls, Total2.5_test, type = "prob")
+Total2.5_test$xgb <- predict(total2.5_xgb, Total2.5_test, type = "prob")
+Total2.5_test <- Total2.5_test %>% 
+  mutate(equal_weight = (gbm + pls + xgb) / 3)
+
+confusionMatrix(data = predict(total2.5_gbm, Total2.5_test), reference = Total2.5_test$Total2.5)
+confusionMatrix(data = predict(total2.5_pls, Total2.5_test), reference = Total2.5_test$Total2.5)
+confusionMatrix(data = predict(total2.5_xgb, Total2.5_test), reference = Total2.5_test$Total2.5)
+
+Total3_df <- train_prob %>% 
+  filter(Home_or_Away == "Home") %>% 
+  select(-Home_or_Away, -(Outcome:Total2.5), -(Total3.5:TT3.5))
+
+intervalStart <- Sys.time()
+cluster <- makeCluster(detectCores() - 1)
+registerDoParallel(cluster)
+
+fitControl <- trainControl(method = "repeatedcv",
+                           number = 10,
+                           allowParallel = TRUE)
+
+set.seed(1234)
+total3_gbm <- train(Total3 ~ .,
+                    data = Total3_df,
+                    method = "gbm",
+                    trControl = fitControl)
+set.seed(1234)
+total3_pls <- train(Total3 ~ .,
+                    data = Total3_df,
+                    method = "pls",
+                    trControl = fitControl,
+                    tuneLength = 15,
+                    preProc = c("center", "scale"))
+set.seed(1234)
+total3_xgb <- train(Total3 ~ .,
+                    data = Total3_df,
+                    method = "xgbTree",
+                    trControl = fitControl)
+
+beep(8)
+
+stopCluster(cluster)
+intervalEnd <- Sys.time()
+paste("Total3 classification model training took",intervalEnd - intervalStart,attr(intervalEnd - intervalStart,"units"))
+
+set.seed(1234)
+allResamples_prob <- resamples(list("GBM" = total3_gbm,
+                                    "PLS" = total3_pls,
+                                    "XGB" = total3_xgb))
+
+parallelplot(allResamples_prob)
+
+saveRDS(total3_gbm, "Soccer Machine/total3_gbm.rds")
+saveRDS(total3_pls, "Soccer Machine/total3_pls.rds")
+saveRDS(total3_xgb, "Soccer Machine/total3_xgb.rds")
+
+Total3_test <- test_prob %>% 
+  filter(Home_or_Away == "Home") %>% 
+  select(-Home_or_Away, -(Outcome:Total2.5), -(Total3.5:TT3.5))
+
+Total3_test$gbm <- predict(total3_gbm, Total3_test, type = "prob")
+Total3_test$pls <- predict(total3_pls, Total3_test, type = "prob")
+Total3_test$xgb <- predict(total3_xgb, Total3_test, type = "prob")
+Total3_test <- Total3_test %>% 
+  mutate(equal_weight = (gbm + pls + xgb) / 3)
+
+confusionMatrix(data = predict(total3_gbm, Total3_test), reference = Total3_test$Total3)
+confusionMatrix(data = predict(total3_pls, Total3_test), reference = Total3_test$Total3)
+confusionMatrix(data = predict(total3_xgb, Total3_test), reference = Total3_test$Total3)
+
+Total3.5_df <- train_prob %>% 
+  filter(Home_or_Away == "Home") %>% 
+  select(-Home_or_Away, -(Outcome:Total3), -(Total4:TT3.5))
+
+intervalStart <- Sys.time()
+cluster <- makeCluster(detectCores() - 1)
+registerDoParallel(cluster)
+
+fitControl <- trainControl(method = "repeatedcv",
+                           number = 10,
+                           allowParallel = TRUE)
+
+set.seed(1234)
+total3.5_gbm <- train(Total3.5 ~ .,
+                      data = Total3.5_df,
+                      method = "gbm",
+                      trControl = fitControl)
+set.seed(1234)
+total3.5_pls <- train(Total3.5 ~ .,
+                      data = Total3.5_df,
+                      method = "pls",
+                      trControl = fitControl,
+                      tuneLength = 15,
+                      preProc = c("center", "scale"))
+set.seed(1234)
+total3.5_xgb <- train(Total3.5 ~ .,
+                      data = Total3.5_df,
+                      method = "xgbTree",
+                      trControl = fitControl)
+
+beep(8)
+
+stopCluster(cluster)
+intervalEnd <- Sys.time()
+paste("Total3.5 classification model training took",intervalEnd - intervalStart,attr(intervalEnd - intervalStart,"units"))
+
+set.seed(1234)
+allResamples_prob <- resamples(list("GBM" = total3.5_gbm,
+                                    "PLS" = total3.5_pls,
+                                    "XGB" = total3.5_xgb))
+
+parallelplot(allResamples_prob)
+
+saveRDS(total3.5_gbm, "Soccer Machine/total3.5_gbm.rds")
+saveRDS(total3.5_pls, "Soccer Machine/total3.5_pls.rds")
+saveRDS(total3.5_xgb, "Soccer Machine/total3.5_xgb.rds")
+
+Total3.5_test <- test_prob %>% 
+  filter(Home_or_Away == "Home") %>% 
+  select(-Home_or_Away, -(Outcome:Total3), -(Total4:TT3.5))
+
+Total3.5_test$gbm <- predict(total3.5_gbm, Total3.5_test, type = "prob")
+Total3.5_test$pls <- predict(total3.5_pls, Total3.5_test, type = "prob")
+Total3.5_test$xgb <- predict(total3.5_xgb, Total3.5_test, type = "prob")
+Total3.5_test <- Total3.5_test %>% 
+  mutate(equal_weight = (gbm + pls + xgb) / 3)
+
+confusionMatrix(data = predict(total3.5_gbm, Total3.5_test), reference = Total3.5_test$Total3.5)
+confusionMatrix(data = predict(total3.5_pls, Total3.5_test), reference = Total3.5_test$Total3.5)
+confusionMatrix(data = predict(total3.5_xgb, Total3.5_test), reference = Total3.5_test$Total3.5)
+
+Total4_df <- train_prob %>% 
+  filter(Home_or_Away == "Home") %>% 
+  select(-Home_or_Away, -(Outcome:Total3.5), -(Total4.5:TT3.5))
+
+intervalStart <- Sys.time()
+cluster <- makeCluster(detectCores() - 1)
+registerDoParallel(cluster)
+
+fitControl <- trainControl(method = "repeatedcv",
+                           number = 10,
+                           allowParallel = TRUE)
+
+set.seed(1234)
+total4_gbm <- train(Total4 ~ .,
+                    data = Total4_df,
+                    method = "gbm",
+                    trControl = fitControl)
+set.seed(1234)
+total4_pls <- train(Total4 ~ .,
+                    data = Total4_df,
+                    method = "pls",
+                    trControl = fitControl,
+                    tuneLength = 15,
+                    preProc = c("center", "scale"))
+set.seed(1234)
+total4_xgb <- train(Total4 ~ .,
+                    data = Total4_df,
+                    method = "xgbTree",
+                    trControl = fitControl)
+
+beep(8)
+
+stopCluster(cluster)
+intervalEnd <- Sys.time()
+paste("Total4 classification model training took",intervalEnd - intervalStart,attr(intervalEnd - intervalStart,"units"))
+
+set.seed(1234)
+allResamples_prob <- resamples(list("GBM" = total4_gbm,
+                                    "PLS" = total4_pls,
+                                    "XGB" = total4_xgb))
+
+parallelplot(allResamples_prob)
+
+saveRDS(total4_gbm, "Soccer Machine/total4_gbm.rds")
+saveRDS(total4_pls, "Soccer Machine/total4_pls.rds")
+saveRDS(total4_xgb, "Soccer Machine/total4_xgb.rds")
+
+Total4_test <- test_prob %>% 
+  filter(Home_or_Away == "Home") %>% 
+  select(-Home_or_Away, -(Outcome:Total3.5), -(Total4.5:TT3.5))
+
+Total4_test$gbm <- predict(total4_gbm, Total4_test, type = "prob")
+Total4_test$pls <- predict(total4_pls, Total4_test, type = "prob")
+Total4_test$xgb <- predict(total4_xgb, Total4_test, type = "prob")
+Total4_test <- Total4_test %>% 
+  mutate(equal_weight = (gbm + pls + xgb) / 3)
+
+confusionMatrix(data = predict(total4_gbm, Total4_test), reference = Total4_test$Total4)
+confusionMatrix(data = predict(total4_pls, Total4_test), reference = Total4_test$Total4)
+confusionMatrix(data = predict(total4_xgb, Total4_test), reference = Total4_test$Total4)
+
+Total4.5_df <- train_prob %>% 
+  filter(Home_or_Away == "Home") %>% 
+  select(-Home_or_Away, -(Outcome:Total4), -(BTTS:TT3.5))
+
+intervalStart <- Sys.time()
+cluster <- makeCluster(detectCores() - 1)
+registerDoParallel(cluster)
+
+fitControl <- trainControl(method = "repeatedcv",
+                           number = 10,
+                           allowParallel = TRUE)
+
+set.seed(1234)
+total4.5_gbm <- train(Total4.5 ~ .,
+                      data = Total4.5_df,
+                      method = "gbm",
+                      trControl = fitControl)
+set.seed(1234)
+total4.5_pls <- train(Total4.5 ~ .,
+                      data = Total4.5_df,
+                      method = "pls",
+                      trControl = fitControl,
+                      tuneLength = 15,
+                      preProc = c("center", "scale"))
+set.seed(1234)
+total4.5_xgb <- train(Total4.5 ~ .,
+                      data = Total4.5_df,
+                      method = "xgbTree",
+                      trControl = fitControl)
+
+beep(8)
+
+stopCluster(cluster)
+intervalEnd <- Sys.time()
+paste("Total4.5 classification model training took",intervalEnd - intervalStart,attr(intervalEnd - intervalStart,"units"))
+
+set.seed(1234)
+allResamples_prob <- resamples(list("GBM" = total4.5_gbm,
+                                    "PLS" = total4.5_pls,
+                                    "XGB" = total4.5_xgb))
+
+parallelplot(allResamples_prob)
+
+saveRDS(total4.5_gbm, "Soccer Machine/total4.5_gbm.rds")
+saveRDS(total4.5_pls, "Soccer Machine/total4.5_pls.rds")
+saveRDS(total4.5_xgb, "Soccer Machine/total4.5_xgb.rds")
+
+Total4.5_test <- test_prob %>% 
+  filter(Home_or_Away == "Home") %>% 
+  select(-Home_or_Away, -(Outcome:Total4), -(BTTS:TT3.5))
+
+Total4.5_test$gbm <- predict(total4.5_gbm, Total4.5_test, type = "prob")
+Total4.5_test$pls <- predict(total4.5_pls, Total4.5_test, type = "prob")
+Total4.5_test$xgb <- predict(total4.5_xgb, Total4.5_test, type = "prob")
+Total4.5_test <- Total4.5_test %>% 
+  mutate(equal_weight = (gbm + pls + xgb) / 3)
+
+confusionMatrix(data = predict(total4.5_gbm, Total4.5_test), reference = Total4.5_test$Total4.5)
+confusionMatrix(data = predict(total4.5_pls, Total4.5_test), reference = Total4.5_test$Total4.5)
+confusionMatrix(data = predict(total4.5_xgb, Total4.5_test), reference = Total4.5_test$Total4.5)
+
+BTTS_df <- train_prob %>% 
+  filter(Home_or_Away == "Home") %>% 
+  select(-Home_or_Away, -(Outcome:Total4.5), -(TT0.5:TT3.5))
+
+intervalStart <- Sys.time()
+cluster <- makeCluster(detectCores() - 1)
+registerDoParallel(cluster)
+
+fitControl <- trainControl(method = "repeatedcv",
+                           number = 10,
+                           allowParallel = TRUE)
+
+set.seed(1234)
+BTTS_gbm <- train(BTTS ~ .,
+                      data = BTTS_df,
+                      method = "gbm",
+                      trControl = fitControl)
+set.seed(1234)
+BTTS_pls <- train(BTTS ~ .,
+                      data = BTTS_df,
+                      method = "pls",
+                      trControl = fitControl,
+                      tuneLength = 15,
+                      preProc = c("center", "scale"))
+set.seed(1234)
+BTTS_xgb <- train(BTTS ~ .,
+                      data = BTTS_df,
+                      method = "xgbTree",
+                      trControl = fitControl)
+
+beep(8)
+
+stopCluster(cluster)
+intervalEnd <- Sys.time()
+paste("BTTS classification model training took",intervalEnd - intervalStart,attr(intervalEnd - intervalStart,"units"))
+
+set.seed(1234)
+allResamples_prob <- resamples(list("GBM" = BTTS_gbm,
+                                    "PLS" = BTTS_pls,
+                                    "XGB" = BTTS_xgb))
+
+parallelplot(allResamples_prob)
+
+saveRDS(BTTS_gbm, "Soccer Machine/BTTS_gbm.rds")
+saveRDS(BTTS_pls, "Soccer Machine/BTTS_pls.rds")
+saveRDS(BTTS_xgb, "Soccer Machine/BTTS_xgb.rds")
+
+BTTS_test <- test_prob %>% 
+  filter(Home_or_Away == "Home") %>% 
+  select(-Home_or_Away, -(Outcome:Total4.5), -(TT0.5:TT3.5))
+
+BTTS_test$gbm <- predict(BTTS_gbm, BTTS_test, type = "prob")
+BTTS_test$pls <- predict(BTTS_pls, BTTS_test, type = "prob")
+BTTS_test$xgb <- predict(BTTS_xgb, BTTS_test, type = "prob")
+BTTS_test <- BTTS_test %>% 
+  mutate(equal_weight = (gbm + pls + xgb) / 3)
+
+confusionMatrix(data = predict(BTTS_gbm, BTTS_test), reference = BTTS_test$BTTS)
+confusionMatrix(data = predict(BTTS_pls, BTTS_test), reference = BTTS_test$BTTS)
+confusionMatrix(data = predict(BTTS_xgb, BTTS_test), reference = BTTS_test$BTTS)
+
+TT0.5_df <- train_prob %>% 
+  filter(Home_or_Away == "Home") %>% 
+  select(-Home_or_Away, -(Outcome:BTTS), -(TT1:TT3.5))
+
+intervalStart <- Sys.time()
+cluster <- makeCluster(detectCores() - 1)
+registerDoParallel(cluster)
+
+fitControl <- trainControl(method = "repeatedcv",
+                           number = 10,
+                           allowParallel = TRUE)
+
+set.seed(1234)
+tt0.5_gbm <- train(TT0.5 ~ .,
+                     data = TT0.5_df,
+                     method = "gbm",
+                     trControl = fitControl)
+set.seed(1234)
+tt0.5_pls <- train(TT0.5 ~ .,
+                     data = TT0.5_df,
+                     method = "pls",
+                     trControl = fitControl,
+                     tuneLength = 15,
+                     preProc = c("center", "scale"))
+set.seed(1234)
+tt0.5_xgb <- train(TT0.5 ~ .,
+                     data = TT0.5_df,
+                     method = "xgbTree",
+                     trControl = fitControl)
+
+beep(8)
+
+stopCluster(cluster)
+intervalEnd <- Sys.time()
+paste("TT0.5 classification model training took",intervalEnd - intervalStart,attr(intervalEnd - intervalStart,"units"))
+
+set.seed(1234)
+allResamples_prob <- resamples(list("GBM" = tt0.5_gbm,
+                                    "PLS" = tt0.5_pls,
+                                    "XGB" = tt0.5_xgb))
+
+parallelplot(allResamples_prob)
+
+saveRDS(tt0.5_gbm, "Soccer Machine/tt0.5_gbm.rds")
+saveRDS(tt0.5_pls, "Soccer Machine/tt0.5_pls.rds")
+saveRDS(tt0.5_xgb, "Soccer Machine/tt0.5_xgb.rds")
+
+TT0.5_test <- test_prob %>% 
+  filter(Home_or_Away == "Home") %>% 
+  select(-Home_or_Away, -(Outcome:BTTS), -(TT1:TT3.5))
+
+TT0.5_test$gbm <- predict(tt0.5_gbm, TT0.5_test, type = "prob")
+TT0.5_test$pls <- predict(tt0.5_pls, TT0.5_test, type = "prob")
+TT0.5_test$xgb <- predict(tt0.5_xgb, TT0.5_test, type = "prob")
+TT0.5_test <- TT0.5_test %>% 
+  mutate(equal_weight = (gbm + pls + xgb) / 3)
+
+confusionMatrix(data = predict(tt0.5_gbm, TT0.5_test), reference = TT0.5_test$TT0.5)
+confusionMatrix(data = predict(tt0.5_pls, TT0.5_test), reference = TT0.5_test$TT0.5)
+confusionMatrix(data = predict(tt0.5_xgb, TT0.5_test), reference = TT0.5_test$TT0.5)
+
+TT1_df <- train_prob %>% 
+  filter(Home_or_Away == "Home") %>% 
+  select(-Home_or_Away, -(Outcome:TT0.5), -(TT1.5:TT3.5))
+
+intervalStart <- Sys.time()
+cluster <- makeCluster(detectCores() - 1)
+registerDoParallel(cluster)
+
+fitControl <- trainControl(method = "repeatedcv",
+                           number = 10,
+                           allowParallel = TRUE)
+
+set.seed(1234)
+tt1_gbm <- train(TT1 ~ .,
+                   data = TT1_df,
+                   method = "gbm",
+                   trControl = fitControl)
+set.seed(1234)
+tt1_pls <- train(TT1 ~ .,
+                   data = TT1_df,
+                   method = "pls",
+                   trControl = fitControl,
+                   tuneLength = 15,
+                   preProc = c("center", "scale"))
+set.seed(1234)
+tt1_xgb <- train(TT1 ~ .,
+                   data = TT1_df,
+                   method = "xgbTree",
+                   trControl = fitControl)
+
+beep(8)
+
+stopCluster(cluster)
+intervalEnd <- Sys.time()
+paste("TT1 classification model training took",intervalEnd - intervalStart,attr(intervalEnd - intervalStart,"units"))
+
+set.seed(1234)
+allResamples_prob <- resamples(list("GBM" = tt1_gbm,
+                                    "PLS" = tt1_pls,
+                                    "XGB" = tt1_xgb))
+
+parallelplot(allResamples_prob)
+
+saveRDS(tt1_gbm, "Soccer Machine/tt1_gbm.rds")
+saveRDS(tt1_pls, "Soccer Machine/tt1_pls.rds")
+saveRDS(tt1_xgb, "Soccer Machine/tt1_xgb.rds")
+
+TT1_test <- test_prob %>% 
+  filter(Home_or_Away == "Home") %>% 
+  select(-Home_or_Away, -(Outcome:TT0.5), -(TT1.5:TT3.5))
+
+TT1_test$gbm <- predict(tt1_gbm, TT1_test, type = "prob")
+TT1_test$pls <- predict(tt1_pls, TT1_test, type = "prob")
+TT1_test$xgb <- predict(tt1_xgb, TT1_test, type = "prob")
+TT1_test <- TT1_test %>% 
+  mutate(equal_weight = (gbm + pls + xgb) / 3)
+
+confusionMatrix(data = predict(tt1_gbm, TT1_test), reference = TT1_test$TT1)
+confusionMatrix(data = predict(tt1_pls, TT1_test), reference = TT1_test$TT1)
+confusionMatrix(data = predict(tt1_xgb, TT1_test), reference = TT1_test$TT1)
+
+TT1.5_df <- train_prob %>% 
+  filter(Home_or_Away == "Home") %>% 
+  select(-Home_or_Away, -(Outcome:TT1), -(TT2:TT3.5))
+
+intervalStart <- Sys.time()
+cluster <- makeCluster(detectCores() - 1)
+registerDoParallel(cluster)
+
+fitControl <- trainControl(method = "repeatedcv",
+                           number = 10,
+                           allowParallel = TRUE)
+
+set.seed(1234)
+tt1.5_gbm <- train(TT1.5 ~ .,
+                     data = TT1.5_df,
+                     method = "gbm",
+                     trControl = fitControl)
+set.seed(1234)
+tt1.5_pls <- train(TT1.5 ~ .,
+                     data = TT1.5_df,
+                     method = "pls",
+                     trControl = fitControl,
+                     tuneLength = 15,
+                     preProc = c("center", "scale"))
+set.seed(1234)
+tt1.5_xgb <- train(TT1.5 ~ .,
+                     data = TT1.5_df,
+                     method = "xgbTree",
+                     trControl = fitControl)
+
+beep(8)
+
+stopCluster(cluster)
+intervalEnd <- Sys.time()
+paste("TT1.5 classification model training took",intervalEnd - intervalStart,attr(intervalEnd - intervalStart,"units"))
+
+set.seed(1234)
+allResamples_prob <- resamples(list("GBM" = tt1.5_gbm,
+                                    "PLS" = tt1.5_pls,
+                                    "XGB" = tt1.5_xgb))
+
+parallelplot(allResamples_prob)
+
+saveRDS(tt1.5_gbm, "Soccer Machine/tt1.5_gbm.rds")
+saveRDS(tt1.5_pls, "Soccer Machine/tt1.5_pls.rds")
+saveRDS(tt1.5_xgb, "Soccer Machine/tt1.5_xgb.rds")
+
+TT1.5_test <- test_prob %>% 
+  filter(Home_or_Away == "Home") %>% 
+  select(-Home_or_Away, -(Outcome:TT1), -(TT2:TT3.5))
+
+TT1.5_test$gbm <- predict(tt1.5_gbm, TT1.5_test, type = "prob")
+TT1.5_test$pls <- predict(tt1.5_pls, TT1.5_test, type = "prob")
+TT1.5_test$xgb <- predict(tt1.5_xgb, TT1.5_test, type = "prob")
+TT1.5_test <- TT1.5_test %>% 
+  mutate(equal_weight = (gbm + pls + xgb) / 3)
+
+confusionMatrix(data = predict(tt1.5_gbm, TT1.5_test), reference = TT1.5_test$TT1.5)
+confusionMatrix(data = predict(tt1.5_pls, TT1.5_test), reference = TT1.5_test$TT1.5)
+confusionMatrix(data = predict(tt1.5_xgb, TT1.5_test), reference = TT1.5_test$TT1.5)
+
+TT2_df <- train_prob %>% 
+  filter(Home_or_Away == "Home") %>% 
+  select(-Home_or_Away, -(Outcome:TT1.5), -(TT2.5:TT3.5))
+
+intervalStart <- Sys.time()
+cluster <- makeCluster(detectCores() - 1)
+registerDoParallel(cluster)
+
+fitControl <- trainControl(method = "repeatedcv",
+                           number = 10,
+                           allowParallel = TRUE)
+
+set.seed(1234)
+tt2_gbm <- train(TT2 ~ .,
+                   data = TT2_df,
+                   method = "gbm",
+                   trControl = fitControl)
+set.seed(1234)
+tt2_pls <- train(TT2 ~ .,
+                   data = TT2_df,
+                   method = "pls",
+                   trControl = fitControl,
+                   tuneLength = 15,
+                   preProc = c("center", "scale"))
+set.seed(1234)
+tt2_xgb <- train(TT2 ~ .,
+                   data = TT2_df,
+                   method = "xgbTree",
+                   trControl = fitControl)
+
+beep(8)
+
+stopCluster(cluster)
+intervalEnd <- Sys.time()
+paste("TT2 classification model training took",intervalEnd - intervalStart,attr(intervalEnd - intervalStart,"units"))
+
+set.seed(1234)
+allResamples_prob <- resamples(list("GBM" = tt2_gbm,
+                                    "PLS" = tt2_pls,
+                                    "XGB" = tt2_xgb))
+
+parallelplot(allResamples_prob)
+
+saveRDS(tt2_gbm, "Soccer Machine/tt2_gbm.rds")
+saveRDS(tt2_pls, "Soccer Machine/tt2_pls.rds")
+saveRDS(tt2_xgb, "Soccer Machine/tt2_xgb.rds")
+
+TT2_test <- test_prob %>% 
+  filter(Home_or_Away == "Home") %>% 
+  select(-Home_or_Away, -(Outcome:TT1.5), -(TT2.5:TT3.5))
+
+TT2_test$gbm <- predict(tt2_gbm, TT2_test, type = "prob")
+TT2_test$pls <- predict(tt2_pls, TT2_test, type = "prob")
+TT2_test$xgb <- predict(tt2_xgb, TT2_test, type = "prob")
+TT2_test <- TT2_test %>% 
+  mutate(equal_weight = (gbm + pls + xgb) / 3)
+
+confusionMatrix(data = predict(tt2_gbm, TT2_test), reference = TT2_test$TT2)
+confusionMatrix(data = predict(tt2_pls, TT2_test), reference = TT2_test$TT2)
+confusionMatrix(data = predict(tt2_xgb, TT2_test), reference = TT2_test$TT2)
+
+TT2.5_df <- train_prob %>% 
+  filter(Home_or_Away == "Home") %>% 
+  select(-Home_or_Away, -(Outcome:TT2), -(TT3:TT3.5))
+
+intervalStart <- Sys.time()
+cluster <- makeCluster(detectCores() - 1)
+registerDoParallel(cluster)
+
+fitControl <- trainControl(method = "repeatedcv",
+                           number = 10,
+                           allowParallel = TRUE)
+
+set.seed(1234)
+tt2.5_gbm <- train(TT2.5 ~ .,
+                     data = TT2.5_df,
+                     method = "gbm",
+                     trControl = fitControl)
+set.seed(1234)
+tt2.5_pls <- train(TT2.5 ~ .,
+                     data = TT2.5_df,
+                     method = "pls",
+                     trControl = fitControl,
+                     tuneLength = 15,
+                     preProc = c("center", "scale"))
+set.seed(1234)
+tt2.5_xgb <- train(TT2.5 ~ .,
+                     data = TT2.5_df,
+                     method = "xgbTree",
+                     trControl = fitControl)
+
+beep(8)
+
+stopCluster(cluster)
+intervalEnd <- Sys.time()
+paste("TT2.5 classification model training took",intervalEnd - intervalStart,attr(intervalEnd - intervalStart,"units"))
+
+set.seed(1234)
+allResamples_prob <- resamples(list("GBM" = tt2.5_gbm,
+                                    "PLS" = tt2.5_pls,
+                                    "XGB" = tt2.5_xgb))
+
+parallelplot(allResamples_prob)
+
+saveRDS(tt2.5_gbm, "Soccer Machine/tt2.5_gbm.rds")
+saveRDS(tt2.5_pls, "Soccer Machine/tt2.5_pls.rds")
+saveRDS(tt2.5_xgb, "Soccer Machine/tt2.5_xgb.rds")
+
+TT2.5_test <- test_prob %>% 
+  filter(Home_or_Away == "Home") %>% 
+  select(-Home_or_Away, -(Outcome:TT2), -(TT3:TT3.5))
+
+TT2.5_test$gbm <- predict(tt2.5_gbm, TT2.5_test, type = "prob")
+TT2.5_test$pls <- predict(tt2.5_pls, TT2.5_test, type = "prob")
+TT2.5_test$xgb <- predict(tt2.5_xgb, TT2.5_test, type = "prob")
+TT2.5_test <- TT2.5_test %>% 
+  mutate(equal_weight = (gbm + pls + xgb) / 3)
+
+confusionMatrix(data = predict(tt2.5_gbm, TT2.5_test), reference = TT2.5_test$TT2.5)
+confusionMatrix(data = predict(tt2.5_pls, TT2.5_test), reference = TT2.5_test$TT2.5)
+confusionMatrix(data = predict(tt2.5_xgb, TT2.5_test), reference = TT2.5_test$TT2.5)
+
+TT3_df <- train_prob %>% 
+  filter(Home_or_Away == "Home") %>% 
+  select(-Home_or_Away, -(Outcome:TT2.5), -TT3.5)
+
+intervalStart <- Sys.time()
+cluster <- makeCluster(detectCores() - 1)
+registerDoParallel(cluster)
+
+fitControl <- trainControl(method = "repeatedcv",
+                           number = 10,
+                           allowParallel = TRUE)
+
+set.seed(1234)
+tt3_gbm <- train(TT3 ~ .,
+                   data = TT3_df,
+                   method = "gbm",
+                   trControl = fitControl)
+set.seed(1234)
+tt3_pls <- train(TT3 ~ .,
+                   data = TT3_df,
+                   method = "pls",
+                   trControl = fitControl,
+                   tuneLength = 15,
+                   preProc = c("center", "scale"))
+set.seed(1234)
+tt3_xgb <- train(TT3 ~ .,
+                   data = TT3_df,
+                   method = "xgbTree",
+                   trControl = fitControl)
+
+beep(8)
+
+stopCluster(cluster)
+intervalEnd <- Sys.time()
+paste("TT3 classification model training took",intervalEnd - intervalStart,attr(intervalEnd - intervalStart,"units"))
+
+set.seed(1234)
+allResamples_prob <- resamples(list("GBM" = tt3_gbm,
+                                    "PLS" = tt3_pls,
+                                    "XGB" = tt3_xgb))
+
+parallelplot(allResamples_prob)
+
+saveRDS(tt3_gbm, "Soccer Machine/tt3_gbm.rds")
+saveRDS(tt3_pls, "Soccer Machine/tt3_pls.rds")
+saveRDS(tt3_xgb, "Soccer Machine/tt3_xgb.rds")
+
+TT3_test <- test_prob %>% 
+  filter(Home_or_Away == "Home") %>% 
+  select(-Home_or_Away, -(Outcome:TT2.5), -TT3.5)
+
+TT3_test$gbm <- predict(tt3_gbm, TT3_test, type = "prob")
+TT3_test$pls <- predict(tt3_pls, TT3_test, type = "prob")
+TT3_test$xgb <- predict(tt3_xgb, TT3_test, type = "prob")
+TT3_test <- TT3_test %>% 
+  mutate(equal_weight = (gbm + pls + xgb) / 3)
+
+confusionMatrix(data = predict(tt3_gbm, TT3_test), reference = TT3_test$TT3)
+confusionMatrix(data = predict(tt3_pls, TT3_test), reference = TT3_test$TT3)
+confusionMatrix(data = predict(tt3_xgb, TT3_test), reference = TT3_test$TT3)
+
+TT3.5_df <- train_prob %>% 
+  filter(Home_or_Away == "Home") %>% 
+  select(-Home_or_Away, -(Outcome:TT3))
+
+intervalStart <- Sys.time()
+cluster <- makeCluster(detectCores() - 1)
+registerDoParallel(cluster)
+
+fitControl <- trainControl(method = "repeatedcv",
+                           number = 10,
+                           allowParallel = TRUE)
+
+set.seed(1234)
+tt3.5_gbm <- train(TT3.5 ~ .,
+                     data = TT3.5_df,
+                     method = "gbm",
+                     trControl = fitControl)
+set.seed(1234)
+tt3.5_pls <- train(TT3.5 ~ .,
+                     data = TT3.5_df,
+                     method = "pls",
+                     trControl = fitControl,
+                     tuneLength = 15,
+                     preProc = c("center", "scale"))
+set.seed(1234)
+tt3.5_xgb <- train(TT3.5 ~ .,
+                     data = TT3.5_df,
+                     method = "xgbTree",
+                     trControl = fitControl)
+
+beep(8)
+
+stopCluster(cluster)
+intervalEnd <- Sys.time()
+paste("TT3.5 classification model training took",intervalEnd - intervalStart,attr(intervalEnd - intervalStart,"units"))
+
+set.seed(1234)
+allResamples_prob <- resamples(list("GBM" = tt3.5_gbm,
+                                    "PLS" = tt3.5_pls,
+                                    "XGB" = tt3.5_xgb))
+
+parallelplot(allResamples_prob)
+
+saveRDS(tt3.5_gbm, "Soccer Machine/tt3.5_gbm.rds")
+saveRDS(tt3.5_pls, "Soccer Machine/tt3.5_pls.rds")
+saveRDS(tt3.5_xgb, "Soccer Machine/tt3.5_xgb.rds")
+
+TT3.5_test <- test_prob %>% 
+  filter(Home_or_Away == "Home") %>% 
+  select(-Home_or_Away, -(Outcome:TT3))
+
+TT3.5_test$gbm <- predict(tt3.5_gbm, TT3.5_test, type = "prob")
+TT3.5_test$pls <- predict(tt3.5_pls, TT3.5_test, type = "prob")
+TT3.5_test$xgb <- predict(tt3.5_xgb, TT3.5_test, type = "prob")
+TT3.5_test <- TT3.5_test %>% 
+  mutate(equal_weight = (gbm + pls + xgb) / 3)
+
+confusionMatrix(data = predict(tt3.5_gbm, TT3.5_test), reference = TT3.5_test$TT3.5)
+confusionMatrix(data = predict(tt3.5_pls, TT3.5_test), reference = TT3.5_test$TT3.5)
+confusionMatrix(data = predict(tt3.5_xgb, TT3.5_test), reference = TT3.5_test$TT3.5)
+
+
+
 
 
 
