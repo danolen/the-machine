@@ -1779,7 +1779,7 @@ allResamples_prob <- resamples(list("GBM" = total1.5_gbm,
 parallelplot(allResamples_prob)
 
 saveRDS(total1.5_gbm, "Soccer Machine/total1.5_gbm.rds")
-saveRDS(total1.5_pls, "Soccer Machine/total_pls.rds")
+saveRDS(total1.5_pls, "Soccer Machine/total1.5_pls.rds")
 saveRDS(total1.5_xgb, "Soccer Machine/total1.5_xgb.rds")
 
 Total1.5_test <- test_prob %>% 
@@ -2223,8 +2223,7 @@ confusionMatrix(data = predict(BTTS_gbm, BTTS_test), reference = BTTS_test$BTTS)
 confusionMatrix(data = predict(BTTS_pls, BTTS_test), reference = BTTS_test$BTTS)
 confusionMatrix(data = predict(BTTS_xgb, BTTS_test), reference = BTTS_test$BTTS)
 
-TT0.5_df <- train_prob %>% 
-  filter(Home_or_Away == "Home") %>% 
+TT0.5_df <- train_prob %>%
   select(-Home_or_Away, -(Outcome:BTTS), -(TT1:TT3.5))
 
 intervalStart <- Sys.time()
@@ -2270,8 +2269,7 @@ saveRDS(tt0.5_gbm, "Soccer Machine/tt0.5_gbm.rds")
 saveRDS(tt0.5_pls, "Soccer Machine/tt0.5_pls.rds")
 saveRDS(tt0.5_xgb, "Soccer Machine/tt0.5_xgb.rds")
 
-TT0.5_test <- test_prob %>% 
-  filter(Home_or_Away == "Home") %>% 
+TT0.5_test <- test_prob %>%
   select(-Home_or_Away, -(Outcome:BTTS), -(TT1:TT3.5))
 
 TT0.5_test$gbm <- predict(tt0.5_gbm, TT0.5_test, type = "prob")
@@ -2284,8 +2282,7 @@ confusionMatrix(data = predict(tt0.5_gbm, TT0.5_test), reference = TT0.5_test$TT
 confusionMatrix(data = predict(tt0.5_pls, TT0.5_test), reference = TT0.5_test$TT0.5)
 confusionMatrix(data = predict(tt0.5_xgb, TT0.5_test), reference = TT0.5_test$TT0.5)
 
-TT1_df <- train_prob %>% 
-  filter(Home_or_Away == "Home") %>% 
+TT1_df <- train_prob %>%
   select(-Home_or_Away, -(Outcome:TT0.5), -(TT1.5:TT3.5))
 
 intervalStart <- Sys.time()
@@ -2331,8 +2328,7 @@ saveRDS(tt1_gbm, "Soccer Machine/tt1_gbm.rds")
 saveRDS(tt1_pls, "Soccer Machine/tt1_pls.rds")
 saveRDS(tt1_xgb, "Soccer Machine/tt1_xgb.rds")
 
-TT1_test <- test_prob %>% 
-  filter(Home_or_Away == "Home") %>% 
+TT1_test <- test_prob %>%
   select(-Home_or_Away, -(Outcome:TT0.5), -(TT1.5:TT3.5))
 
 TT1_test$gbm <- predict(tt1_gbm, TT1_test, type = "prob")
@@ -2345,8 +2341,7 @@ confusionMatrix(data = predict(tt1_gbm, TT1_test), reference = TT1_test$TT1)
 confusionMatrix(data = predict(tt1_pls, TT1_test), reference = TT1_test$TT1)
 confusionMatrix(data = predict(tt1_xgb, TT1_test), reference = TT1_test$TT1)
 
-TT1.5_df <- train_prob %>% 
-  filter(Home_or_Away == "Home") %>% 
+TT1.5_df <- train_prob %>%
   select(-Home_or_Away, -(Outcome:TT1), -(TT2:TT3.5))
 
 intervalStart <- Sys.time()
@@ -2392,8 +2387,7 @@ saveRDS(tt1.5_gbm, "Soccer Machine/tt1.5_gbm.rds")
 saveRDS(tt1.5_pls, "Soccer Machine/tt1.5_pls.rds")
 saveRDS(tt1.5_xgb, "Soccer Machine/tt1.5_xgb.rds")
 
-TT1.5_test <- test_prob %>% 
-  filter(Home_or_Away == "Home") %>% 
+TT1.5_test <- test_prob %>%
   select(-Home_or_Away, -(Outcome:TT1), -(TT2:TT3.5))
 
 TT1.5_test$gbm <- predict(tt1.5_gbm, TT1.5_test, type = "prob")
@@ -2406,8 +2400,7 @@ confusionMatrix(data = predict(tt1.5_gbm, TT1.5_test), reference = TT1.5_test$TT
 confusionMatrix(data = predict(tt1.5_pls, TT1.5_test), reference = TT1.5_test$TT1.5)
 confusionMatrix(data = predict(tt1.5_xgb, TT1.5_test), reference = TT1.5_test$TT1.5)
 
-TT2_df <- train_prob %>% 
-  filter(Home_or_Away == "Home") %>% 
+TT2_df <- train_prob %>%
   select(-Home_or_Away, -(Outcome:TT1.5), -(TT2.5:TT3.5))
 
 intervalStart <- Sys.time()
@@ -2453,8 +2446,7 @@ saveRDS(tt2_gbm, "Soccer Machine/tt2_gbm.rds")
 saveRDS(tt2_pls, "Soccer Machine/tt2_pls.rds")
 saveRDS(tt2_xgb, "Soccer Machine/tt2_xgb.rds")
 
-TT2_test <- test_prob %>% 
-  filter(Home_or_Away == "Home") %>% 
+TT2_test <- test_prob %>%
   select(-Home_or_Away, -(Outcome:TT1.5), -(TT2.5:TT3.5))
 
 TT2_test$gbm <- predict(tt2_gbm, TT2_test, type = "prob")
@@ -2467,8 +2459,7 @@ confusionMatrix(data = predict(tt2_gbm, TT2_test), reference = TT2_test$TT2)
 confusionMatrix(data = predict(tt2_pls, TT2_test), reference = TT2_test$TT2)
 confusionMatrix(data = predict(tt2_xgb, TT2_test), reference = TT2_test$TT2)
 
-TT2.5_df <- train_prob %>% 
-  filter(Home_or_Away == "Home") %>% 
+TT2.5_df <- train_prob %>%
   select(-Home_or_Away, -(Outcome:TT2), -(TT3:TT3.5))
 
 intervalStart <- Sys.time()
@@ -2514,8 +2505,7 @@ saveRDS(tt2.5_gbm, "Soccer Machine/tt2.5_gbm.rds")
 saveRDS(tt2.5_pls, "Soccer Machine/tt2.5_pls.rds")
 saveRDS(tt2.5_xgb, "Soccer Machine/tt2.5_xgb.rds")
 
-TT2.5_test <- test_prob %>% 
-  filter(Home_or_Away == "Home") %>% 
+TT2.5_test <- test_prob %>%
   select(-Home_or_Away, -(Outcome:TT2), -(TT3:TT3.5))
 
 TT2.5_test$gbm <- predict(tt2.5_gbm, TT2.5_test, type = "prob")
@@ -2528,8 +2518,7 @@ confusionMatrix(data = predict(tt2.5_gbm, TT2.5_test), reference = TT2.5_test$TT
 confusionMatrix(data = predict(tt2.5_pls, TT2.5_test), reference = TT2.5_test$TT2.5)
 confusionMatrix(data = predict(tt2.5_xgb, TT2.5_test), reference = TT2.5_test$TT2.5)
 
-TT3_df <- train_prob %>% 
-  filter(Home_or_Away == "Home") %>% 
+TT3_df <- train_prob %>%
   select(-Home_or_Away, -(Outcome:TT2.5), -TT3.5)
 
 intervalStart <- Sys.time()
@@ -2575,8 +2564,7 @@ saveRDS(tt3_gbm, "Soccer Machine/tt3_gbm.rds")
 saveRDS(tt3_pls, "Soccer Machine/tt3_pls.rds")
 saveRDS(tt3_xgb, "Soccer Machine/tt3_xgb.rds")
 
-TT3_test <- test_prob %>% 
-  filter(Home_or_Away == "Home") %>% 
+TT3_test <- test_prob %>%
   select(-Home_or_Away, -(Outcome:TT2.5), -TT3.5)
 
 TT3_test$gbm <- predict(tt3_gbm, TT3_test, type = "prob")
@@ -2589,8 +2577,7 @@ confusionMatrix(data = predict(tt3_gbm, TT3_test), reference = TT3_test$TT3)
 confusionMatrix(data = predict(tt3_pls, TT3_test), reference = TT3_test$TT3)
 confusionMatrix(data = predict(tt3_xgb, TT3_test), reference = TT3_test$TT3)
 
-TT3.5_df <- train_prob %>% 
-  filter(Home_or_Away == "Home") %>% 
+TT3.5_df <- train_prob %>%
   select(-Home_or_Away, -(Outcome:TT3))
 
 intervalStart <- Sys.time()
@@ -2636,8 +2623,7 @@ saveRDS(tt3.5_gbm, "Soccer Machine/tt3.5_gbm.rds")
 saveRDS(tt3.5_pls, "Soccer Machine/tt3.5_pls.rds")
 saveRDS(tt3.5_xgb, "Soccer Machine/tt3.5_xgb.rds")
 
-TT3.5_test <- test_prob %>% 
-  filter(Home_or_Away == "Home") %>% 
+TT3.5_test <- test_prob %>%
   select(-Home_or_Away, -(Outcome:TT3))
 
 TT3.5_test$gbm <- predict(tt3.5_gbm, TT3.5_test, type = "prob")
