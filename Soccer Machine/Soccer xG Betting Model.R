@@ -11,7 +11,7 @@ library(caretEnsemble)
 library(parallel)
 library(doParallel)
 library(beepr)
-#library(worldfootballR)
+#library(worldfootballR) # bring in transfermarkt data?
 
 intervalStart <- Sys.time()
 urls <- c("https://fbref.com/en/comps/9/schedule/Premier-League-Scores-and-Fixtures",
