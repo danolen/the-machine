@@ -51,7 +51,8 @@ urls <- c("https://fbref.com/en/comps/9/schedule/Premier-League-Scores-and-Fixtu
           "https://fbref.com/en/comps/19/schedule/Europa-League-Scores-and-Fixtures",
           "https://fbref.com/en/comps/19/10097/schedule/2020-2021-Europa-League-Scores-and-Fixtures",
           "https://fbref.com/en/comps/19/2901/schedule/2019-2020-Europa-League-Scores-and-Fixtures",
-          "https://fbref.com/en/comps/19/2103/schedule/2018-2019-Europa-League-Scores-and-Fixtures")
+          "https://fbref.com/en/comps/19/2103/schedule/2018-2019-Europa-League-Scores-and-Fixtures",
+          "https://fbref.com/en/comps/22/schedule/Major-League-Soccer-Scores-and-Fixtures")
 
 epl_21_22 <- urls[[1]] %>%
   read_html() %>% 
@@ -449,6 +450,17 @@ UEL_18_19 <- urls[[37]] %>%
   filter(Home_Score != "") %>%
   mutate(League = "UEL", Season = "2018-2019")
 
+mls_22 <- urls[[38]] %>%
+  read_html() %>%
+  html_nodes("table") %>%
+  .[1] %>%
+  html_table(trim = TRUE) %>%
+  data.frame(stringsAsFactors = FALSE) %>%
+  filter(Day != "Day") %>%
+  select(Day:Away) %>%
+  separate(Score, c("Home_Score", "Away_Score")) %>%
+  mutate(League = "MLS", Season = "2022")
+
 intervalEnd <- Sys.time()
 paste("Web scraping took",intervalEnd - intervalStart,attr(intervalEnd - intervalStart,"units"))
 
@@ -457,7 +469,7 @@ fixtures <- rbind(epl_21_22, epl_20_21, epl_19_20, epl_18_19, epl_17_18,
                   bundes_21_22, bundes_20_21, bundes_19_20, bundes_18_19, bundes_17_18,
                   seriea_21_22, seriea_20_21, seriea_19_20, seriea_18_19, seriea_17_18,
                   ligue1_21_22, ligue1_20_21, ligue1_19_20, ligue1_18_19, ligue1_17_18,
-                  mls_21, mls_20, mls_19, mls_18,
+                  mls_22, mls_21, mls_20, mls_19, mls_18,
                   UCL_21_22, UCL_20_21, UCL_19_20, UCL_18_19,
                   UEL_21_22, UEL_20_21, UEL_19_20, UEL_18_19)
 fixtures$Date <- as.Date(fixtures$Date)

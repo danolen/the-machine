@@ -1,9 +1,18 @@
 ### Soccer betting model
 ## Picks
-
-library("pacman")
-p_load("jsonlite", "rlist", "stringr", "tidyjson", "reshape2", "readxl", "rvest",
-       "h2o", "DataCombine", "plyr", "RDCOMClient", "xtable", "tidyverse")
+overallStart <- Sys.time()
+library("jsonlite")
+library("rlist")
+library("stringr")
+library("tidyjson")
+library("reshape2")
+library("readxl")
+library("rvest")
+library("DataCombine")
+library("plyr")
+library("RDCOMClient")
+library("xtable")
+library("tidyverse")
 
 ## Get odds from Bovada API
 
@@ -45,7 +54,7 @@ mls_odds <- fromJSON(mls_url) %>%
                               bet_type == "Spread" & type == "AUN" ~ paste0("Alternate Spread - Home: ", as.numeric(SpreadTotal)*-1),
                               bet_type == "Total Goals O/U" ~ paste0("Alternate Total - ", abs(as.numeric(SpreadTotal))),
                               grepl("Total Goals O/U - CF Montr?al", bet_type) ~ paste0("Total Goals O/U - CF Montreal", " - ", abs(as.numeric(SpreadTotal))),
-                              grepl("Total Goals O/U - CF Montr?al", bet_type) ~ paste0("Total Goals O/U - CF Montreal", " - ", abs(as.numeric(SpreadTotal))),
+                              grepl("Total Goals O/U - CF Montréal", bet_type) ~ paste0("Total Goals O/U - CF Montreal", " - ", abs(as.numeric(SpreadTotal))),
                               grepl("Total Goals O/U - Orlando City", bet_type) ~ paste0("Total Goals O/U - Orlando City SC", " - ", abs(as.numeric(SpreadTotal))),
                               grepl("Total Goals O/U - LA Galaxy", bet_type) ~ paste0("Total Goals O/U - Los Angeles Galaxy", " - ", abs(as.numeric(SpreadTotal))),
                               grepl("Total Goals O/U - ", bet_type) ~ paste0(bet_type, " - ", abs(as.numeric(SpreadTotal))),
@@ -934,8 +943,8 @@ Email$Send()
 
 h2o.shutdown()
 
-
-
+overallEnd <- Sys.time()
+paste("Entire script took",overallEnd - overallStart,attr(overallEnd - overallStart,"units"))
 
 
 
