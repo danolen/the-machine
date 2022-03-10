@@ -14,8 +14,6 @@ library("RDCOMClient")
 library("xtable")
 library("tidyverse")
 
-## Get odds from Bovada API
-
 mls_url <- "https://www.bovada.lv/services/sports/event/v2/events/A/description/soccer/major-league-soccer"
 epl_url <- "https://www.bovada.lv/services/sports/event/v2/events/A/description/soccer/england-premier-league"
 esp_url <- "https://www.bovada.lv/services/sports/event/v2/events/A/description/soccer/spain-la-liga"
@@ -50,11 +48,12 @@ mls_odds <- fromJSON(mls_url) %>%
                         if_else(type == "D", "D", "AUN"))) %>%
   mutate(Odds = if_else(is.na(Odds), 100, Odds)) %>%
   select(gamedate, HomeTeam, AwayTeam, bet_type, type, Odds, any_of("SpreadTotal")) %>%
-  mutate(bet_type = case_when(bet_type == "Spread" & type == "HOY" ~ paste0("Alternate Spread - Home: ", as.numeric(SpreadTotal)),
+  mutate(HomeTeam = iconv(HomeTeam, from = 'UTF-8', to = 'ASCII//TRANSLIT'),
+         AwayTeam = iconv(AwayTeam, from = 'UTF-8', to = 'ASCII//TRANSLIT'),
+         bet_type = iconv(bet_type, from = 'UTF-8', to = 'ASCII//TRANSLIT'),
+         bet_type = case_when(bet_type == "Spread" & type == "HOY" ~ paste0("Alternate Spread - Home: ", as.numeric(SpreadTotal)),
                               bet_type == "Spread" & type == "AUN" ~ paste0("Alternate Spread - Home: ", as.numeric(SpreadTotal)*-1),
                               bet_type == "Total Goals O/U" ~ paste0("Alternate Total - ", abs(as.numeric(SpreadTotal))),
-                              grepl("Total Goals O/U - CF Montr?al", bet_type) ~ paste0("Total Goals O/U - CF Montreal", " - ", abs(as.numeric(SpreadTotal))),
-                              grepl("Total Goals O/U - CF Montréal", bet_type) ~ paste0("Total Goals O/U - CF Montreal", " - ", abs(as.numeric(SpreadTotal))),
                               grepl("Total Goals O/U - Orlando City", bet_type) ~ paste0("Total Goals O/U - Orlando City SC", " - ", abs(as.numeric(SpreadTotal))),
                               grepl("Total Goals O/U - LA Galaxy", bet_type) ~ paste0("Total Goals O/U - Los Angeles Galaxy", " - ", abs(as.numeric(SpreadTotal))),
                               grepl("Total Goals O/U - ", bet_type) ~ paste0(bet_type, " - ", abs(as.numeric(SpreadTotal))),
@@ -95,7 +94,10 @@ epl_odds <- fromJSON(epl_url) %>%
                         if_else(type == "D", "D", "AUN"))) %>%
   mutate(Odds = if_else(is.na(Odds), 100, Odds)) %>%
   select(gamedate, HomeTeam, AwayTeam, bet_type, type, Odds, any_of("SpreadTotal")) %>%
-  mutate(bet_type = case_when(bet_type == "Spread" & type == "HOY" ~ paste0("Alternate Spread - Home: ", as.numeric(SpreadTotal)),
+  mutate(HomeTeam = iconv(HomeTeam, from = 'UTF-8', to = 'ASCII//TRANSLIT'),
+         AwayTeam = iconv(AwayTeam, from = 'UTF-8', to = 'ASCII//TRANSLIT'),
+         bet_type = iconv(bet_type, from = 'UTF-8', to = 'ASCII//TRANSLIT'),
+         bet_type = case_when(bet_type == "Spread" & type == "HOY" ~ paste0("Alternate Spread - Home: ", as.numeric(SpreadTotal)),
                               bet_type == "Spread" & type == "AUN" ~ paste0("Alternate Spread - Home: ", as.numeric(SpreadTotal)*-1),
                               bet_type == "Total Goals O/U" ~ paste0("Alternate Total - ", abs(as.numeric(SpreadTotal))),
                               grepl("Total Goals O/U - ", bet_type) ~ paste0(bet_type, " - ", abs(as.numeric(SpreadTotal))),
@@ -136,12 +138,12 @@ esp_odds <- fromJSON(esp_url) %>%
                         if_else(type == "D", "D", "AUN"))) %>%
   mutate(Odds = if_else(is.na(Odds), 100, Odds)) %>%
   select(gamedate, HomeTeam, AwayTeam, bet_type, type, Odds, any_of("SpreadTotal")) %>%
-  mutate(bet_type = case_when(bet_type == "Spread" & type == "HOY" ~ paste0("Alternate Spread - Home: ", as.numeric(SpreadTotal)),
+  mutate(HomeTeam = iconv(HomeTeam, from = 'UTF-8', to = 'ASCII//TRANSLIT'),
+         AwayTeam = iconv(AwayTeam, from = 'UTF-8', to = 'ASCII//TRANSLIT'),
+         bet_type = iconv(bet_type, from = 'UTF-8', to = 'ASCII//TRANSLIT'),
+         bet_type = case_when(bet_type == "Spread" & type == "HOY" ~ paste0("Alternate Spread - Home: ", as.numeric(SpreadTotal)),
                               bet_type == "Spread" & type == "AUN" ~ paste0("Alternate Spread - Home: ", as.numeric(SpreadTotal)*-1),
                               bet_type == "Total Goals O/U" ~ paste0("Alternate Total - ", abs(as.numeric(SpreadTotal))),
-                              grepl("Total Goals O/U - Alav?s", bet_type) ~ paste0("Total Goals O/U - Alaves", " - ", abs(as.numeric(SpreadTotal))),
-                              grepl("Total Goals O/U - Atl?tico Madrid", bet_type) ~ paste0("Total Goals O/U - Atletico Madrid", " - ", abs(as.numeric(SpreadTotal))),
-                              grepl("Total Goals O/U - C?diz", bet_type) ~ paste0("Total Goals O/U - Cadiz", " - ", abs(as.numeric(SpreadTotal))),
                               grepl("Total Goals O/U - ", bet_type) ~ paste0(bet_type, " - ", abs(as.numeric(SpreadTotal))),
                               TRUE ~ bet_type)) %>%
   melt(id.vars = c("gamedate", "HomeTeam", "AwayTeam", "bet_type", "type")) %>%
@@ -180,12 +182,12 @@ ger_odds <- fromJSON(ger_url) %>%
                         if_else(type == "D", "D", "AUN"))) %>%
   mutate(Odds = if_else(is.na(Odds), 100, Odds)) %>%
   select(gamedate, HomeTeam, AwayTeam, bet_type, type, Odds, any_of("SpreadTotal")) %>%
-  mutate(bet_type = case_when(bet_type == "Spread" & type == "HOY" ~ paste0("Alternate Spread - Home: ", as.numeric(SpreadTotal)),
+  mutate(HomeTeam = iconv(HomeTeam, from = 'UTF-8', to = 'ASCII//TRANSLIT'),
+         AwayTeam = iconv(AwayTeam, from = 'UTF-8', to = 'ASCII//TRANSLIT'),
+         bet_type = iconv(bet_type, from = 'UTF-8', to = 'ASCII//TRANSLIT'),
+         bet_type = case_when(bet_type == "Spread" & type == "HOY" ~ paste0("Alternate Spread - Home: ", as.numeric(SpreadTotal)),
                               bet_type == "Spread" & type == "AUN" ~ paste0("Alternate Spread - Home: ", as.numeric(SpreadTotal)*-1),
                               bet_type == "Total Goals O/U" ~ paste0("Alternate Total - ", abs(as.numeric(SpreadTotal))),
-                              grepl("Total Goals O/U - Greuther F?rth", bet_type) ~ paste0("Total Goals O/U - Greuther Furth", " - ", abs(as.numeric(SpreadTotal))),
-                              grepl("Total Goals O/U - FC K?ln", bet_type) ~ paste0("Total Goals O/U - FC Koln", " - ", abs(as.numeric(SpreadTotal))),
-                              grepl("Total Goals O/U - Borussia M?nchengladbach", bet_type) ~ paste0("Total Goals O/U - Borussia Monchengladbach", " - ", abs(as.numeric(SpreadTotal))),
                               grepl("Total Goals O/U - ", bet_type) ~ paste0(bet_type, " - ", abs(as.numeric(SpreadTotal))),
                               TRUE ~ bet_type)) %>%
   melt(id.vars = c("gamedate", "HomeTeam", "AwayTeam", "bet_type", "type")) %>%
@@ -224,10 +226,12 @@ fra_odds <- fromJSON(fra_url) %>%
                         if_else(type == "D", "D", "AUN"))) %>%
   mutate(Odds = if_else(is.na(Odds), 100, Odds)) %>%
   select(gamedate, HomeTeam, AwayTeam, bet_type, type, Odds, any_of("SpreadTotal")) %>%
-  mutate(bet_type = case_when(bet_type == "Spread" & type == "HOY" ~ paste0("Alternate Spread - Home: ", as.numeric(SpreadTotal)),
+  mutate(HomeTeam = iconv(HomeTeam, from = 'UTF-8', to = 'ASCII//TRANSLIT'),
+         AwayTeam = iconv(AwayTeam, from = 'UTF-8', to = 'ASCII//TRANSLIT'),
+         bet_type = iconv(bet_type, from = 'UTF-8', to = 'ASCII//TRANSLIT'),
+         bet_type = case_when(bet_type == "Spread" & type == "HOY" ~ paste0("Alternate Spread - Home: ", as.numeric(SpreadTotal)),
                               bet_type == "Spread" & type == "AUN" ~ paste0("Alternate Spread - Home: ", as.numeric(SpreadTotal)*-1),
                               bet_type == "Total Goals O/U" ~ paste0("Alternate Total - ", abs(as.numeric(SpreadTotal))),
-                              grepl("Total Goals O/U - Saint-?tienne", bet_type) ~ paste0("Total Goals O/U - Saint-Etienne", " - ", abs(as.numeric(SpreadTotal))),
                               grepl("Total Goals O/U - ", bet_type) ~ paste0(bet_type, " - ", abs(as.numeric(SpreadTotal))),
                               TRUE ~ bet_type)) %>%
   melt(id.vars = c("gamedate", "HomeTeam", "AwayTeam", "bet_type", "type")) %>%
@@ -266,7 +270,10 @@ ita_odds <- fromJSON(ita_url) %>%
                         if_else(type == "D", "D", "AUN"))) %>%
   mutate(Odds = if_else(is.na(Odds), 100, Odds)) %>%
   select(gamedate, HomeTeam, AwayTeam, bet_type, type, Odds, any_of("SpreadTotal")) %>%
-  mutate(bet_type = case_when(bet_type == "Spread" & type == "HOY" ~ paste0("Alternate Spread - Home: ", as.numeric(SpreadTotal)),
+  mutate(HomeTeam = iconv(HomeTeam, from = 'UTF-8', to = 'ASCII//TRANSLIT'),
+         AwayTeam = iconv(AwayTeam, from = 'UTF-8', to = 'ASCII//TRANSLIT'),
+         bet_type = iconv(bet_type, from = 'UTF-8', to = 'ASCII//TRANSLIT'),
+         bet_type = case_when(bet_type == "Spread" & type == "HOY" ~ paste0("Alternate Spread - Home: ", as.numeric(SpreadTotal)),
                               bet_type == "Spread" & type == "AUN" ~ paste0("Alternate Spread - Home: ", as.numeric(SpreadTotal)*-1),
                               bet_type == "Total Goals O/U" ~ paste0("Alternate Total - ", abs(as.numeric(SpreadTotal))),
                               grepl("Total Goals O/U - ", bet_type) ~ paste0(bet_type, " - ", abs(as.numeric(SpreadTotal))),
@@ -307,11 +314,12 @@ ucl_odds <- fromJSON(ucl_url) %>%
                         if_else(type == "D", "D", "AUN"))) %>%
   mutate(Odds = if_else(is.na(Odds), 100, Odds)) %>%
   select(gamedate, HomeTeam, AwayTeam, bet_type, type, Odds, any_of("SpreadTotal")) %>%
-  mutate(bet_type = case_when(bet_type == "Spread" & type == "HOY" ~ paste0("Alternate Spread - Home: ", as.numeric(SpreadTotal)),
+  mutate(HomeTeam = iconv(HomeTeam, from = 'UTF-8', to = 'ASCII//TRANSLIT'),
+         AwayTeam = iconv(AwayTeam, from = 'UTF-8', to = 'ASCII//TRANSLIT'),
+         bet_type = iconv(bet_type, from = 'UTF-8', to = 'ASCII//TRANSLIT'),
+         bet_type = case_when(bet_type == "Spread" & type == "HOY" ~ paste0("Alternate Spread - Home: ", as.numeric(SpreadTotal)),
                               bet_type == "Spread" & type == "AUN" ~ paste0("Alternate Spread - Home: ", as.numeric(SpreadTotal)*-1),
                               bet_type == "Total Goals O/U" ~ paste0("Alternate Total - ", abs(as.numeric(SpreadTotal))),
-                              grepl("Total Goals O/U - Atl?tico Madrid", bet_type) ~ paste0("Total Goals O/U - Atletico Madrid", " - ", abs(as.numeric(SpreadTotal))),
-                              grepl("Total Goals O/U - Malm? FF", bet_type) ~ paste0("Total Goals O/U - Malmo FF", " - ", abs(as.numeric(SpreadTotal))),
                               grepl("Total Goals O/U - ", bet_type) ~ paste0(bet_type, " - ", abs(as.numeric(SpreadTotal))),
                               TRUE ~ bet_type)) %>%
   melt(id.vars = c("gamedate", "HomeTeam", "AwayTeam", "bet_type", "type")) %>%
@@ -350,11 +358,12 @@ uel_odds <- fromJSON(uel_url) %>%
                         if_else(type == "D", "D", "AUN"))) %>%
   mutate(Odds = if_else(is.na(Odds), 100, Odds)) %>%
   select(gamedate, HomeTeam, AwayTeam, bet_type, type, Odds, any_of("SpreadTotal")) %>%
-  mutate(bet_type = case_when(bet_type == "Spread" & type == "HOY" ~ paste0("Alternate Spread - Home: ", as.numeric(SpreadTotal)),
+  mutate(HomeTeam = iconv(HomeTeam, from = 'UTF-8', to = 'ASCII//TRANSLIT'),
+         AwayTeam = iconv(AwayTeam, from = 'UTF-8', to = 'ASCII//TRANSLIT'),
+         bet_type = iconv(bet_type, from = 'UTF-8', to = 'ASCII//TRANSLIT'),
+         bet_type = case_when(bet_type == "Spread" & type == "HOY" ~ paste0("Alternate Spread - Home: ", as.numeric(SpreadTotal)),
                               bet_type == "Spread" & type == "AUN" ~ paste0("Alternate Spread - Home: ", as.numeric(SpreadTotal)*-1),
                               bet_type == "Total Goals O/U" ~ paste0("Alternate Total - ", abs(as.numeric(SpreadTotal))),
-                              grepl("Total Goals O/U - Ferencv?rosi TC", bet_type) ~ paste0("Total Goals O/U - Ferencvaros", " - ", abs(as.numeric(SpreadTotal))),
-                              grepl("Total Goals O/U - Br?ndby IF", bet_type) ~ paste0("Total Goals O/U - Brondby IF", " - ", abs(as.numeric(SpreadTotal))),
                               grepl("Total Goals O/U - ", bet_type) ~ paste0(bet_type, " - ", abs(as.numeric(SpreadTotal))),
                               TRUE ~ bet_type)) %>%
   melt(id.vars = c("gamedate", "HomeTeam", "AwayTeam", "bet_type", "type")) %>%
@@ -369,20 +378,14 @@ uel_odds <- fromJSON(uel_url) %>%
   select(-D.SpreadTotal)
 
 bovada_odds <- rbind(epl_odds, esp_odds, ger_odds, ita_odds, 
-                     fra_odds
-                     #, mls_odds
-                     , ucl_odds, uel_odds
-                     )
+                     fra_odds, mls_odds, ucl_odds, uel_odds)
 
-# Replace club names with normalized club names
-
-club_names <- read_excel("Club Names.xlsx")
+club_names <- read_excel("Soccer Machine/Club Names.xlsx")
 
 bovada_odds <- FindReplace(bovada_odds, Var = "HomeTeam", replaceData = club_names,
                            from = "Bovada", to = "Name")
 bovada_odds <- FindReplace(bovada_odds, Var = "AwayTeam", replaceData = club_names,
                            from = "Bovada", to = "Name")
-## Bring in data from FBRef
 
 urls <- c("https://fbref.com/en/comps/22/schedule/Major-League-Soccer-Scores-and-Fixtures",
           "https://fbref.com/en/comps/9/schedule/Premier-League-Scores-and-Fixtures",
@@ -494,8 +497,6 @@ fixtures$xG <- as.numeric(fixtures$xG)
 fixtures$Home_Score <- as.numeric(fixtures$Home_Score) 
 fixtures$Away_Score <- as.numeric(fixtures$Away_Score)
 fixtures$xG.1 <- as.numeric(fixtures$xG.1)
-
-## Replace club names with normalized club names
 
 fixtures <- FindReplace(fixtures, Var = "Home", replaceData = club_names,
                         from = "FBRef", to = "Name")
