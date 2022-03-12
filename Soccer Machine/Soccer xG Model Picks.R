@@ -473,9 +473,9 @@ ucl_21_22 <- urls[[7]] %>%
   separate(Score, c("Home_Score", "Away_Score")) %>%
   mutate(League = "UCL", Season = "2021-2022")
 
-# ucl_21_22 <- mutate(ucl_21_22, 
-#                     Home = if_else(endsWith(Home, "tr"), "Besiktas tr", Home),
-#                     Away = if_else(startsWith(Away, "tr"), "tr Besiktas", Away))
+ucl_21_22 <- mutate(ucl_21_22,
+                    Home = if_else(endsWith(Home, "tr"), "Besiktas tr", Home),
+                    Away = if_else(startsWith(Away, "tr"), "tr Besiktas", Away))
 
 uel_21_22 <- urls[[8]] %>%
   read_html() %>%
@@ -489,7 +489,8 @@ uel_21_22 <- urls[[8]] %>%
   mutate(League = "UEL", Season = "2021-2022")
 
 fixtures <- rbind(epl_21_22, laliga_21_22, bundes_21_22, seriea_21_22, 
-                  ligue1_21_22, mls_22, ucl_21_22, uel_21_22)
+                  ligue1_21_22, mls_22, ucl_21_22, uel_21_22) 
+  
 fixtures$Date <- as.Date(fixtures$Date)
 today <- Sys.Date()
 
@@ -532,9 +533,9 @@ metrics <- bind_rows(home, away) %>%
   filter(!is.na(Date) & (!is.na(xG) | Date >= Sys.Date())) %>% 
   replace(is.na(.), 0) %>% 
   arrange(Date, Time, League, ID) %>% 
-  mutate(Team = trimws(case_when(League %in% c('UCL', 'UEL') & Home_or_Away == "Home" ~ substr(Team, 1, nchar(Team)-3),
-                                 League %in% c('UCL', 'UEL') & Home_or_Away == "Away" ~ substr(Team, 4, nchar(Team)),
-                                 TRUE ~ Team), which = c("both"))) %>% 
+  # mutate(Team = trimws(case_when(League %in% c('UCL', 'UEL') & Home_or_Away == "Home" ~ substr(Team, 1, nchar(Team)-3),
+  #                                League %in% c('UCL', 'UEL') & Home_or_Away == "Away" ~ substr(Team, 4, nchar(Team)),
+  #                                TRUE ~ Team), which = c("both"))) %>% 
   group_by(Team, League, Season, Home_or_Away) %>% 
   mutate(SplitxG = cumsum(xG) - xG,
          SplitxGA = cumsum(xGA) - xGA,
@@ -556,6 +557,8 @@ metrics <- bind_rows(home, away) %>%
          SeasonGoals_roll4 = (lag(Goals,1)+lag(Goals,2)+lag(Goals,3)+lag(Goals,4))/4,
          SeasonGoalsAllowed_roll4 = (lag(GoalsAllowed,1)+lag(GoalsAllowed,2)+lag(GoalsAllowed,3)+lag(GoalsAllowed,4))/4) %>% 
   ungroup() %>% 
+  mutate(SplitGP = case_when(Date < today ~ SplitGP - 1, TRUE ~ SplitGP),
+         SeasonGP = case_when(Date < today ~ SeasonGP - 1, TRUE ~ SeasonGP)) %>% 
   mutate(SplitxG = SplitxG / SplitGP,
          SplitxGA = SplitxGA / SplitGP,
          SplitGoals = SplitGoals / SplitGP,
@@ -565,9 +568,17 @@ metrics <- bind_rows(home, away) %>%
          SeasonGoals = SeasonGoals / SeasonGP,
          SeasonGoalsAllowed = SeasonGoalsAllowed / SeasonGP) %>% 
   replace(is.na(.), 0)
+
+metrics_df <- metrics %>% 
+  left_join(metrics, by = c("ID" = "ID", "Date" = "Date", "Day" = "Day", "Time" = "Time",
+                            "League" = "League", "Season" = "Season", "Opponent" = "Team"),
+            suffix = c("", "_Opp")) %>% 
+  filter(Home_or_Away == "Home") %>%
+  select(-(Home_or_Away:GoalsAllowed), -(Opponent_Opp:GoalsAllowed_Opp))
+
 ## Join Fixture data with odds data
 
-upcoming <- left_join(bovada_odds, fixtures,
+upcoming <- left_join(bovada_odds, metrics,
                       by = c("gamedate" = "Date", "HomeTeam" = "Home", "AwayTeam" = "Away")) %>%
   select(gamedate, Day, Time, League, HomeTeam:bet_type, HOY.Odds, HOY.SpreadTotal,
          D.Odds, AUN.Odds, AUN.SpreadTotal, HomexGHome:AwayxGAAway)
