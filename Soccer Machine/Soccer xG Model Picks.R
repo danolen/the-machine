@@ -377,7 +377,7 @@ uel_odds <- fromJSON(uel_url) %>%
   filter((AUN.Odds >= 100 | AUN.Odds <= -100) & (HOY.Odds >= 100 | HOY.Odds <= -100)) %>%
   select(-D.SpreadTotal)
 
-bovada_odds <- rbind(epl_odds, esp_odds, ger_odds, ita_odds, 
+bovada_odds <- bind_rows(epl_odds, esp_odds, ger_odds, ita_odds, 
                      fra_odds, mls_odds, ucl_odds, uel_odds)
 
 club_names <- read_excel("Soccer Machine/Club Names.xlsx")
@@ -396,7 +396,7 @@ urls <- c("https://fbref.com/en/comps/22/schedule/Major-League-Soccer-Scores-and
           "https://fbref.com/en/comps/8/schedule/Champions-League-Scores-and-Fixtures",
           "https://fbref.com/en/comps/19/schedule/Europa-League-Scores-and-Fixtures")
 
-mls_21 <- urls[[1]] %>%
+mls_22 <- urls[[1]] %>%
   read_html() %>%
   html_nodes("table") %>%
   .[1] %>%
@@ -405,7 +405,7 @@ mls_21 <- urls[[1]] %>%
   filter(Day != "Day") %>%
   select(Day:Away) %>%
   separate(Score, c("Home_Score", "Away_Score")) %>%
-  mutate(League = "MLS", Season = "2021")
+  mutate(League = "MLS", Season = "2022")
 
 epl_21_22 <- urls[[2]] %>%
   read_html() %>%
@@ -473,9 +473,9 @@ ucl_21_22 <- urls[[7]] %>%
   separate(Score, c("Home_Score", "Away_Score")) %>%
   mutate(League = "UCL", Season = "2021-2022")
 
-ucl_21_22 <- mutate(ucl_21_22, 
-                    Home = if_else(endsWith(Home, "tr"), "Besiktas tr", Home),
-                    Away = if_else(startsWith(Away, "tr"), "tr Besiktas", Away))
+# ucl_21_22 <- mutate(ucl_21_22, 
+#                     Home = if_else(endsWith(Home, "tr"), "Besiktas tr", Home),
+#                     Away = if_else(startsWith(Away, "tr"), "tr Besiktas", Away))
 
 uel_21_22 <- urls[[8]] %>%
   read_html() %>%
@@ -489,7 +489,7 @@ uel_21_22 <- urls[[8]] %>%
   mutate(League = "UEL", Season = "2021-2022")
 
 fixtures <- rbind(epl_21_22, laliga_21_22, bundes_21_22, seriea_21_22, 
-                  ligue1_21_22, mls_21, ucl_21_22, uel_21_22)
+                  ligue1_21_22, mls_22, ucl_21_22, uel_21_22)
 fixtures$Date <- as.Date(fixtures$Date)
 today <- Sys.Date()
 
@@ -503,30 +503,68 @@ fixtures <- FindReplace(fixtures, Var = "Home", replaceData = club_names,
 fixtures <- FindReplace(fixtures, Var = "Away", replaceData = club_names,
                         from = "FBRef", to = "Name")
 
-## Create scores table to analyze performance later
-
 scores <- filter(fixtures, !is.na(Away_Score))
 
-## Create predictor columns
+home <- fixtures %>% 
+  mutate(ID = gsub(" ", "", gsub("[[:punct:]]","",paste0(Home, Away, Date, Time)), fixed = TRUE)) %>% 
+  select(ID, Date, Day, Time, League, Season, Home, Away, xG:xG.1) %>% 
+  mutate(Home_or_Away = "Home") %>% 
+  select(ID:Away, Home_or_Away, xG, xG.1, Home_Score, Away_Score) %>% 
+  rename(Team = Home,
+         Opponent = Away,
+         xGA = xG.1,
+         Goals = Home_Score,
+         GoalsAllowed = Away_Score)
 
-averageif<-function(df,id,year,tiime,valuestoaverage, new_column_name){
-  #df<- df[order(df[id],df[tiime]),]
-  z<-dim(df)[2]+1
-  df[,z]<-0;colnames(df)[z]<-new_column_name
-  n<-dim(df)[1]
-  for(i in 1:n){
-    df[i,z]<-mean(df[df[,id]==df[i,id]&df[,year]==df[i,year]&df[,tiime]<df[i,tiime],valuestoaverage], na.rm = TRUE)
-  }
-  return(df)
-}
+away <- fixtures %>% 
+  mutate(ID = gsub(" ", "", gsub("[[:punct:]]","",paste0(Home, Away, Date, Time)), fixed = TRUE)) %>% 
+  select(ID, Date, Day, Time, League, Season, Away, Home, xG:xG.1) %>% 
+  mutate(Home_or_Away = "Away") %>% 
+  select(ID:Home, Home_or_Away, xG.1, xG, Away_Score, Home_Score) %>% 
+  rename(Team = Away,
+         Opponent = Home,
+         xG = xG.1,
+         xGA = xG,
+         Goals = Away_Score,
+         GoalsAllowed = Home_Score)
 
-fixtures <- averageif(fixtures, 'Home', 'Season', 'Date', 'xG', 'HomexGHome') %>%
-  averageif('Home', 'Season', 'Date', 'xG.1', 'HomexGAHome') %>%
-  averageif('Away', 'Season', 'Date', 'xG.1', 'AwayxGAway') %>%
-  averageif('Away', 'Season', 'Date', 'xG', 'AwayxGAAway')
-
-fixtures$League <- as.factor(fixtures$League)
-
+metrics <- bind_rows(home, away) %>%
+  filter(!is.na(Date) & (!is.na(xG) | Date >= Sys.Date())) %>% 
+  replace(is.na(.), 0) %>% 
+  arrange(Date, Time, League, ID) %>% 
+  mutate(Team = trimws(case_when(League %in% c('UCL', 'UEL') & Home_or_Away == "Home" ~ substr(Team, 1, nchar(Team)-3),
+                                 League %in% c('UCL', 'UEL') & Home_or_Away == "Away" ~ substr(Team, 4, nchar(Team)),
+                                 TRUE ~ Team), which = c("both"))) %>% 
+  group_by(Team, League, Season, Home_or_Away) %>% 
+  mutate(SplitxG = cumsum(xG) - xG,
+         SplitxGA = cumsum(xGA) - xGA,
+         SplitGoals = cumsum(Goals) - Goals,
+         SplitGoalsAllowed = cumsum(GoalsAllowed) - GoalsAllowed,
+         SplitGP = cumsum(case_when(Date < today ~ 1, TRUE ~ 0)),
+         SplitxG_roll4 = (lag(xG,1)+lag(xG,2)+lag(xG,3)+lag(xG,4))/4,
+         SplitxGA_roll4 = (lag(xGA,1)+lag(xGA,2)+lag(xGA,3)+lag(xGA,4))/4,
+         SplitGoals_roll4 = (lag(Goals,1)+lag(Goals,2)+lag(Goals,3)+lag(Goals,4))/4,
+         SplitGoalsAllowed_roll4 = (lag(GoalsAllowed,1)+lag(GoalsAllowed,2)+lag(GoalsAllowed,3)+lag(GoalsAllowed,4))/4) %>% 
+  group_by(Team, League, Season) %>% 
+  mutate(SeasonxG = cumsum(xG) - xG,
+         SeasonxGA = cumsum(xGA) - xGA,
+         SeasonGoals = cumsum(Goals) - Goals,
+         SeasonGoalsAllowed = cumsum(GoalsAllowed) - GoalsAllowed,
+         SeasonGP = cumsum(case_when(Date < today ~ 1, TRUE ~ 0)),
+         SeasonxG_roll4 = (lag(xG,1)+lag(xG,2)+lag(xG,3)+lag(xG,4))/4,
+         SeasonxGA_roll4 = (lag(xGA,1)+lag(xGA,2)+lag(xGA,3)+lag(xGA,4))/4,
+         SeasonGoals_roll4 = (lag(Goals,1)+lag(Goals,2)+lag(Goals,3)+lag(Goals,4))/4,
+         SeasonGoalsAllowed_roll4 = (lag(GoalsAllowed,1)+lag(GoalsAllowed,2)+lag(GoalsAllowed,3)+lag(GoalsAllowed,4))/4) %>% 
+  ungroup() %>% 
+  mutate(SplitxG = SplitxG / SplitGP,
+         SplitxGA = SplitxGA / SplitGP,
+         SplitGoals = SplitGoals / SplitGP,
+         SplitGoalsAllowed = SplitGoalsAllowed / SplitGP,
+         SeasonxG = SeasonxG / SeasonGP,
+         SeasonxGA = SeasonxGA / SeasonGP,
+         SeasonGoals = SeasonGoals / SeasonGP,
+         SeasonGoalsAllowed = SeasonGoalsAllowed / SeasonGP) %>% 
+  replace(is.na(.), 0)
 ## Join Fixture data with odds data
 
 upcoming <- left_join(bovada_odds, fixtures,
