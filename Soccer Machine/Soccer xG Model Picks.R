@@ -573,31 +573,168 @@ metrics_df <- metrics %>%
   left_join(metrics, by = c("ID" = "ID", "Date" = "Date", "Day" = "Day", "Time" = "Time",
                             "League" = "League", "Season" = "Season", "Opponent" = "Team"),
             suffix = c("", "_Opp")) %>% 
-  filter(Home_or_Away == "Home") %>%
+  filter(Home_or_Away == "Home" & Date >= today) %>%
   select(-(Home_or_Away:GoalsAllowed), -(Opponent_Opp:GoalsAllowed_Opp))
+
+metrics_tt <- metrics %>% 
+  left_join(metrics, by = c("ID" = "ID", "Date" = "Date", "Day" = "Day", "Time" = "Time",
+                            "League" = "League", "Season" = "Season", "Opponent" = "Team"),
+            suffix = c("", "_Opp")) %>%
+  filter(Date >= today) %>% 
+  select(-(xG:GoalsAllowed), -(Opponent_Opp:GoalsAllowed_Opp))
+
+gbm_reg <- readRDS("Soccer Machine/Models/train_gbm.rds")
+cub_reg <- readRDS("Soccer Machine/Models/train_cub.rds")
+rf_reg <- readRDS("Soccer Machine/Models/train_rf.rds")
+ctree_reg <- readRDS("Soccer Machine/Models/train_ctree.rds")
+pls_reg <- readRDS("Soccer Machine/Models/train_pls.rds")
+lm_reg <- readRDS("Soccer Machine/Models/train_lm.rds")
+outcome_gbm <- readRDS("Soccer Machine/Models/outcome_gbm.rds")
+outcome_pls <- readRDS("Soccer Machine/Models/outcome_pls.rds")
+outcome_xgb <- readRDS("Soccer Machine/Models/outcome_xgb.rds")
+minus0.5_gbm <- readRDS("Soccer Machine/Models/minus0.5_gbm.rds")
+minus0.5_pls <- readRDS("Soccer Machine/Models/minus0.5_pls.rds")
+minus0.5_xgb <- readRDS("Soccer Machine/Models/minus0.5_xgb.rds")
+minus1_gbm <- readRDS("Soccer Machine/Models/minus1_gbm.rds")
+minus1_pls <- readRDS("Soccer Machine/Models/minus1_pls.rds")
+minus1_xgb <- readRDS("Soccer Machine/Models/minus1_xgb.rds")
+minus1.5_gbm <- readRDS("Soccer Machine/Models/minus1.5_gbm.rds")
+minus1.5_pls <- readRDS("Soccer Machine/Models/minus1.5_pls.rds")
+minus1.5_xgb <- readRDS("Soccer Machine/Models/minus1.5_xgb.rds")
+minus2_gbm <- readRDS("Soccer Machine/Models/minus2_gbm.rds")
+minus2_pls <- readRDS("Soccer Machine/Models/minus2_pls.rds")
+minus2_xgb <- readRDS("Soccer Machine/Models/minus2_xgb.rds")
+minus2.5_gbm <- readRDS("Soccer Machine/Models/minus2.5_gbm.rds")
+minus2.5_pls <- readRDS("Soccer Machine/Models/minus2.5_pls.rds")
+minus2.5_xgb <- readRDS("Soccer Machine/Models/minus2.5_xgb.rds")
+minus3_gbm <- readRDS("Soccer Machine/Models/minus3_gbm.rds")
+minus3_pls <- readRDS("Soccer Machine/Models/minus3_pls.rds")
+minus3_xgb <- readRDS("Soccer Machine/Models/minus3_xgb.rds")
+minus3.5_gbm <- readRDS("Soccer Machine/Models/minus3.5_gbm.rds")
+minus3.5_pls <- readRDS("Soccer Machine/Models/minus3.5_pls.rds")
+minus3.5_xgb <- readRDS("Soccer Machine/Models/minus3.5_xgb.rds")
+plus0.5_gbm <- readRDS("Soccer Machine/Models/plus0.5_gbm.rds")
+plus0.5_pls <- readRDS("Soccer Machine/Models/plus0.5_pls.rds")
+plus0.5_xgb <- readRDS("Soccer Machine/Models/plus0.5_xgb.rds")
+plus1_gbm <- readRDS("Soccer Machine/Models/plus1_gbm.rds")
+plus1_pls <- readRDS("Soccer Machine/Models/plus1_pls.rds")
+plus1_xgb <- readRDS("Soccer Machine/Models/plus1_xgb.rds")
+plus1.5_gbm <- readRDS("Soccer Machine/Models/plus1.5_gbm.rds")
+plus1.5_pls <- readRDS("Soccer Machine/Models/plus1.5_pls.rds")
+plus1.5_xgb <- readRDS("Soccer Machine/Models/plus1.5_xgb.rds")
+plus2_gbm <- readRDS("Soccer Machine/Models/plus2_gbm.rds")
+plus2_pls <- readRDS("Soccer Machine/Models/plus2_pls.rds")
+plus2_xgb <- readRDS("Soccer Machine/Models/plus2_xgb.rds")
+plus2.5_gbm <- readRDS("Soccer Machine/Models/plus2.5_gbm.rds")
+plus2.5_pls <- readRDS("Soccer Machine/Models/plus2.5_pls.rds")
+plus2.5_xgb <- readRDS("Soccer Machine/Models/plus2.5_xgb.rds")
+plus3_gbm <- readRDS("Soccer Machine/Models/plus3_gbm.rds")
+plus3_pls <- readRDS("Soccer Machine/Models/plus3_pls.rds")
+plus3_xgb <- readRDS("Soccer Machine/Models/plus3_xgb.rds")
+plus3.5_gbm <- readRDS("Soccer Machine/Models/plus3.5_gbm.rds")
+plus3.5_pls <- readRDS("Soccer Machine/Models/plus3.5_pls.rds")
+plus3.5_xgb <- readRDS("Soccer Machine/Models/plus3.5_xgb.rds")
+total1.5_gbm <- readRDS("Soccer Machine/Models/total1.5_gbm.rds")
+total1.5_pls <- readRDS("Soccer Machine/Models/total1.5_pls.rds")
+total1.5_xgb <- readRDS("Soccer Machine/Models/total1.5_xgb.rds")
+total2_gbm <- readRDS("Soccer Machine/Models/total2_gbm.rds")
+total2_pls <- readRDS("Soccer Machine/Models/total2_pls.rds")
+total2_xgb <- readRDS("Soccer Machine/Models/total2_xgb.rds")
+total2.5_gbm <- readRDS("Soccer Machine/Models/total2.5_gbm.rds")
+total2.5_pls <- readRDS("Soccer Machine/Models/total2.5_pls.rds")
+total2.5_xgb <- readRDS("Soccer Machine/Models/total2.5_xgb.rds")
+total3_gbm <- readRDS("Soccer Machine/Models/total3_gbm.rds")
+total3_pls <- readRDS("Soccer Machine/Models/total3_pls.rds")
+total3_xgb <- readRDS("Soccer Machine/Models/total3_xgb.rds")
+total3.5_gbm <- readRDS("Soccer Machine/Models/total3.5_gbm.rds")
+total3.5_pls <- readRDS("Soccer Machine/Models/total3.5_pls.rds")
+total3.5_xgb <- readRDS("Soccer Machine/Models/total3.5_xgb.rds")
+total4_gbm <- readRDS("Soccer Machine/Models/total4_gbm.rds")
+total4_pls <- readRDS("Soccer Machine/Models/total4_pls.rds")
+total4_xgb <- readRDS("Soccer Machine/Models/total4_xgb.rds")
+total4.5_gbm <- readRDS("Soccer Machine/Models/total4.5_gbm.rds")
+total4.5_pls <- readRDS("Soccer Machine/Models/total4.5_pls.rds")
+total4.5_xgb <- readRDS("Soccer Machine/Models/total4.5_xgb.rds")
+BTTS_gbm <- readRDS("Soccer Machine/Models/BTTS_gbm.rds")
+BTTS_pls <- readRDS("Soccer Machine/Models/BTTS_pls.rds")
+BTTS_xgb <- readRDS("Soccer Machine/Models/BTTS_xgb.rds")
+tt0.5_gbm <- readRDS("Soccer Machine/Models/tt0.5_gbm.rds")
+tt0.5_pls <- readRDS("Soccer Machine/Models/tt0.5_pls.rds")
+tt0.5_xgb <- readRDS("Soccer Machine/Models/tt0.5_xgb.rds")
+tt1_gbm <- readRDS("Soccer Machine/Models/tt1_gbm.rds")
+tt1_pls <- readRDS("Soccer Machine/Models/tt1_pls.rds")
+tt1_xgb <- readRDS("Soccer Machine/Models/tt1_xgb.rds")
+tt1.5_gbm <- readRDS("Soccer Machine/Models/tt1.5_gbm.rds")
+tt1.5_pls <- readRDS("Soccer Machine/Models/tt1.5_pls.rds")
+tt1.5_xgb <- readRDS("Soccer Machine/Models/tt1.5_xgb.rds")
+tt2_gbm <- readRDS("Soccer Machine/Models/tt2_gbm.rds")
+tt2_pls <- readRDS("Soccer Machine/Models/tt2_pls.rds")
+tt2_xgb <- readRDS("Soccer Machine/Models/tt2_xgb.rds")
+tt2.5_gbm <- readRDS("Soccer Machine/Models/tt2.5_gbm.rds")
+tt2.5_pls <- readRDS("Soccer Machine/Models/tt2.5_pls.rds")
+tt2.5_xgb <- readRDS("Soccer Machine/Models/tt2.5_xgb.rds")
+tt3_gbm <- readRDS("Soccer Machine/Models/tt3_gbm.rds")
+tt3_pls <- readRDS("Soccer Machine/Models/tt3_pls.rds")
+tt3_xgb <- readRDS("Soccer Machine/Models/tt3_xgb.rds")
+tt3.5_gbm <- readRDS("Soccer Machine/Models/tt3.5_gbm.rds")
+tt3.5_pls <- readRDS("Soccer Machine/Models/tt3.5_pls.rds")
+tt3.5_xgb <- readRDS("Soccer Machine/Models/tt3.5_xgb.rds")
+
+singles <- metrics_tt
+singles$pG_gbm <- predict(gbm_reg, metrics_tt)
+singles$pG_cub <- predict(cub_reg, metrics_tt)
+singles$pG_rf <- predict(rf_reg, metrics_tt)
+singles$pG_ctree <- predict(ctree_reg, metrics_tt)
+singles$pG_pls <- predict(pls_reg, metrics_tt)
+singles$pG_lm <- predict(lm_reg, metrics_tt)
+singles$tt0.5_gbm <- predict(tt0.5_gbm, metrics_tt)
+singles$tt0.5_pls <- predict(tt0.5_pls, metrics_tt)
+singles$tt0.5_xgb <- predict(tt0.5_xgb, metrics_tt)
+singles$tt1_gbm <- predict(tt1_gbm, metrics_tt)
+singles$tt1_pls <- predict(tt1_pls, metrics_tt)
+singles$tt1_xgb <- predict(tt1_xgb, metrics_tt)
+singles$tt1.5_gbm <- predict(tt1.5_gbm, metrics_tt)
+singles$tt1.5_pls <- predict(tt1.5_pls, metrics_tt)
+singles$tt1.5_xgb <- predict(tt1.5_xgb, metrics_tt)
+singles$tt2_gbm <- predict(tt2_gbm, metrics_tt)
+singles$tt2_pls <- predict(tt2_pls, metrics_tt)
+singles$tt2_xgb <- predict(tt2_xgb, metrics_tt)
+singles$tt2.5_gbm <- predict(tt2.5_gbm, metrics_tt)
+singles$tt2.5_pls <- predict(tt2.5_pls, metrics_tt)
+singles$tt2.5_xgb <- predict(tt2.5_xgb, metrics_tt)
+singles$tt3_gbm <- predict(tt3_gbm, metrics_tt)
+singles$tt3_pls <- predict(tt3_pls, metrics_tt)
+singles$tt3_xgb <- predict(tt3_xgb, metrics_tt)
+singles$tt3.5_gbm <- predict(tt3.5_gbm, metrics_tt)
+singles$tt3.5_pls <- predict(tt3.5_pls, metrics_tt)
+singles$tt3.5_xgb <- predict(tt3.5_xgb, metrics_tt)
+singles <- singles %>% 
+  mutate(pG_ens = (pG_gbm + pG_cub + pG_rf + pG_ctree + pG_pls + pG_lm) / 6,
+         pG_ensrf = (pG_ens + pG_rf) / 2,
+         ptt0.5 = (tt0.5_gbm + tt0.5_pls + tt0.5_xgb) / 3,
+         ptt1 = (tt1_gbm + tt1_pls + tt1_xgb) / 3,
+         ptt1.5 = (tt1.5_gbm + tt1.5_pls + tt1.5_xgb) / 3,
+         ptt2 = (tt2_gbm + tt2_pls + tt2_xgb) / 3,
+         ptt2.5 = (tt2.5_gbm + tt2.5_pls + tt2.5_xgb) / 3,
+         ptt3 = (tt3_gbm + tt3_pls + tt3_xgb) / 3,
+         ptt3.5 = (tt3.5_gbm + tt3.5_pls + tt3.5_xgb) / 3)
+
+doubles <- metrics_df
+doubles
 
 ## Join Fixture data with odds data
 
-upcoming <- left_join(bovada_odds, metrics,
-                      by = c("gamedate" = "Date", "HomeTeam" = "Home", "AwayTeam" = "Away")) %>%
+upcoming <- left_join(bovada_odds, metrics_df,
+                      by = c("gamedate" = "Date", "HomeTeam" = "Team", "AwayTeam" = "Opponent")) %>%
+  select(ID, gamedate, Day, Time, League, HomeTeam:bet_type, HOY.Odds, HOY.SpreadTotal,
+         D.Odds, AUN.Odds, AUN.SpreadTotal, SplitxG:SeasonGoalsAllowed_roll4_Opp)
+
+upcoming_tt <- left_join(bovada_odds, metrics_tt,
+                      by = c("gamedate" = "Date", "HomeTeam" = "Team", "AwayTeam" = "Opponent")) %>%
+  left_join(bovada_odds, metrics_df,
+            by = c("gamedate" = "Date", "HomeTeam" = "Opponent", "AwayTeam" = "Team")) %>%
   select(gamedate, Day, Time, League, HomeTeam:bet_type, HOY.Odds, HOY.SpreadTotal,
-         D.Odds, AUN.Odds, AUN.SpreadTotal, HomexGHome:AwayxGAAway)
-
-## Make Predictions
-
-h2o.init(nthreads = -1)
-
-Home_pred <- predict(h2o.loadModel("C:\\Users\\danie\\Desktop\\Sports Stuff\\Soccer Betting\\StackedEnsemble_AllModels_AutoML_20211115_234023"),
-                     as.h2o(upcoming)) %>% as.data.frame()
-colnames(Home_pred) <- "Home_pred"
-
-Away_pred <- predict(h2o.loadModel("C:\\Users\\danie\\Desktop\\Sports Stuff\\Soccer Betting\\StackedEnsemble_AllModels_AutoML_20211116_001854"),
-                     as.h2o(upcoming)) %>% as.data.frame()
-colnames(Away_pred) <- "Away_pred"
-
-## Join predictions to odds data
-
-upcoming <- upcoming %>% cbind(Home_pred, Away_pred)
+         D.Odds, AUN.Odds, AUN.SpreadTotal, SplitxG:SeasonGoalsAllowed_roll4_Opp)
 
 ## Functions to simulate outcome probabilities
 

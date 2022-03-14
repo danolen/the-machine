@@ -1627,7 +1627,7 @@ saveRDS(tt0.5_pls, "Soccer Machine/Models/tt0.5_pls.rds")
 saveRDS(tt0.5_xgb, "Soccer Machine/Models/tt0.5_xgb.rds")
 
 TT1_df <- train_prob %>%
-  select(-Home_or_Away, -(Outcome:TT0.5), -(TT1.5:TT3.5))
+  select(-(Outcome:TT0.5), -(TT1.5:TT3.5))
 
 intervalStart <- Sys.time()
 cluster <- makeCluster(detectCores() - 1)
@@ -1664,7 +1664,7 @@ saveRDS(tt1_pls, "Soccer Machine/Models/tt1_pls.rds")
 saveRDS(tt1_xgb, "Soccer Machine/Models/tt1_xgb.rds")
 
 TT1.5_df <- train_prob %>%
-  select(-Home_or_Away, -(Outcome:TT1), -(TT2:TT3.5))
+  select(-(Outcome:TT1), -(TT2:TT3.5))
 
 intervalStart <- Sys.time()
 cluster <- makeCluster(detectCores() - 1)
@@ -1701,7 +1701,7 @@ saveRDS(tt1.5_pls, "Soccer Machine/Models/tt1.5_pls.rds")
 saveRDS(tt1.5_xgb, "Soccer Machine/Models/tt1.5_xgb.rds")
 
 TT2_df <- train_prob %>%
-  select(-Home_or_Away, -(Outcome:TT1.5), -(TT2.5:TT3.5))
+  select(-(Outcome:TT1.5), -(TT2.5:TT3.5))
 
 intervalStart <- Sys.time()
 cluster <- makeCluster(detectCores() - 1)
@@ -1738,7 +1738,7 @@ saveRDS(tt2_pls, "Soccer Machine/Models/tt2_pls.rds")
 saveRDS(tt2_xgb, "Soccer Machine/Models/tt2_xgb.rds")
 
 TT2.5_df <- train_prob %>%
-  select(-Home_or_Away, -(Outcome:TT2), -(TT3:TT3.5))
+  select(-(Outcome:TT2), -(TT3:TT3.5))
 
 intervalStart <- Sys.time()
 cluster <- makeCluster(detectCores() - 1)
@@ -1775,7 +1775,7 @@ saveRDS(tt2.5_pls, "Soccer Machine/Models/tt2.5_pls.rds")
 saveRDS(tt2.5_xgb, "Soccer Machine/Models/tt2.5_xgb.rds")
 
 TT3_df <- train_prob %>%
-  select(-Home_or_Away, -(Outcome:TT2.5), -TT3.5)
+  select(-(Outcome:TT2.5), -TT3.5)
 
 intervalStart <- Sys.time()
 cluster <- makeCluster(detectCores() - 1)
@@ -1813,7 +1813,7 @@ saveRDS(tt3_pls, "Soccer Machine/Models/tt3_pls.rds")
 saveRDS(tt3_xgb, "Soccer Machine/Models/tt3_xgb.rds")
 
 TT3.5_df <- train_prob %>%
-  select(-Home_or_Away, -(Outcome:TT3))
+  select(-(Outcome:TT3))
 
 intervalStart <- Sys.time()
 cluster <- makeCluster(detectCores() - 1)
