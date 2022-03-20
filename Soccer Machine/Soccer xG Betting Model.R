@@ -525,10 +525,22 @@ metrics <- bind_rows(home, away) %>%
          SplitGoals = cumsum(Goals) - Goals,
          SplitGoalsAllowed = cumsum(GoalsAllowed) - GoalsAllowed,
          SplitGP = row_number() - 1,
-         SplitxG_roll4 = (lag(xG,1)+lag(xG,2)+lag(xG,3)+lag(xG,4))/4,
-         SplitxGA_roll4 = (lag(xGA,1)+lag(xGA,2)+lag(xGA,3)+lag(xGA,4))/4,
-         SplitGoals_roll4 = (lag(Goals,1)+lag(Goals,2)+lag(Goals,3)+lag(Goals,4))/4,
-         SplitGoalsAllowed_roll4 = (lag(GoalsAllowed,1)+lag(GoalsAllowed,2)+lag(GoalsAllowed,3)+lag(GoalsAllowed,4))/4) %>% 
+         SplitxG_roll4 = case_when(SplitGP == 1 ~ lag(xG,1),
+                                   SplitGP == 2 ~ (lag(xG,1)+lag(xG,2))/2,
+                                   SplitGP == 3 ~ (lag(xG,1)+lag(xG,2)+lag(xG,3))/3,
+                                   TRUE ~ (lag(xG,1)+lag(xG,2)+lag(xG,3)+lag(xG,4))/4),
+         SplitxGA_roll4 = case_when(SplitGP == 1 ~ lag(xGA,1),
+                                   SplitGP == 2 ~ (lag(xGA,1)+lag(xGA,2))/2,
+                                   SplitGP == 3 ~ (lag(xGA,1)+lag(xGA,2)+lag(xGA,3))/3,
+                                   TRUE ~ (lag(xGA,1)+lag(xGA,2)+lag(xGA,3)+lag(xGA,4))/4),
+         SplitGoals_roll4 = case_when(SplitGP == 1 ~ lag(Goals,1),
+                                   SplitGP == 2 ~ (lag(Goals,1)+lag(Goals,2))/2,
+                                   SplitGP == 3 ~ (lag(Goals,1)+lag(Goals,2)+lag(Goals,3))/3,
+                                   TRUE ~ (lag(Goals,1)+lag(Goals,2)+lag(Goals)+lag(Goals,4))/4),
+         SplitGoalsAllowed_roll4 = case_when(SplitGP == 1 ~ lag(GoalsAllowed,1),
+                                      SplitGP == 2 ~ (lag(GoalsAllowed,1)+lag(GoalsAllowed,2))/2,
+                                      SplitGP == 3 ~ (lag(GoalsAllowed,1)+lag(GoalsAllowed,2)+lag(GoalsAllowed,3))/3,
+                                      TRUE ~ (lag(GoalsAllowed,1)+lag(GoalsAllowed,2)+lag(GoalsAllowed)+lag(GoalsAllowed,4))/4)) %>% 
   group_by(Team, League, Season) %>% 
   mutate(SeasonxG = cumsum(xG) - xG,
          SeasonxGA = cumsum(xGA) - xGA,
@@ -641,6 +653,8 @@ train <- train_df %>%
          -(Outcome:TT3.5))
 
 upcoming_games <- filter(train_df, Date >= today)
+
+
 
 intervalStart <- Sys.time()
 cluster <- makeCluster(detectCores() - 1)
