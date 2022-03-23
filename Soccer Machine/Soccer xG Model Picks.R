@@ -542,10 +542,15 @@ metrics <- bind_rows(home, away) %>%
          SplitGoals = cumsum(Goals) - Goals,
          SplitGoalsAllowed = cumsum(GoalsAllowed) - GoalsAllowed,
          SplitGP = cumsum(case_when(Date < today ~ 1, TRUE ~ 0)),
-         SplitxG_roll4 = (lag(xG,1)+lag(xG,2)+lag(xG,3)+lag(xG,4))/4,
-         SplitxGA_roll4 = (lag(xGA,1)+lag(xGA,2)+lag(xGA,3)+lag(xGA,4))/4,
-         SplitGoals_roll4 = (lag(Goals,1)+lag(Goals,2)+lag(Goals,3)+lag(Goals,4))/4,
-         SplitGoalsAllowed_roll4 = (lag(GoalsAllowed,1)+lag(GoalsAllowed,2)+lag(GoalsAllowed,3)+lag(GoalsAllowed,4))/4) %>% 
+         SplitxG_roll4 = case_when(SplitGP < 5 ~ SplitxG / (SplitGP-1),
+                                   TRUE ~ (lag(xG,1)+lag(xG,2)+lag(xG,3)+lag(xG,4))/4),
+         SplitxGA_roll4 = case_when(SplitGP < 5 ~ SplitxG / (SplitGP-1),
+                                    TRUE ~ (lag(xGA,1)+lag(xGA,2)+lag(xGA,3)+lag(xGA,4))/4),
+         SplitGoals_roll4 = case_when(SplitGP < 5 ~ SplitGoals / (SplitGP-1),
+                                      TRUE ~ (lag(Goals,1)+lag(Goals,2)+lag(Goals)+lag(Goals,4))/4),
+         SplitGoalsAllowed_roll4 = case_when(SplitGP < 5 ~ SplitGoalsAllowed / (SplitGP-1),
+                                             TRUE ~ (lag(GoalsAllowed,1)+lag(GoalsAllowed,2)+lag(GoalsAllowed)+lag(GoalsAllowed,4))/4)) %>%
+  
   group_by(Team, League, Season) %>% 
   mutate(SeasonxG = cumsum(xG) - xG,
          SeasonxGA = cumsum(xGA) - xGA,
@@ -558,7 +563,7 @@ metrics <- bind_rows(home, away) %>%
          SeasonGoalsAllowed_roll4 = (lag(GoalsAllowed,1)+lag(GoalsAllowed,2)+lag(GoalsAllowed,3)+lag(GoalsAllowed,4))/4) %>% 
   ungroup() %>% 
   mutate(SplitGP = case_when(Date < today ~ SplitGP - 1, TRUE ~ SplitGP),
-         SeasonGP = case_when(Date < today ~ SeasonGP - 1, TRUE ~ SeasonGP)) %>% 
+         SeasonGP = case_when(Date < today ~ SeasonGP - 1, TRUE ~ SeasonGP)) %>%
   mutate(SplitxG = SplitxG / SplitGP,
          SplitxGA = SplitxGA / SplitGP,
          SplitGoals = SplitGoals / SplitGP,
@@ -567,6 +572,25 @@ metrics <- bind_rows(home, away) %>%
          SeasonxGA = SeasonxGA / SeasonGP,
          SeasonGoals = SeasonGoals / SeasonGP,
          SeasonGoalsAllowed = SeasonGoalsAllowed / SeasonGP) %>% 
+  group_by(Team, League, Season, Home_or_Away) %>% 
+  mutate(SplitxG_roll4 = case_when(SplitGP == lag(SplitGP,1) ~ lag(SplitxG_roll4,1),
+                                   TRUE ~ SplitxG_roll4),
+         SplitxGA_roll4 = case_when(SplitGP == lag(SplitGP,1) ~ lag(SplitxGA_roll4,1),
+                                    TRUE ~ SplitxGA_roll4),
+         SplitGoals_roll4 = case_when(SplitGP == lag(SplitGP,1) ~ lag(SplitGoals_roll4,1),
+                                      TRUE ~ SplitGoals_roll4),
+         SplitGoalsAllowed_roll4 = case_when(SplitGP == lag(SplitGP,1) ~ lag(SplitGoalsAllowed_roll4,1),
+                                             TRUE ~ SplitGoalsAllowed_roll4)) %>% 
+  group_by(Team, League, Season) %>% 
+  mutate(SeasonxG_roll4 = case_when(SeasonGP == lag(SeasonGP,1) ~ lag(SeasonxG_roll4,1),
+                                    TRUE ~ SeasonxG_roll4),
+         SeasonxGA_roll4 = case_when(SeasonGP == lag(SeasonGP,1) ~ lag(SeasonxGA_roll4,1),
+                                     TRUE ~ SeasonxGA_roll4),
+         SeasonGoals_roll4 = case_when(SeasonGP == lag(SeasonGP,1) ~ lag(SeasonGoals_roll4,1),
+                                       TRUE ~ SeasonGoals_roll4),
+         SeasonGoalsAllowed_roll4 = case_when(SeasonGP == lag(SeasonGP,1) ~ lag(SeasonGoalsAllowed_roll4,1),
+                                              TRUE ~ SeasonGoalsAllowed_roll4)) %>% 
+  ungroup() %>% 
   replace(is.na(.), 0)
 
 metrics_df <- metrics %>% 
