@@ -12,6 +12,7 @@ library("DataCombine")
 library("plyr")
 library("RDCOMClient")
 library("xtable")
+library("data.table")
 library("tidyverse")
 
 mls_url <- "https://www.bovada.lv/services/sports/event/v2/events/A/description/soccer/major-league-soccer"
@@ -530,6 +531,7 @@ away <- fixtures %>%
          GoalsAllowed = Home_Score)
 
 metrics <- bind_rows(home, away) %>%
+  filter(League != 'MLS') %>% 
   filter(!is.na(Date) & (!is.na(xG) | Date >= Sys.Date())) %>% 
   replace(is.na(.), 0) %>% 
   arrange(Date, Time, League, ID) %>% 
@@ -711,27 +713,27 @@ singles$pG_rf <- predict(rf_reg, metrics_tt)
 singles$pG_ctree <- predict(ctree_reg, metrics_tt)
 singles$pG_pls <- predict(pls_reg, metrics_tt)
 singles$pG_lm <- predict(lm_reg, metrics_tt)
-singles$tt0.5_gbm <- predict(tt0.5_gbm, metrics_tt)
-singles$tt0.5_pls <- predict(tt0.5_pls, metrics_tt)
-singles$tt0.5_xgb <- predict(tt0.5_xgb, metrics_tt)
-singles$tt1_gbm <- predict(tt1_gbm, metrics_tt)
-singles$tt1_pls <- predict(tt1_pls, metrics_tt)
-singles$tt1_xgb <- predict(tt1_xgb, metrics_tt)
-singles$tt1.5_gbm <- predict(tt1.5_gbm, metrics_tt)
-singles$tt1.5_pls <- predict(tt1.5_pls, metrics_tt)
-singles$tt1.5_xgb <- predict(tt1.5_xgb, metrics_tt)
-singles$tt2_gbm <- predict(tt2_gbm, metrics_tt)
-singles$tt2_pls <- predict(tt2_pls, metrics_tt)
-singles$tt2_xgb <- predict(tt2_xgb, metrics_tt)
-singles$tt2.5_gbm <- predict(tt2.5_gbm, metrics_tt)
-singles$tt2.5_pls <- predict(tt2.5_pls, metrics_tt)
-singles$tt2.5_xgb <- predict(tt2.5_xgb, metrics_tt)
-singles$tt3_gbm <- predict(tt3_gbm, metrics_tt)
-singles$tt3_pls <- predict(tt3_pls, metrics_tt)
-singles$tt3_xgb <- predict(tt3_xgb, metrics_tt)
-singles$tt3.5_gbm <- predict(tt3.5_gbm, metrics_tt)
-singles$tt3.5_pls <- predict(tt3.5_pls, metrics_tt)
-singles$tt3.5_xgb <- predict(tt3.5_xgb, metrics_tt)
+singles$tt0.5_gbm <- predict(tt0.5_gbm, metrics_tt, type = "prob")
+singles$tt0.5_pls <- predict(tt0.5_pls, metrics_tt, type = "prob")
+singles$tt0.5_xgb <- predict(tt0.5_xgb, metrics_tt, type = "prob")
+singles$tt1_gbm <- predict(tt1_gbm, metrics_tt, type = "prob")
+singles$tt1_pls <- predict(tt1_pls, metrics_tt, type = "prob")
+singles$tt1_xgb <- predict(tt1_xgb, metrics_tt, type = "prob")
+singles$tt1.5_gbm <- predict(tt1.5_gbm, metrics_tt, type = "prob")
+singles$tt1.5_pls <- predict(tt1.5_pls, metrics_tt, type = "prob")
+singles$tt1.5_xgb <- predict(tt1.5_xgb, metrics_tt, type = "prob")
+singles$tt2_gbm <- predict(tt2_gbm, metrics_tt, type = "prob")
+singles$tt2_pls <- predict(tt2_pls, metrics_tt, type = "prob")
+singles$tt2_xgb <- predict(tt2_xgb, metrics_tt, type = "prob")
+singles$tt2.5_gbm <- predict(tt2.5_gbm, metrics_tt, type = "prob")
+singles$tt2.5_pls <- predict(tt2.5_pls, metrics_tt, type = "prob")
+singles$tt2.5_xgb <- predict(tt2.5_xgb, metrics_tt, type = "prob")
+singles$tt3_gbm <- predict(tt3_gbm, metrics_tt, type = "prob")
+singles$tt3_pls <- predict(tt3_pls, metrics_tt, type = "prob")
+singles$tt3_xgb <- predict(tt3_xgb, metrics_tt, type = "prob")
+singles$tt3.5_gbm <- predict(tt3.5_gbm, metrics_tt, type = "prob")
+singles$tt3.5_pls <- predict(tt3.5_pls, metrics_tt, type = "prob")
+singles$tt3.5_xgb <- predict(tt3.5_xgb, metrics_tt, type = "prob")
 singles <- singles %>% 
   mutate(pG_ens = (pG_gbm + pG_cub + pG_rf + pG_ctree + pG_pls + pG_lm) / 6,
          pG_ensrf = (pG_ens + pG_rf) / 2,
@@ -743,76 +745,114 @@ singles <- singles %>%
          ptt3 = (tt3_gbm + tt3_pls + tt3_xgb) / 3,
          ptt3.5 = (tt3.5_gbm + tt3.5_pls + tt3.5_xgb) / 3)
 
+singles2 <- singles %>% 
+  select(ID:Home_or_Away, pG_ensrf:ptt3.5) %>%
+  left_join(singles %>% 
+              select(ID:Home_or_Away, pG_ensrf:ptt3.5),
+            by = c("ID", "Date", "Day", "Time", "League", "Season", "Team" = "Opponent", "Opponent" = "Team"),
+            suffix = c("_Home", "_Away")) %>% 
+  select(ID:pG_ensrf_Home, pG_ensrf_Away, ptt0.5_Home:ptt3.5_Away, -Home_or_Away_Away) %>% 
+  rename(Home = Team,
+         Away = Opponent) %>% 
+  filter(Home_or_Away_Home == "Home")
+
 doubles <- metrics_df
-doubles$outcome_gbm <- predict(outcome_gbm, metrics_df)
-doubles$outcome_pls <- predict(outcome_pls, metrics_df)
-doubles$outcome_xgb <- predict(outcome_xgb, metrics_df)
-doubles$minus0.5_gbm <- predict(minus0.5_gbm, metrics_df)
-doubles$minus0.5_pls <- predict(minus0.5_pls, metrics_df)
-doubles$minus0.5_xgb <- predict(minus0.5_xgb, metrics_df)
-doubles$minus1_gbm <- predict(minus1_gbm, metrics_df)
-doubles$minus1_pls <- predict(minus1_pls, metrics_df)
-doubles$minus1_xgb <- predict(minus1_xgb, metrics_df)
-doubles$minus1.5_gbm <- predict(minus2.5_gbm, metrics_df)
-doubles$minus1.5_pls <- predict(minus2.5_pls, metrics_df)
-doubles$minus1.5_xgb <- predict(minus2.5_xgb, metrics_df)
-doubles$minus2_gbm <- predict(minus2_gbm, metrics_df)
-doubles$minus2_pls <- predict(minus2_pls, metrics_df)
-doubles$minus2_xgb <- predict(minus2_xgb, metrics_df)
-doubles$minus2.5_gbm <- predict(minus2.5_gbm, metrics_df)
-doubles$minus2.5_pls <- predict(minus2.5_pls, metrics_df)
-doubles$minus2.5_xgb <- predict(minus2.5_xgb, metrics_df)
-doubles$minus3_gbm <- predict(minus3_gbm, metrics_df)
-doubles$minus3_pls <- predict(minus3_pls, metrics_df)
-doubles$minus3_xgb <- predict(minus3_xgb, metrics_df)
-doubles$minus3.5_gbm <- predict(minus3.5_gbm, metrics_df)
-doubles$minus3.5_pls <- predict(minus3.5_pls, metrics_df)
-doubles$minus3.5_xgb <- predict(minus3.5_xgb, metrics_df)
-doubles$plus0.5_gbm <- predict(plus0.5_gbm, metrics_df)
-doubles$plus0.5_pls <- predict(plus0.5_pls, metrics_df)
-doubles$plus0.5_xgb <- predict(plus0.5_xgb, metrics_df)
-doubles$plus1_gbm <- predict(plus1_gbm, metrics_df)
-doubles$plus1_pls <- predict(plus1_pls, metrics_df)
-doubles$plus1_xgb <- predict(plus1_xgb, metrics_df)
-doubles$plus1.5_gbm <- predict(plus2.5_gbm, metrics_df)
-doubles$plus1.5_pls <- predict(plus2.5_pls, metrics_df)
-doubles$plus1.5_xgb <- predict(plus2.5_xgb, metrics_df)
-doubles$plus2_gbm <- predict(plus2_gbm, metrics_df)
-doubles$plus2_pls <- predict(plus2_pls, metrics_df)
-doubles$plus2_xgb <- predict(plus2_xgb, metrics_df)
-doubles$plus2.5_gbm <- predict(plus2.5_gbm, metrics_df)
-doubles$plus2.5_pls <- predict(plus2.5_pls, metrics_df)
-doubles$plus2.5_xgb <- predict(plus2.5_xgb, metrics_df)
-doubles$plus3_gbm <- predict(plus3_gbm, metrics_df)
-doubles$plus3_pls <- predict(plus3_pls, metrics_df)
-doubles$plus3_xgb <- predict(plus3_xgb, metrics_df)
-doubles$plus3.5_gbm <- predict(plus3.5_gbm, metrics_df)
-doubles$plus3.5_pls <- predict(plus3.5_pls, metrics_df)
-doubles$plus3.5_xgb <- predict(plus3.5_xgb, metrics_df)
-doubles$total1.5_gbm <- predict(total2.5_gbm, metrics_df)
-doubles$total1.5_pls <- predict(total2.5_pls, metrics_df)
-doubles$total1.5_xgb <- predict(total2.5_xgb, metrics_df)
-doubles$total2_gbm <- predict(total2_gbm, metrics_df)
-doubles$total2_pls <- predict(total2_pls, metrics_df)
-doubles$total2_xgb <- predict(total2_xgb, metrics_df)
-doubles$total2.5_gbm <- predict(total2.5_gbm, metrics_df)
-doubles$total2.5_pls <- predict(total2.5_pls, metrics_df)
-doubles$total2.5_xgb <- predict(total2.5_xgb, metrics_df)
-doubles$total3_gbm <- predict(total3_gbm, metrics_df)
-doubles$total3_pls <- predict(total3_pls, metrics_df)
-doubles$total3_xgb <- predict(total3_xgb, metrics_df)
-doubles$total3.5_gbm <- predict(total3.5_gbm, metrics_df)
-doubles$total3.5_pls <- predict(total3.5_pls, metrics_df)
-doubles$total3.5_xgb <- predict(total3.5_xgb, metrics_df)
-doubles$total4_gbm <- predict(total4_gbm, metrics_df)
-doubles$total4_pls <- predict(total4_pls, metrics_df)
-doubles$total4_xgb <- predict(total4_xgb, metrics_df)
-doubles$total4.5_gbm <- predict(total4.5_gbm, metrics_df)
-doubles$total4.5_pls <- predict(total4.5_pls, metrics_df)
-doubles$total4.5_xgb <- predict(total4.5_xgb, metrics_df)
-doubles$BTTS_gbm <- predict(BTTS_gbm, metrics_df)
-doubles$BTTS_pls <- predict(BTTS_pls, metrics_df)
-doubles$BTTS_xgb <- predict(BTTS_xgb, metrics_df)
+doubles$outcome_gbm <- predict(outcome_gbm, metrics_df, type = "prob")
+doubles$outcome_pls <- predict(outcome_pls, metrics_df, type = "prob")
+doubles$outcome_xgb <- predict(outcome_xgb, metrics_df, type = "prob")
+doubles$minus0.5_gbm <- predict(minus0.5_gbm, metrics_df, type = "prob")
+doubles$minus0.5_pls <- predict(minus0.5_pls, metrics_df, type = "prob")
+doubles$minus0.5_xgb <- predict(minus0.5_xgb, metrics_df, type = "prob")
+doubles$minus1_gbm <- predict(minus1_gbm, metrics_df, type = "prob")
+doubles$minus1_pls <- predict(minus1_pls, metrics_df, type = "prob")
+doubles$minus1_xgb <- predict(minus1_xgb, metrics_df, type = "prob")
+doubles$minus1.5_gbm <- predict(minus2.5_gbm, metrics_df, type = "prob")
+doubles$minus1.5_pls <- predict(minus2.5_pls, metrics_df, type = "prob")
+doubles$minus1.5_xgb <- predict(minus2.5_xgb, metrics_df, type = "prob")
+doubles$minus2_gbm <- predict(minus2_gbm, metrics_df, type = "prob")
+doubles$minus2_pls <- predict(minus2_pls, metrics_df, type = "prob")
+doubles$minus2_xgb <- predict(minus2_xgb, metrics_df, type = "prob")
+doubles$minus2.5_gbm <- predict(minus2.5_gbm, metrics_df, type = "prob")
+doubles$minus2.5_pls <- predict(minus2.5_pls, metrics_df, type = "prob")
+doubles$minus2.5_xgb <- predict(minus2.5_xgb, metrics_df, type = "prob")
+doubles$minus3_gbm <- predict(minus3_gbm, metrics_df, type = "prob")
+doubles$minus3_pls <- predict(minus3_pls, metrics_df, type = "prob")
+doubles$minus3_xgb <- predict(minus3_xgb, metrics_df, type = "prob")
+doubles$minus3.5_gbm <- predict(minus3.5_gbm, metrics_df, type = "prob")
+doubles$minus3.5_pls <- predict(minus3.5_pls, metrics_df, type = "prob")
+doubles$minus3.5_xgb <- predict(minus3.5_xgb, metrics_df, type = "prob")
+doubles$plus0.5_gbm <- predict(plus0.5_gbm, metrics_df, type = "prob")
+doubles$plus0.5_pls <- predict(plus0.5_pls, metrics_df, type = "prob")
+doubles$plus0.5_xgb <- predict(plus0.5_xgb, metrics_df, type = "prob")
+doubles$plus1_gbm <- predict(plus1_gbm, metrics_df, type = "prob")
+doubles$plus1_pls <- predict(plus1_pls, metrics_df, type = "prob")
+doubles$plus1_xgb <- predict(plus1_xgb, metrics_df, type = "prob")
+doubles$plus1.5_gbm <- predict(plus2.5_gbm, metrics_df, type = "prob")
+doubles$plus1.5_pls <- predict(plus2.5_pls, metrics_df, type = "prob")
+doubles$plus1.5_xgb <- predict(plus2.5_xgb, metrics_df, type = "prob")
+doubles$plus2_gbm <- predict(plus2_gbm, metrics_df, type = "prob")
+doubles$plus2_pls <- predict(plus2_pls, metrics_df, type = "prob")
+doubles$plus2_xgb <- predict(plus2_xgb, metrics_df, type = "prob")
+doubles$plus2.5_gbm <- predict(plus2.5_gbm, metrics_df, type = "prob")
+doubles$plus2.5_pls <- predict(plus2.5_pls, metrics_df, type = "prob")
+doubles$plus2.5_xgb <- predict(plus2.5_xgb, metrics_df, type = "prob")
+doubles$plus3_gbm <- predict(plus3_gbm, metrics_df, type = "prob")
+doubles$plus3_pls <- predict(plus3_pls, metrics_df, type = "prob")
+doubles$plus3_xgb <- predict(plus3_xgb, metrics_df, type = "prob")
+doubles$plus3.5_gbm <- predict(plus3.5_gbm, metrics_df, type = "prob")
+doubles$plus3.5_pls <- predict(plus3.5_pls, metrics_df, type = "prob")
+doubles$plus3.5_xgb <- predict(plus3.5_xgb, metrics_df, type = "prob")
+doubles$total1.5_gbm <- predict(total2.5_gbm, metrics_df, type = "prob")
+doubles$total1.5_pls <- predict(total2.5_pls, metrics_df, type = "prob")
+doubles$total1.5_xgb <- predict(total2.5_xgb, metrics_df, type = "prob")
+doubles$total2_gbm <- predict(total2_gbm, metrics_df, type = "prob")
+doubles$total2_pls <- predict(total2_pls, metrics_df, type = "prob")
+doubles$total2_xgb <- predict(total2_xgb, metrics_df, type = "prob")
+doubles$total2.5_gbm <- predict(total2.5_gbm, metrics_df, type = "prob")
+doubles$total2.5_pls <- predict(total2.5_pls, metrics_df, type = "prob")
+doubles$total2.5_xgb <- predict(total2.5_xgb, metrics_df, type = "prob")
+doubles$total3_gbm <- predict(total3_gbm, metrics_df, type = "prob")
+doubles$total3_pls <- predict(total3_pls, metrics_df, type = "prob")
+doubles$total3_xgb <- predict(total3_xgb, metrics_df, type = "prob")
+doubles$total3.5_gbm <- predict(total3.5_gbm, metrics_df, type = "prob")
+doubles$total3.5_pls <- predict(total3.5_pls, metrics_df, type = "prob")
+doubles$total3.5_xgb <- predict(total3.5_xgb, metrics_df, type = "prob")
+doubles$total4_gbm <- predict(total4_gbm, metrics_df, type = "prob")
+doubles$total4_pls <- predict(total4_pls, metrics_df, type = "prob")
+doubles$total4_xgb <- predict(total4_xgb, metrics_df, type = "prob")
+doubles$total4.5_gbm <- predict(total4.5_gbm, metrics_df, type = "prob")
+doubles$total4.5_pls <- predict(total4.5_pls, metrics_df, type = "prob")
+doubles$total4.5_xgb <- predict(total4.5_xgb, metrics_df, type = "prob")
+doubles$BTTS_gbm <- predict(BTTS_gbm, metrics_df, type = "prob")
+doubles$BTTS_pls <- predict(BTTS_pls, metrics_df, type = "prob")
+doubles$BTTS_xgb <- predict(BTTS_xgb, metrics_df, type = "prob")
+doubles <- doubles %>% 
+  mutate(poutcome = (outcome_gbm + outcome_pls + outcome_xgb) / 3,
+         pminus0.5 = (minus0.5_gbm + minus0.5_pls + minus0.5_xgb) / 3,
+         pminus1 = (minus1_gbm + minus1_pls + minus1_xgb) / 3,
+         pminus1.5 = (minus1.5_gbm + minus1.5_pls + minus1.5_xgb) / 3,
+         pminus2 = (minus2_gbm + minus2_pls + minus2_xgb) / 3,
+         pminus2.5 = (minus2.5_gbm + minus2.5_pls + minus2.5_xgb) / 3,
+         pminus3 = (minus3_gbm + minus3_pls + minus3_xgb) / 3,
+         pminus3.5 = (minus3.5_gbm + minus3.5_pls + minus3.5_xgb) / 3,
+         pplus0.5 = (plus0.5_gbm + plus0.5_pls + plus0.5_xgb) / 3,
+         pplus1 = (plus1_gbm + plus1_pls + plus1_xgb) / 3,
+         pplus1.5 = (plus1.5_gbm + plus1.5_pls + plus1.5_xgb) / 3,
+         pplus2 = (plus2_gbm + plus2_pls + plus2_xgb) / 3,
+         pplus2.5 = (plus2.5_gbm + plus2.5_pls + plus2.5_xgb) / 3,
+         pplus3 = (plus3_gbm + plus3_pls + plus3_xgb) / 3,
+         pplus3.5 = (plus3.5_gbm + plus3.5_pls + plus3.5_xgb) / 3,
+         ptotal1.5 = (total1.5_gbm + total1.5_pls + total1.5_xgb) / 3,
+         ptotal2 = (total2_gbm + total2_pls + total2_xgb) / 3,
+         ptotal2.5 = (total2.5_gbm + total2.5_pls + total2.5_xgb) / 3,
+         ptotal3 = (total3_gbm + total3_pls + total3_xgb) / 3,
+         ptotal3.5 = (total3.5_gbm + total3.5_pls + total3.5_xgb) / 3,
+         ptotal4 = (total4_gbm + total4_pls + total4_xgb) / 3,
+         ptotal4.5 = (total4.5_gbm + total4.5_pls + total4.5_xgb) / 3,
+         pBTTS = (BTTS_gbm + BTTS_pls + BTTS_xgb) / 3)
+
+doubles2 <- doubles %>% 
+  select(ID:Opponent, poutcome:pBTTS)
 
 ## Join Fixture data with odds data
 
