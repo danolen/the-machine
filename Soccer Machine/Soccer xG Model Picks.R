@@ -59,11 +59,11 @@ mls_odds <- fromJSON(mls_url) %>%
                               grepl("Total Goals O/U - LA Galaxy", bet_type) ~ paste0("Total Goals O/U - Los Angeles Galaxy", " - ", abs(as.numeric(SpreadTotal))),
                               grepl("Total Goals O/U - ", bet_type) ~ paste0(bet_type, " - ", abs(as.numeric(SpreadTotal))),
                               TRUE ~ bet_type)) %>%
-  melt(id.vars = c("gamedate", "HomeTeam", "AwayTeam", "bet_type", "type")) %>%
+  reshape2::melt(id.vars = c("gamedate", "HomeTeam", "AwayTeam", "bet_type", "type")) %>%
   mutate(name = paste0(type, ".", variable)) %>%
   select(-type, -variable) %>%
   mutate(value = as.numeric(value)) %>%
-  dcast(gamedate + HomeTeam + AwayTeam + bet_type ~ name, fun.aggregate = mean) %>%
+  reshape2::dcast(gamedate + HomeTeam + AwayTeam + bet_type ~ name, fun.aggregate = mean) %>%
   mutate(AUN.Odds = round(AUN.Odds, 0),
          HOY.Odds = round(HOY.Odds, 0),
          D.Odds = round(D.Odds, 0)) %>%
@@ -103,11 +103,11 @@ epl_odds <- fromJSON(epl_url) %>%
                               bet_type == "Total Goals O/U" ~ paste0("Alternate Total - ", abs(as.numeric(SpreadTotal))),
                               grepl("Total Goals O/U - ", bet_type) ~ paste0(bet_type, " - ", abs(as.numeric(SpreadTotal))),
                               TRUE ~ bet_type)) %>%
-  melt(id.vars = c("gamedate", "HomeTeam", "AwayTeam", "bet_type", "type")) %>%
+  reshape2::melt(id.vars = c("gamedate", "HomeTeam", "AwayTeam", "bet_type", "type")) %>%
   mutate(name = paste0(type, ".", variable)) %>%
   select(-type, -variable) %>%
   mutate(value = as.numeric(value)) %>%
-  dcast(gamedate + HomeTeam + AwayTeam + bet_type ~ name, fun.aggregate = mean) %>%
+  reshape2::dcast(gamedate + HomeTeam + AwayTeam + bet_type ~ name, fun.aggregate = mean) %>%
   mutate(AUN.Odds = round(AUN.Odds, 0),
          HOY.Odds = round(HOY.Odds, 0),
          D.Odds = round(D.Odds, 0)) %>%
@@ -147,11 +147,11 @@ esp_odds <- fromJSON(esp_url) %>%
                               bet_type == "Total Goals O/U" ~ paste0("Alternate Total - ", abs(as.numeric(SpreadTotal))),
                               grepl("Total Goals O/U - ", bet_type) ~ paste0(bet_type, " - ", abs(as.numeric(SpreadTotal))),
                               TRUE ~ bet_type)) %>%
-  melt(id.vars = c("gamedate", "HomeTeam", "AwayTeam", "bet_type", "type")) %>%
+  reshape2::melt(id.vars = c("gamedate", "HomeTeam", "AwayTeam", "bet_type", "type")) %>%
   mutate(name = paste0(type, ".", variable)) %>%
   select(-type, -variable) %>%
   mutate(value = as.numeric(value)) %>%
-  dcast(gamedate + HomeTeam + AwayTeam + bet_type ~ name, fun.aggregate = mean) %>%
+  reshape2::dcast(gamedate + HomeTeam + AwayTeam + bet_type ~ name, fun.aggregate = mean) %>%
   mutate(AUN.Odds = round(AUN.Odds, 0),
          HOY.Odds = round(HOY.Odds, 0),
          D.Odds = round(D.Odds, 0)) %>%
@@ -191,11 +191,11 @@ ger_odds <- fromJSON(ger_url) %>%
                               bet_type == "Total Goals O/U" ~ paste0("Alternate Total - ", abs(as.numeric(SpreadTotal))),
                               grepl("Total Goals O/U - ", bet_type) ~ paste0(bet_type, " - ", abs(as.numeric(SpreadTotal))),
                               TRUE ~ bet_type)) %>%
-  melt(id.vars = c("gamedate", "HomeTeam", "AwayTeam", "bet_type", "type")) %>%
+  reshape2::melt(id.vars = c("gamedate", "HomeTeam", "AwayTeam", "bet_type", "type")) %>%
   mutate(name = paste0(type, ".", variable)) %>%
   select(-type, -variable) %>%
   mutate(value = as.numeric(value)) %>%
-  dcast(gamedate + HomeTeam + AwayTeam + bet_type ~ name, fun.aggregate = mean) %>%
+  reshape2::dcast(gamedate + HomeTeam + AwayTeam + bet_type ~ name, fun.aggregate = mean) %>%
   mutate(AUN.Odds = round(AUN.Odds, 0),
          HOY.Odds = round(HOY.Odds, 0),
          D.Odds = round(D.Odds, 0)) %>%
@@ -235,11 +235,11 @@ fra_odds <- fromJSON(fra_url) %>%
                               bet_type == "Total Goals O/U" ~ paste0("Alternate Total - ", abs(as.numeric(SpreadTotal))),
                               grepl("Total Goals O/U - ", bet_type) ~ paste0(bet_type, " - ", abs(as.numeric(SpreadTotal))),
                               TRUE ~ bet_type)) %>%
-  melt(id.vars = c("gamedate", "HomeTeam", "AwayTeam", "bet_type", "type")) %>%
+  reshape2::melt(id.vars = c("gamedate", "HomeTeam", "AwayTeam", "bet_type", "type")) %>%
   mutate(name = paste0(type, ".", variable)) %>%
   select(-type, -variable) %>%
   mutate(value = as.numeric(value)) %>%
-  dcast(gamedate + HomeTeam + AwayTeam + bet_type ~ name, fun.aggregate = mean) %>%
+  reshape2::dcast(gamedate + HomeTeam + AwayTeam + bet_type ~ name, fun.aggregate = mean) %>%
   mutate(AUN.Odds = round(AUN.Odds, 0),
          HOY.Odds = round(HOY.Odds, 0),
          D.Odds = round(D.Odds, 0)) %>%
@@ -279,11 +279,11 @@ ita_odds <- fromJSON(ita_url) %>%
                               bet_type == "Total Goals O/U" ~ paste0("Alternate Total - ", abs(as.numeric(SpreadTotal))),
                               grepl("Total Goals O/U - ", bet_type) ~ paste0(bet_type, " - ", abs(as.numeric(SpreadTotal))),
                               TRUE ~ bet_type)) %>%
-  melt(id.vars = c("gamedate", "HomeTeam", "AwayTeam", "bet_type", "type")) %>%
+  reshape2::melt(id.vars = c("gamedate", "HomeTeam", "AwayTeam", "bet_type", "type")) %>%
   mutate(name = paste0(type, ".", variable)) %>%
   select(-type, -variable) %>%
   mutate(value = as.numeric(value)) %>%
-  dcast(gamedate + HomeTeam + AwayTeam + bet_type ~ name, fun.aggregate = mean) %>%
+  reshape2::dcast(gamedate + HomeTeam + AwayTeam + bet_type ~ name, fun.aggregate = mean) %>%
   mutate(AUN.Odds = round(AUN.Odds, 0),
          HOY.Odds = round(HOY.Odds, 0),
          D.Odds = round(D.Odds, 0)) %>%
@@ -323,11 +323,11 @@ ucl_odds <- fromJSON(ucl_url) %>%
                               bet_type == "Total Goals O/U" ~ paste0("Alternate Total - ", abs(as.numeric(SpreadTotal))),
                               grepl("Total Goals O/U - ", bet_type) ~ paste0(bet_type, " - ", abs(as.numeric(SpreadTotal))),
                               TRUE ~ bet_type)) %>%
-  melt(id.vars = c("gamedate", "HomeTeam", "AwayTeam", "bet_type", "type")) %>%
+  reshape2::melt(id.vars = c("gamedate", "HomeTeam", "AwayTeam", "bet_type", "type")) %>%
   mutate(name = paste0(type, ".", variable)) %>%
   select(-type, -variable) %>%
   mutate(value = as.numeric(value)) %>%
-  dcast(gamedate + HomeTeam + AwayTeam + bet_type ~ name, fun.aggregate = mean) %>%
+  reshape2::dcast(gamedate + HomeTeam + AwayTeam + bet_type ~ name, fun.aggregate = mean) %>%
   mutate(AUN.Odds = round(AUN.Odds, 0),
          HOY.Odds = round(HOY.Odds, 0),
          D.Odds = round(D.Odds, 0)) %>%
@@ -367,11 +367,11 @@ uel_odds <- fromJSON(uel_url) %>%
                               bet_type == "Total Goals O/U" ~ paste0("Alternate Total - ", abs(as.numeric(SpreadTotal))),
                               grepl("Total Goals O/U - ", bet_type) ~ paste0(bet_type, " - ", abs(as.numeric(SpreadTotal))),
                               TRUE ~ bet_type)) %>%
-  melt(id.vars = c("gamedate", "HomeTeam", "AwayTeam", "bet_type", "type")) %>%
+  reshape2::melt(id.vars = c("gamedate", "HomeTeam", "AwayTeam", "bet_type", "type")) %>%
   mutate(name = paste0(type, ".", variable)) %>%
   select(-type, -variable) %>%
   mutate(value = as.numeric(value)) %>%
-  dcast(gamedate + HomeTeam + AwayTeam + bet_type ~ name, fun.aggregate = mean) %>%
+  reshape2::dcast(gamedate + HomeTeam + AwayTeam + bet_type ~ name, fun.aggregate = mean) %>%
   mutate(AUN.Odds = round(AUN.Odds, 0),
          HOY.Odds = round(HOY.Odds, 0),
          D.Odds = round(D.Odds, 0)) %>%
@@ -469,7 +469,7 @@ ucl_21_22 <- urls[[7]] %>%
   .[1] %>%
   html_table(trim = TRUE) %>%
   data.frame(stringsAsFactors = FALSE) %>%
-  filter(is.na(Wk) == FALSE) %>%
+  filter(Day != "") %>%
   select(Day:Away) %>%
   separate(Score, c("Home_Score", "Away_Score")) %>%
   mutate(League = "UCL", Season = "2021-2022")
@@ -484,7 +484,7 @@ uel_21_22 <- urls[[8]] %>%
   .[1] %>%
   html_table(trim = TRUE) %>%
   data.frame(stringsAsFactors = FALSE) %>%
-  filter(Wk != "" & Wk != "Wk") %>%
+  filter(Day != "" & Day != "Day") %>%
   select(Day:Away) %>%
   separate(Score, c("Home_Score", "Away_Score")) %>%
   mutate(League = "UEL", Season = "2021-2022")
@@ -754,7 +754,8 @@ singles2 <- singles %>%
   select(ID:pG_ensrf_Home, pG_ensrf_Away, ptt0.5_Home:ptt3.5_Away, -Home_or_Away_Away) %>% 
   rename(Home = Team,
          Away = Opponent) %>% 
-  filter(Home_or_Away_Home == "Home")
+  filter(Home_or_Away_Home == "Home") %>% 
+  select(-Home_or_Away_Home)
 
 doubles <- metrics_df
 doubles$outcome_gbm <- predict(outcome_gbm, metrics_df, type = "prob")
@@ -852,23 +853,17 @@ doubles <- doubles %>%
          pBTTS = (BTTS_gbm + BTTS_pls + BTTS_xgb) / 3)
 
 doubles2 <- doubles %>% 
-  select(ID:Opponent, poutcome:pBTTS)
+  select(ID:Opponent, poutcome:pBTTS) %>% 
+  rename(Home = Team,
+         Away = Opponent)
 
-## Join Fixture data with odds data
+predsDF <- doubles2 %>% 
+  left_join(singles2)
 
-upcoming <- left_join(bovada_odds, metrics_df,
-                      by = c("gamedate" = "Date", "HomeTeam" = "Team", "AwayTeam" = "Opponent")) %>%
+upcoming <- left_join(bovada_odds, predsDF,
+                      by = c("gamedate" = "Date", "HomeTeam" = "Home", "AwayTeam" = "Away")) %>%
   select(ID, gamedate, Day, Time, League, HomeTeam:bet_type, HOY.Odds, HOY.SpreadTotal,
-         D.Odds, AUN.Odds, AUN.SpreadTotal, SplitxG:SeasonGoalsAllowed_roll4_Opp)
-
-upcoming_tt <- left_join(bovada_odds, metrics_tt,
-                      by = c("gamedate" = "Date", "HomeTeam" = "Team", "AwayTeam" = "Opponent")) %>%
-  left_join(bovada_odds, metrics_df,
-            by = c("gamedate" = "Date", "HomeTeam" = "Opponent", "AwayTeam" = "Team")) %>%
-  select(gamedate, Day, Time, League, HomeTeam:bet_type, HOY.Odds, HOY.SpreadTotal,
-         D.Odds, AUN.Odds, AUN.SpreadTotal, SplitxG:SeasonGoalsAllowed_roll4_Opp)
-
-## Functions to simulate outcome probabilities
+         D.Odds, AUN.Odds, AUN.SpreadTotal, poutcome:ptt3.5_Away)
 
 simulate_game <- function(homeScorePred, awayScorePred, homeORaway = c("home", "away"), max_score = 10) {
   score_matrix = dpois(0:max_score, homeScorePred) %o% dpois(0:max_score, awayScorePred)
@@ -881,7 +876,7 @@ simulate_spread <- function(homeScorePred, awayScorePred, homeORaway = c("home",
   score_matrix = dpois(0:max_score, homeScorePred) %o% dpois(0:max_score, awayScorePred)
   colnames(score_matrix) = 0:max_score
   rownames(score_matrix) = 0:max_score
-  score_matrix = rownames_to_column(as.data.frame(score_matrix)) %>% melt(id = "rowname")
+  score_matrix = rownames_to_column(as.data.frame(score_matrix)) %>% reshape2::melt(id = "rowname")
   colnames(score_matrix) = c("home_score", "away_score", "prob")
   score_matrix = mutate(score_matrix,
                         home_score = as.numeric(home_score),
@@ -897,7 +892,7 @@ simulate_total <- function(homeScorePred, awayScorePred, overORunder = c("over",
   score_matrix = dpois(0:max_score, homeScorePred) %o% dpois(0:max_score, awayScorePred)
   colnames(score_matrix) = 0:max_score
   rownames(score_matrix) = 0:max_score
-  score_matrix = rownames_to_column(as.data.frame(score_matrix)) %>% melt(id = "rowname")
+  score_matrix = rownames_to_column(as.data.frame(score_matrix)) %>% reshape2::melt(id = "rowname")
   colnames(score_matrix) = c("home_score", "away_score", "prob")
   score_matrix = mutate(score_matrix,
                         home_score = as.numeric(home_score),
@@ -923,27 +918,199 @@ simulate_team_total <- function(homeScorePred, awayScorePred, homeORaway = c("ho
 bets <- mutate(upcoming,
                HOY_ImpliedOdds = if_else(HOY.Odds > 0, 100 / (HOY.Odds + 100), abs(HOY.Odds) / (abs(HOY.Odds) + 100)),
                AUN_ImpliedOdds = if_else(AUN.Odds > 0, 100 / (AUN.Odds + 100), abs(AUN.Odds) / (abs(AUN.Odds) + 100)),
-               D_ImpliedOdds = if_else(D.Odds > 0, 100 / (D.Odds + 100), abs(D.Odds) / (abs(D.Odds) + 100)))
+               D_ImpliedOdds = if_else(D.Odds > 0, 100 / (D.Odds + 100), abs(D.Odds) / (abs(D.Odds) + 100))) %>% 
+  rename(Home_pred = pG_ensrf_Home,
+         Away_pred = pG_ensrf_Away)
 
-bets <- bets %>%
+bets2 <- bets %>%
   rowwise() %>%
-  dplyr::mutate(HOY_ProjOdds = case_when(bet_type == "3-Way Moneyline" | bet_type == "Draw No Bet" ~ simulate_game(Home_pred, Away_pred, "home"),
+  dplyr::mutate(HOY_ProjOdds1 = case_when(bet_type == "3-Way Moneyline" | bet_type == "Draw No Bet" ~ simulate_game(Home_pred, Away_pred, "home"),
                                   grepl("Spread", bet_type) ~ simulate_spread(Home_pred, Away_pred, "home", spread = HOY.SpreadTotal),
                                   bet_type == "Total" | grepl("Alternate Total", bet_type) ~ simulate_total(Home_pred, Away_pred, "over", ou_total = HOY.SpreadTotal),
                                   grepl(paste0("Total Goals O/U - ", HomeTeam), bet_type) ~ simulate_team_total(Home_pred, Away_pred, "home", "over", team_total = HOY.SpreadTotal),
                                   grepl(paste0("Total Goals O/U - ", AwayTeam), bet_type) ~ simulate_team_total(Home_pred, Away_pred, "away", "over", team_total = HOY.SpreadTotal),
                                   bet_type == "Both Teams To Score" ~ simulate_team_total(Home_pred, Away_pred, "home", "over", team_total = 0.5) * simulate_team_total(Home_pred, Away_pred, "away", "over", team_total = 0.5),
                                   TRUE ~ 0),
-         AUN_ProjOdds = case_when(bet_type == "3-Way Moneyline" | bet_type == "Draw No Bet" ~ simulate_game(Home_pred, Away_pred, "away"),
+         AUN_ProjOdds1 = case_when(bet_type == "3-Way Moneyline" | bet_type == "Draw No Bet" ~ simulate_game(Home_pred, Away_pred, "away"),
                                   grepl("Spread", bet_type) ~ simulate_spread(Home_pred, Away_pred, "away", spread = AUN.SpreadTotal),
                                   bet_type == "Total" | grepl("Alternate Total", bet_type) ~ simulate_total(Home_pred, Away_pred, "under", ou_total = AUN.SpreadTotal),
                                   grepl(paste0("Total Goals O/U - ", HomeTeam), bet_type) ~ simulate_team_total(Home_pred, Away_pred, "home", "under", team_total = AUN.SpreadTotal),
                                   grepl(paste0("Total Goals O/U - ", AwayTeam), bet_type) ~ simulate_team_total(Home_pred, Away_pred, "away", "under", team_total = AUN.SpreadTotal),
-                                  bet_type == "Both Teams To Score" ~ 1 - HOY_ProjOdds,
+                                  bet_type == "Both Teams To Score" ~ 1 - HOY_ProjOdds1,
                                   TRUE ~ 0)) %>%
-  dplyr::mutate(D_ProjOdds = case_when(bet_type == "3-Way Moneyline" ~ 1 - HOY_ProjOdds - AUN_ProjOdds))
+  dplyr::mutate(D_ProjOdds1 = case_when(bet_type == "3-Way Moneyline" ~ 1 - HOY_ProjOdds1 - AUN_ProjOdds1))
 
-bets <- mutate(bets,
+bets3 <- bets2 %>% 
+  mutate(HOY_ProjOdds2 = case_when(bet_type == "3-Way Moneyline" | 
+                                     bet_type == "Draw No Bet" | 
+                                     (grepl("Spread", bet_type) &
+                                     HOY.SpreadTotal == 0.0) ~ poutcome$Win,
+                                   grepl("Spread", bet_type) &
+                                     HOY.SpreadTotal == -0.5 ~ pminus0.5$Win,
+                                   grepl("Spread", bet_type) &
+                                     HOY.SpreadTotal == -1 ~ pminus1$Win,
+                                   grepl("Spread", bet_type) &
+                                     HOY.SpreadTotal == -1.5 ~ pminus1.5$Win,
+                                   grepl("Spread", bet_type) &
+                                     HOY.SpreadTotal == -2 ~ pminus2$Win,
+                                   grepl("Spread", bet_type) &
+                                     HOY.SpreadTotal == -2.5 ~ pminus2.5$Win,
+                                   grepl("Spread", bet_type) &
+                                     HOY.SpreadTotal == -3 ~ pminus3$Win,
+                                   grepl("Spread", bet_type) &
+                                     HOY.SpreadTotal == -3.5 ~ pminus3.5$Win,
+                                   grepl("Spread", bet_type) &
+                                     HOY.SpreadTotal == 0.5 ~ pplus0.5$Win,
+                                   grepl("Spread", bet_type) &
+                                     HOY.SpreadTotal == 1 ~ pplus1$Win,
+                                   grepl("Spread", bet_type) &
+                                     HOY.SpreadTotal == 1.5 ~ pplus1.5$Win,
+                                   grepl("Spread", bet_type) &
+                                     HOY.SpreadTotal == 2 ~ pplus2$Win,
+                                   grepl("Spread", bet_type) &
+                                     HOY.SpreadTotal == 2.5 ~ pplus2.5$Win,
+                                   grepl("Spread", bet_type) &
+                                     HOY.SpreadTotal == 3 ~ pplus3$Win,
+                                   grepl("Spread", bet_type) &
+                                     HOY.SpreadTotal == 3.5 ~ pplus3.5$Win,
+                                   (bet_type == "Total" | 
+                                     grepl("Alternate Total", bet_type)) &
+                                     HOY.SpreadTotal == 1.5 ~ ptotal1.5$Over,
+                                   (bet_type == "Total" | 
+                                      grepl("Alternate Total", bet_type)) &
+                                     HOY.SpreadTotal == 2 ~ ptotal2$Over,
+                                   (bet_type == "Total" | 
+                                      grepl("Alternate Total", bet_type)) &
+                                     HOY.SpreadTotal == 2.5 ~ ptotal2.5$Over,
+                                   (bet_type == "Total" | 
+                                      grepl("Alternate Total", bet_type)) &
+                                     HOY.SpreadTotal == 3 ~ ptotal3$Over,
+                                   (bet_type == "Total" | 
+                                      grepl("Alternate Total", bet_type)) &
+                                     HOY.SpreadTotal == 3.5 ~ ptotal3.5$Over,
+                                   (bet_type == "Total" | 
+                                      grepl("Alternate Total", bet_type)) &
+                                     HOY.SpreadTotal == 4 ~ ptotal4$Over,
+                                   (bet_type == "Total" | 
+                                      grepl("Alternate Total", bet_type)) &
+                                     HOY.SpreadTotal == 4.5 ~ ptotal4.5$Over,
+                                   grepl(paste0("Total Goals O/U - ", HomeTeam), bet_type) &
+                                     HOY.SpreadTotal == 0.5 ~ ptt0.5_Home$Over,
+                                   grepl(paste0("Total Goals O/U - ", HomeTeam), bet_type) &
+                                     HOY.SpreadTotal == 1 ~ ptt1_Home$Over,
+                                   grepl(paste0("Total Goals O/U - ", HomeTeam), bet_type) &
+                                     HOY.SpreadTotal == 1.5 ~ ptt1.5_Home$Over,
+                                   grepl(paste0("Total Goals O/U - ", HomeTeam), bet_type) &
+                                     HOY.SpreadTotal == 2 ~ ptt2_Home$Over,
+                                   grepl(paste0("Total Goals O/U - ", HomeTeam), bet_type) &
+                                     HOY.SpreadTotal == 2.5 ~ ptt2.5_Home$Over,
+                                   grepl(paste0("Total Goals O/U - ", HomeTeam), bet_type) &
+                                     HOY.SpreadTotal == 3 ~ ptt3_Home$Over,
+                                   grepl(paste0("Total Goals O/U - ", HomeTeam), bet_type) &
+                                     HOY.SpreadTotal == 3.5 ~ ptt3.5_Home$Over,
+                                   grepl(paste0("Total Goals O/U - ", AwayTeam), bet_type) &
+                                     HOY.SpreadTotal == 0.5 ~ ptt0.5_Away$Over,
+                                   grepl(paste0("Total Goals O/U - ", AwayTeam), bet_type) &
+                                     HOY.SpreadTotal == 1 ~ ptt1_Away$Over,
+                                   grepl(paste0("Total Goals O/U - ", AwayTeam), bet_type) &
+                                     HOY.SpreadTotal == 1.5 ~ ptt1.5_Away$Over,
+                                   grepl(paste0("Total Goals O/U - ", AwayTeam), bet_type) &
+                                     HOY.SpreadTotal == 2 ~ ptt2_Away$Over,
+                                   grepl(paste0("Total Goals O/U - ", AwayTeam), bet_type) &
+                                     HOY.SpreadTotal == 2.5 ~ ptt2.5_Away$Over,
+                                   grepl(paste0("Total Goals O/U - ", AwayTeam), bet_type) &
+                                     HOY.SpreadTotal == 3 ~ ptt3_Away$Over,
+                                   grepl(paste0("Total Goals O/U - ", AwayTeam), bet_type) &
+                                     HOY.SpreadTotal == 3.5 ~ ptt3.5_Away$Over,
+                                   bet_type == "Both Teams To Score" ~ pBTTS$Yes),
+         AUN_ProjOdds2 = case_when(bet_type == "3-Way Moneyline" | 
+                                     bet_type == "Draw No Bet" | 
+                                     (grepl("Spread", bet_type) &
+                                        HOY.SpreadTotal == 0.0) ~ poutcome$Lose,
+                                   grepl("Spread", bet_type) &
+                                     HOY.SpreadTotal == -0.5 ~ pminus0.5$Lose,
+                                   grepl("Spread", bet_type) &
+                                     HOY.SpreadTotal == -1 ~ pminus1$Lose,
+                                   grepl("Spread", bet_type) &
+                                     HOY.SpreadTotal == -1.5 ~ pminus1.5$Lose,
+                                   grepl("Spread", bet_type) &
+                                     HOY.SpreadTotal == -2 ~ pminus2$Lose,
+                                   grepl("Spread", bet_type) &
+                                     HOY.SpreadTotal == -2.5 ~ pminus2.5$Lose,
+                                   grepl("Spread", bet_type) &
+                                     HOY.SpreadTotal == -3 ~ pminus3$Lose,
+                                   grepl("Spread", bet_type) &
+                                     HOY.SpreadTotal == -3.5 ~ pminus3.5$Lose,
+                                   grepl("Spread", bet_type) &
+                                     HOY.SpreadTotal == 0.5 ~ pplus0.5$Lose,
+                                   grepl("Spread", bet_type) &
+                                     HOY.SpreadTotal == 1 ~ pplus1$Lose,
+                                   grepl("Spread", bet_type) &
+                                     HOY.SpreadTotal == 1.5 ~ pplus1.5$Lose,
+                                   grepl("Spread", bet_type) &
+                                     HOY.SpreadTotal == 2 ~ pplus2$Lose,
+                                   grepl("Spread", bet_type) &
+                                     HOY.SpreadTotal == 2.5 ~ pplus2.5$Lose,
+                                   grepl("Spread", bet_type) &
+                                     HOY.SpreadTotal == 3 ~ pplus3$Lose,
+                                   grepl("Spread", bet_type) &
+                                     HOY.SpreadTotal == 3.5 ~ pplus3.5$Lose,
+                                   (bet_type == "Total" | 
+                                      grepl("Alternate Total", bet_type)) &
+                                     HOY.SpreadTotal == 1.5 ~ ptotal1.5$Under,
+                                   (bet_type == "Total" | 
+                                      grepl("Alternate Total", bet_type)) &
+                                     HOY.SpreadTotal == 2 ~ ptotal2$Under,
+                                   (bet_type == "Total" | 
+                                      grepl("Alternate Total", bet_type)) &
+                                     HOY.SpreadTotal == 2.5 ~ ptotal2.5$Under,
+                                   (bet_type == "Total" | 
+                                      grepl("Alternate Total", bet_type)) &
+                                     HOY.SpreadTotal == 3 ~ ptotal3$Under,
+                                   (bet_type == "Total" | 
+                                      grepl("Alternate Total", bet_type)) &
+                                     HOY.SpreadTotal == 3.5 ~ ptotal3.5$Under,
+                                   (bet_type == "Total" | 
+                                      grepl("Alternate Total", bet_type)) &
+                                     HOY.SpreadTotal == 4 ~ ptotal4$Under,
+                                   (bet_type == "Total" | 
+                                      grepl("Alternate Total", bet_type)) &
+                                     HOY.SpreadTotal == 4.5 ~ ptotal4.5$Under,
+                                   grepl(paste0("Total Goals O/U - ", HomeTeam), bet_type) &
+                                     HOY.SpreadTotal == 0.5 ~ ptt0.5_Home$Under,
+                                   grepl(paste0("Total Goals O/U - ", HomeTeam), bet_type) &
+                                     HOY.SpreadTotal == 1 ~ ptt1_Home$Under,
+                                   grepl(paste0("Total Goals O/U - ", HomeTeam), bet_type) &
+                                     HOY.SpreadTotal == 1.5 ~ ptt1.5_Home$Under,
+                                   grepl(paste0("Total Goals O/U - ", HomeTeam), bet_type) &
+                                     HOY.SpreadTotal == 2 ~ ptt2_Home$Under,
+                                   grepl(paste0("Total Goals O/U - ", HomeTeam), bet_type) &
+                                     HOY.SpreadTotal == 2.5 ~ ptt2.5_Home$Under,
+                                   grepl(paste0("Total Goals O/U - ", HomeTeam), bet_type) &
+                                     HOY.SpreadTotal == 3 ~ ptt3_Home$Under,
+                                   grepl(paste0("Total Goals O/U - ", HomeTeam), bet_type) &
+                                     HOY.SpreadTotal == 3.5 ~ ptt3.5_Home$Under,
+                                   grepl(paste0("Total Goals O/U - ", AwayTeam), bet_type) &
+                                     HOY.SpreadTotal == 0.5 ~ ptt0.5_Away$Under,
+                                   grepl(paste0("Total Goals O/U - ", AwayTeam), bet_type) &
+                                     HOY.SpreadTotal == 1 ~ ptt1_Away$Under,
+                                   grepl(paste0("Total Goals O/U - ", AwayTeam), bet_type) &
+                                     HOY.SpreadTotal == 1.5 ~ ptt1.5_Away$Under,
+                                   grepl(paste0("Total Goals O/U - ", AwayTeam), bet_type) &
+                                     HOY.SpreadTotal == 2 ~ ptt2_Away$Under,
+                                   grepl(paste0("Total Goals O/U - ", AwayTeam), bet_type) &
+                                     HOY.SpreadTotal == 2.5 ~ ptt2.5_Away$Under,
+                                   grepl(paste0("Total Goals O/U - ", AwayTeam), bet_type) &
+                                     HOY.SpreadTotal == 3 ~ ptt3_Away$Under,
+                                   grepl(paste0("Total Goals O/U - ", AwayTeam), bet_type) &
+                                     HOY.SpreadTotal == 3.5 ~ ptt3.5_Away$Under,
+                                   bet_type == "Both Teams To Score" ~ pBTTS$No)) %>% 
+  mutate(D_ProjOdds2 = case_when(bet_type == "3-Way Moneyline" ~ 1 - HOY_ProjOdds2 - AUN_ProjOdds2))
+
+check <- bets3 %>% 
+  filter(is.na(HOY_ProjOdds2))
+
+bets4 <- mutate(bets3,
                HOY.Odds_Diff = HOY_ProjOdds - HOY_ImpliedOdds,
                AUN.Odds_Diff = AUN_ProjOdds - AUN_ImpliedOdds,
                D.Odds_Diff = D_ProjOdds - D_ImpliedOdds,
