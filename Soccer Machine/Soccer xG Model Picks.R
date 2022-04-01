@@ -1150,9 +1150,9 @@ bets4 <- bets3 %>%
          run_timestamp = Sys.time()) %>% 
   filter(!is.na(Pick))
 
-write.csv(bets4, "upcoming_bets.csv", row.names = FALSE, na = "")
+write.csv(bets4, "Soccer Machine/upcoming_bets.csv", row.names = FALSE, na = "")
 
-write.csv(bets4, "PicksHistory.csv", row.names = FALSE, na = "")
+write.csv(bets4, "Soccer Machine/PicksHistory.csv", row.names = FALSE, na = "")
 
 ## Analyze performance
 
