@@ -277,6 +277,7 @@ ita_odds <- fromJSON(ita_url) %>%
          bet_type = case_when(bet_type == "Spread" & type == "HOY" ~ paste0("Alternate Spread - Home: ", as.numeric(SpreadTotal)),
                               bet_type == "Spread" & type == "AUN" ~ paste0("Alternate Spread - Home: ", as.numeric(SpreadTotal)*-1),
                               bet_type == "Total Goals O/U" ~ paste0("Alternate Total - ", abs(as.numeric(SpreadTotal))),
+                              grepl("Total Goals O/U - Inter Milan", bet_type) ~ paste0("Total Goals O/U - Inter Milano - ", abs(as.numeric(SpreadTotal))),
                               grepl("Total Goals O/U - ", bet_type) ~ paste0(bet_type, " - ", abs(as.numeric(SpreadTotal))),
                               TRUE ~ bet_type)) %>%
   reshape2::melt(id.vars = c("gamedate", "HomeTeam", "AwayTeam", "bet_type", "type")) %>%
@@ -531,7 +532,7 @@ away <- fixtures %>%
          GoalsAllowed = Home_Score)
 
 metrics <- bind_rows(home, away) %>%
-  filter(League != 'MLS') %>% 
+  filter(!League %in% c('MLS', 'UCL', 'UEL')) %>% 
   filter(!is.na(Date) & (!is.na(xG) | Date >= Sys.Date())) %>% 
   replace(is.na(.), 0) %>% 
   arrange(Date, Time, League, ID) %>% 
@@ -618,9 +619,6 @@ lm_reg <- readRDS("Soccer Machine/Models/train_lm.rds")
 outcome_gbm <- readRDS("Soccer Machine/Models/outcome_gbm.rds")
 outcome_pls <- readRDS("Soccer Machine/Models/outcome_pls.rds")
 outcome_xgb <- readRDS("Soccer Machine/Models/outcome_xgb.rds")
-minus0.5_gbm <- readRDS("Soccer Machine/Models/minus0.5_gbm.rds")
-minus0.5_pls <- readRDS("Soccer Machine/Models/minus0.5_pls.rds")
-minus0.5_xgb <- readRDS("Soccer Machine/Models/minus0.5_xgb.rds")
 minus1_gbm <- readRDS("Soccer Machine/Models/minus1_gbm.rds")
 minus1_pls <- readRDS("Soccer Machine/Models/minus1_pls.rds")
 minus1_xgb <- readRDS("Soccer Machine/Models/minus1_xgb.rds")
@@ -639,9 +637,6 @@ minus3_xgb <- readRDS("Soccer Machine/Models/minus3_xgb.rds")
 minus3.5_gbm <- readRDS("Soccer Machine/Models/minus3.5_gbm.rds")
 minus3.5_pls <- readRDS("Soccer Machine/Models/minus3.5_pls.rds")
 minus3.5_xgb <- readRDS("Soccer Machine/Models/minus3.5_xgb.rds")
-plus0.5_gbm <- readRDS("Soccer Machine/Models/plus0.5_gbm.rds")
-plus0.5_pls <- readRDS("Soccer Machine/Models/plus0.5_pls.rds")
-plus0.5_xgb <- readRDS("Soccer Machine/Models/plus0.5_xgb.rds")
 plus1_gbm <- readRDS("Soccer Machine/Models/plus1_gbm.rds")
 plus1_pls <- readRDS("Soccer Machine/Models/plus1_pls.rds")
 plus1_xgb <- readRDS("Soccer Machine/Models/plus1_xgb.rds")
@@ -761,9 +756,6 @@ doubles <- metrics_df
 doubles$outcome_gbm <- predict(outcome_gbm, metrics_df, type = "prob")
 doubles$outcome_pls <- predict(outcome_pls, metrics_df, type = "prob")
 doubles$outcome_xgb <- predict(outcome_xgb, metrics_df, type = "prob")
-doubles$minus0.5_gbm <- predict(minus0.5_gbm, metrics_df, type = "prob")
-doubles$minus0.5_pls <- predict(minus0.5_pls, metrics_df, type = "prob")
-doubles$minus0.5_xgb <- predict(minus0.5_xgb, metrics_df, type = "prob")
 doubles$minus1_gbm <- predict(minus1_gbm, metrics_df, type = "prob")
 doubles$minus1_pls <- predict(minus1_pls, metrics_df, type = "prob")
 doubles$minus1_xgb <- predict(minus1_xgb, metrics_df, type = "prob")
@@ -782,9 +774,6 @@ doubles$minus3_xgb <- predict(minus3_xgb, metrics_df, type = "prob")
 doubles$minus3.5_gbm <- predict(minus3.5_gbm, metrics_df, type = "prob")
 doubles$minus3.5_pls <- predict(minus3.5_pls, metrics_df, type = "prob")
 doubles$minus3.5_xgb <- predict(minus3.5_xgb, metrics_df, type = "prob")
-doubles$plus0.5_gbm <- predict(plus0.5_gbm, metrics_df, type = "prob")
-doubles$plus0.5_pls <- predict(plus0.5_pls, metrics_df, type = "prob")
-doubles$plus0.5_xgb <- predict(plus0.5_xgb, metrics_df, type = "prob")
 doubles$plus1_gbm <- predict(plus1_gbm, metrics_df, type = "prob")
 doubles$plus1_pls <- predict(plus1_pls, metrics_df, type = "prob")
 doubles$plus1_xgb <- predict(plus1_xgb, metrics_df, type = "prob")
@@ -829,14 +818,12 @@ doubles$BTTS_pls <- predict(BTTS_pls, metrics_df, type = "prob")
 doubles$BTTS_xgb <- predict(BTTS_xgb, metrics_df, type = "prob")
 doubles <- doubles %>% 
   mutate(poutcome = (outcome_gbm + outcome_pls + outcome_xgb) / 3,
-         pminus0.5 = (minus0.5_gbm + minus0.5_pls + minus0.5_xgb) / 3,
          pminus1 = (minus1_gbm + minus1_pls + minus1_xgb) / 3,
          pminus1.5 = (minus1.5_gbm + minus1.5_pls + minus1.5_xgb) / 3,
          pminus2 = (minus2_gbm + minus2_pls + minus2_xgb) / 3,
          pminus2.5 = (minus2.5_gbm + minus2.5_pls + minus2.5_xgb) / 3,
          pminus3 = (minus3_gbm + minus3_pls + minus3_xgb) / 3,
          pminus3.5 = (minus3.5_gbm + minus3.5_pls + minus3.5_xgb) / 3,
-         pplus0.5 = (plus0.5_gbm + plus0.5_pls + plus0.5_xgb) / 3,
          pplus1 = (plus1_gbm + plus1_pls + plus1_xgb) / 3,
          pplus1.5 = (plus1.5_gbm + plus1.5_pls + plus1.5_xgb) / 3,
          pplus2 = (plus2_gbm + plus2_pls + plus2_xgb) / 3,
@@ -946,7 +933,7 @@ bets3 <- bets2 %>%
                                      (grepl("Spread", bet_type) &
                                      HOY.SpreadTotal == 0.0) ~ poutcome$Win,
                                    grepl("Spread", bet_type) &
-                                     HOY.SpreadTotal == -0.5 ~ pminus0.5$Win,
+                                     HOY.SpreadTotal == -0.5 ~ poutcome$Win,
                                    grepl("Spread", bet_type) &
                                      HOY.SpreadTotal == -1 ~ pminus1$Win,
                                    grepl("Spread", bet_type) &
@@ -960,7 +947,7 @@ bets3 <- bets2 %>%
                                    grepl("Spread", bet_type) &
                                      HOY.SpreadTotal == -3.5 ~ pminus3.5$Win,
                                    grepl("Spread", bet_type) &
-                                     HOY.SpreadTotal == 0.5 ~ pplus0.5$Win,
+                                     HOY.SpreadTotal == 0.5 ~ poutcome$Win + poutcome$Draw,
                                    grepl("Spread", bet_type) &
                                      HOY.SpreadTotal == 1 ~ pplus1$Win,
                                    grepl("Spread", bet_type) &
@@ -1028,7 +1015,7 @@ bets3 <- bets2 %>%
                                      (grepl("Spread", bet_type) &
                                         HOY.SpreadTotal == 0.0) ~ poutcome$Lose,
                                    grepl("Spread", bet_type) &
-                                     HOY.SpreadTotal == -0.5 ~ pminus0.5$Lose,
+                                     HOY.SpreadTotal == -0.5 ~ poutcome$Lose + poutcome$Draw,
                                    grepl("Spread", bet_type) &
                                      HOY.SpreadTotal == -1 ~ pminus1$Lose,
                                    grepl("Spread", bet_type) &
@@ -1042,7 +1029,7 @@ bets3 <- bets2 %>%
                                    grepl("Spread", bet_type) &
                                      HOY.SpreadTotal == -3.5 ~ pminus3.5$Lose,
                                    grepl("Spread", bet_type) &
-                                     HOY.SpreadTotal == 0.5 ~ pplus0.5$Lose,
+                                     HOY.SpreadTotal == 0.5 ~ poutcome$Lose,
                                    grepl("Spread", bet_type) &
                                      HOY.SpreadTotal == 1 ~ pplus1$Lose,
                                    grepl("Spread", bet_type) &
@@ -1110,15 +1097,19 @@ bets3 <- bets2 %>%
 check <- bets3 %>% 
   filter(is.na(HOY_ProjOdds2))
 
-bets4 <- mutate(bets3,
-               HOY.Odds_Diff = HOY_ProjOdds - HOY_ImpliedOdds,
-               AUN.Odds_Diff = AUN_ProjOdds - AUN_ImpliedOdds,
-               D.Odds_Diff = D_ProjOdds - D_ImpliedOdds,
-               Pick = if_else(bet_type == "3-Way Moneyline",
-                              case_when(AUN.Odds_Diff > HOY.Odds_Diff & AUN.Odds_Diff > D.Odds_Diff ~ AwayTeam,
-                                        HOY.Odds_Diff > AUN.Odds_Diff & HOY.Odds_Diff > D.Odds_Diff ~ HomeTeam,
-                                        D.Odds_Diff > AUN.Odds_Diff & D.Odds_Diff > HOY.Odds_Diff ~ "Draw"),
-                              if_else(AUN.Odds_Diff > HOY.Odds_Diff, AwayTeam, HomeTeam))) %>%
+bets4 <- bets3 %>% 
+  select(-(poutcome:ptt3.5_Away)) %>% 
+  mutate(HOY_ProjOdds = (HOY_ProjOdds1 + HOY_ProjOdds2) / 2,
+         AUN_ProjOdds = (AUN_ProjOdds1 + AUN_ProjOdds2) / 2,
+         D_ProjOdds = (D_ProjOdds1 + D_ProjOdds2) / 2,
+         HOY.Odds_Diff = HOY_ProjOdds - HOY_ImpliedOdds,
+         AUN.Odds_Diff = AUN_ProjOdds - AUN_ImpliedOdds,
+         D.Odds_Diff = D_ProjOdds - D_ImpliedOdds,
+         Pick = if_else(bet_type == "3-Way Moneyline",
+                        case_when(AUN.Odds_Diff > HOY.Odds_Diff & AUN.Odds_Diff > D.Odds_Diff ~ AwayTeam,
+                                  HOY.Odds_Diff > AUN.Odds_Diff & HOY.Odds_Diff > D.Odds_Diff ~ HomeTeam,
+                                  D.Odds_Diff > AUN.Odds_Diff & D.Odds_Diff > HOY.Odds_Diff ~ "Draw"),
+                        if_else(AUN.Odds_Diff > HOY.Odds_Diff, AwayTeam, HomeTeam))) %>%
   mutate(Pick_Odds = case_when(Pick == AwayTeam ~ AUN.Odds,
                                Pick == HomeTeam ~ HOY.Odds,
                                Pick == "Draw" ~ D.Odds),
@@ -1127,11 +1118,19 @@ bets4 <- mutate(bets3,
          Pick_WinProb = case_when(Pick == AwayTeam ~ AUN_ProjOdds,
                                   Pick == HomeTeam ~ HOY_ProjOdds,
                                   Pick == "Draw" ~ D_ProjOdds),
+         Pick_LoseProb = case_when(bet_type == "3-Way Moneyline" ~
+                                     case_when(Pick == AwayTeam ~ HOY_ProjOdds + D_ProjOdds,
+                                               Pick == HomeTeam ~ AUN_ProjOdds + D_ProjOdds,
+                                               Pick == "Draw" ~ AUN_ProjOdds + HOY_ProjOdds),
+                                   TRUE ~ case_when(Pick == AwayTeam ~ HOY_ProjOdds,
+                                                    TRUE ~ AUN_ProjOdds)),
          Pick_Edge = case_when(Pick == AwayTeam ~ AUN.Odds_Diff,
                                Pick == HomeTeam ~ HOY.Odds_Diff,
                                Pick == "Draw" ~ D.Odds_Diff),
          Fract_Odds = (100 / abs(Pick_Odds))^if_else(Pick_Odds < 0, 1, -1),
-         Kelly_Criteria = (Pick_WinProb * (Fract_Odds + 1) - 1) / Fract_Odds) %>%
+         Kelly_Criteria = (Pick_WinProb * (Fract_Odds + 1) - 1) / Fract_Odds,
+         EV = case_when(Pick_Odds < 0 ~ (10*Pick_WinProb) - ((Pick_Odds/10)*Pick_LoseProb),
+                        TRUE ~ ((Pick_Odds/10*Pick_WinProb) - (10*Pick_LoseProb)))) %>%
   mutate(Pick = case_when(grepl("Total", bet_type) ~ if_else(Pick == HomeTeam, "Over", "Under"),
                           bet_type == "Both Teams To Score" ~ if_else(Pick == HomeTeam, "Yes", "No"),
                           TRUE ~ Pick),
@@ -1147,9 +1146,10 @@ bets4 <- mutate(bets3,
                               bet_type == "Draw No Bet" ~ "Draw No Bet",
                               TRUE ~ "Other"),
          Machine_Odds = round(if_else(Pick_WinProb < 0.5, (100 / Pick_WinProb) - 100, -1 * (100 * Pick_WinProb) / (1 - Pick_WinProb)),0),
-         KC_tier = as.factor(round_any(Kelly_Criteria, 0.05, floor)))
+         KC_tier = as.factor(round_any(Kelly_Criteria, 0.05, floor)),
+         run_timestamp = Sys.time())
 
-write.csv(bets, "upcoming_bets.csv", row.names = FALSE)
+write.csv(bets4, "upcoming_bets.csv", row.names = FALSE)
 
 ## Analyze performance
 

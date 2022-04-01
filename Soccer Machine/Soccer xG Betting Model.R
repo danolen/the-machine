@@ -489,7 +489,9 @@ scores$Home_Score <- as.numeric(scores$Home_Score)
 scores$Away_Score <- as.numeric(scores$Away_Score)
 scores$xG.1 <- as.numeric(scores$xG.1)
 
-scores <- bind_rows(scores, upcoming) 
+scores <- bind_rows(scores, upcoming) %>% 
+  mutate(Home = trimws(substr(Home, 1, nchar(Home)-3)),
+         Away = trimws(substr(Away, 4, nchar(Away))))
 
 home <- scores %>% 
   mutate(ID = gsub(" ", "", gsub("[[:punct:]]","",paste0(Home, Away, Date, Time)), fixed = TRUE)) %>% 
@@ -516,9 +518,12 @@ away <- scores %>%
 
 metrics <- bind_rows(home, away) %>% 
   arrange(Date, Time, League, ID) %>% 
-  mutate(Team = trimws(case_when(League %in% c('UCL', 'UEL') & Home_or_Away == "Home" ~ substr(Team, 1, nchar(Team)-3),
-                                 League %in% c('UCL', 'UEL') & Home_or_Away == "Away" ~ substr(Team, 4, nchar(Team)),
-                                 TRUE ~ Team), which = c("both"))) %>% 
+  # mutate(Team = trimws(case_when(League %in% c('UCL', 'UEL') & Home_or_Away == "Home" ~ substr(Team, 1, nchar(Team)-3),
+  #                                League %in% c('UCL', 'UEL') & Home_or_Away == "Away" ~ substr(Team, 4, nchar(Team)),
+  #                                TRUE ~ Team), which = c("both")),
+  #        Opponent = trimws(case_when(League %in% c('UCL', 'UEL') & Home_or_Away == "Home" ~ substr(Opponent, 1, nchar(Opponent)-3),
+  #                                League %in% c('UCL', 'UEL') & Home_or_Away == "Away" ~ substr(Opponent, 4, nchar(Opponent)),
+  #                                TRUE ~ Opponent), which = c("both"))) %>% 
   group_by(Team, League, Season, Home_or_Away) %>% 
   mutate(SplitxG = cumsum(xG) - xG,
          SplitxGA = cumsum(xGA) - xGA,
@@ -767,44 +772,6 @@ saveRDS(outcome_gbm, "Soccer Machine/Models/outcome_gbm.rds")
 saveRDS(outcome_pls, "Soccer Machine/Models/outcome_pls.rds")
 saveRDS(outcome_xgb, "Soccer Machine/Models/outcome_xgb.rds")
 
-Minus0.5_df <- train_prob %>% 
-  filter(Home_or_Away == "Home") %>% 
-  select(-Home_or_Away, -Outcome, -(Minus1:TT3.5))
-
-intervalStart <- Sys.time()
-cluster <- makeCluster(detectCores() - 1)
-registerDoParallel(cluster)
-
-fitControl <- trainControl(method = "repeatedcv",
-                           number = 10,
-                           allowParallel = TRUE)
-
-set.seed(1234)
-minus0.5_gbm <- train(Minus0.5 ~ .,
-                     data = Minus0.5_df,
-                     method = "gbm",
-                     trControl = fitControl)
-set.seed(1234)
-minus0.5_pls <- train(Minus0.5 ~ .,
-                     data = Minus0.5_df,
-                     method = "pls",
-                     trControl = fitControl,
-                     tuneLength = 15,
-                     preProc = c("center", "scale"))
-set.seed(1234)
-minus0.5_xgb <- train(Minus0.5 ~ .,
-                         data = Minus0.5_df,
-                         method = "xgbTree",
-                         trControl = fitControl)
-
-stopCluster(cluster)
-intervalEnd <- Sys.time()
-paste("Minus0.5 classification model training took",intervalEnd - intervalStart,attr(intervalEnd - intervalStart,"units"))
-
-saveRDS(minus0.5_gbm, "Soccer Machine/Models/minus0.5_gbm.rds")
-saveRDS(minus0.5_pls, "Soccer Machine/Models/minus0.5_pls.rds")
-saveRDS(minus0.5_xgb, "Soccer Machine/Models/minus0.5_xgb.rds")
-
 Minus1_df <- train_prob %>% 
   filter(Home_or_Away == "Home") %>% 
   select(-Home_or_Away, -(Outcome:Minus0.5), -(Minus1.5:TT3.5))
@@ -1032,44 +999,6 @@ paste("Minus3.5 classification model training took",intervalEnd - intervalStart,
 saveRDS(minus3.5_gbm, "Soccer Machine/Models/minus3.5_gbm.rds")
 saveRDS(minus3.5_pls, "Soccer Machine/Models/minus3.5_pls.rds")
 saveRDS(minus3.5_xgb, "Soccer Machine/Models/minus3.5_xgb.rds")
-
-Plus0.5_df <- train_prob %>% 
-  filter(Home_or_Away == "Home") %>% 
-  select(-Home_or_Away, -(Outcome:Minus3.5), -(Plus1:TT3.5))
-
-intervalStart <- Sys.time()
-cluster <- makeCluster(detectCores() - 1)
-registerDoParallel(cluster)
-
-fitControl <- trainControl(method = "repeatedcv",
-                           number = 10,
-                           allowParallel = TRUE)
-
-set.seed(1234)
-plus0.5_gbm <- train(Plus0.5 ~ .,
-                      data = Plus0.5_df,
-                      method = "gbm",
-                      trControl = fitControl)
-set.seed(1234)
-plus0.5_pls <- train(Plus0.5 ~ .,
-                      data = Plus0.5_df,
-                      method = "pls",
-                      trControl = fitControl,
-                      tuneLength = 15,
-                      preProc = c("center", "scale"))
-set.seed(1234)
-plus0.5_xgb <- train(Plus0.5 ~ .,
-                      data = Plus0.5_df,
-                      method = "xgbTree",
-                      trControl = fitControl)
-
-stopCluster(cluster)
-intervalEnd <- Sys.time()
-paste("Plus0.5 classification model training took",intervalEnd - intervalStart,attr(intervalEnd - intervalStart,"units"))
-
-saveRDS(plus0.5_gbm, "Soccer Machine/Models/plus0.5_gbm.rds")
-saveRDS(plus0.5_pls, "Soccer Machine/Models/plus0.5_pls.rds")
-saveRDS(plus0.5_xgb, "Soccer Machine/Models/plus0.5_xgb.rds")
 
 Plus1_df <- train_prob %>% 
   filter(Home_or_Away == "Home") %>% 
