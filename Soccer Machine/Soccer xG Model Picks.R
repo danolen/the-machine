@@ -13,6 +13,7 @@ library("plyr")
 library("RDCOMClient")
 library("xtable")
 library("data.table")
+library("lubridate")
 library("tidyverse")
 
 mls_url <- "https://www.bovada.lv/services/sports/event/v2/events/A/description/soccer/major-league-soccer"
@@ -901,7 +902,6 @@ simulate_team_total <- function(homeScorePred, awayScorePred, homeORaway = c("ho
   
 }
 
-## Add in implied odds, projected odds, edge, kelly criteria
 bets <- mutate(upcoming,
                HOY_ImpliedOdds = if_else(HOY.Odds > 0, 100 / (HOY.Odds + 100), abs(HOY.Odds) / (abs(HOY.Odds) + 100)),
                AUN_ImpliedOdds = if_else(AUN.Odds > 0, 100 / (AUN.Odds + 100), abs(AUN.Odds) / (abs(AUN.Odds) + 100)),
@@ -1147,13 +1147,22 @@ bets4 <- bets3 %>%
                               TRUE ~ "Other"),
          Machine_Odds = round(if_else(Pick_WinProb < 0.5, (100 / Pick_WinProb) - 100, -1 * (100 * Pick_WinProb) / (1 - Pick_WinProb)),0),
          KC_tier = as.factor(round_any(Kelly_Criteria, 0.05, floor)),
-         run_timestamp = Sys.time())
+         run_timestamp = Sys.time()) %>% 
+  filter(!is.na(Pick))
 
-write.csv(bets4, "upcoming_bets.csv", row.names = FALSE)
+write.csv(bets4, "upcoming_bets.csv", row.names = FALSE, na = "")
+
+write.csv(bets4, "PicksHistory.csv", row.names = FALSE, na = "")
 
 ## Analyze performance
 
-history <- read_excel("Machine Picks History - Soccer.xlsx")
+history <- read.csv("PicksHistory.csv") %>% 
+  mutate(gamedate = as.Date(gamedate),
+         KC_tier = as.factor(KC_tier)) %>% 
+  bind_rows(bets4 %>% 
+              mutate(run_timestamp = as.character(run_timestamp)) %>% 
+              replace(. == "",NA)) %>% 
+  distinct()
 
 history <- inner_join(history, scores, by = c("gamedate" = "Date", "HomeTeam" = "Home", "AwayTeam" = "Away")) %>%
   mutate(Total_Score = Home_Score + Away_Score)
