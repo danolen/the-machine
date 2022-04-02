@@ -659,8 +659,6 @@ train <- train_df %>%
 
 upcoming_games <- filter(train_df, Date >= today)
 
-
-
 intervalStart <- Sys.time()
 cluster <- makeCluster(detectCores() - 1)
 registerDoParallel(cluster)
