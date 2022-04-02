@@ -1094,9 +1094,6 @@ bets3 <- bets2 %>%
                                    bet_type == "Both Teams To Score" ~ pBTTS$No)) %>% 
   mutate(D_ProjOdds2 = case_when(bet_type == "3-Way Moneyline" ~ 1 - HOY_ProjOdds2 - AUN_ProjOdds2))
 
-check <- bets3 %>% 
-  filter(is.na(HOY_ProjOdds2))
-
 bets4 <- bets3 %>% 
   select(-(poutcome:pBTTS), -(ptt0.5_Home:ptt3.5_Away)) %>% 
   mutate(HOY_ProjOdds = (HOY_ProjOdds1 + HOY_ProjOdds2) / 2,
