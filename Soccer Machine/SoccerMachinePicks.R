@@ -16,6 +16,8 @@ library("data.table")
 library("lubridate")
 library("tidyverse")
 
+setwd("C:/Users/danie/Desktop/Sports Stuff/The Machine/the-machine")
+
 mls_url <- "https://www.bovada.lv/services/sports/event/v2/events/A/description/soccer/major-league-soccer"
 epl_url <- "https://www.bovada.lv/services/sports/event/v2/events/A/description/soccer/england-premier-league"
 esp_url <- "https://www.bovada.lv/services/sports/event/v2/events/A/description/soccer/spain-la-liga"
