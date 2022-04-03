@@ -1403,8 +1403,8 @@ saveRDS(history, "Soccer Machine/PicksHistory.rds")
 Outlook <- COMCreate("Outlook.Application")
 
 Email = Outlook$CreateItem(0)
-#Email[["to"]] = paste("dnolen@smu.edu", "jorler@smu.edu", "asnolen@crimson.ua.edu", sep = ";", collapse = NULL)
-Email[["to"]] = "dnolen@smu.edu"
+Email[["to"]] = paste("dnolen@smu.edu", "jorler@smu.edu", "asnolen@crimson.ua.edu", sep = ";", collapse = NULL)
+#Email[["to"]] = "dnolen@smu.edu"
 Email[["subject"]] = paste0("Soccer Machine Picks: ", Sys.Date())
 Email[["HTMLbody"]] = sprintf("
 The new and (hopefully) improved Machine is here! I noticed something was wrong with the EV calculation last time. Should be fixed now.
