@@ -16,7 +16,7 @@ library("data.table")
 library("lubridate")
 library("tidyverse")
 
-setwd("C:/Users/danie/Desktop/Sports Stuff/The Machine/the-machine")
+setwd("C:/Users/danie/Desktop/SportsStuff/TheMachine/the-machine")
 
 mls_url <- "https://www.bovada.lv/services/sports/event/v2/events/A/description/soccer/major-league-soccer"
 epl_url <- "https://www.bovada.lv/services/sports/event/v2/events/A/description/soccer/england-premier-league"
@@ -1128,7 +1128,7 @@ bets4 <- bets3 %>%
                                Pick == "Draw" ~ D.Odds_Diff),
          Fract_Odds = (100 / abs(Pick_Odds))^if_else(Pick_Odds < 0, 1, -1),
          Kelly_Criteria = (Pick_WinProb * (Fract_Odds + 1) - 1) / Fract_Odds,
-         EV = case_when(Pick_Odds < 0 ~ (10*Pick_WinProb) - ((Pick_Odds/10)*Pick_LoseProb),
+         EV = case_when(Pick_Odds < 0 ~ (10*Pick_WinProb) - ((abs(Pick_Odds)/10)*Pick_LoseProb),
                         TRUE ~ ((Pick_Odds/10*Pick_WinProb) - (10*Pick_LoseProb)))) %>%
   mutate(Pick = case_when(grepl("Total", bet_type) ~ if_else(Pick == HomeTeam, "Over", "Under"),
                           bet_type == "Both Teams To Score" ~ if_else(Pick == HomeTeam, "Yes", "No"),
@@ -1151,7 +1151,7 @@ bets4 <- bets3 %>%
 
 write.csv(bets4, "Soccer Machine/upcoming_bets.csv", row.names = FALSE, na = "")
 
-saveRDS(bets4, "Soccer Machine/PicksHistory.rds")
+#saveRDS(bets4, "Soccer Machine/PicksHistory.rds")
 
 ## Analyze performance
 
@@ -1403,11 +1403,11 @@ saveRDS(history, "Soccer Machine/PicksHistory.rds")
 Outlook <- COMCreate("Outlook.Application")
 
 Email = Outlook$CreateItem(0)
-Email[["to"]] = paste("dnolen@smu.edu", "jorler@smu.edu", "asnolen@crimson.ua.edu", sep = ";", collapse = NULL)
-#Email[["to"]] = "dnolen@smu.edu"
+#Email[["to"]] = paste("dnolen@smu.edu", "jorler@smu.edu", "asnolen@crimson.ua.edu", sep = ";", collapse = NULL)
+Email[["to"]] = "dnolen@smu.edu"
 Email[["subject"]] = paste0("Soccer Machine Picks: ", Sys.Date())
 Email[["HTMLbody"]] = sprintf("
-The new and (hopefully) improved Machine is here!
+The new and (hopefully) improved Machine is here! I noticed something was wrong with the EV calculation last time. Should be fixed now.
 </p><br></p>
 The Machine's picks for upcoming soccer matches are in! The Machine currently offers picks for the Big 5 European Leagues. MLS will come later once more games are played this season. Something weird is going on with Champions League and Europa League so the Machine is excluding those for now.
 </p><br></p>
@@ -1417,7 +1417,7 @@ NOTE: Consider this a BETA version. If you feel like reviewing this, please let 
 </p><br></p>
 ANOTHER NOTE: I will start to track the performance of these bets. Right now there's nothing to go off of. Once the Machine has a better history to draw from, I will include its performance here. When I do that, I will probably exclude bets with juice over -250 (maybe even -200). I suggest never betting juice higher than -250. I will also probably filter out bets that have less than a 30%% win probability (maybe lower, we'll see). I don't believe it is worth it to bet on these huge underdogs. I suggest filtering these out, but I'll leave them in her in case you're interested.
 ")
-Email[["attachments"]]$Add("C:/Users/danie/Desktop/Sports Stuff/The Machine/the-machine/Soccer Machine/upcoming_bets.csv")
+Email[["attachments"]]$Add("C:/Users/danie/Desktop/SportsStuff/TheMachine/the-machine/Soccer Machine/upcoming_bets.csv")
 
 Email$Send()
 
