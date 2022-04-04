@@ -1151,8 +1151,6 @@ bets4 <- bets3 %>%
 
 write.csv(bets4, "Soccer Machine/upcoming_bets.csv", row.names = FALSE, na = "")
 
-#saveRDS(bets4, "Soccer Machine/PicksHistory.rds")
-
 ## Analyze performance
 
 history <- readRDS("Soccer Machine/PicksHistory.rds") %>% 
