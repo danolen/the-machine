@@ -1405,15 +1405,13 @@ Email[["to"]] = paste("dnolen@smu.edu", "jorler@smu.edu", "asnolen@crimson.ua.ed
 #Email[["to"]] = "dnolen@smu.edu"
 Email[["subject"]] = paste0("Soccer Machine Picks: ", Sys.Date())
 Email[["HTMLbody"]] = sprintf("
-The new and (hopefully) improved Machine is here! I noticed something was wrong with the EV calculation last time. Should be fixed now.
-</p><br></p>
 The Machine's picks for upcoming soccer matches are in! The Machine currently offers picks for the Big 5 European Leagues. MLS will come later once more games are played this season. Something weird is going on with Champions League and Europa League so the Machine is excluding those for now.
 </p><br></p>
 The attached document contains all of the pertinent betting information for the upcoming matches. Good luck!
 </p><br></p>
 NOTE: Consider this a BETA version. If you feel like reviewing this, please let me know if anything looks off.
 </p><br></p>
-ANOTHER NOTE: I will start to track the performance of these bets. Right now there's nothing to go off of. Once the Machine has a better history to draw from, I will include its performance here. When I do that, I will probably exclude bets with juice over -250 (maybe even -200). I suggest never betting juice higher than -250. I will also probably filter out bets that have less than a 30%% win probability (maybe lower, we'll see). I don't believe it is worth it to bet on these huge underdogs. I suggest filtering these out, but I'll leave them in her in case you're interested.
+ANOTHER NOTE: I will start to track the performance of these bets. Right now there's nothing to go off of. Once the Machine has a better history to draw from, I will include its performance here. When I do that, I will probably exclude bets with juice over -250 (maybe even -200). I suggest never betting juice higher than -250. I will also probably filter out bets that have less than a 30%% win probability (maybe lower, we'll see). I don't believe it is worth it to bet on these huge underdogs. I suggest filtering these out, but I'll leave them in here in case you're interested.
 ")
 Email[["attachments"]]$Add("C:/Users/danie/Desktop/SportsStuff/TheMachine/the-machine/Soccer Machine/upcoming_bets.csv")
 
