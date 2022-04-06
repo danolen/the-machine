@@ -1159,12 +1159,14 @@ history <- readRDS("Soccer Machine/PicksHistory.rds") %>%
 
 saveRDS(history, "Soccer Machine/PicksHistory.rds")
 
-# history <- inner_join(history, scores, by = c("gamedate" = "Date", "HomeTeam" = "Home", "AwayTeam" = "Away")) %>%
+# history <- inner_join(history, scores, by = c("gamedate" = "Date", "HomeTeam" = "Home", 
+#                                               "AwayTeam" = "Away", "Day" = "Day", 
+#                                               "Time" = "Time", "League" = "League")) %>%
 #   mutate(Total_Score = Home_Score + Away_Score)
 # 
 # history$Pick_SpreadTotal <- as.numeric(history$Pick_SpreadTotal)
 # 
-# history <- history %>%
+# history2 <- history %>%
 #   rowwise() %>%
 #   mutate(Winner = case_when(bet_type == "ML" ~ if_else(Away_Score > Home_Score,
 #                                                         AwayTeam,
@@ -1208,18 +1210,26 @@ saveRDS(history, "Soccer Machine/PicksHistory.rds")
 #                                                                                      "Under")),
 #                                                                      "NA"))),
 #          Pick_Correct = if_else(Winner == Pick, 1, 0),
-#          Units = if_else(Pick_Correct == 1, 
+#          Units = if_else(Pick_Correct == 1,
 #                          if_else(Pick_Odds > 0, Pick_Odds / 100, 1),
 #                          if_else(Pick_Odds > 0, -1, Pick_Odds / 100)),
 #          Kelly_Bet = if_else(Kelly_Criteria < 0.05, 5, Kelly_Criteria * 100),
 #          Half_Kelly_Bet = if_else(Kelly_Criteria < 0.1, 5, Kelly_Criteria * 50),
 #          Kelly_Profit = Units * Kelly_Bet,
-#          Half_Kelly_Profit = Units * Half_Kelly_Bet)
+#          Half_Kelly_Profit = Units * Half_Kelly_Bet) %>% 
+#   arrange(run_timestamp) %>% 
+#   group_by(ID, bet_type_full) %>% 
+#   mutate(partition = row_number())
 # 
-# write.csv(history, "machine_pa_soccer.csv", row.names = FALSE)
-# 
-# types <- filter(history, Winner != "Push" & Kelly_Criteria > 0 & Pick_Odds >= -250 & Pick_WinProb >= 0.3) %>%
-#   select(gamedate, League.x, bet_type, Pick_Odds, Pick_WinProb, Fract_Odds, Kelly_Criteria, KC_tier, Pick_Correct, Units)
+# # write.csv(history, "machine_pa_soccer.csv", row.names = FALSE)
+# # 
+# types <- filter(history2, 
+#                 Winner != "Push" & 
+#                   Kelly_Criteria > 0 & 
+#                   Pick_Odds >= -250 & 
+#                   Pick_WinProb >= 0.3 &
+#                   partition == 2) %>%
+#   select(gamedate, League, bet_type, Pick_Odds, Pick_WinProb, Fract_Odds, Kelly_Criteria, KC_tier, Pick_Correct, Units)
 # 
 # types %>%
 #   filter(Kelly_Criteria >= 0 & !(League.x %in% c("UCL", "UEL"))) %>%
@@ -1239,7 +1249,7 @@ saveRDS(history, "Soccer Machine/PicksHistory.rds")
 #                    Kelly_Profit = sum(Kelly_Profit)) %>%
 #   mutate(Units_per_bet = Flat_Profit / bets) %>%
 #   print(n=40)
-# 
+
 # types %>%
 #   filter(Kelly_Criteria >= 0) %>%
 #   mutate(Kelly_Bet = if_else(Kelly_Criteria < 0.05, 5, Kelly_Criteria * 100),
