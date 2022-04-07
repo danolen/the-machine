@@ -14,6 +14,8 @@ library("RDCOMClient")
 library("xtable")
 library("data.table")
 library("lubridate")
+library("esquisse")
+library("blastula")
 library("tidyverse")
 
 setwd("C:/Users/danie/Desktop/SportsStuff/TheMachine/the-machine")
@@ -1159,150 +1161,145 @@ history <- readRDS("Soccer Machine/PicksHistory.rds") %>%
 
 saveRDS(history, "Soccer Machine/PicksHistory.rds")
 
-# history <- inner_join(history, scores, by = c("gamedate" = "Date", "HomeTeam" = "Home", 
-#                                               "AwayTeam" = "Away", "Day" = "Day", 
-#                                               "Time" = "Time", "League" = "League")) %>%
-#   mutate(Total_Score = Home_Score + Away_Score)
-# 
-# history$Pick_SpreadTotal <- as.numeric(history$Pick_SpreadTotal)
-# 
-# history2 <- history %>%
-#   rowwise() %>%
-#   mutate(Winner = case_when(bet_type == "ML" ~ if_else(Away_Score > Home_Score,
-#                                                         AwayTeam,
-#                                                         if_else(Away_Score == Home_Score,
-#                                                                 "Draw",
-#                                                                 HomeTeam)),
-#                              bet_type == "Draw No Bet" ~ if_else(Away_Score > Home_Score,
-#                                                         AwayTeam,
-#                                                         if_else(Away_Score == Home_Score,
-#                                                                 "Push",
-#                                                                 HomeTeam)),
-#                              grepl("Spread", bet_type) ~ if_else(Pick == paste0(AwayTeam),
-#                                                                  if_else(Away_Score + Pick_SpreadTotal > Home_Score,
-#                                                                          AwayTeam,
-#                                                                          if_else(Away_Score + Pick_SpreadTotal == Home_Score,
-#                                                                                  "Push",
-#                                                                                  HomeTeam)),
-#                                                                  if_else(Home_Score + Pick_SpreadTotal > Away_Score,
-#                                                                          HomeTeam,
-#                                                                          if_else(Home_Score + Pick_SpreadTotal == Away_Score,
-#                                                                                  "Push",
-#                                                                                  AwayTeam))),
-#                              grepl("Total", bet_type) ~ if_else(Total_Score > Pick_SpreadTotal,
-#                                                                 "Over",
-#                                                                 if_else(Total_Score == Pick_SpreadTotal,
-#                                                                         "Push",
-#                                                                         "Under")),
-#                              bet_type == "BTTS" ~ if_else(Away_Score > 0 & Home_Score > 0,
-#                                                           "Yes", "No"),
-#                              grepl("TT", bet_type) ~ if_else(grepl(paste0(AwayTeam), bet_type_full),
-#                                                              if_else(Away_Score > Pick_SpreadTotal,
-#                                                                      "Over",
-#                                                                      if_else(Away_Score == Pick_SpreadTotal,
-#                                                                              "Push",
-#                                                                              "Under")),
-#                                                              if_else(grepl(paste0(HomeTeam), bet_type_full),
-#                                                                      if_else(Home_Score > Pick_SpreadTotal,
-#                                                                              "Over",
-#                                                                              if_else(Home_Score == Pick_SpreadTotal,
-#                                                                                      "Push",
-#                                                                                      "Under")),
-#                                                                      "NA"))),
-#          Pick_Correct = if_else(Winner == Pick, 1, 0),
-#          Units = if_else(Pick_Correct == 1,
-#                          if_else(Pick_Odds > 0, Pick_Odds / 100, 1),
-#                          if_else(Pick_Odds > 0, -1, Pick_Odds / 100)),
-#          Kelly_Bet = if_else(Kelly_Criteria < 0.05, 5, Kelly_Criteria * 100),
-#          Half_Kelly_Bet = if_else(Kelly_Criteria < 0.1, 5, Kelly_Criteria * 50),
-#          Kelly_Profit = Units * Kelly_Bet,
-#          Half_Kelly_Profit = Units * Half_Kelly_Bet) %>% 
-#   arrange(run_timestamp) %>% 
-#   group_by(ID, bet_type_full) %>% 
-#   mutate(partition = row_number())
-# 
-# # write.csv(history, "machine_pa_soccer.csv", row.names = FALSE)
-# # 
-# types <- filter(history2, 
-#                 Winner != "Push" & 
-#                   Kelly_Criteria > 0 & 
-#                   Pick_Odds >= -250 & 
-#                   Pick_WinProb >= 0.3 &
-#                   partition == 2) %>%
-#   select(gamedate, League, bet_type, Pick_Odds, Pick_WinProb, Fract_Odds, Kelly_Criteria, KC_tier, Pick_Correct, Units)
-# 
-# types %>%
-#   filter(Kelly_Criteria >= 0 & !(League.x %in% c("UCL", "UEL"))) %>%
-#   mutate(Kelly_Bet = if_else(Kelly_Criteria < 0.05, 5, Kelly_Criteria * 100),
-#          Kelly_Profit = Units * Kelly_Bet,
-#          WinProb_tier = round_any(Pick_WinProb, 0.05, floor),
-#          Odds_tier = as.factor(round_any(Pick_Odds, 10, floor)),
-#          bets = 1,
-#          Total = "Total") %>%
-#   #group_by(Total) %>%
-#   group_by(bet_type) %>%
-#   #group_by(KC_tier) %>%
-#   #group_by(Odds_tier) %>%
-#   dplyr::summarise(HitRate = mean(Pick_Correct),
-#                    bets = sum(bets),
-#                    Flat_Profit = sum(Units),
-#                    Kelly_Profit = sum(Kelly_Profit)) %>%
-#   mutate(Units_per_bet = Flat_Profit / bets) %>%
-#   print(n=40)
+history <- inner_join(history, scores, by = c("gamedate" = "Date", "HomeTeam" = "Home",
+                                              "AwayTeam" = "Away", "Day" = "Day",
+                                              "Time" = "Time", "League" = "League")) %>%
+  mutate(Total_Score = Home_Score + Away_Score)
 
-# types %>%
-#   filter(Kelly_Criteria >= 0) %>%
-#   mutate(Kelly_Bet = if_else(Kelly_Criteria < 0.05, 5, Kelly_Criteria * 100),
-#          Kelly_Profit = Units * Kelly_Bet,
-#          WinProb_tier = as.factor(round_any(Pick_WinProb, 0.05, floor)),
-#          Odds_tier = as.factor(round_any(Pick_Odds, 10, floor)),
-#          bets = 1,
-#          Total = "Total") %>%
-#   group_by(League.x) %>%
-#   dplyr::summarise(HitRate = mean(Pick_Correct),
-#                    bets = sum(bets),
-#                    Flat_Profit = sum(Units),
-#                    Kelly_Profit = sum(Kelly_Profit)) %>%
-#   mutate(Units_per_bet = Flat_Profit / bets) %>%
-#   print(n=40)
-# 
-# types %>%
-#   filter(Kelly_Criteria >= 0.3 & Kelly_Criteria < 1 & !(League.x %in% c("UCL", "UEL"))) %>%
-#   mutate(Kelly_Bet = if_else(Kelly_Criteria < 0.05, 5, Kelly_Criteria * 100),
-#          Kelly_Profit = Units * Kelly_Bet,
-#          WinProb_tier = as.factor(round_any(Pick_WinProb, 0.05, floor)),
-#          Odds_tier = as.factor(round_any(Pick_Odds, 10, floor)),
-#          bets = 1,
-#          Total = "Total") %>%
-#   group_by(Total) %>%
-#   #group_by(bet_type) %>%
-#   #group_by(KC_tier) %>%
-#   #group_by(Odds_tier) %>%
-#   dplyr::summarise(HitRate = mean(Pick_Correct),
-#                    bets = sum(bets),
-#                    Flat_Profit = sum(Units),
-#                    Kelly_Profit = sum(Kelly_Profit)) %>%
-#   mutate(Units_per_bet = Flat_Profit / bets) %>%
-#   print(n=40)
-# 
-# types %>%
-#   filter(!(League.x %in% c("UCL", "UEL"))) %>%
-#   mutate(Kelly_Bet = if_else(Kelly_Criteria < 0.05, 5, Kelly_Criteria * 100),
-#          Kelly_Profit = Units * Kelly_Bet,
-#          WinProb_tier = round_any(Pick_WinProb, 0.05, floor),
-#          Odds_tier = as.factor(round_any(Pick_Odds, 10, floor)),
-#          bets = 1) %>%
-#   #group_by(bet_type) %>%
-#   group_by(KC_tier) %>%
-#   #group_by(WinProb_tier) %>%
-#   #group_by(Odds_tier) %>%
-#   dplyr::summarise(HitRate = mean(Pick_Correct),
-#                    bets = sum(bets),
-#                    Flat_Profit = sum(Units),
-#                    Kelly_Profit = sum(Kelly_Profit)) %>%
-#   mutate(Units_per_bet = Flat_Profit / bets) %>%
-#   print(n=40)
-# 
+#history$Pick_SpreadTotal <- as.numeric(history$Pick_SpreadTotal)
+
+history2 <- history %>%
+  rowwise() %>%
+  mutate(Winner = case_when(bet_type == "ML" ~ if_else(Away_Score > Home_Score,
+                                                        AwayTeam,
+                                                        if_else(Away_Score == Home_Score,
+                                                                "Draw",
+                                                                HomeTeam)),
+                             bet_type == "Draw No Bet" ~ if_else(Away_Score > Home_Score,
+                                                        AwayTeam,
+                                                        if_else(Away_Score == Home_Score,
+                                                                "Push",
+                                                                HomeTeam)),
+                             grepl("Spread", bet_type) ~ if_else(Pick == paste0(AwayTeam),
+                                                                 if_else(Away_Score + Pick_SpreadTotal > Home_Score,
+                                                                         AwayTeam,
+                                                                         if_else(Away_Score + Pick_SpreadTotal == Home_Score,
+                                                                                 "Push",
+                                                                                 HomeTeam)),
+                                                                 if_else(Home_Score + Pick_SpreadTotal > Away_Score,
+                                                                         HomeTeam,
+                                                                         if_else(Home_Score + Pick_SpreadTotal == Away_Score,
+                                                                                 "Push",
+                                                                                 AwayTeam))),
+                             grepl("Total", bet_type) ~ if_else(Total_Score > Pick_SpreadTotal,
+                                                                "Over",
+                                                                if_else(Total_Score == Pick_SpreadTotal,
+                                                                        "Push",
+                                                                        "Under")),
+                             bet_type == "BTTS" ~ if_else(Away_Score > 0 & Home_Score > 0,
+                                                          "Yes", "No"),
+                             grepl("TT", bet_type) ~ if_else(grepl(paste0(AwayTeam), bet_type_full),
+                                                             if_else(Away_Score > Pick_SpreadTotal,
+                                                                     "Over",
+                                                                     if_else(Away_Score == Pick_SpreadTotal,
+                                                                             "Push",
+                                                                             "Under")),
+                                                             if_else(grepl(paste0(HomeTeam), bet_type_full),
+                                                                     if_else(Home_Score > Pick_SpreadTotal,
+                                                                             "Over",
+                                                                             if_else(Home_Score == Pick_SpreadTotal,
+                                                                                     "Push",
+                                                                                     "Under")),
+                                                                     "NA"))),
+         Pick_Correct = if_else(Winner == Pick, 1, 0),
+         Units = if_else(Pick_Correct == 1,
+                         if_else(Pick_Odds > 0, Pick_Odds / 100, 1),
+                         if_else(Pick_Odds > 0, -1, Pick_Odds / 100)),
+         Kelly_Bet = if_else(Kelly_Criteria < 0.05, 5, Kelly_Criteria * 100),
+         Half_Kelly_Bet = if_else(Kelly_Criteria < 0.1, 5, Kelly_Criteria * 50),
+         Kelly_Profit = Units * Kelly_Bet,
+         Half_Kelly_Profit = Units * Half_Kelly_Bet) %>%
+  arrange(desc(run_timestamp)) %>%
+  group_by(ID, bet_type_full) %>%
+  mutate(partition = row_number())
+
+types <- filter(history2,
+                Winner != "Push" &
+                  Kelly_Criteria > 0 &
+                  Pick_Odds >= -250 &
+                  Pick_WinProb >= 0.3 &
+                  partition == 1) %>%
+  select(gamedate, League, bet_type, Pick_Odds, Pick_WinProb, Fract_Odds, Kelly_Criteria, EV, KC_tier, Pick_Correct, Units) %>% 
+  mutate(Kelly_Bet = if_else(Kelly_Criteria < 0.05, 5, Kelly_Criteria * 100),
+         Kelly_Profit = Units * Kelly_Bet,
+         WinProb_tier = round_any(Pick_WinProb, 0.05, floor),
+         Odds_tier = as.factor(round_any(Pick_Odds, 10, floor)),
+         EV_tier = round_any(EV, 1, floor),
+         bets = 1,
+         Total = "Total")
+
+types %>%
+  filter(Kelly_Criteria >= 0 & !(League %in% c("UCL", "UEL"))) %>%
+  #group_by(Total) %>%
+  group_by(bet_type) %>%
+  #group_by(KC_tier = as.numeric(as.character(KC_tier))) %>%
+  #group_by(Odds_tier) %>%
+  dplyr::summarise(HitRate = mean(Pick_Correct),
+                   bets = sum(bets),
+                   Flat_Profit = sum(Units),
+                   Kelly_Profit = sum(Kelly_Profit)) %>%
+  mutate(Units_per_bet = Flat_Profit / bets) %>%
+  print(n=40)
+
+types %>%
+  filter(Kelly_Criteria >= 0) %>%
+  group_by(League) %>%
+  dplyr::summarise(HitRate = mean(Pick_Correct),
+                   bets = sum(bets),
+                   Flat_Profit = sum(Units),
+                   Kelly_Profit = sum(Kelly_Profit)) %>%
+  mutate(Units_per_bet = Flat_Profit / bets) %>%
+  print(n=40)
+
+types %>%
+  filter(Kelly_Criteria >= 0.1 & Kelly_Criteria < 1 & EV >= 3 & !(League %in% c("UCL", "UEL"))) %>%
+  group_by(Total) %>%
+  #group_by(bet_type) %>%
+  #group_by(KC_tier) %>%
+  #group_by(Odds_tier) %>%
+  dplyr::summarise(HitRate = mean(Pick_Correct),
+                   bets = sum(bets),
+                   Flat_Profit = sum(Units),
+                   Kelly_Profit = sum(Kelly_Profit)) %>%
+  mutate(Units_per_bet = Flat_Profit / bets) %>%
+  print(n=40)
+
+types %>%
+  filter(!(League %in% c("UCL", "UEL"))) %>%
+  #group_by(bet_type) %>%
+  group_by(KC_tier = as.numeric(as.character(KC_tier))) %>%
+  #group_by(WinProb_tier) %>%
+  #group_by(Odds_tier) %>%
+  dplyr::summarise(HitRate = mean(Pick_Correct),
+                   bets = sum(bets),
+                   Flat_Profit = sum(Units),
+                   Kelly_Profit = sum(Kelly_Profit)) %>%
+  mutate(Units_per_bet = Flat_Profit / bets) %>%
+  print(n=40)
+
+types %>%
+  filter(Kelly_Criteria >= 0 & !(League %in% c("UCL", "UEL"))) %>%
+  #group_by(Total) %>%
+  #group_by(bet_type) %>%
+  #group_by(KC_tier = as.numeric(as.character(KC_tier))) %>%
+  #group_by(Odds_tier) %>%
+  group_by(EV_tier) %>% 
+  dplyr::summarise(HitRate = mean(Pick_Correct),
+                   bets = sum(bets),
+                   Flat_Profit = sum(Units)) %>%
+  mutate(Units_per_bet = Flat_Profit / bets) %>%
+  print(n=40)
+
 # types %>%
 #   filter((bet_type == "TT"
 #           #| bet_type == "Alt Total"
@@ -1310,11 +1307,6 @@ saveRDS(history, "Soccer Machine/PicksHistory.rds")
 #           )
 #          & League.x == "EPL"
 #          ) %>%
-#   mutate(Kelly_Bet = if_else(Kelly_Criteria < 0.05, 5, Kelly_Criteria * 100),
-#          Kelly_Profit = Units * Kelly_Bet,
-#          WinProb_tier = round_any(Pick_WinProb, 0.05, floor),
-#          Odds_tier = as.factor(round_any(Pick_Odds, 10, floor)),
-#          bets = 1) %>%
 #   group_by(KC_tier) %>%
 #   #group_by(WinProb_tier) %>%
 #   #group_by(Odds_tier) %>%
@@ -1326,103 +1318,142 @@ saveRDS(history, "Soccer Machine/PicksHistory.rds")
 #   print(n=40)
 # 
 # ## Create email tables
-# 
-# email_table_1 <- types %>%
-#   filter(Kelly_Criteria >= 0 & !(League.x %in% c("UCL", "UEL"))) %>%
-#   mutate(Kelly_Bet = if_else(Kelly_Criteria < 0.05, 5, Kelly_Criteria * 100),
-#          Kelly_Profit = Units * Kelly_Bet,
-#          WinProb_tier = as.factor(round_any(Pick_WinProb, 0.05, floor)),
-#          Odds_tier = as.factor(round_any(Pick_Odds, 10, floor)),
-#          bets = 1,
-#          Total = "Total") %>%
-#   #group_by(Total) %>%
-#   group_by(bet_type) %>%
-#   #group_by(KC_tier) %>%
-#   #group_by(Odds_tier) %>%
-#   dplyr::summarise(HitRate = mean(Pick_Correct),
-#                    bets = sum(bets),
-#                    Flat_Profit = sum(Units),
-#                    Kelly_Profit = sum(Kelly_Profit)) %>%
-#   mutate(Units_per_bet = Flat_Profit / bets) %>%
-#   print(n=40)
-# 
-# df_html_1 <- print(xtable(email_table_1), type = "html", print.results = FALSE)
-# 
-# email_table_2 <- types %>%
-#   filter(Kelly_Criteria >= 0) %>%
-#   mutate(Kelly_Bet = if_else(Kelly_Criteria < 0.05, 5, Kelly_Criteria * 100),
-#          Kelly_Profit = Units * Kelly_Bet,
-#          WinProb_tier = as.factor(round_any(Pick_WinProb, 0.05, floor)),
-#          Odds_tier = as.factor(round_any(Pick_Odds, 10, floor)),
-#          bets = 1,
-#          Total = "Total") %>%
-#   group_by(League.x) %>%
-#   dplyr::summarise(HitRate = mean(Pick_Correct),
-#                    bets = sum(bets),
-#                    Flat_Profit = sum(Units),
-#                    Kelly_Profit = sum(Kelly_Profit)) %>%
-#   mutate(Units_per_bet = Flat_Profit / bets) %>%
-#   print(n=40)
-# 
-# df_html_2 <- print(xtable(email_table_2), type = "html", print.results = FALSE)
-# 
-# email_table_3 <- types %>%
-#   filter(Kelly_Criteria >= 0.3 & Kelly_Criteria < 1 & !(League.x %in% c("UCL", "UEL"))) %>%
-#   mutate(Kelly_Bet = if_else(Kelly_Criteria < 0.05, 5, Kelly_Criteria * 100),
-#          Kelly_Profit = Units * Kelly_Bet,
-#          WinProb_tier = as.factor(round_any(Pick_WinProb, 0.05, floor)),
-#          Odds_tier = as.factor(round_any(Pick_Odds, 10, floor)),
-#          bets = 1,
-#          Total = "Total") %>%
-#   group_by(Total) %>%
-#   #group_by(bet_type) %>%
-#   #group_by(KC_tier) %>%
-#   #group_by(Odds_tier) %>%
-#   dplyr::summarise(HitRate = mean(Pick_Correct),
-#                    bets = sum(bets),
-#                    Flat_Profit = sum(Units),
-#                    Kelly_Profit = sum(Kelly_Profit)) %>%
-#   mutate(Units_per_bet = Flat_Profit / bets) %>%
-#   print(n=40)
-# 
-# df_html_3 <- print(xtable(email_table_3), type = "html", print.results = FALSE)
-# 
-# email_table_4 <- types %>%
-#   filter(!(League.x %in% c("UCL", "UEL"))) %>%
-#   mutate(Kelly_Bet = if_else(Kelly_Criteria < 0.05, 5, Kelly_Criteria * 100),
-#          Kelly_Profit = Units * Kelly_Bet,
-#          WinProb_tier = as.factor(round_any(Pick_WinProb, 0.05, floor)),
-#          Odds_tier = as.factor(round_any(Pick_Odds, 10, floor)),
-#          bets = 1) %>%
-#   #group_by(bet_type) %>%
-#   group_by(KC_tier) %>%
-#   #group_by(Odds_tier) %>%
-#   dplyr::summarise(HitRate = mean(Pick_Correct),
-#                    bets = sum(bets),
-#                    Flat_Profit = sum(Units),
-#                    Kelly_Profit = sum(Kelly_Profit)) %>%
-#   mutate(Units_per_bet = Flat_Profit / bets) %>%
-#   print(n=40)
-# 
-# df_html_4 <- print(xtable(email_table_4), type = "html", print.results = FALSE)
+
+email_table_1 <- types %>%
+  filter(Kelly_Criteria >= 0 & !(League %in% c("UCL", "UEL"))) %>%
+  #group_by(Total) %>%
+  group_by(bet_type) %>%
+  #group_by(KC_tier = as.numeric(as.character(KC_tier))) %>%
+  #group_by(Odds_tier) %>%
+  dplyr::summarise(HitRate = mean(Pick_Correct),
+                   bets = sum(bets),
+                   Flat_Profit = sum(Units),
+                   Kelly_Profit = sum(Kelly_Profit)) %>%
+  mutate(Units_per_bet = Flat_Profit / bets) %>%
+  print(n=40)
+
+df_html_1 <- print(xtable(email_table_1), type = "html", print.results = FALSE)
+
+email_table_2 <- types %>%
+  filter(Kelly_Criteria >= 0) %>%
+  group_by(League) %>%
+  dplyr::summarise(HitRate = mean(Pick_Correct),
+                   bets = sum(bets),
+                   Flat_Profit = sum(Units),
+                   Kelly_Profit = sum(Kelly_Profit)) %>%
+  mutate(Units_per_bet = Flat_Profit / bets) %>%
+  print(n=40)
+
+df_html_2 <- print(xtable(email_table_2), type = "html", print.results = FALSE)
+
+email_table_3 <- types %>%
+  filter(Kelly_Criteria >= 0.1 & Kelly_Criteria < 1 & EV >= 3 & !(League %in% c("UCL", "UEL"))) %>%
+  group_by(Total) %>%
+  #group_by(bet_type) %>%
+  #group_by(KC_tier) %>%
+  #group_by(Odds_tier) %>%
+  dplyr::summarise(HitRate = mean(Pick_Correct),
+                   bets = sum(bets),
+                   Flat_Profit = sum(Units),
+                   Kelly_Profit = sum(Kelly_Profit)) %>%
+  mutate(Units_per_bet = Flat_Profit / bets) %>%
+  print(n=40)
+
+
+df_html_3 <- print(xtable(email_table_3), type = "html", print.results = FALSE)
+
+email_table_4 <- types %>%
+  filter(!(League %in% c("UCL", "UEL"))) %>%
+  #group_by(bet_type) %>%
+  group_by(KC_tier = as.numeric(as.character(KC_tier))) %>%
+  #group_by(WinProb_tier) %>%
+  #group_by(Odds_tier) %>%
+  dplyr::summarise(HitRate = mean(Pick_Correct),
+                   bets = sum(bets),
+                   Flat_Profit = sum(Units),
+                   Kelly_Profit = sum(Kelly_Profit)) %>%
+  mutate(Units_per_bet = Flat_Profit / bets) %>%
+  print(n=40)
+
+df_html_4 <- print(xtable(email_table_4), type = "html", print.results = FALSE)
+
+email_table_5 <- types %>%
+  filter(Kelly_Criteria >= 0 & !(League %in% c("UCL", "UEL"))) %>%
+  #group_by(Total) %>%
+  #group_by(bet_type) %>%
+  #group_by(KC_tier = as.numeric(as.character(KC_tier))) %>%
+  #group_by(Odds_tier) %>%
+  group_by(EV_tier) %>% 
+  dplyr::summarise(HitRate = mean(Pick_Correct),
+                   bets = sum(bets),
+                   Flat_Profit = sum(Units)) %>%
+  mutate(Units_per_bet = Flat_Profit / bets) %>%
+  print(n=40)
+
+df_html_5 <- print(xtable(email_table_5), type = "html", print.results = FALSE)
+
+graph_data <- types %>%
+  ungroup() %>% 
+  select(gamedate, Units, Kelly_Profit) %>%
+  rename(Flat_Profit = Units) %>% 
+  melt("gamedate", c("Flat_Profit", "Kelly_Profit")) %>% 
+  group_by(gamedate, variable) %>% 
+  summarise(value = sum(value))
+
+plot <- ggplot(graph_data) +
+  aes(x = gamedate, y = value, colour = variable) +
+  geom_line(size = 0.5) +
+  scale_color_hue(direction = 1) +
+  labs(
+    x = "Game Date",
+    y = "Profit",
+    color = ""
+  ) +
+  theme_minimal()
+
+plot_html <- add_ggplot(plot_object = plot)
 
 ## Send an email
 
 Outlook <- COMCreate("Outlook.Application")
 
 Email = Outlook$CreateItem(0)
-Email[["to"]] = paste("dnolen@smu.edu", "jorler@smu.edu", "asnolen@crimson.ua.edu", sep = ";", collapse = NULL)
-#Email[["to"]] = "dnolen@smu.edu"
+#Email[["to"]] = paste("dnolen@smu.edu", "jorler@smu.edu", "asnolen@crimson.ua.edu", sep = ";", collapse = NULL)
+Email[["to"]] = "dnolen@smu.edu"
 Email[["subject"]] = paste0("Soccer Machine Picks: ", Sys.Date())
 Email[["HTMLbody"]] = sprintf("
-The Machine's picks for upcoming soccer matches are in! The Machine currently offers picks for the Big 5 European Leagues. MLS will come later once more games are played this season. Something weird is going on with Champions League and Europa League so the Machine is excluding those for now.
+The Machine's picks for upcoming soccer matches are in! The Machine currently offers picks for the Big 5 European Leagues. MLS will be coming soon.
 </p><br></p>
 The attached document contains all of the pertinent betting information for the upcoming matches. Good luck!
 </p><br></p>
+Below are the results for each bet type:
+</p><br></p>
+%s
+</p><br></p>
+Below are the results for each league:
+</p><br></p>
+%s
+</p><br></p>
+Bets with a KC of at least 0.1 and EV of at least 3 have had the best performance so far. Here are their results:
+</p><br></p>
+%s
+</p><br></p>
+Results grouped by KC rounded to the nearest 0.05:
+</p><br></p>
+%s
+</p><br></p>
+Results grouped by EV rounded to the nearest 1:
+</p><br></p>
+%s
+</p><br></p>
+Here is the flat betting vs. Kelly betting results over time:
+</p><br></p>
+%s
+</p><br></p>
 NOTE: Consider this a BETA version. If you feel like reviewing this, please let me know if anything looks off.
 </p><br></p>
-ANOTHER NOTE: I will start to track the performance of these bets. Right now there's nothing to go off of. Once the Machine has a better history to draw from, I will include its performance here. When I do that, I will probably exclude bets with juice over -250 (maybe even -200). I suggest never betting juice higher than -250. I will also probably filter out bets that have less than a 30%% win probability (maybe lower, we'll see). I don't believe it is worth it to bet on these huge underdogs. I suggest filtering these out, but I'll leave them in here in case you're interested.
-")
+ANOTHER NOTE: I filtered out bets where the odds are less than -250 from this analysis. I suggest never betting juice higher than -250. I also filtered out bets that have less than a 30%% win probability. I don't believe it is worth it to bet on these huge underdogs. I am also only looking at the run_timestamp for each beet that is closest to the actual game time. Later, I will look at how the performance changes using odds from further in advance of a game.
+", df_html_1, df_html_2, df_html_3, df_html_4, df_html_3, plot_html)
 Email[["attachments"]]$Add("C:/Users/danie/Desktop/SportsStuff/TheMachine/the-machine/Soccer Machine/upcoming_bets.csv")
 
 Email$Send()
