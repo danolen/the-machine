@@ -537,13 +537,16 @@ away <- fixtures %>%
          GoalsAllowed = Home_Score)
 
 metrics <- bind_rows(home, away) %>%
-  filter(!League %in% c('MLS', 'UCL', 'UEL')) %>% 
+  filter(!League %in% c('UCL', 'UEL')) %>% 
   filter(!is.na(Date) & (!is.na(xG) | Date >= Sys.Date())) %>% 
   replace(is.na(.), 0) %>% 
   arrange(Date, Time, League, ID) %>% 
   # mutate(Team = trimws(case_when(League %in% c('UCL', 'UEL') & Home_or_Away == "Home" ~ substr(Team, 1, nchar(Team)-3),
   #                                League %in% c('UCL', 'UEL') & Home_or_Away == "Away" ~ substr(Team, 4, nchar(Team)),
-  #                                TRUE ~ Team), which = c("both"))) %>% 
+  #                                TRUE ~ Team), which = c("both")),
+  #        Opponent = trimws(case_when(League %in% c('UCL', 'UEL') & Home_or_Away == "Home" ~ substr(Opponent, 1, nchar(Opponent)-3),
+  #                                League %in% c('UCL', 'UEL') & Home_or_Away == "Away" ~ substr(Opponent, 4, nchar(Opponent)),
+  #                                TRUE ~ Opponent), which = c("both"))) %>% 
   group_by(Team, League, Season, Home_or_Away) %>% 
   mutate(SplitxG = cumsum(xG) - xG,
          SplitxGA = cumsum(xGA) - xGA,
@@ -605,14 +608,14 @@ metrics_df <- metrics %>%
   left_join(metrics, by = c("ID" = "ID", "Date" = "Date", "Day" = "Day", "Time" = "Time",
                             "League" = "League", "Season" = "Season", "Opponent" = "Team"),
             suffix = c("", "_Opp")) %>% 
-  filter(Home_or_Away == "Home" & Date >= today) %>%
+  filter(Home_or_Away == "Home" & Date >= today & SplitGP > 1 & SplitGP_Opp > 1) %>%
   select(-(Home_or_Away:GoalsAllowed), -(Opponent_Opp:GoalsAllowed_Opp))
 
 metrics_tt <- metrics %>% 
   left_join(metrics, by = c("ID" = "ID", "Date" = "Date", "Day" = "Day", "Time" = "Time",
                             "League" = "League", "Season" = "Season", "Opponent" = "Team"),
             suffix = c("", "_Opp")) %>%
-  filter(Date >= today) %>% 
+  filter(Date >= today & SplitGP > 1 & SplitGP_Opp > 1) %>% 
   select(-(xG:GoalsAllowed), -(Opponent_Opp:GoalsAllowed_Opp))
 
 gbm_reg <- readRDS("Soccer Machine/Models/train_gbm.rds")
@@ -1212,11 +1215,14 @@ history2 <- history %>%
                                                                                      "Under")),
                                                                      "NA"))),
          Pick_Correct = if_else(Winner == Pick, 1, 0),
-         Units = if_else(Pick_Correct == 1,
-                         if_else(Pick_Odds > 0, Pick_Odds / 100, 1),
-                         if_else(Pick_Odds > 0, -1, Pick_Odds / 100)),
-         Kelly_Bet = if_else(Kelly_Criteria < 0.05, 5, Kelly_Criteria * 100),
-         Half_Kelly_Bet = if_else(Kelly_Criteria < 0.1, 5, Kelly_Criteria * 50),
+         Units = if_else(Pick_Correct == 1, Fract_Odds, -1),
+         # Units = if_else(Pick_Correct == 1,
+         #                 if_else(Pick_Odds > 0, Pick_Odds / 100, 1),
+         #                 if_else(Pick_Odds > 0, -1, Pick_Odds / 100)),
+         Kelly_Bet = Kelly_Criteria * 100,
+         # Kelly_Bet = if_else(Kelly_Criteria < 0.05, 5, Kelly_Criteria * 100),
+         Half_Kelly_Bet = Kelly_Criteria * 50,
+         # Half_Kelly_Bet = if_else(Kelly_Criteria < 0.1, 5, Kelly_Criteria * 50),
          Kelly_Profit = Units * Kelly_Bet,
          Half_Kelly_Profit = Units * Half_Kelly_Bet) %>%
   arrange(desc(run_timestamp)) %>%
@@ -1228,7 +1234,8 @@ types <- filter(history2,
                   Kelly_Criteria > 0 &
                   Pick_Odds >= -250 &
                   Pick_WinProb >= 0.3 &
-                  partition == 1) %>%
+                  bet_type_full != 'Alternate Total - 1.5' &
+                  partition == 2) %>%
   select(gamedate, League, bet_type, Pick_Odds, Pick_WinProb, Fract_Odds, Kelly_Criteria, EV, KC_tier, Pick_Correct, Units) %>% 
   mutate(Kelly_Bet = if_else(Kelly_Criteria < 0.05, 5, Kelly_Criteria * 100),
          Kelly_Profit = Units * Kelly_Bet,
@@ -1243,7 +1250,7 @@ types %>%
   #group_by(Total) %>%
   group_by(bet_type) %>%
   #group_by(KC_tier = as.numeric(as.character(KC_tier))) %>%
-  #group_by(Odds_tier) %>%
+  #group_by(Odds_tier = as.numeric(as.character(Odds_tier))) %>%
   dplyr::summarise(HitRate = mean(Pick_Correct),
                    bets = sum(bets),
                    Flat_Profit = sum(Units),
@@ -1262,7 +1269,7 @@ types %>%
   print(n=40)
 
 types %>%
-  filter(Kelly_Criteria >= 0.1 & Kelly_Criteria < 1 & EV >= 3 & !(League %in% c("UCL", "UEL"))) %>%
+  filter(Kelly_Criteria >= 0.1 & Kelly_Criteria < 0.4 & EV >= 2 & EV < 5 & !(League %in% c("UCL", "UEL"))) %>%
   group_by(Total) %>%
   #group_by(bet_type) %>%
   #group_by(KC_tier) %>%
@@ -1288,7 +1295,7 @@ types %>%
   print(n=40)
 
 types %>%
-  filter(Kelly_Criteria >= 0 & !(League %in% c("UCL", "UEL"))) %>%
+  filter(!(League %in% c("UCL", "UEL"))) %>%
   #group_by(Total) %>%
   #group_by(bet_type) %>%
   #group_by(KC_tier = as.numeric(as.character(KC_tier))) %>%
@@ -1347,7 +1354,7 @@ email_table_2 <- types %>%
 df_html_2 <- print(xtable(email_table_2), type = "html", print.results = FALSE)
 
 email_table_3 <- types %>%
-  filter(Kelly_Criteria >= 0.1 & Kelly_Criteria < 1 & EV >= 3 & !(League %in% c("UCL", "UEL"))) %>%
+  filter(Kelly_Criteria >= 0.1 & Kelly_Criteria < 0.4 & EV >= 2 & EV < 5 & !(League %in% c("UCL", "UEL"))) %>%
   group_by(Total) %>%
   #group_by(bet_type) %>%
   #group_by(KC_tier) %>%
@@ -1378,7 +1385,7 @@ email_table_4 <- types %>%
 df_html_4 <- print(xtable(email_table_4), type = "html", print.results = FALSE)
 
 email_table_5 <- types %>%
-  filter(Kelly_Criteria >= 0 & !(League %in% c("UCL", "UEL"))) %>%
+  filter(!(League %in% c("UCL", "UEL"))) %>%
   #group_by(Total) %>%
   #group_by(bet_type) %>%
   #group_by(KC_tier = as.numeric(as.character(KC_tier))) %>%
@@ -1398,31 +1405,60 @@ graph_data <- types %>%
   rename(Flat_Profit = Units) %>% 
   melt("gamedate", c("Flat_Profit", "Kelly_Profit")) %>% 
   group_by(gamedate, variable) %>% 
-  summarise(value = sum(value))
+  summarise(value = sum(value)) %>% 
+  group_by(variable) %>% 
+  mutate(cumulative_value = cumsum(value))
 
 plot <- ggplot(graph_data) +
-  aes(x = gamedate, y = value, colour = variable) +
+  aes(x = gamedate, y = cumulative_value, colour = variable) +
   geom_line(size = 0.5) +
   scale_color_hue(direction = 1) +
   labs(
     x = "Game Date",
-    y = "Profit",
+    y = "Cumulative Profit",
     color = ""
   ) +
   theme_minimal()
 
 plot_html <- add_ggplot(plot_object = plot)
 
+graph_data2 <- types %>%
+  ungroup() %>%
+  filter(Pick_Odds >= 100) %>% 
+  select(gamedate, Units, Kelly_Profit) %>%
+  rename(Flat_Profit = Units) %>% 
+  melt("gamedate", c("Flat_Profit", "Kelly_Profit")) %>% 
+  group_by(gamedate, variable) %>% 
+  summarise(value = sum(value)) %>% 
+  group_by(variable) %>% 
+  mutate(cumulative_value = cumsum(value))
+
+plot2 <- ggplot(graph_data2) +
+  aes(x = gamedate, y = cumulative_value, colour = variable) +
+  geom_line(size = 0.5) +
+  scale_color_hue(direction = 1) +
+  labs(
+    x = "Game Date",
+    y = "Cumulative Profit",
+    color = ""
+  ) +
+  theme_minimal()
+
+plot_html2 <- add_ggplot(plot_object = plot2)
+
+
 ## Send an email
 
 Outlook <- COMCreate("Outlook.Application")
 
 Email = Outlook$CreateItem(0)
-#Email[["to"]] = paste("dnolen@smu.edu", "jorler@smu.edu", "asnolen@crimson.ua.edu", sep = ";", collapse = NULL)
-Email[["to"]] = "dnolen@smu.edu"
+Email[["to"]] = paste("dnolen@smu.edu", "jorler@smu.edu", "asnolen@crimson.ua.edu", "jamestodd425@gmail.com", sep = ";", collapse = NULL)
+#Email[["to"]] = "dnolen@smu.edu"
 Email[["subject"]] = paste0("Soccer Machine Picks: ", Sys.Date())
 Email[["HTMLbody"]] = sprintf("
-The Machine's picks for upcoming soccer matches are in! The Machine currently offers picks for the Big 5 European Leagues. MLS will be coming soon.
+The Machine's picks for upcoming soccer matches are in! The Machine currently offers picks for the Big 5 European Leagues plus MLS. Previously, for the analysis below I was using the odds for each bet that were closest to the date of the game. I've switched it to use the second closest timestamp, which improved the results. In general, you will get worse odds as you get closer to kickoff. It might be helpful to make these bets a day or two ahead of the game.
+</p><br></p>
+Another change that I've made - for bet sizing on bets with negaitve odds, I used to use the amount needed to win one unit as the wager. For example, if the odds are -200, I would use 2 units as the wager to profit 1 unit. I have changed that so that now each wager is 1 unit no matter what. So a 1 unit bet with odds of -200 would profit 0.5 units. For the Kelly bets, I still multiply the units by 100. So a 1 unit wager would turn into a $10 wager if the Kelly Criteria is 0.1. This change lowers our risk of losing big when betting on favorites (but also lowers the amount of profit we can make on those bets).
 </p><br></p>
 The attached document contains all of the pertinent betting information for the upcoming matches. Good luck!
 </p><br></p>
@@ -1434,7 +1470,7 @@ Below are the results for each league:
 </p><br></p>
 %s
 </p><br></p>
-Bets with a KC of at least 0.1 and EV of at least 3 have had the best performance so far. Here are their results:
+Bets with a KC of at least 0.1 and less than 0.4 and EV of at least 2 and less than 5 have had the best performance so far. This is expected. If there is not a big difference between the Machine projection and the odds then there is not much of an edge. On the other end, if the Machine projections are way off from the odds, then it's more likely that the oddsmakers know something that the Machine doesn't, rather than the other way around. Here are those results:
 </p><br></p>
 %s
 </p><br></p>
@@ -1450,10 +1486,14 @@ Here is the flat betting vs. Kelly betting results over time:
 </p><br></p>
 %s
 </p><br></p>
+Here are the same results if you only place bets where the odds are even or better. It might make sense to only bet on plus money or even odds. Maybe I will start to only place negative odds bets if I parlay two or three of them.
+</p><br></p>
+%s
+</p><br></p>
 NOTE: Consider this a BETA version. If you feel like reviewing this, please let me know if anything looks off.
 </p><br></p>
-ANOTHER NOTE: I filtered out bets where the odds are less than -250 from this analysis. I suggest never betting juice higher than -250. I also filtered out bets that have less than a 30%% win probability. I don't believe it is worth it to bet on these huge underdogs. I am also only looking at the run_timestamp for each beet that is closest to the actual game time. Later, I will look at how the performance changes using odds from further in advance of a game.
-", df_html_1, df_html_2, df_html_3, df_html_4, df_html_3, plot_html)
+ANOTHER NOTE: I filtered out bets where the odds are less than -250 from this analysis. I suggest never betting juice higher than -250. I also filtered out bets that have less than a 30%% win probability. I don't believe it is worth it to bet on these huge underdogs. I also removed any bets on Alternate Totals set at 1.5 goals. The Machine almost always suggests an under bet on those. The performance on those bets was not very good, and that is also a very lame bet. Nobody likes cheering for a game to be that low scoring.
+", df_html_1, df_html_2, df_html_3, df_html_4, df_html_5, plot_html, plot_html2)
 Email[["attachments"]]$Add("C:/Users/danie/Desktop/SportsStuff/TheMachine/the-machine/Soccer Machine/upcoming_bets.csv")
 
 Email$Send()

@@ -489,9 +489,7 @@ scores$Home_Score <- as.numeric(scores$Home_Score)
 scores$Away_Score <- as.numeric(scores$Away_Score)
 scores$xG.1 <- as.numeric(scores$xG.1)
 
-scores <- bind_rows(scores, upcoming) %>% 
-  mutate(Home = trimws(substr(Home, 1, nchar(Home)-3)),
-         Away = trimws(substr(Away, 4, nchar(Away))))
+scores <- bind_rows(scores, upcoming)
 
 home <- scores %>% 
   mutate(ID = gsub(" ", "", gsub("[[:punct:]]","",paste0(Home, Away, Date, Time)), fixed = TRUE)) %>% 
@@ -517,13 +515,14 @@ away <- scores %>%
          GoalsAllowed = Home_Score)
 
 metrics <- bind_rows(home, away) %>% 
-  arrange(Date, Time, League, ID) %>% 
+  arrange(Date, Time, League, ID) %>%
+  filter(!League %in% c('UCL', 'UEL')) %>% 
   # mutate(Team = trimws(case_when(League %in% c('UCL', 'UEL') & Home_or_Away == "Home" ~ substr(Team, 1, nchar(Team)-3),
   #                                League %in% c('UCL', 'UEL') & Home_or_Away == "Away" ~ substr(Team, 4, nchar(Team)),
   #                                TRUE ~ Team), which = c("both")),
   #        Opponent = trimws(case_when(League %in% c('UCL', 'UEL') & Home_or_Away == "Home" ~ substr(Opponent, 1, nchar(Opponent)-3),
   #                                League %in% c('UCL', 'UEL') & Home_or_Away == "Away" ~ substr(Opponent, 4, nchar(Opponent)),
-  #                                TRUE ~ Opponent), which = c("both"))) %>% 
+  #                                TRUE ~ Opponent), which = c("both"))) %>%
   group_by(Team, League, Season, Home_or_Away) %>% 
   mutate(SplitxG = cumsum(xG) - xG,
          SplitxGA = cumsum(xGA) - xGA,
