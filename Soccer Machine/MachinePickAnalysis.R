@@ -219,7 +219,9 @@ types <- filter(history2,
          Odds_tier = as.factor(round_any(Pick_Odds, 10, floor)),
          EV_tier = round_any(EV, 1, floor),
          bets = as.integer(1),
-         Total = "Total")
+         Total = "Total",
+         Side_or_Total = case_when(bet_type %in% c('Alt Spread', 'Draw No Bet', 'ML', 'Spread') ~ "Side",
+                                   TRUE ~ Total))
 
 types %>%
   filter(Kelly_Criteria >= 0 & !(League %in% c("UCL", "UEL"))) %>%
@@ -244,8 +246,18 @@ types %>%
   mutate(Units_per_bet = Flat_Profit / bets) %>%
   print(n=100)
 
-types %>%
-  filter(Kelly_Criteria >= 0.1 & Kelly_Criteria < 0.4 & EV >= 2 & EV < 5 & !(League %in% c("UCL", "UEL"))) %>%
+types %>% 
+  arrange(gamedate, ID, desc(Kelly_Criteria)) %>% 
+  group_by(ID, Side_or_Total) %>% 
+  mutate(KC_Rank = row_number()) %>% 
+  arrange(gamedate, ID, desc(EV)) %>% 
+  group_by(ID, Side_or_Total) %>% 
+  mutate(EV_Rank = row_number(),
+         Rank = (KC_Rank + EV_Rank) / 2) %>% 
+  arrange(gamedate, ID, Rank, desc(Kelly_Criteria)) %>% 
+  mutate(Final_Rank = row_number()) %>% 
+  filter(Final_Rank == 1) %>% 
+  filter(Kelly_Criteria >= 0.1 & Kelly_Criteria < 0.4 & EV >= 2 & EV < 6 & !(League %in% c("UCL", "UEL"))) %>%
   group_by(Total) %>%
   #group_by(bet_type) %>%
   #group_by(KC_tier) %>%
