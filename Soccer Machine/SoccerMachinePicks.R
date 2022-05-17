@@ -1288,6 +1288,29 @@ types %>%
   mutate(Units_per_bet = Flat_Profit / bets) %>%
   print(n=40)
 
+types %>% 
+  filter(Kelly_Criteria >= 0.1 & Kelly_Criteria < 0.4 & EV >= 2 & EV < 6 & !(League %in% c("UCL", "UEL"))) %>%
+  arrange(gamedate, ID, desc(Kelly_Criteria)) %>% 
+  group_by(ID) %>% 
+  mutate(KC_Rank = row_number()) %>% 
+  arrange(gamedate, ID, desc(EV)) %>% 
+  group_by(ID) %>% 
+  mutate(EV_Rank = row_number(),
+         Rank = (KC_Rank + EV_Rank) / 2) %>% 
+  arrange(gamedate, ID, Rank) %>% 
+  mutate(Final_Rank = row_number()) %>% 
+  filter(Final_Rank == 1) %>%
+  group_by(Total) %>%
+  #group_by(bet_type) %>%
+  #group_by(KC_tier) %>%
+  #group_by(Odds_tier) %>%
+  dplyr::summarise(HitRate = mean(Pick_Correct),
+                   bets = sum(bets),
+                   Flat_Profit = sum(Units),
+                   Kelly_Profit = sum(Kelly_Profit)) %>%
+  mutate(Units_per_bet = Flat_Profit / bets) %>%
+  print(n=40)
+
 types %>%
   filter(!(League %in% c("UCL", "UEL"))) %>%
   #group_by(bet_type) %>%
@@ -1373,8 +1396,32 @@ email_table_3 <- types %>%
   mutate(Units_per_bet = Flat_Profit / bets) %>%
   print(n=40)
 
-
 df_html_3 <- print(xtable(email_table_3), type = "html", print.results = FALSE)
+
+email_table_3b <- types %>% 
+  filter(Kelly_Criteria >= 0.1 & Kelly_Criteria < 0.4 & EV >= 2 & EV < 6 & !(League %in% c("UCL", "UEL"))) %>%
+  arrange(gamedate, ID, desc(Kelly_Criteria)) %>% 
+  group_by(ID) %>% 
+  mutate(KC_Rank = row_number()) %>% 
+  arrange(gamedate, ID, desc(EV)) %>% 
+  group_by(ID) %>% 
+  mutate(EV_Rank = row_number(),
+         Rank = (KC_Rank + EV_Rank) / 2) %>% 
+  arrange(gamedate, ID, Rank) %>% 
+  mutate(Final_Rank = row_number()) %>% 
+  filter(Final_Rank == 1) %>%
+  group_by(Total) %>%
+  #group_by(bet_type) %>%
+  #group_by(KC_tier) %>%
+  #group_by(Odds_tier) %>%
+  dplyr::summarise(HitRate = mean(Pick_Correct),
+                   bets = sum(bets),
+                   Flat_Profit = sum(Units),
+                   Kelly_Profit = sum(Kelly_Profit)) %>%
+  mutate(Units_per_bet = Flat_Profit / bets) %>%
+  print(n=40)
+
+df_html_3b <- print(xtable(email_table_3b), type = "html", print.results = FALSE)
 
 email_table_4 <- types %>%
   filter(!(League %in% c("UCL", "UEL"))) %>%
@@ -1453,6 +1500,39 @@ plot2 <- ggplot(graph_data2) +
 
 plot_html2 <- add_ggplot(plot_object = plot2)
 
+graph_data3 <- types %>%
+  filter(Pick_Odds >= 100 & Kelly_Criteria >= 0.1 & Kelly_Criteria < 0.4 & EV >= 2 & EV < 6 & !(League %in% c("UCL", "UEL"))) %>%
+  arrange(gamedate, ID, desc(Kelly_Criteria)) %>% 
+  group_by(ID) %>% 
+  mutate(KC_Rank = row_number()) %>% 
+  arrange(gamedate, ID, desc(EV)) %>% 
+  group_by(ID) %>% 
+  mutate(EV_Rank = row_number(),
+         Rank = (KC_Rank + EV_Rank) / 2) %>% 
+  arrange(gamedate, ID, Rank) %>% 
+  mutate(Final_Rank = row_number()) %>% 
+  filter(Final_Rank == 1) %>%
+  ungroup() %>% 
+  select(gamedate, Units, Kelly_Profit) %>%
+  rename(Flat_Profit = Units) %>% 
+  melt("gamedate", c("Flat_Profit", "Kelly_Profit")) %>% 
+  group_by(gamedate, variable) %>% 
+  summarise(value = sum(value)) %>% 
+  group_by(variable) %>% 
+  mutate(cumulative_value = cumsum(value))
+
+plot3 <- ggplot(graph_data3) +
+  aes(x = gamedate, y = cumulative_value, colour = variable) +
+  geom_line(size = 0.5) +
+  scale_color_hue(direction = 1) +
+  labs(
+    x = "Game Date",
+    y = "Cumulative Profit",
+    color = ""
+  ) +
+  theme_minimal()
+
+plot_html3 <- add_ggplot(plot_object = plot3)
 
 ## Send an email
 
@@ -1481,6 +1561,10 @@ Bets with a KC of at least 0.1 and less than 0.4 and EV of at least 2 and less t
 </p><br></p>
 %s
 </p><br></p>
+Here are the same results as above, but filtered to only include the top bet for each game (which is much more realistic than betting everything):
+</p><br></p>
+%s
+</p><br></p>
 Results grouped by KC rounded to the nearest 0.05:
 </p><br></p>
 %s
@@ -1497,10 +1581,14 @@ Here are the same results if you only place bets where the odds are even or bett
 </p><br></p>
 %s
 </p><br></p>
+Here are the same results again only using the top bet for each game:
+</p><br></p>
+%s
+</p><br></p>
 NOTE: Consider this a BETA version. If you feel like reviewing this, please let me know if anything looks off.
 </p><br></p>
 ANOTHER NOTE: I filtered out bets where the odds are less than -250 from this analysis. I suggest never betting juice higher than -250. I also filtered out bets that have less than a 30%% win probability. I don't believe it is worth it to bet on these huge underdogs. I also removed any bets on Alternate Totals set at 1.5 goals. The Machine almost always suggests an under bet on those. The performance on those bets was not very good, and that is also a very lame bet. Nobody likes cheering for a game to be that low scoring.
-", df_html_1, df_html_2, df_html_3, df_html_4, df_html_5, plot_html, plot_html2)
+", df_html_1, df_html_2, df_html_3, df_html_3b, df_html_4, df_html_5, plot_html, plot_html2, plot_html3)
 Email[["attachments"]]$Add("C:/Users/danie/Desktop/SportsStuff/TheMachine/the-machine/Soccer Machine/upcoming_bets.csv")
 
 Email$Send()

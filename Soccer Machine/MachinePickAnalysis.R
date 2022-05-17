@@ -247,17 +247,17 @@ types %>%
   print(n=100)
 
 types %>% 
+  filter(Kelly_Criteria >= 0.1 & Kelly_Criteria < 0.4 & EV >= 2 & EV < 6 & !(League %in% c("UCL", "UEL"))) %>%
   arrange(gamedate, ID, desc(Kelly_Criteria)) %>% 
-  group_by(ID, Side_or_Total) %>% 
+  group_by(ID) %>% 
   mutate(KC_Rank = row_number()) %>% 
   arrange(gamedate, ID, desc(EV)) %>% 
-  group_by(ID, Side_or_Total) %>% 
+  group_by(ID) %>% 
   mutate(EV_Rank = row_number(),
          Rank = (KC_Rank + EV_Rank) / 2) %>% 
-  arrange(gamedate, ID, Rank, desc(Kelly_Criteria)) %>% 
+  arrange(gamedate, ID, Rank) %>% 
   mutate(Final_Rank = row_number()) %>% 
-  filter(Final_Rank == 1) %>% 
-  filter(Kelly_Criteria >= 0.1 & Kelly_Criteria < 0.4 & EV >= 2 & EV < 6 & !(League %in% c("UCL", "UEL"))) %>%
+  filter(Final_Rank == 1) %>%
   group_by(Total) %>%
   #group_by(bet_type) %>%
   #group_by(KC_tier) %>%
@@ -314,6 +314,17 @@ types %>%
   print(n=40)
 
 graph_data <- types %>%
+  filter(Kelly_Criteria >= 0.1 & Kelly_Criteria < 0.4 & EV >= 2 & EV < 6 & !(League %in% c("UCL", "UEL"))) %>%
+  arrange(gamedate, ID, desc(Kelly_Criteria)) %>% 
+  group_by(ID) %>% 
+  mutate(KC_Rank = row_number()) %>% 
+  arrange(gamedate, ID, desc(EV)) %>% 
+  group_by(ID) %>% 
+  mutate(EV_Rank = row_number(),
+         Rank = (KC_Rank + EV_Rank) / 2) %>% 
+  arrange(gamedate, ID, Rank) %>% 
+  mutate(Final_Rank = row_number()) %>% 
+  filter(Final_Rank == 1) %>%
   ungroup() %>% 
   select(gamedate, Units, Kelly_Profit) %>%
   rename(Flat_Profit = Units) %>% 
@@ -335,8 +346,18 @@ ggplot(graph_data) +
   theme_minimal()
 
 graph_data2 <- types %>%
+  filter(Pick_Odds >= 100 & Kelly_Criteria >= 0.1 & Kelly_Criteria < 0.4 & EV >= 2 & EV < 6 & !(League %in% c("UCL", "UEL"))) %>%
+  arrange(gamedate, ID, desc(Kelly_Criteria)) %>% 
+  group_by(ID) %>% 
+  mutate(KC_Rank = row_number()) %>% 
+  arrange(gamedate, ID, desc(EV)) %>% 
+  group_by(ID) %>% 
+  mutate(EV_Rank = row_number(),
+         Rank = (KC_Rank + EV_Rank) / 2) %>% 
+  arrange(gamedate, ID, Rank) %>% 
+  mutate(Final_Rank = row_number()) %>% 
+  filter(Final_Rank == 1) %>%
   ungroup() %>%
-  filter(Pick_Odds >= 100) %>% 
   select(gamedate, Units, Kelly_Profit) %>%
   rename(Flat_Profit = Units) %>% 
   melt("gamedate", c("Flat_Profit", "Kelly_Profit")) %>% 
