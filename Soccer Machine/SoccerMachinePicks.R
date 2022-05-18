@@ -1534,20 +1534,61 @@ plot3 <- ggplot(graph_data3) +
 
 plot_html3 <- add_ggplot(plot_object = plot3)
 
+bets_table <- read.csv("Soccer Machine/upcoming_bets.csv") %>% 
+  mutate(gamedate = as.Date(gamedate)) %>%
+  filter(Kelly_Criteria >= 0.1 & 
+           Kelly_Criteria < 0.4 & 
+           EV >= 2 & 
+           EV < 6 & 
+           !(League %in% c("UCL", "UEL")) &
+           Pick_Odds > 0 &
+           Pick_WinProb >= 0.3 &
+           bet_type_full != 'Alternate Total - 1.5' &
+           gamedate <= Sys.Date() + 3) %>%
+  arrange(gamedate, ID, desc(Kelly_Criteria)) %>% 
+  group_by(ID) %>% 
+  mutate(KC_Rank = row_number()) %>% 
+  arrange(gamedate, ID, desc(EV)) %>% 
+  group_by(ID) %>% 
+  mutate(EV_Rank = row_number(),
+         Rank = (KC_Rank + EV_Rank) / 2) %>% 
+  arrange(gamedate, ID, Rank) %>% 
+  mutate(Final_Rank = row_number()) %>% 
+  filter(Final_Rank == 1) %>%
+  mutate(bet_size = case_when(KC_tier %in% c(0.1, 0.15) ~ '$5',
+                              KC_tier %in% c(0.2, 0.25) ~ '$10',
+                              KC_tier %in% c(0.3, 0.35) ~ '$15',
+                              KC_tier %in% c(0.4, 0.45) ~ '$20',
+                              TRUE ~ 'No bet - something went wrong')) %>%
+  arrange(gamedate, desc(Kelly_Criteria)) %>% 
+  ungroup() %>% 
+  select(gamedate, League, HomeTeam, AwayTeam, bet_type_full, Pick, Pick_Odds, Machine_Odds, bet_size) %>% 
+  mutate(Machine_Odds =  as.integer(pmax(Machine_Odds, 100)),
+         gamedate = as.character(gamedate)) %>% 
+  rename(`Game Date` = gamedate,
+         `Home Team` = HomeTeam,
+         `Away Team` = AwayTeam,
+         `Bet` = bet_type_full,
+         `Current Pick Odds` = Pick_Odds,
+         `Minimum Odds Needed` = Machine_Odds,
+         `Wager Amount` = bet_size)
+
+df_html_bets <- print(xtable(bets_table), type = "html", print.results = FALSE)
+
 ## Send an email
 
 Outlook <- COMCreate("Outlook.Application")
 
 Email = Outlook$CreateItem(0)
-Email[["to"]] = paste("dnolen@smu.edu", "jorler@smu.edu", "asnolen@crimson.ua.edu", "jamestodd425@gmail.com", sep = ";", collapse = NULL)
-#Email[["to"]] = "dnolen@smu.edu"
+#Email[["to"]] = paste("dnolen@smu.edu", "jorler@smu.edu", "asnolen@crimson.ua.edu", "jamestodd425@gmail.com", sep = ";", collapse = NULL)
+Email[["to"]] = "dnolen@smu.edu"
 Email[["subject"]] = paste0("Soccer Machine Picks: ", Sys.Date())
 Email[["HTMLbody"]] = sprintf("
-The Machine's picks for upcoming soccer matches are in! The Machine currently offers picks for the Big 5 European Leagues plus MLS. Previously, for the analysis below I was using the odds for each bet that were closest to the date of the game. I've switched it to use the second closest timestamp, which improved the results. In general, you will get worse odds as you get closer to kickoff. It might be helpful to make these bets a day or two ahead of the game.
+The Machine's picks for upcoming soccer matches are in! The Machine currently offers picks for the Big 5 European Leagues plus MLS. The attached document contains all of the pertinent betting information for the upcoming matches. Good luck!
 </p><br></p>
-Another change that I've made - for bet sizing on bets with negaitve odds, I used to use the amount needed to win one unit as the wager. For example, if the odds are -200, I would use 2 units as the wager to profit 1 unit. I have changed that so that now each wager is 1 unit no matter what. So a 1 unit bet with odds of -200 would profit 0.5 units. For the Kelly bets, I still multiply the units by 100. So a 1 unit wager would turn into a $10 wager if the Kelly Criteria is 0.1. This change lowers our risk of losing big when betting on favorites (but also lowers the amount of profit we can make on those bets).
+TL;DR: These are the bets that The Machine recommends that you should make for the next few days. The bet sizes are based on a unit size of $10. If your regular bet is something other than $10, adjust accordingly.
 </p><br></p>
-The attached document contains all of the pertinent betting information for the upcoming matches. Good luck!
+%s
 </p><br></p>
 Below are the results for each bet type:
 </p><br></p>
@@ -1557,7 +1598,7 @@ Below are the results for each league:
 </p><br></p>
 %s
 </p><br></p>
-Bets with a KC of at least 0.1 and less than 0.4 and EV of at least 2 and less than 5 have had the best performance so far. This is expected. If there is not a big difference between the Machine projection and the odds then there is not much of an edge. On the other end, if the Machine projections are way off from the odds, then it's more likely that the oddsmakers know something that the Machine doesn't, rather than the other way around. Here are those results:
+Bets with a KC of at least 0.1 and less than 0.4 and EV of at least 2 and less than 6 have had the best performance so far. This is expected. If there is not a big difference between the Machine projection and the odds then there is not much of an edge. On the other end, if the Machine projections are way off from the odds, then it's more likely that the oddsmakers know something that the Machine doesn't, rather than the other way around. Here are those results:
 </p><br></p>
 %s
 </p><br></p>
@@ -1588,7 +1629,7 @@ Here are the same results again only using the top bet for each game:
 NOTE: Consider this a BETA version. If you feel like reviewing this, please let me know if anything looks off.
 </p><br></p>
 ANOTHER NOTE: I filtered out bets where the odds are less than -250 from this analysis. I suggest never betting juice higher than -250. I also filtered out bets that have less than a 30%% win probability. I don't believe it is worth it to bet on these huge underdogs. I also removed any bets on Alternate Totals set at 1.5 goals. The Machine almost always suggests an under bet on those. The performance on those bets was not very good, and that is also a very lame bet. Nobody likes cheering for a game to be that low scoring.
-", df_html_1, df_html_2, df_html_3, df_html_3b, df_html_4, df_html_5, plot_html, plot_html2, plot_html3)
+", df_html_bets, df_html_1, df_html_2, df_html_3, df_html_3b, df_html_4, df_html_5, plot_html, plot_html2, plot_html3)
 Email[["attachments"]]$Add("C:/Users/danie/Desktop/SportsStuff/TheMachine/the-machine/Soccer Machine/upcoming_bets.csv")
 
 Email$Send()
