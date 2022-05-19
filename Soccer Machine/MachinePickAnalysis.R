@@ -226,9 +226,9 @@ types <- filter(history2,
 types %>%
   filter(Kelly_Criteria >= 0 & !(League %in% c("UCL", "UEL"))) %>%
   #group_by(Total) %>%
-  group_by(bet_type) %>%
+  #group_by(bet_type) %>%
   #group_by(KC_tier = as.numeric(as.character(KC_tier))) %>%
-  #group_by(Odds_tier = as.numeric(as.character(Odds_tier))) %>%
+  group_by(Odds_tier = as.numeric(as.character(Odds_tier))) %>%
   #group_by(WinProb_tier = as.numeric(as.character(WinProb_tier))) %>%
   dplyr::summarise(HitRate = mean(Pick_Correct),
                    bets = sum(bets),
@@ -248,7 +248,12 @@ types %>%
   print(n=100)
 
 types %>% 
-  filter(Kelly_Criteria >= 0.1 & Kelly_Criteria < 0.4 & EV >= 2 & EV < 6 & !(League %in% c("UCL", "UEL"))) %>%
+  filter(Kelly_Criteria >= 0.15 & 
+          Kelly_Criteria < 0.4 & 
+          EV >= 2 & 
+          EV < 6 & 
+          Pick_Odds > 0 &
+          !(League %in% c("UCL", "UEL"))) %>%
   arrange(gamedate, ID, desc(Kelly_Criteria)) %>% 
   group_by(ID) %>% 
   mutate(KC_Rank = row_number()) %>% 
@@ -271,7 +276,7 @@ types %>%
   print(n=40)
 
 types %>%
-  filter(!(League %in% c("UCL", "UEL")) & Pick_Odds > 0) %>%
+  filter(!(League %in% c("UCL", "UEL"))) %>%
   #filter(League == 'Serie A') %>% 
   #group_by(bet_type) %>%
   group_by(KC_tier = as.numeric(as.character(KC_tier))) %>%
@@ -294,12 +299,13 @@ types %>%
   group_by(EV_tier) %>% 
   dplyr::summarise(HitRate = mean(Pick_Correct),
                    bets = sum(bets),
-                   Flat_Profit = sum(Units)) %>%
+                   Flat_Profit = sum(Units),
+                   Kelly_Profit = sum(Kelly_Profit)) %>%
   mutate(Units_per_bet = Flat_Profit / bets) %>%
   print(n=40)
 
 types %>%
-  filter((bet_type == "TT"
+  filter((bet_type == "Draw No Bet"
           # | bet_type == "Alt Total"
           # | bet_type == "Draw No Bet"
           )
@@ -403,10 +409,12 @@ bets_table <- read.csv("Soccer Machine/upcoming_bets.csv") %>%
   mutate(bet_size = case_when(KC_tier %in% c(0.1, 0.15) ~ '$5',
                               KC_tier %in% c(0.2, 0.25) ~ '$10',
                               KC_tier %in% c(0.3, 0.35) ~ '$15',
-                              KC_tier %in% c(0.4, 0.45) ~ '$20',
                               TRUE ~ 'No bet - something went wrong')) %>%
   arrange(gamedate, desc(Kelly_Criteria)) %>% 
   ungroup() %>% 
+  mutate(Pick = case_when(is.na(Pick_SpreadTotal) | Pick_SpreadTotal == 0 ~ paste0(Pick),
+                          str_detect(bet_type_full, "Spread") & Pick_SpreadTotal > 0 ~ paste0(Pick, " +", Pick_SpreadTotal),
+                          TRUE ~ paste0(Pick, " ", Pick_SpreadTotal))) %>% 
   select(gamedate, League, HomeTeam, AwayTeam, bet_type_full, Pick, Pick_Odds, Machine_Odds, bet_size) %>% 
   mutate(Machine_Odds =  pmax(Machine_Odds, 100)) %>% 
   rename(`Game Date` = gamedate,
