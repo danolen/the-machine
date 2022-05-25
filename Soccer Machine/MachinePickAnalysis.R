@@ -226,9 +226,9 @@ types <- filter(history2,
 types %>%
   filter(Kelly_Criteria >= 0 & !(League %in% c("UCL", "UEL"))) %>%
   #group_by(Total) %>%
-  #group_by(bet_type) %>%
+  group_by(bet_type) %>%
   #group_by(KC_tier = as.numeric(as.character(KC_tier))) %>%
-  group_by(Odds_tier = as.numeric(as.character(Odds_tier))) %>%
+  #group_by(Odds_tier = as.numeric(as.character(Odds_tier))) %>%
   #group_by(WinProb_tier = as.numeric(as.character(WinProb_tier))) %>%
   dplyr::summarise(HitRate = mean(Pick_Correct),
                    bets = sum(bets),
@@ -251,7 +251,7 @@ types %>%
   filter(Kelly_Criteria >= 0.15 & 
           Kelly_Criteria < 0.4 & 
           EV >= 2 & 
-          EV < 6 & 
+          EV < 7 & 
           Pick_Odds > 0 &
           !(League %in% c("UCL", "UEL"))) %>%
   arrange(gamedate, ID, desc(Kelly_Criteria)) %>% 
@@ -277,7 +277,7 @@ types %>%
 
 types %>%
   filter(!(League %in% c("UCL", "UEL"))) %>%
-  #filter(League == 'Serie A') %>% 
+  #filter(League == 'MLS') %>% 
   #group_by(bet_type) %>%
   group_by(KC_tier = as.numeric(as.character(KC_tier))) %>%
   #group_by(WinProb_tier) %>%
@@ -414,9 +414,19 @@ bets_table <- read.csv("Soccer Machine/upcoming_bets.csv") %>%
   ungroup() %>% 
   mutate(Pick = case_when(is.na(Pick_SpreadTotal) | Pick_SpreadTotal == 0 ~ paste0(Pick),
                           str_detect(bet_type_full, "Spread") & Pick_SpreadTotal > 0 ~ paste0(Pick, " +", Pick_SpreadTotal),
-                          TRUE ~ paste0(Pick, " ", Pick_SpreadTotal))) %>% 
+                          TRUE ~ paste0(Pick, " ", Pick_SpreadTotal)),
+         Machine_Odds = round(if_else(Pushable == 'Y',
+                                      if_else((Pick_WinProb + ((1-Pick_WinProb-Pick_LoseProb)/2)) < 0.5,
+                                              (100 / (Pick_WinProb + ((1-Pick_WinProb-Pick_LoseProb)/2))) - 100,
+                                              -1 * (100 * (Pick_WinProb + ((1-Pick_WinProb-Pick_LoseProb)/2))) / 
+                                                (1 - (Pick_WinProb + ((1-Pick_WinProb-Pick_LoseProb)/2)))),
+                                      if_else(Pick_WinProb < 0.5,
+                                              (100 / Pick_WinProb) - 100,
+                                              -1 * (100 * Pick_WinProb) / (1 - Pick_WinProb))),
+                              0)) %>% 
   select(gamedate, League, HomeTeam, AwayTeam, bet_type_full, Pick, Pick_Odds, Machine_Odds, bet_size) %>% 
-  mutate(Machine_Odds =  pmax(Machine_Odds, 100)) %>% 
+  mutate(Machine_Odds =  as.integer(pmax(Machine_Odds, 100)),
+         gamedate = as.character(gamedate)) %>% 
   rename(`Game Date` = gamedate,
          `Home Team` = HomeTeam,
          `Away Team` = AwayTeam,
@@ -425,3 +435,75 @@ bets_table <- read.csv("Soccer Machine/upcoming_bets.csv") %>%
          `Don't Bet if Odds Worse Than` = Machine_Odds,
          `Wager Amount` = bet_size)
 
+SGPs <- types %>%
+  filter(Pick_Odds < 0 & Kelly_Criteria >= 0.15 & Kelly_Criteria < 0.4 & EV >= 2 & EV < 7 & !(League %in% c("UCL", "UEL"))) %>%
+  arrange(gamedate, ID, desc(Kelly_Criteria)) %>% 
+  group_by(ID, Side_or_Total) %>% 
+  mutate(KC_Rank = row_number()) %>% 
+  arrange(gamedate, ID, desc(EV)) %>% 
+  group_by(ID, Side_or_Total) %>% 
+  mutate(EV_Rank = row_number()) %>%
+  arrange(gamedate, ID, desc(Pick_WinProb)) %>% 
+  group_by(ID, Side_or_Total) %>% 
+  mutate(WinProb_Rank = row_number(),
+         Rank = (KC_Rank + EV_Rank) / 2) %>%
+  arrange(gamedate, ID, Side_or_Total, Rank) %>% 
+  mutate(Final_Rank = row_number()) %>%  
+  filter(Final_Rank == 1) %>% 
+  group_by(ID) %>% 
+  mutate(legs = sum(bets),
+         hits = sum(Pick_Correct)) %>% 
+  filter(legs > 1) %>%
+  mutate(Parlay_Odds = floor((prod(Fract_Odds+1)-1)*100),
+         winner = if_else(legs==hits,1,0),
+         Parlay_Units = if_else(winner==1,Parlay_Odds/100,-1)) %>% 
+  filter(Parlay_Odds >= 100)
+
+SGP_performance <- SGPs %>% 
+  distinct(ID, Parlay_Odds, winner, Parlay_Units)
+
+sum(SGP_performance$Parlay_Units) 
+
+Parlays <- types %>%
+  filter(Pick_Odds < 0 & Kelly_Criteria >= 0.15 & Kelly_Criteria < 0.4 & EV >= 2 & EV < 7 & !(League %in% c("UCL", "UEL"))) %>%
+  arrange(gamedate, ID, desc(Kelly_Criteria)) %>% 
+  group_by(ID) %>% 
+  mutate(KC_Rank = row_number()) %>% 
+  arrange(gamedate, ID, desc(EV)) %>% 
+  group_by(ID) %>% 
+  mutate(EV_Rank = row_number()) %>%
+  arrange(gamedate, ID, desc(Pick_WinProb)) %>% 
+  group_by(ID) %>% 
+  mutate(WinProb_Rank = row_number(),
+         Rank = (KC_Rank + EV_Rank) / 2) %>%
+  arrange(gamedate, ID, Rank) %>% 
+  mutate(Final_Rank = row_number()) %>%  
+  filter(Final_Rank == 1) %>%
+  arrange(gamedate, ID, desc(Kelly_Criteria)) %>% 
+  group_by(gamedate) %>% 
+  mutate(KC_Rank = row_number()) %>% 
+  arrange(gamedate, ID, desc(EV)) %>% 
+  group_by(gamedate) %>% 
+  mutate(EV_Rank = row_number()) %>%
+  arrange(gamedate, ID, desc(Pick_WinProb)) %>% 
+  group_by(gamedate) %>% 
+  mutate(WinProb_Rank = row_number(),
+         Rank = (KC_Rank + EV_Rank) / 2) %>%
+  arrange(gamedate, ID, Side_or_Total, Rank) %>% 
+  mutate(Final_Rank = row_number()) %>%  
+  filter(Final_Rank <= 4) %>%
+  group_by(gamedate) %>% 
+  mutate(legs = sum(bets),
+         hits = sum(Pick_Correct)) %>% 
+  filter(legs > 1) %>%
+  mutate(Parlay_Odds = floor((prod(Fract_Odds+1)-1)*100),
+         winner = if_else(legs==hits,1,0),
+         Parlay_Units = if_else(winner==1,Parlay_Odds/100,-1)) %>% 
+  filter(Parlay_Odds >= 100)
+  
+Parlay_performance <- Parlays %>% 
+  distinct(gamedate, Parlay_Odds, legs, winner, Parlay_Units)
+
+sum(Parlay_performance$Parlay_Units)  
+  
+  
