@@ -422,88 +422,91 @@ mls_22 <- urls[[1]] %>%
   mutate(League = "MLS", Season = "2022")
 
 epl_21_22 <- urls[[2]] %>%
-  read_html() %>%
-  html_nodes("table") %>%
-  .[1] %>%
-  html_table(trim = TRUE) %>%
-  data.frame(stringsAsFactors = FALSE) %>%
-  filter(is.na(Wk) == FALSE) %>%
-  select(Day:Away) %>%
-  separate(Score, c("Home_Score", "Away_Score")) %>%
-  mutate(League = "EPL", Season = "2021-2022")
+ read_html() %>%
+ html_nodes("table") %>%
+ .[1] %>%
+ html_table(trim = TRUE) %>%
+ data.frame(stringsAsFactors = FALSE) %>%
+ filter(is.na(Wk) == FALSE) %>%
+ select(Day:Away) %>%
+ separate(Score, c("Home_Score", "Away_Score")) %>%
+ mutate(League = "EPL", Season = "2021-2022")
 
 ligue1_21_22 <- urls[[3]] %>%
-  read_html() %>%
-  html_nodes("table") %>%
-  .[1] %>%
-  html_table(trim = TRUE) %>%
-  data.frame(stringsAsFactors = FALSE) %>%
-  filter(is.na(Wk) == FALSE) %>%
-  select(Day:Away) %>%
-  separate(Score, c("Home_Score", "Away_Score")) %>%
-  mutate(League = "Ligue 1", Season = "2021-2022")
+ read_html() %>%
+ html_nodes("table") %>%
+ .[1] %>%
+ html_table(trim = TRUE) %>%
+ data.frame(stringsAsFactors = FALSE) %>%
+ filter(is.na(Wk) == FALSE) %>%
+ select(Day:Away) %>%
+ separate(Score, c("Home_Score", "Away_Score")) %>%
+ mutate(League = "Ligue 1", Season = "2021-2022")
 
 bundes_21_22 <- urls[[4]] %>%
-  read_html() %>%
-  html_nodes("table") %>%
-  .[1] %>%
-  html_table(trim = TRUE) %>%
-  data.frame(stringsAsFactors = FALSE) %>%
-  filter(is.na(Wk) == FALSE) %>%
-  select(Day:Away) %>%
-  separate(Score, c("Home_Score", "Away_Score")) %>%
-  mutate(League = "Bundesliga", Season = "2021-2022")
+ read_html() %>%
+ html_nodes("table") %>%
+ .[1] %>%
+ html_table(trim = TRUE) %>%
+ data.frame(stringsAsFactors = FALSE) %>%
+ filter(is.na(Wk) == FALSE) %>%
+ select(Day:Away) %>%
+ separate(Score, c("Home_Score", "Away_Score")) %>%
+ mutate(League = "Bundesliga", Season = "2021-2022")
 
 seriea_21_22 <- urls[[5]] %>%
-  read_html() %>%
-  html_nodes("table") %>%
-  .[1] %>%
-  html_table(trim = TRUE) %>%
-  data.frame(stringsAsFactors = FALSE) %>%
-  filter(is.na(Wk) == FALSE) %>%
-  select(Day:Away) %>%
-  separate(Score, c("Home_Score", "Away_Score")) %>%
-  mutate(League = "Serie A", Season = "2021-2022")
+ read_html() %>%
+ html_nodes("table") %>%
+ .[1] %>%
+ html_table(trim = TRUE) %>%
+ data.frame(stringsAsFactors = FALSE) %>%
+ filter(is.na(Wk) == FALSE) %>%
+ select(Day:Away) %>%
+ separate(Score, c("Home_Score", "Away_Score")) %>%
+ mutate(League = "Serie A", Season = "2021-2022")
 
 laliga_21_22 <- urls[[6]] %>%
-  read_html() %>%
-  html_nodes("table") %>%
-  .[1] %>%
-  html_table(trim = TRUE) %>%
-  data.frame(stringsAsFactors = FALSE) %>%
-  filter(is.na(Wk) == FALSE) %>%
-  select(Day:Away) %>%
-  separate(Score, c("Home_Score", "Away_Score")) %>%
-  mutate(League = "La Liga", Season = "2021-2022")
+ read_html() %>%
+ html_nodes("table") %>%
+ .[1] %>%
+ html_table(trim = TRUE) %>%
+ data.frame(stringsAsFactors = FALSE) %>%
+ filter(is.na(Wk) == FALSE) %>%
+ select(Day:Away) %>%
+ separate(Score, c("Home_Score", "Away_Score")) %>%
+ mutate(League = "La Liga", Season = "2021-2022")
 
 ucl_21_22 <- urls[[7]] %>%
-  read_html() %>%
-  html_nodes("table") %>%
-  .[1] %>%
-  html_table(trim = TRUE) %>%
-  data.frame(stringsAsFactors = FALSE) %>%
-  filter(Day != "") %>%
-  select(Day:Away) %>%
-  separate(Score, c("Home_Score", "Away_Score")) %>%
-  mutate(League = "UCL", Season = "2021-2022")
+ read_html() %>%
+ html_nodes("table") %>%
+ .[1] %>%
+ html_table(trim = TRUE) %>%
+ data.frame(stringsAsFactors = FALSE) %>%
+ filter(Day != "") %>%
+ select(Day:Away) %>%
+ separate(Score, c("Home_Score", "Away_Score")) %>%
+ mutate(League = "UCL", Season = "2021-2022")
 
 ucl_21_22 <- mutate(ucl_21_22,
-                    Home = if_else(endsWith(Home, "tr"), "Besiktas tr", Home),
-                    Away = if_else(startsWith(Away, "tr"), "tr Besiktas", Away))
+                   Home = if_else(endsWith(Home, "tr"), "Besiktas tr", Home),
+                   Away = if_else(startsWith(Away, "tr"), "tr Besiktas", Away))
 
-uel_21_22 <- urls[[8]] %>%
-  read_html() %>%
-  html_nodes("table") %>%
-  .[1] %>%
-  html_table(trim = TRUE) %>%
-  data.frame(stringsAsFactors = FALSE) %>%
-  filter(Day != "" & Day != "Day") %>%
-  select(Day:Away) %>%
-  separate(Score, c("Home_Score", "Away_Score")) %>%
-  mutate(League = "UEL", Season = "2021-2022")
+ uel_21_22 <- urls[[8]] %>%
+ read_html() %>%
+ html_nodes("table") %>%
+ .[1] %>%
+ html_table(trim = TRUE) %>%
+ data.frame(stringsAsFactors = FALSE) %>%
+ filter(Day != "" & Day != "Day") %>%
+ select(Day:Away) %>%
+ separate(Score, c("Home_Score", "Away_Score")) %>%
+ mutate(League = "UEL", Season = "2021-2022")
 
 fixtures <- rbind(epl_21_22, laliga_21_22, bundes_21_22, seriea_21_22, 
-                  ligue1_21_22, mls_22, ucl_21_22, uel_21_22) 
+                  ligue1_21_22, 
+                  mls_22
+                  # , ucl_21_22, uel_21_22
+                  ) 
   
 fixtures$Date <- as.Date(fixtures$Date)
 today <- Sys.Date()
