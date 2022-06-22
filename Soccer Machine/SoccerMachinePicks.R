@@ -491,7 +491,7 @@ ucl_21_22 <- mutate(ucl_21_22,
                    Home = if_else(endsWith(Home, "tr"), "Besiktas tr", Home),
                    Away = if_else(startsWith(Away, "tr"), "tr Besiktas", Away))
 
- uel_21_22 <- urls[[8]] %>%
+uel_21_22 <- urls[[8]] %>%
  read_html() %>%
  html_nodes("table") %>%
  .[1] %>%
@@ -1268,108 +1268,6 @@ types <- filter(history2,
          bets = as.integer(1),
          Total = "Total")
 
-types %>%
-  filter(Kelly_Criteria >= 0 & !(League %in% c("UCL", "UEL"))) %>%
-  #group_by(Total) %>%
-  group_by(bet_type) %>%
-  #group_by(KC_tier = as.numeric(as.character(KC_tier))) %>%
-  #group_by(Odds_tier = as.numeric(as.character(Odds_tier))) %>%
-  dplyr::summarise(HitRate = mean(Pick_Correct),
-                   bets = sum(bets),
-                   Flat_Profit = sum(Units),
-                   Kelly_Profit = sum(Kelly_Profit)) %>%
-  mutate(Units_per_bet = Flat_Profit / bets) %>%
-  print(n=40)
-
-types %>%
-  filter(Kelly_Criteria >= 0) %>%
-  group_by(League) %>%
-  dplyr::summarise(HitRate = mean(Pick_Correct),
-                   bets = sum(bets),
-                   Flat_Profit = sum(Units),
-                   Kelly_Profit = sum(Kelly_Profit)) %>%
-  mutate(Units_per_bet = Flat_Profit / bets) %>%
-  print(n=40)
-
-types %>%
-  filter(Kelly_Criteria >= 0.1 & Kelly_Criteria < 0.4 & EV >= 2 & EV < 7 & !(League %in% c("UCL", "UEL"))) %>%
-  group_by(Total) %>%
-  #group_by(bet_type) %>%
-  #group_by(KC_tier) %>%
-  #group_by(Odds_tier) %>%
-  dplyr::summarise(HitRate = mean(Pick_Correct),
-                   bets = sum(bets),
-                   Flat_Profit = sum(Units),
-                   Kelly_Profit = sum(Kelly_Profit)) %>%
-  mutate(Units_per_bet = Flat_Profit / bets) %>%
-  print(n=40)
-
-types %>% 
-  filter(Kelly_Criteria >= 0.1 & Kelly_Criteria < 0.4 & EV >= 2 & EV < 7 & !(League %in% c("UCL", "UEL"))) %>%
-  arrange(gamedate, ID, desc(Kelly_Criteria)) %>% 
-  group_by(ID) %>% 
-  mutate(KC_Rank = row_number()) %>% 
-  arrange(gamedate, ID, desc(EV)) %>% 
-  group_by(ID) %>% 
-  mutate(EV_Rank = row_number(),
-         Rank = (KC_Rank + EV_Rank) / 2) %>% 
-  arrange(gamedate, ID, Rank) %>% 
-  mutate(Final_Rank = row_number()) %>% 
-  filter(Final_Rank == 1) %>%
-  group_by(Total) %>%
-  #group_by(bet_type) %>%
-  #group_by(KC_tier) %>%
-  #group_by(Odds_tier) %>%
-  dplyr::summarise(HitRate = mean(Pick_Correct),
-                   bets = sum(bets),
-                   Flat_Profit = sum(Units),
-                   Kelly_Profit = sum(Kelly_Profit)) %>%
-  mutate(Units_per_bet = Flat_Profit / bets) %>%
-  print(n=40)
-
-types %>%
-  filter(!(League %in% c("UCL", "UEL"))) %>%
-  #group_by(bet_type) %>%
-  group_by(KC_tier = as.numeric(as.character(KC_tier))) %>%
-  #group_by(WinProb_tier) %>%
-  #group_by(Odds_tier) %>%
-  dplyr::summarise(HitRate = mean(Pick_Correct),
-                   bets = sum(bets),
-                   Flat_Profit = sum(Units),
-                   Kelly_Profit = sum(Kelly_Profit)) %>%
-  mutate(Units_per_bet = Flat_Profit / bets) %>%
-  print(n=40)
-
-types %>%
-  filter(!(League %in% c("UCL", "UEL"))) %>%
-  #group_by(Total) %>%
-  #group_by(bet_type) %>%
-  #group_by(KC_tier = as.numeric(as.character(KC_tier))) %>%
-  #group_by(Odds_tier) %>%
-  group_by(EV_tier) %>% 
-  dplyr::summarise(HitRate = mean(Pick_Correct),
-                   bets = sum(bets),
-                   Flat_Profit = sum(Units)) %>%
-  mutate(Units_per_bet = Flat_Profit / bets) %>%
-  print(n=40)
-
-# types %>%
-#   filter((bet_type == "TT"
-#           #| bet_type == "Alt Total"
-#           #| bet_type == "Draw No Bet"
-#           )
-#          & League.x == "EPL"
-#          ) %>%
-#   group_by(KC_tier) %>%
-#   #group_by(WinProb_tier) %>%
-#   #group_by(Odds_tier) %>%
-#   dplyr::summarise(HitRate = mean(Pick_Correct),
-#                    bets = sum(bets),
-#                    Flat_Profit = sum(Units),
-#                    Kelly_Profit = sum(Kelly_Profit)) %>%
-#   mutate(Units_per_bet = Flat_Profit / bets) %>%
-#   print(n=40)
-# 
 # ## Create email tables
 
 email_table_1 <- types %>%
