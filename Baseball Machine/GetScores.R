@@ -1,15 +1,13 @@
+## Daily Scores Update
 library(tidyverse)
 library(baseballr)
 
-try(mlb_game_linescore(game_pk = 566001))
+setwd("C:/Users/danie/Desktop/SportsStuff/TheMachine/the-machine")
 
-yesterday <- baseballr::get_game_pks_mlb("2022-04-08")
-today <- get_game_pks_mlb(Sys.Date())
-
-gm1 <- mlb_game_linescore(today$game_pk[1])
+scores_2022_file <- read.csv("Baseball Machine/scores_2022.csv")
 
 i <- 1
-date <- as.Date("2022-04-07")
+date <- as.Date(max(scores_2022_file$officialDate))
 gamedates <- list()
 while (date < as.Date(Sys.Date())) {
   gamedate = date
@@ -53,11 +51,14 @@ scores5 <- game_tbl %>%
   summarise(F5_VisitorRunsScored = sum(away_runs, na.rm = T),
             F5_HomeRunsScored = sum(home_runs, na.rm = T))
 
-scores_2022 <- game_pks %>% 
-  left_join(scores9) %>% 
-  left_join(scores5)
+scores_2022 <- scores_2022_file %>% 
+  bind_rows(game_pks %>% 
+              left_join(scores9) %>% 
+              left_join(scores5)) %>% 
+  distinct()
 
 write.csv(scores_2022, "Baseball Machine/scores_2022.csv", row.names = F, na = "")
+
 
 
 
