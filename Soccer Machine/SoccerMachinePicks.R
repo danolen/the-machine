@@ -20,7 +20,7 @@ library("tidyverse")
 
 setwd("C:/Users/danie/Desktop/SportsStuff/TheMachine/the-machine")
 
-mls_url <- "https://www.bovada.lv/services/sports/event/v2/events/A/description/soccer/major-league-soccer"
+mls_url <- "https://www.bovada.lv/services/sports/event/v2/events/A/description/soccer/north-america/united-states/mls"
 epl_url <- "https://www.bovada.lv/services/sports/event/v2/events/A/description/soccer/england-premier-league"
 esp_url <- "https://www.bovada.lv/services/sports/event/v2/events/A/description/soccer/spain-la-liga"
 ger_url <- "https://www.bovada.lv/services/sports/event/v2/events/A/description/soccer/germany-bundesliga"
@@ -421,89 +421,89 @@ mls_22 <- urls[[1]] %>%
   separate(Score, c("Home_Score", "Away_Score")) %>%
   mutate(League = "MLS", Season = "2022")
 
-epl_21_22 <- urls[[2]] %>%
- read_html() %>%
- html_nodes("table") %>%
- .[1] %>%
- html_table(trim = TRUE) %>%
- data.frame(stringsAsFactors = FALSE) %>%
- filter(is.na(Wk) == FALSE) %>%
- select(Day:Away) %>%
- separate(Score, c("Home_Score", "Away_Score")) %>%
- mutate(League = "EPL", Season = "2021-2022")
+# epl_21_22 <- urls[[2]] %>%
+#  read_html() %>%
+#  html_nodes("table") %>%
+#  .[1] %>%
+#  html_table(trim = TRUE) %>%
+#  data.frame(stringsAsFactors = FALSE) %>%
+#  filter(is.na(Wk) == FALSE) %>%
+#  select(Day:Away) %>%
+#  separate(Score, c("Home_Score", "Away_Score")) %>%
+#  mutate(League = "EPL", Season = "2021-2022")
+# 
+# ligue1_21_22 <- urls[[3]] %>%
+#  read_html() %>%
+#  html_nodes("table") %>%
+#  .[1] %>%
+#  html_table(trim = TRUE) %>%
+#  data.frame(stringsAsFactors = FALSE) %>%
+#  filter(is.na(Wk) == FALSE) %>%
+#  select(Day:Away) %>%
+#  separate(Score, c("Home_Score", "Away_Score")) %>%
+#  mutate(League = "Ligue 1", Season = "2021-2022")
+# 
+# bundes_21_22 <- urls[[4]] %>%
+#  read_html() %>%
+#  html_nodes("table") %>%
+#  .[1] %>%
+#  html_table(trim = TRUE) %>%
+#  data.frame(stringsAsFactors = FALSE) %>%
+#  filter(is.na(Wk) == FALSE) %>%
+#  select(Day:Away) %>%
+#  separate(Score, c("Home_Score", "Away_Score")) %>%
+#  mutate(League = "Bundesliga", Season = "2021-2022")
+# 
+# seriea_21_22 <- urls[[5]] %>%
+#  read_html() %>%
+#  html_nodes("table") %>%
+#  .[1] %>%
+#  html_table(trim = TRUE) %>%
+#  data.frame(stringsAsFactors = FALSE) %>%
+#  filter(is.na(Wk) == FALSE) %>%
+#  select(Day:Away) %>%
+#  separate(Score, c("Home_Score", "Away_Score")) %>%
+#  mutate(League = "Serie A", Season = "2021-2022")
+# 
+# laliga_21_22 <- urls[[6]] %>%
+#  read_html() %>%
+#  html_nodes("table") %>%
+#  .[1] %>%
+#  html_table(trim = TRUE) %>%
+#  data.frame(stringsAsFactors = FALSE) %>%
+#  filter(is.na(Wk) == FALSE) %>%
+#  select(Day:Away) %>%
+#  separate(Score, c("Home_Score", "Away_Score")) %>%
+#  mutate(League = "La Liga", Season = "2021-2022")
+# 
+# ucl_21_22 <- urls[[7]] %>%
+#  read_html() %>%
+#  html_nodes("table") %>%
+#  .[1] %>%
+#  html_table(trim = TRUE) %>%
+#  data.frame(stringsAsFactors = FALSE) %>%
+#  filter(Day != "") %>%
+#  select(Day:Away) %>%
+#  separate(Score, c("Home_Score", "Away_Score")) %>%
+#  mutate(League = "UCL", Season = "2021-2022")
+# 
+# ucl_21_22 <- mutate(ucl_21_22,
+#                    Home = if_else(endsWith(Home, "tr"), "Besiktas tr", Home),
+#                    Away = if_else(startsWith(Away, "tr"), "tr Besiktas", Away))
+# 
+# uel_21_22 <- urls[[8]] %>%
+#  read_html() %>%
+#  html_nodes("table") %>%
+#  .[1] %>%
+#  html_table(trim = TRUE) %>%
+#  data.frame(stringsAsFactors = FALSE) %>%
+#  filter(Day != "" & Day != "Day") %>%
+#  select(Day:Away) %>%
+#  separate(Score, c("Home_Score", "Away_Score")) %>%
+#  mutate(League = "UEL", Season = "2021-2022")
 
-ligue1_21_22 <- urls[[3]] %>%
- read_html() %>%
- html_nodes("table") %>%
- .[1] %>%
- html_table(trim = TRUE) %>%
- data.frame(stringsAsFactors = FALSE) %>%
- filter(is.na(Wk) == FALSE) %>%
- select(Day:Away) %>%
- separate(Score, c("Home_Score", "Away_Score")) %>%
- mutate(League = "Ligue 1", Season = "2021-2022")
-
-bundes_21_22 <- urls[[4]] %>%
- read_html() %>%
- html_nodes("table") %>%
- .[1] %>%
- html_table(trim = TRUE) %>%
- data.frame(stringsAsFactors = FALSE) %>%
- filter(is.na(Wk) == FALSE) %>%
- select(Day:Away) %>%
- separate(Score, c("Home_Score", "Away_Score")) %>%
- mutate(League = "Bundesliga", Season = "2021-2022")
-
-seriea_21_22 <- urls[[5]] %>%
- read_html() %>%
- html_nodes("table") %>%
- .[1] %>%
- html_table(trim = TRUE) %>%
- data.frame(stringsAsFactors = FALSE) %>%
- filter(is.na(Wk) == FALSE) %>%
- select(Day:Away) %>%
- separate(Score, c("Home_Score", "Away_Score")) %>%
- mutate(League = "Serie A", Season = "2021-2022")
-
-laliga_21_22 <- urls[[6]] %>%
- read_html() %>%
- html_nodes("table") %>%
- .[1] %>%
- html_table(trim = TRUE) %>%
- data.frame(stringsAsFactors = FALSE) %>%
- filter(is.na(Wk) == FALSE) %>%
- select(Day:Away) %>%
- separate(Score, c("Home_Score", "Away_Score")) %>%
- mutate(League = "La Liga", Season = "2021-2022")
-
-ucl_21_22 <- urls[[7]] %>%
- read_html() %>%
- html_nodes("table") %>%
- .[1] %>%
- html_table(trim = TRUE) %>%
- data.frame(stringsAsFactors = FALSE) %>%
- filter(Day != "") %>%
- select(Day:Away) %>%
- separate(Score, c("Home_Score", "Away_Score")) %>%
- mutate(League = "UCL", Season = "2021-2022")
-
-ucl_21_22 <- mutate(ucl_21_22,
-                   Home = if_else(endsWith(Home, "tr"), "Besiktas tr", Home),
-                   Away = if_else(startsWith(Away, "tr"), "tr Besiktas", Away))
-
-uel_21_22 <- urls[[8]] %>%
- read_html() %>%
- html_nodes("table") %>%
- .[1] %>%
- html_table(trim = TRUE) %>%
- data.frame(stringsAsFactors = FALSE) %>%
- filter(Day != "" & Day != "Day") %>%
- select(Day:Away) %>%
- separate(Score, c("Home_Score", "Away_Score")) %>%
- mutate(League = "UEL", Season = "2021-2022")
-
-fixtures <- rbind(epl_21_22, laliga_21_22, bundes_21_22, seriea_21_22, 
-                  ligue1_21_22, 
+fixtures <- rbind(#epl_21_22, laliga_21_22, bundes_21_22, seriea_21_22, 
+                  #ligue1_21_22, 
                   mls_22
                   # , ucl_21_22, uel_21_22
                   ) 
@@ -1298,7 +1298,7 @@ email_table_2 <- types %>%
 df_html_2 <- print(xtable(email_table_2), type = "html", print.results = FALSE)
 
 email_table_3a <- types %>%
-  filter(Kelly_Criteria >= 0.15 & Kelly_Criteria < 0.4 & EV >= 2 & EV < 7 & !(League %in% c("UCL", "UEL"))) %>%
+  filter(Kelly_Criteria >= 0.15 & Kelly_Criteria < 0.4 & EV >= 3 & EV < 7 & !(League %in% c("UCL", "UEL"))) %>%
   #group_by(Total) %>%
   group_by(Strategy = 'Bet Everything') %>% 
   #group_by(bet_type) %>%
@@ -1312,7 +1312,7 @@ email_table_3a <- types %>%
   print(n=40)
 
 email_table_3b <- types %>% 
-  filter(Kelly_Criteria >= 0.15 & Kelly_Criteria < 0.4 & EV >= 2 & EV < 7 & !(League %in% c("UCL", "UEL"))) %>%
+  filter(Kelly_Criteria >= 0.15 & Kelly_Criteria < 0.4 & EV >= 3 & EV < 7 & !(League %in% c("UCL", "UEL"))) %>%
   arrange(gamedate, ID, desc(Kelly_Criteria)) %>% 
   group_by(ID) %>% 
   mutate(KC_Rank = row_number()) %>% 
@@ -1336,7 +1336,7 @@ email_table_3b <- types %>%
   print(n=40)
 
 email_table_3c <- types %>% 
-  filter(Kelly_Criteria >= 0.15 & Kelly_Criteria < 0.4 & EV >= 2 & EV < 7 & !(League %in% c("UCL", "UEL")) & Pick_Odds > 0) %>%
+  filter(Kelly_Criteria >= 0.15 & Kelly_Criteria < 0.4 & EV >= 3 & EV < 7 & !(League %in% c("UCL", "UEL")) & Pick_Odds > 0) %>%
   arrange(gamedate, ID, desc(Kelly_Criteria)) %>% 
   group_by(ID) %>% 
   mutate(KC_Rank = row_number()) %>% 
@@ -1360,7 +1360,7 @@ email_table_3c <- types %>%
   print(n=40)
 
 email_table_3d <- types %>%
-  filter(Kelly_Criteria >= 0.15 & Kelly_Criteria < 0.4 & EV >= 2 & EV < 7 & !(League %in% c("UCL", "UEL")) & Pick_Odds > 0) %>%
+  filter(Kelly_Criteria >= 0.15 & Kelly_Criteria < 0.4 & EV >= 3 & EV < 7 & !(League %in% c("UCL", "UEL")) & Pick_Odds > 0) %>%
   #group_by(Total) %>%
   group_by(Strategy = 'Bet Everything at Even Odds or Better') %>% 
   #group_by(bet_type) %>%
@@ -1494,10 +1494,10 @@ plot_html <- add_ggplot(plot_object = plot)
 
 bets_table <- read.csv("Soccer Machine/upcoming_bets.csv") %>% 
   mutate(gamedate = as.Date(gamedate)) %>%
-  filter(Kelly_Criteria >= 0.1 & 
+  filter(Kelly_Criteria >= 0.15 & 
            Kelly_Criteria < 0.4 & 
-           EV >= 2 & 
-           EV < 6 & 
+           EV >= 3 & 
+           EV < 7 & 
            !(League %in% c("UCL", "UEL")) &
            Pick_Odds > 0 &
            Pick_WinProb >= 0.3 &
@@ -1544,7 +1544,7 @@ Email[["to"]] = paste("dnolen@smu.edu", "jorler@smu.edu", "asnolen@crimson.ua.ed
 #Email[["to"]] = "dnolen@smu.edu"
 Email[["subject"]] = paste0("Soccer Machine Picks: ", Sys.Date())
 Email[["HTMLbody"]] = sprintf("
-The Machine's picks for upcoming soccer matches are in! The Machine currently offers picks for the Big 5 European Leagues plus MLS. The attached document contains all of the pertinent betting information for the upcoming matches. Good luck!
+The Machine's picks for upcoming soccer matches are in! The Machine currently offers picks for the Big 5 European Leagues plus MLS. The MLS is the only league that is in season currently, so all of the historical Machine results below are filtered to only include MLS games. The attached document contains all of the pertinent betting information for the upcoming matches. Good luck!
 </p><br></p>
 TL;DR: These are the bets that The Machine recommends that you should make for the next week. The bet sizes are based on a unit size of $10. If your regular bet is something other than $10, adjust accordingly.
 </p><br></p>
@@ -1558,7 +1558,7 @@ Below are the results for each league:
 </p><br></p>
 %s
 </p><br></p>
-Bets with a KC of at least 0.15 and less than 0.4 and EV of at least 2 and less than 7 have had the best performance so far. This is expected. If there is not a big difference between the Machine projection and the odds then there is not much of an edge. On the other end, if the Machine projections are way off from the odds, then it's more likely that the oddsmakers know something that the Machine doesn't, rather than the other way around. Here are the results for those bets using four different strategies:
+Bets with a KC of at least 0.15 and less than 0.4 and EV of at least 3 and less than 7 have had the best performance so far. This is expected. If there is not a big difference between the Machine projection and the odds then there is not much of an edge. On the other end, if the Machine projections are way off from the odds, then it's more likely that the oddsmakers know something that the Machine doesn't, rather than the other way around. Here are the results for those bets using four different strategies:
 </p><br></p>
 %s
 </p><br></p>
@@ -1574,9 +1574,7 @@ Here is the Kelly betting results over time for each of the four strategies list
 </p><br></p>
 %s
 </p><br></p>
-NOTE: Consider this a BETA version. If you feel like reviewing this, please let me know if anything looks off.
-</p><br></p>
-ANOTHER NOTE: I filtered out bets where the odds are less than -250 from this analysis. I suggest never betting juice higher than -250. I also filtered out bets that have less than a 30%% win probability. I don't believe it is worth it to bet on these huge underdogs. I also removed any bets on Alternate Totals set at 1.5 goals. The Machine almost always suggests an under bet on those. The performance on those bets was not very good, and that is also a very lame bet. Nobody likes cheering for a game to be that low scoring.
+NOTE: I filtered out bets where the odds are less than -250 from this analysis. I suggest never betting juice higher than -250. I also filtered out bets that have less than a 30%% win probability. I don't believe it is worth it to bet on these huge underdogs. I also removed any bets on Alternate Totals set at 1.5 goals. The Machine almost always suggests an under bet on those. The performance on those bets was not very good, and that is also a very lame bet. Nobody likes cheering for a game to be that low scoring.
 ", df_html_bets, df_html_1, df_html_2, df_html_3, df_html_4, df_html_5, plot_html)
 Email[["attachments"]]$Add("C:/Users/danie/Desktop/SportsStuff/TheMachine/the-machine/Soccer Machine/upcoming_bets.csv")
 
