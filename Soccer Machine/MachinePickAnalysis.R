@@ -123,7 +123,10 @@ uel_21_22 <- urls[[8]] %>%
   mutate(League = "UEL", Season = "2021-2022")
 
 fixtures <- rbind(epl_21_22, laliga_21_22, bundes_21_22, seriea_21_22, 
-                  ligue1_21_22, mls_22, ucl_21_22, uel_21_22) 
+                  ligue1_21_22, 
+                  mls_22
+                  #, ucl_21_22, uel_21_22
+                  ) 
 
 fixtures$Date <- as.Date(fixtures$Date)
 today <- Sys.Date()
@@ -227,7 +230,7 @@ types %>%
   filter(#Kelly_Criteria >= 0 &
           Kelly_Criteria >= 0.15 & 
           Kelly_Criteria < 0.4 & 
-          EV >= 2 & 
+          EV >= 3 & 
           EV < 7 &
           !(League %in% c("UCL", "UEL"))) %>%
   #group_by(Total) %>%
@@ -255,7 +258,7 @@ types %>%
 types %>% 
   filter(Kelly_Criteria >= 0.15 & 
           Kelly_Criteria < 0.4 & 
-          EV >= 2 & 
+          EV >= 3 & 
           EV < 7 & 
           Pick_Odds > 0 &
           !(League %in% c("UCL", "UEL"))) %>%
@@ -282,7 +285,7 @@ types %>%
 
 types %>%
   filter(!(League %in% c("UCL", "UEL"))) %>%
-  #filter(League == 'MLS') %>% 
+  filter(League == 'MLS' &) %>% 
   #group_by(bet_type) %>%
   group_by(KC_tier = as.numeric(as.character(KC_tier))) %>%
   #group_by(WinProb_tier) %>%
@@ -392,15 +395,15 @@ ggplot(graph_data2) +
 
 bets_table <- read.csv("Soccer Machine/upcoming_bets.csv") %>% 
   mutate(gamedate = as.Date(gamedate)) %>%
-  filter(Kelly_Criteria >= 0.1 & 
+  filter(Kelly_Criteria >= 0.15 & 
            Kelly_Criteria < 0.4 & 
-           EV >= 2 & 
-           EV < 6 & 
+           EV >= 3 & 
+           EV < 7 & 
            !(League %in% c("UCL", "UEL")) &
            Pick_Odds > 0 &
            Pick_WinProb >= 0.3 &
            bet_type_full != 'Alternate Total - 1.5' &
-           gamedate <= Sys.Date() + 3) %>%
+           gamedate <= Sys.Date() + 7) %>%
   arrange(gamedate, ID, desc(Kelly_Criteria)) %>% 
   group_by(ID) %>% 
   mutate(KC_Rank = row_number()) %>% 
@@ -419,16 +422,7 @@ bets_table <- read.csv("Soccer Machine/upcoming_bets.csv") %>%
   ungroup() %>% 
   mutate(Pick = case_when(is.na(Pick_SpreadTotal) | Pick_SpreadTotal == 0 ~ paste0(Pick),
                           str_detect(bet_type_full, "Spread") & Pick_SpreadTotal > 0 ~ paste0(Pick, " +", Pick_SpreadTotal),
-                          TRUE ~ paste0(Pick, " ", Pick_SpreadTotal)),
-         Machine_Odds = round(if_else(Pushable == 'Y',
-                                      if_else((Pick_WinProb + ((1-Pick_WinProb-Pick_LoseProb)/2)) < 0.5,
-                                              (100 / (Pick_WinProb + ((1-Pick_WinProb-Pick_LoseProb)/2))) - 100,
-                                              -1 * (100 * (Pick_WinProb + ((1-Pick_WinProb-Pick_LoseProb)/2))) / 
-                                                (1 - (Pick_WinProb + ((1-Pick_WinProb-Pick_LoseProb)/2)))),
-                                      if_else(Pick_WinProb < 0.5,
-                                              (100 / Pick_WinProb) - 100,
-                                              -1 * (100 * Pick_WinProb) / (1 - Pick_WinProb))),
-                              0)) %>% 
+                          TRUE ~ paste0(Pick, " ", Pick_SpreadTotal))) %>% 
   select(gamedate, League, HomeTeam, AwayTeam, bet_type_full, Pick, Pick_Odds, Machine_Odds, bet_size) %>% 
   mutate(Machine_Odds =  as.integer(pmax(Machine_Odds, 100)),
          gamedate = as.character(gamedate)) %>% 
@@ -441,7 +435,13 @@ bets_table <- read.csv("Soccer Machine/upcoming_bets.csv") %>%
          `Wager Amount` = bet_size)
 
 SGPs <- types %>%
-  filter(Pick_Odds < 0 & Kelly_Criteria >= 0.15 & Kelly_Criteria < 0.4 & EV >= 2 & EV < 7 & !(League %in% c("UCL", "UEL"))) %>%
+  filter(League == 'MLS') %>% 
+  filter(Pick_Odds < 0 &
+           Kelly_Criteria >= 0.15 &
+           Kelly_Criteria < 0.4 &
+           EV >= 2 &
+           EV < 7 &
+           !(League %in% c("UCL", "UEL"))) %>%
   mutate(Pushable = case_when(Pick_WinProb + Pick_LoseProb < 0.999 ~ 'Y',
                               TRUE ~ 'N')) %>% 
   filter(Pushable == 'N') %>% 
@@ -478,6 +478,7 @@ sum(SGP_performance$Parlay_Units)
 sum(SGP_performance$Parlay_Kelly_Profit)
 
 Parlays <- types %>%
+  #filter(League == 'MLS') %>% 
   filter(Pick_Odds < 0 & Kelly_Criteria >= 0.15 & Kelly_Criteria < 0.4 & EV >= 2 & EV < 7 & !(League %in% c("UCL", "UEL"))) %>%
   mutate(Pushable = case_when(Pick_WinProb + Pick_LoseProb < 0.999 ~ 'Y',
                               TRUE ~ 'N')) %>% 
