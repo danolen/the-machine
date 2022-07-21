@@ -359,96 +359,96 @@ mls_18 <- urls[[29]] %>%
   filter(Home_Score != "") %>%
   mutate(League = "MLS", Season = "2018")
 
-UCL_21_22 <- urls[[30]] %>%
-  read_html() %>%
-  html_nodes("table") %>%
-  .[1] %>%
-  html_table(trim = TRUE) %>%
-  data.frame(stringsAsFactors = FALSE) %>%
-  filter(is.na(Wk) == FALSE) %>%
-  select(Day:Away) %>%
-  separate(Score, c("Home_Score", "Away_Score")) %>%
-  mutate(League = "UCL", Season = "2021-2022")
-
-UCL_20_21 <- urls[[31]] %>%
-  read_html() %>%
-  html_nodes("table") %>%
-  .[1] %>%
-  html_table(trim = TRUE) %>%
-  data.frame(stringsAsFactors = FALSE) %>%
-  filter(Wk != "" & Wk != "Wk") %>%
-  select(Day:Away) %>%
-  separate(Score, c("Home_Score", "Away_Score")) %>%
-  mutate(League = "UCL", Season = "2020-2021")
-
-UCL_19_20 <- urls[[32]] %>%
-  read_html() %>%
-  html_nodes("table") %>%
-  .[1] %>%
-  html_table(trim = TRUE) %>%
-  data.frame(stringsAsFactors = FALSE) %>%
-  filter(Wk != "" & Wk != "Wk") %>%
-  select(Day:Away) %>%
-  separate(Score, c("Home_Score", "Away_Score")) %>%
-  mutate(League = "UCL", Season = "2019-2020")
-
-UCL_18_19 <- urls[[33]] %>%
-  read_html() %>%
-  html_nodes("table") %>%
-  .[1] %>%
-  html_table(trim = TRUE) %>%
-  data.frame(stringsAsFactors = FALSE) %>%
-  filter(Wk != "" & Wk != "Wk") %>%
-  select(Day:Away) %>%
-  separate(Score, c("Home_Score", "Away_Score")) %>%
-  mutate(League = "UCL", Season = "2018-2019")
-
-UEL_21_22 <- urls[[34]] %>%
-  read_html() %>%
-  html_nodes("table") %>%
-  .[1] %>%
-  html_table(trim = TRUE) %>%
-  data.frame(stringsAsFactors = FALSE) %>%
-  filter(Wk != "" & Wk != "Wk") %>%
-  select(Day:Away) %>%
-  separate(Score, c("Home_Score", "Away_Score")) %>%
-  mutate(League = "UEL", Season = "2021-2022")
-
-UEL_20_21 <- urls[[35]] %>%
-  read_html() %>%
-  html_nodes("table") %>%
-  .[1] %>%
-  html_table(trim = TRUE) %>%
-  data.frame(stringsAsFactors = FALSE) %>%
-  filter(Day != "" & Day != "Day") %>%
-  select(Day:Away) %>%
-  separate(Score, c("Home_Score", "Away_Score")) %>%
-  filter(Home_Score != "") %>%
-  mutate(League = "UEL", Season = "2020-2021")
-
-UEL_19_20 <- urls[[36]] %>%
-  read_html() %>%
-  html_nodes("table") %>%
-  .[1] %>%
-  html_table(trim = TRUE) %>%
-  data.frame(stringsAsFactors = FALSE) %>%
-  filter(Day != "" & Day != "Day") %>%
-  select(Day:Away) %>%
-  separate(Score, c("Home_Score", "Away_Score")) %>%
-  filter(Home_Score != "") %>%
-  mutate(League = "UEL", Season = "2019-2020")
-
-UEL_18_19 <- urls[[37]] %>%
-  read_html() %>%
-  html_nodes("table") %>%
-  .[1] %>%
-  html_table(trim = TRUE) %>%
-  data.frame(stringsAsFactors = FALSE) %>%
-  filter(Day != "" & Day != "Day") %>%
-  select(Day:Away) %>%
-  separate(Score, c("Home_Score", "Away_Score")) %>%
-  filter(Home_Score != "") %>%
-  mutate(League = "UEL", Season = "2018-2019")
+# UCL_21_22 <- urls[[30]] %>%
+#   read_html() %>%
+#   html_nodes("table") %>%
+#   .[1] %>%
+#   html_table(trim = TRUE) %>%
+#   data.frame(stringsAsFactors = FALSE) %>%
+#   filter(is.na(Wk) == FALSE) %>%
+#   select(Day:Away) %>%
+#   separate(Score, c("Home_Score", "Away_Score")) %>%
+#   mutate(League = "UCL", Season = "2021-2022")
+# 
+# UCL_20_21 <- urls[[31]] %>%
+#   read_html() %>%
+#   html_nodes("table") %>%
+#   .[1] %>%
+#   html_table(trim = TRUE) %>%
+#   data.frame(stringsAsFactors = FALSE) %>%
+#   filter(Wk != "" & Wk != "Wk") %>%
+#   select(Day:Away) %>%
+#   separate(Score, c("Home_Score", "Away_Score")) %>%
+#   mutate(League = "UCL", Season = "2020-2021")
+# 
+# UCL_19_20 <- urls[[32]] %>%
+#   read_html() %>%
+#   html_nodes("table") %>%
+#   .[1] %>%
+#   html_table(trim = TRUE) %>%
+#   data.frame(stringsAsFactors = FALSE) %>%
+#   filter(Wk != "" & Wk != "Wk") %>%
+#   select(Day:Away) %>%
+#   separate(Score, c("Home_Score", "Away_Score")) %>%
+#   mutate(League = "UCL", Season = "2019-2020")
+# 
+# UCL_18_19 <- urls[[33]] %>%
+#   read_html() %>%
+#   html_nodes("table") %>%
+#   .[1] %>%
+#   html_table(trim = TRUE) %>%
+#   data.frame(stringsAsFactors = FALSE) %>%
+#   filter(Wk != "" & Wk != "Wk") %>%
+#   select(Day:Away) %>%
+#   separate(Score, c("Home_Score", "Away_Score")) %>%
+#   mutate(League = "UCL", Season = "2018-2019")
+# 
+# UEL_21_22 <- urls[[34]] %>%
+#   read_html() %>%
+#   html_nodes("table") %>%
+#   .[1] %>%
+#   html_table(trim = TRUE) %>%
+#   data.frame(stringsAsFactors = FALSE) %>%
+#   filter(Wk != "" & Wk != "Wk") %>%
+#   select(Day:Away) %>%
+#   separate(Score, c("Home_Score", "Away_Score")) %>%
+#   mutate(League = "UEL", Season = "2021-2022")
+# 
+# UEL_20_21 <- urls[[35]] %>%
+#   read_html() %>%
+#   html_nodes("table") %>%
+#   .[1] %>%
+#   html_table(trim = TRUE) %>%
+#   data.frame(stringsAsFactors = FALSE) %>%
+#   filter(Day != "" & Day != "Day") %>%
+#   select(Day:Away) %>%
+#   separate(Score, c("Home_Score", "Away_Score")) %>%
+#   filter(Home_Score != "") %>%
+#   mutate(League = "UEL", Season = "2020-2021")
+# 
+# UEL_19_20 <- urls[[36]] %>%
+#   read_html() %>%
+#   html_nodes("table") %>%
+#   .[1] %>%
+#   html_table(trim = TRUE) %>%
+#   data.frame(stringsAsFactors = FALSE) %>%
+#   filter(Day != "" & Day != "Day") %>%
+#   select(Day:Away) %>%
+#   separate(Score, c("Home_Score", "Away_Score")) %>%
+#   filter(Home_Score != "") %>%
+#   mutate(League = "UEL", Season = "2019-2020")
+# 
+# UEL_18_19 <- urls[[37]] %>%
+#   read_html() %>%
+#   html_nodes("table") %>%
+#   .[1] %>%
+#   html_table(trim = TRUE) %>%
+#   data.frame(stringsAsFactors = FALSE) %>%
+#   filter(Day != "" & Day != "Day") %>%
+#   select(Day:Away) %>%
+#   separate(Score, c("Home_Score", "Away_Score")) %>%
+#   filter(Home_Score != "") %>%
+#   mutate(League = "UEL", Season = "2018-2019")
 
 mls_22 <- urls[[38]] %>%
   read_html() %>%
@@ -469,9 +469,10 @@ fixtures <- rbind(epl_21_22, epl_20_21, epl_19_20, epl_18_19, epl_17_18,
                   bundes_21_22, bundes_20_21, bundes_19_20, bundes_18_19, bundes_17_18,
                   seriea_21_22, seriea_20_21, seriea_19_20, seriea_18_19, seriea_17_18,
                   ligue1_21_22, ligue1_20_21, ligue1_19_20, ligue1_18_19, ligue1_17_18,
-                  mls_22, mls_21, mls_20, mls_19, mls_18,
-                  UCL_21_22, UCL_20_21, UCL_19_20, UCL_18_19,
-                  UEL_21_22, UEL_20_21, UEL_19_20, UEL_18_19)
+                  mls_22, mls_21, mls_20, mls_19, mls_18#,
+                  # UCL_21_22, UCL_20_21, UCL_19_20, UCL_18_19,
+                  # UEL_21_22, UEL_20_21, UEL_19_20, UEL_18_19
+                  )
 fixtures$Date <- as.Date(fixtures$Date)
 today <- Sys.Date()
 
