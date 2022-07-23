@@ -16,6 +16,7 @@ library("data.table")
 library("lubridate")
 library("esquisse")
 library("blastula")
+library(worldfootballR)
 library("tidyverse")
 
 setwd("C:/Users/danie/Desktop/SportsStuff/TheMachine/the-machine")
@@ -410,16 +411,21 @@ urls <- c("https://fbref.com/en/comps/22/schedule/Major-League-Soccer-Scores-and
           "https://fbref.com/en/comps/8/schedule/Champions-League-Scores-and-Fixtures",
           "https://fbref.com/en/comps/19/schedule/Europa-League-Scores-and-Fixtures")
 
-mls_22 <- urls[[1]] %>%
-  read_html() %>%
-  html_nodes("table") %>%
-  .[1] %>%
-  html_table(trim = TRUE) %>%
-  data.frame(stringsAsFactors = FALSE) %>%
-  filter(Day != "Day") %>%
-  select(Day:Away) %>%
-  separate(Score, c("Home_Score", "Away_Score")) %>%
-  mutate(League = "MLS", Season = "2022")
+mls_22 <- load_match_results(country = "USA", gender = "M", season_end_year = 2022, tier = "1st") %>% 
+  select(Day, Date, Time, Home, Home_xG, HomeGoals, AwayGoals, Away_xG, Away, Competition_Name, Season_End_Year) %>% 
+  rename(xG = Home_xG,
+         Home_Score = HomeGoals,
+         Away_Score = AwayGoals,
+         xG.1 = Away_xG,
+         League = Competition_Name,
+         Season = Season_End_Year) %>% 
+  filter(Day != "") %>% 
+  mutate(xG = as.numeric(xG),
+         Home_Score = as.numeric(Home_Score),
+         Away_Score = as.numeric(Away_Score),
+         xG.1 = as.numeric(xG.1),
+         League = "MLS",
+         Season = as.character(Season))
 
 # epl_21_22 <- urls[[2]] %>%
 #  read_html() %>%
@@ -508,13 +514,13 @@ fixtures <- rbind(#epl_21_22, laliga_21_22, bundes_21_22, seriea_21_22,
                   # , ucl_21_22, uel_21_22
                   ) 
   
-fixtures$Date <- as.Date(fixtures$Date)
+# fixtures$Date <- as.Date(fixtures$Date)
 today <- Sys.Date()
 
-fixtures$xG <- as.numeric(fixtures$xG)
-fixtures$Home_Score <- as.numeric(fixtures$Home_Score) 
-fixtures$Away_Score <- as.numeric(fixtures$Away_Score)
-fixtures$xG.1 <- as.numeric(fixtures$xG.1)
+# fixtures$xG <- as.numeric(fixtures$xG)
+# fixtures$Home_Score <- as.numeric(fixtures$Home_Score) 
+# fixtures$Away_Score <- as.numeric(fixtures$Away_Score)
+# fixtures$xG.1 <- as.numeric(fixtures$xG.1)
 
 fixtures <- FindReplace(fixtures, Var = "Home", replaceData = club_names,
                         from = "FBRef", to = "Name")
@@ -1541,7 +1547,7 @@ Outlook <- COMCreate("Outlook.Application")
 
 Email = Outlook$CreateItem(0)
 Email[["to"]] = paste("dnolen@smu.edu", "jorler@smu.edu", "asnolen@crimson.ua.edu", "jamestodd425@gmail.com", sep = ";", collapse = NULL)
-#Email[["to"]] = "dnolen@smu.edu"
+# Email[["to"]] = "dnolen@smu.edu"
 Email[["subject"]] = paste0("Soccer Machine Picks: ", Sys.Date())
 Email[["HTMLbody"]] = sprintf("
 The Machine's picks for upcoming soccer matches are in! The Machine currently offers picks for the Big 5 European Leagues plus MLS. The MLS is the only league that is in season currently, so all of the historical Machine results below are filtered to only include MLS games. The attached document contains all of the pertinent betting information for the upcoming matches. Good luck!
