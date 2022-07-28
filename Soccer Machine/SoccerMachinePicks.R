@@ -402,16 +402,16 @@ bovada_odds <- FindReplace(bovada_odds, Var = "HomeTeam", replaceData = club_nam
 bovada_odds <- FindReplace(bovada_odds, Var = "AwayTeam", replaceData = club_names,
                            from = "Bovada", to = "Name")
 
-urls <- c("https://fbref.com/en/comps/22/schedule/Major-League-Soccer-Scores-and-Fixtures",
-          "https://fbref.com/en/comps/9/schedule/Premier-League-Scores-and-Fixtures",
-          "https://fbref.com/en/comps/13/schedule/Ligue-1-Scores-and-Fixtures",
-          "https://fbref.com/en/comps/20/schedule/Bundesliga-Scores-and-Fixtures",
-          "https://fbref.com/en/comps/11/schedule/Serie-A-Scores-and-Fixtures",
-          "https://fbref.com/en/comps/12/schedule/La-Liga-Scores-and-Fixtures",
-          "https://fbref.com/en/comps/8/schedule/Champions-League-Scores-and-Fixtures",
-          "https://fbref.com/en/comps/19/schedule/Europa-League-Scores-and-Fixtures")
+# urls <- c("https://fbref.com/en/comps/22/schedule/Major-League-Soccer-Scores-and-Fixtures",
+#           "https://fbref.com/en/comps/9/schedule/Premier-League-Scores-and-Fixtures",
+#           "https://fbref.com/en/comps/13/schedule/Ligue-1-Scores-and-Fixtures",
+#           "https://fbref.com/en/comps/20/schedule/Bundesliga-Scores-and-Fixtures",
+#           "https://fbref.com/en/comps/11/schedule/Serie-A-Scores-and-Fixtures",
+#           "https://fbref.com/en/comps/12/schedule/La-Liga-Scores-and-Fixtures",
+#           "https://fbref.com/en/comps/8/schedule/Champions-League-Scores-and-Fixtures",
+#           "https://fbref.com/en/comps/19/schedule/Europa-League-Scores-and-Fixtures")
 
-mls_22 <- load_match_results(country = "USA", gender = "M", season_end_year = 2022, tier = "1st") %>% 
+mls_22 <- get_match_results(country = "USA", gender = "M", season_end_year = 2022, tier = "1st") %>% 
   select(Day, Date, Time, Home, Home_xG, HomeGoals, AwayGoals, Away_xG, Away, Competition_Name, Season_End_Year) %>% 
   rename(xG = Home_xG,
          Home_Score = HomeGoals,
@@ -508,11 +508,24 @@ mls_22 <- load_match_results(country = "USA", gender = "M", season_end_year = 20
 #  separate(Score, c("Home_Score", "Away_Score")) %>%
 #  mutate(League = "UEL", Season = "2021-2022")
 
-fixtures <- rbind(#epl_21_22, laliga_21_22, bundes_21_22, seriea_21_22, 
-                  #ligue1_21_22, 
-                  mls_22
-                  # , ucl_21_22, uel_21_22
-                  ) 
+Big5 <- load_match_results(country = c("ENG", "ESP", "ITA", "GER", "FRA"), gender = "M", season_end_year = 2022, tier = "1st") %>% 
+  select(Day, Date, Time, Home, Home_xG, HomeGoals, AwayGoals, Away_xG, Away, Competition_Name, Season_End_Year) %>% 
+  rename(xG = Home_xG,
+         Home_Score = HomeGoals,
+         Away_Score = AwayGoals,
+         xG.1 = Away_xG,
+         League = Competition_Name,
+         Season = Season_End_Year) %>%
+  mutate(xG = as.numeric(xG),
+         Home_Score = as.numeric(Home_Score),
+         Away_Score = as.numeric(Away_Score),
+         xG.1 = as.numeric(xG.1),
+         League = case_when(League == "Premier League" ~ "EPL",
+                            League == "Fußball-Bundesliga" ~ "Bundesliga",
+                            TRUE ~ League),
+         Season = paste0(Season-1,"-",Season))
+
+fixtures <- rbind(Big5, mls_22) 
   
 # fixtures$Date <- as.Date(fixtures$Date)
 today <- Sys.Date()
@@ -1550,7 +1563,7 @@ Email[["to"]] = paste("dnolen@smu.edu", "jorler@smu.edu", "asnolen@crimson.ua.ed
 # Email[["to"]] = "dnolen@smu.edu"
 Email[["subject"]] = paste0("Soccer Machine Picks: ", Sys.Date())
 Email[["HTMLbody"]] = sprintf("
-The Machine's picks for upcoming soccer matches are in! The Machine currently offers picks for the Big 5 European Leagues plus MLS. The MLS is the only league that is in season currently, so all of the historical Machine results below are filtered to only include MLS games. The attached document contains all of the pertinent betting information for the upcoming matches. Good luck!
+The Machine's picks for upcoming soccer matches are in! The Machine currently offers picks for the Big 5 European Leagues plus MLS. The attached document contains all of the pertinent betting information for the upcoming matches. Good luck!
 </p><br></p>
 TL;DR: These are the bets that The Machine recommends that you should make for the next week. The bet sizes are based on a unit size of $10. If your regular bet is something other than $10, adjust accordingly.
 </p><br></p>
