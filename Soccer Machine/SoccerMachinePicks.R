@@ -1559,11 +1559,14 @@ df_html_bets <- print(xtable(bets_table), type = "html", print.results = FALSE)
 Outlook <- COMCreate("Outlook.Application")
 
 Email = Outlook$CreateItem(0)
-Email[["to"]] = paste("dnolen@smu.edu", "jorler@smu.edu", "asnolen@crimson.ua.edu", "jamestodd425@gmail.com", sep = ";", collapse = NULL)
+Email[["to"]] = paste("dnolen@smu.edu", "jorler@smu.edu", "asnolen@crimson.ua.edu", "jamestodd425@gmail.com",
+                      "jordanreticker@gmail.com", sep = ";", collapse = NULL)
 # Email[["to"]] = "dnolen@smu.edu"
 Email[["subject"]] = paste0("Soccer Machine Picks: ", Sys.Date())
 Email[["HTMLbody"]] = sprintf("
 The Machine's picks for upcoming soccer matches are in! The Machine currently offers picks for the Big 5 European Leagues plus MLS. The attached document contains all of the pertinent betting information for the upcoming matches. Good luck!
+</p><br></p>
+The European Soccer season starts on August 5th. The Machine needs teams to have played at least 4 games before it can start making predictions. So look for European picks around the end of August. Once the Machine reincorporates the European leagues, I will be able to send this on a more regular basis.
 </p><br></p>
 TL;DR: These are the bets that The Machine recommends that you should make for the next week. The bet sizes are based on a unit size of $10. If your regular bet is something other than $10, adjust accordingly.
 </p><br></p>
