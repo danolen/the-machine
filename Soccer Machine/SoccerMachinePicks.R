@@ -1378,6 +1378,60 @@ email_table_3c <- types %>%
   mutate(Units_per_bet = Flat_Profit / bets) %>%
   print(n=40)
 
+SGPs <- types %>%
+  # filter(League == 'MLS') %>% 
+  filter(Pick_Odds < 0 &
+           Kelly_Criteria >= 0.15 &
+           Kelly_Criteria < 0.4 &
+           EV >= 2 &
+           EV < 7 &
+           !(League %in% c("UCL", "UEL"))) %>%
+  mutate(Pushable = case_when(Pick_WinProb + Pick_LoseProb < 0.999 ~ 'Y',
+                              TRUE ~ 'N')) %>% 
+  filter(Pushable == 'N') %>% 
+  arrange(gamedate, ID, desc(Kelly_Criteria)) %>% 
+  group_by(ID, Side_or_Total) %>% 
+  mutate(KC_Rank = row_number()) %>% 
+  arrange(gamedate, ID, desc(EV)) %>% 
+  group_by(ID, Side_or_Total) %>% 
+  mutate(EV_Rank = row_number()) %>%
+  arrange(gamedate, ID, desc(Pick_WinProb)) %>% 
+  group_by(ID, Side_or_Total) %>% 
+  mutate(WinProb_Rank = row_number(),
+         Rank = (KC_Rank + EV_Rank) / 2) %>%
+  arrange(gamedate, ID, Side_or_Total, Rank) %>% 
+  mutate(Final_Rank = row_number()) %>%  
+  filter(Final_Rank == 1) %>% 
+  group_by(ID) %>% 
+  mutate(legs = sum(bets),
+         hits = sum(Pick_Correct)) %>% 
+  filter(legs > 1) %>%
+  mutate(Parlay_Odds = floor((prod(Fract_Odds+1)-1)*100),
+         winner = if_else(legs==hits,1,0),
+         Parlay_Units = if_else(winner==1,Parlay_Odds/100,-1),
+         Parlay_WinProb = prod(Pick_WinProb),
+         Parlay_Fract_Odds = (100 / abs(Parlay_Odds))^if_else(Parlay_Odds < 0, 1, -1),
+         Parlay_KC = (Parlay_WinProb * (Parlay_Fract_Odds + 1) - 1) / Parlay_Fract_Odds,
+         Parlay_Kelly_Profit = (Parlay_KC*100*Parlay_Units)/2) %>% 
+  filter(Parlay_Odds >= 100)
+
+SGP_performance <- SGPs %>% 
+  distinct(ID, Parlay_Odds, winner, Parlay_Units, Parlay_Kelly_Profit) %>% 
+  mutate(bets = 1)
+
+email_SGP_table <- SGP_performance %>%
+  #group_by(Total) %>%
+  group_by(Strategy = 'Same-Game Parlays') %>% 
+  #group_by(bet_type) %>%
+  #group_by(KC_tier) %>%
+  #group_by(Odds_tier) %>%
+  dplyr::summarise(HitRate = mean(winner),
+                   bets = sum(bets),
+                   Flat_Profit = sum(Parlay_Units),
+                   Kelly_Profit = sum(Parlay_Kelly_Profit)) %>%
+  mutate(Units_per_bet = Flat_Profit / bets) %>%
+  print(n=40)
+
 email_table_3d <- types %>%
   filter(Kelly_Criteria >= 0.15 & Kelly_Criteria < 0.4 & EV >= 3 & EV < 7 & !(League %in% c("UCL", "UEL")) & Pick_Odds > 0) %>%
   #group_by(Total) %>%
@@ -1392,7 +1446,9 @@ email_table_3d <- types %>%
   mutate(Units_per_bet = Flat_Profit / bets) %>%
   print(n=40)
 
-email_table_3 <- bind_rows(email_table_3a, email_table_3d, email_table_3b, email_table_3c)
+email_table_3 <- bind_rows(email_table_3a, email_table_3d, email_table_3b, email_table_3c
+                           # , email_SGP_table
+                           )
 
 df_html_3 <- print(xtable(email_table_3), type = "html", print.results = FALSE)
 
@@ -1566,7 +1622,7 @@ Email[["subject"]] = paste0("Soccer Machine Picks: ", Sys.Date())
 Email[["HTMLbody"]] = sprintf("
 The Machine's picks for upcoming soccer matches are in! The Machine currently offers picks for the Big 5 European Leagues plus MLS. The attached document contains all of the pertinent betting information for the upcoming matches. Good luck!
 </p><br></p>
-The European Soccer season starts on August 5th. The Machine needs teams to have played at least 4 games before it can start making predictions. So look for European picks around the end of August. Once the Machine reincorporates the European leagues, I will be able to send this on a more regular basis.
+The European Soccer season starts on August 5th. The Machine needs teams to have played at least 4 games before it can start making predictions. So look for European picks around the end of August. Once the Machine reincorporates the European leagues, I should be able to send this on a more regular basis.
 </p><br></p>
 TL;DR: These are the bets that The Machine recommends that you should make for the next week. The bet sizes are based on a unit size of $10. If your regular bet is something other than $10, adjust accordingly.
 </p><br></p>

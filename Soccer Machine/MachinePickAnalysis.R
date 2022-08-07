@@ -15,6 +15,7 @@ library("data.table")
 library("lubridate")
 library("esquisse")
 library("blastula")
+library(worldfootballR)
 library("tidyverse")
 
 setwd("C:/Users/danie/Desktop/SportsStuff/TheMachine/the-machine")
@@ -30,111 +31,48 @@ urls <- c("https://fbref.com/en/comps/22/schedule/Major-League-Soccer-Scores-and
           "https://fbref.com/en/comps/8/schedule/Champions-League-Scores-and-Fixtures",
           "https://fbref.com/en/comps/19/schedule/Europa-League-Scores-and-Fixtures")
 
-mls_22 <- urls[[1]] %>%
-  read_html() %>%
-  html_nodes("table") %>%
-  .[1] %>%
-  html_table(trim = TRUE) %>%
-  data.frame(stringsAsFactors = FALSE) %>%
-  filter(Day != "Day") %>%
-  select(Day:Away) %>%
-  separate(Score, c("Home_Score", "Away_Score")) %>%
-  mutate(League = "MLS", Season = "2022")
+mls_22 <- get_match_results(country = "USA", gender = "M", season_end_year = 2022, tier = "1st") %>% 
+  select(Day, Date, Time, Home, Home_xG, HomeGoals, AwayGoals, Away_xG, Away, Competition_Name, Season_End_Year) %>% 
+  rename(xG = Home_xG,
+         Home_Score = HomeGoals,
+         Away_Score = AwayGoals,
+         xG.1 = Away_xG,
+         League = Competition_Name,
+         Season = Season_End_Year) %>% 
+  filter(Day != "") %>% 
+  mutate(xG = as.numeric(xG),
+         Home_Score = as.numeric(Home_Score),
+         Away_Score = as.numeric(Away_Score),
+         xG.1 = as.numeric(xG.1),
+         League = "MLS",
+         Season = as.character(Season))
 
-epl_21_22 <- urls[[2]] %>%
-  read_html() %>%
-  html_nodes("table") %>%
-  .[1] %>%
-  html_table(trim = TRUE) %>%
-  data.frame(stringsAsFactors = FALSE) %>%
-  filter(is.na(Wk) == FALSE) %>%
-  select(Day:Away) %>%
-  separate(Score, c("Home_Score", "Away_Score")) %>%
-  mutate(League = "EPL", Season = "2021-2022")
+Big5 <- load_match_results(country = c("ENG", "ESP", "ITA", "GER", "FRA"), gender = "M", season_end_year = 2022, tier = "1st") %>% 
+  select(Day, Date, Time, Home, Home_xG, HomeGoals, AwayGoals, Away_xG, Away, Competition_Name, Season_End_Year) %>% 
+  rename(xG = Home_xG,
+         Home_Score = HomeGoals,
+         Away_Score = AwayGoals,
+         xG.1 = Away_xG,
+         League = Competition_Name,
+         Season = Season_End_Year) %>%
+  mutate(xG = as.numeric(xG),
+         Home_Score = as.numeric(Home_Score),
+         Away_Score = as.numeric(Away_Score),
+         xG.1 = as.numeric(xG.1),
+         League = case_when(League == "Premier League" ~ "EPL",
+                            League == "Fußball-Bundesliga" ~ "Bundesliga",
+                            TRUE ~ League),
+         Season = paste0(Season-1,"-",Season))
 
-ligue1_21_22 <- urls[[3]] %>%
-  read_html() %>%
-  html_nodes("table") %>%
-  .[1] %>%
-  html_table(trim = TRUE) %>%
-  data.frame(stringsAsFactors = FALSE) %>%
-  filter(is.na(Wk) == FALSE) %>%
-  select(Day:Away) %>%
-  separate(Score, c("Home_Score", "Away_Score")) %>%
-  mutate(League = "Ligue 1", Season = "2021-2022")
+fixtures <- rbind(Big5, mls_22)
 
-bundes_21_22 <- urls[[4]] %>%
-  read_html() %>%
-  html_nodes("table") %>%
-  .[1] %>%
-  html_table(trim = TRUE) %>%
-  data.frame(stringsAsFactors = FALSE) %>%
-  filter(is.na(Wk) == FALSE) %>%
-  select(Day:Away) %>%
-  separate(Score, c("Home_Score", "Away_Score")) %>%
-  mutate(League = "Bundesliga", Season = "2021-2022")
-
-seriea_21_22 <- urls[[5]] %>%
-  read_html() %>%
-  html_nodes("table") %>%
-  .[1] %>%
-  html_table(trim = TRUE) %>%
-  data.frame(stringsAsFactors = FALSE) %>%
-  filter(is.na(Wk) == FALSE) %>%
-  select(Day:Away) %>%
-  separate(Score, c("Home_Score", "Away_Score")) %>%
-  mutate(League = "Serie A", Season = "2021-2022")
-
-laliga_21_22 <- urls[[6]] %>%
-  read_html() %>%
-  html_nodes("table") %>%
-  .[1] %>%
-  html_table(trim = TRUE) %>%
-  data.frame(stringsAsFactors = FALSE) %>%
-  filter(is.na(Wk) == FALSE) %>%
-  select(Day:Away) %>%
-  separate(Score, c("Home_Score", "Away_Score")) %>%
-  mutate(League = "La Liga", Season = "2021-2022")
-
-ucl_21_22 <- urls[[7]] %>%
-  read_html() %>%
-  html_nodes("table") %>%
-  .[1] %>%
-  html_table(trim = TRUE) %>%
-  data.frame(stringsAsFactors = FALSE) %>%
-  filter(Day != "") %>%
-  select(Day:Away) %>%
-  separate(Score, c("Home_Score", "Away_Score")) %>%
-  mutate(League = "UCL", Season = "2021-2022")
-
-ucl_21_22 <- mutate(ucl_21_22,
-                    Home = if_else(endsWith(Home, "tr"), "Besiktas tr", Home),
-                    Away = if_else(startsWith(Away, "tr"), "tr Besiktas", Away))
-
-uel_21_22 <- urls[[8]] %>%
-  read_html() %>%
-  html_nodes("table") %>%
-  .[1] %>%
-  html_table(trim = TRUE) %>%
-  data.frame(stringsAsFactors = FALSE) %>%
-  filter(Day != "" & Day != "Day") %>%
-  select(Day:Away) %>%
-  separate(Score, c("Home_Score", "Away_Score")) %>%
-  mutate(League = "UEL", Season = "2021-2022")
-
-fixtures <- rbind(epl_21_22, laliga_21_22, bundes_21_22, seriea_21_22, 
-                  ligue1_21_22, 
-                  mls_22
-                  #, ucl_21_22, uel_21_22
-                  ) 
-
-fixtures$Date <- as.Date(fixtures$Date)
+# fixtures$Date <- as.Date(fixtures$Date)
 today <- Sys.Date()
 
-fixtures$xG <- as.numeric(fixtures$xG)
-fixtures$Home_Score <- as.numeric(fixtures$Home_Score) 
-fixtures$Away_Score <- as.numeric(fixtures$Away_Score)
-fixtures$xG.1 <- as.numeric(fixtures$xG.1)
+# fixtures$xG <- as.numeric(fixtures$xG)
+# fixtures$Home_Score <- as.numeric(fixtures$Home_Score) 
+# fixtures$Away_Score <- as.numeric(fixtures$Away_Score)
+# fixtures$xG.1 <- as.numeric(fixtures$xG.1)
 
 fixtures <- FindReplace(fixtures, Var = "Home", replaceData = club_names,
                         from = "FBRef", to = "Name")
@@ -224,7 +162,7 @@ types <- filter(history2,
          bets = as.integer(1),
          Total = "Total",
          Side_or_Total = case_when(bet_type %in% c('Alt Spread', 'Draw No Bet', 'ML', 'Spread') ~ "Side",
-                                   TRUE ~ Total))
+                                   TRUE ~ "Total"))
 
 types %>%
   filter(#Kelly_Criteria >= 0 &
@@ -285,7 +223,7 @@ types %>%
 
 types %>%
   filter(!(League %in% c("UCL", "UEL"))) %>%
-  filter(League == 'MLS' &) %>% 
+  #filter(League == 'MLS' &) %>% 
   #group_by(bet_type) %>%
   group_by(KC_tier = as.numeric(as.character(KC_tier))) %>%
   #group_by(WinProb_tier) %>%
@@ -435,13 +373,14 @@ bets_table <- read.csv("Soccer Machine/upcoming_bets.csv") %>%
          `Wager Amount` = bet_size)
 
 SGPs <- types %>%
-  filter(League == 'MLS') %>% 
+  # filter(League == 'MLS') %>% 
   filter(Pick_Odds < 0 &
            Kelly_Criteria >= 0.15 &
            Kelly_Criteria < 0.4 &
            EV >= 2 &
            EV < 7 &
-           !(League %in% c("UCL", "UEL"))) %>%
+           !(League %in% c("UCL", "UEL")) &
+           bet_type_full != 'Alternate Total - 1.5') %>%
   mutate(Pushable = case_when(Pick_WinProb + Pick_LoseProb < 0.999 ~ 'Y',
                               TRUE ~ 'N')) %>% 
   filter(Pushable == 'N') %>% 
@@ -472,10 +411,54 @@ SGPs <- types %>%
   filter(Parlay_Odds >= 100)
 
 SGP_performance <- SGPs %>% 
-  distinct(ID, Parlay_Odds, winner, Parlay_Units, Parlay_Kelly_Profit)
+  distinct(ID, Parlay_Odds, winner, Parlay_Units, Parlay_Kelly_Profit) %>% 
+  mutate(bets = 1)
 
-sum(SGP_performance$Parlay_Units)
-sum(SGP_performance$Parlay_Kelly_Profit)
+SGP_table <- SGP_performance %>%
+  #group_by(Total) %>%
+  group_by(Strategy = 'Same-Game Parlays') %>% 
+  #group_by(bet_type) %>%
+  #group_by(KC_tier) %>%
+  #group_by(Odds_tier) %>%
+  dplyr::summarise(HitRate = mean(winner),
+                   bets = sum(bets),
+                   Flat_Profit = sum(Parlay_Units),
+                   Kelly_Profit = sum(Parlay_Kelly_Profit)) %>%
+  mutate(Units_per_bet = Flat_Profit / bets) %>%
+  print(n=40)
+
+bets_SGP <- read.csv("Soccer Machine/upcoming_bets.csv") %>%
+  mutate(Side_or_Total = case_when(bet_type %in% c('Alt Spread', 'Draw No Bet', 'ML', 'Spread') ~ "Side",
+                                   TRUE ~ "Total")) %>% 
+  mutate(gamedate = as.Date(gamedate)) %>%
+  filter(Pick_Odds < 0 &
+           Kelly_Criteria >= 0.15 &
+           Kelly_Criteria < 0.4 &
+           EV >= 2 &
+           EV < 7 &
+           !(League %in% c("UCL", "UEL")) &
+           bet_type_full != 'Alternate Total - 1.5') %>% 
+  mutate(Pushable = case_when(Pick_WinProb + Pick_LoseProb < 0.999 ~ 'Y',
+                              TRUE ~ 'N')) %>% 
+  filter(Pushable == 'N') %>% 
+  arrange(gamedate, ID, desc(Kelly_Criteria)) %>% 
+  group_by(ID, Side_or_Total) %>% 
+  mutate(KC_Rank = row_number()) %>% 
+  arrange(gamedate, ID, desc(EV)) %>% 
+  group_by(ID, Side_or_Total) %>% 
+  mutate(EV_Rank = row_number()) %>%
+  arrange(gamedate, ID, desc(Pick_WinProb)) %>% 
+  group_by(ID, Side_or_Total) %>% 
+  mutate(WinProb_Rank = row_number(),
+         Rank = (KC_Rank + EV_Rank) / 2) %>%
+  arrange(gamedate, ID, Side_or_Total, Rank) %>% 
+  mutate(Final_Rank = row_number()) %>%  
+  filter(Final_Rank == 1) %>% 
+  group_by(ID) %>% 
+  mutate(bets = 1,
+         legs = sum(bets)) %>% 
+  filter(legs > 1) %>%
+  filter(Parlay_Odds >= 100)
 
 Parlays <- types %>%
   #filter(League == 'MLS') %>% 
