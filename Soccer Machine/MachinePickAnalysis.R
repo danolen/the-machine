@@ -428,6 +428,12 @@ SGP_table <- SGP_performance %>%
   print(n=40)
 
 bets_SGP <- read.csv("Soccer Machine/upcoming_bets.csv") %>%
+  # history %>% 
+  # filter(gamedate > as.Date("2022-06-17")) %>%
+  # arrange(desc(run_timestamp)) %>%
+  # group_by(ID, bet_type_full) %>%
+  # mutate(partition = row_number()) %>% 
+  # filter(partition == 2) %>% 
   mutate(Side_or_Total = case_when(bet_type %in% c('Alt Spread', 'Draw No Bet', 'ML', 'Spread') ~ "Side",
                                    TRUE ~ "Total")) %>% 
   mutate(gamedate = as.Date(gamedate)) %>%
@@ -457,8 +463,41 @@ bets_SGP <- read.csv("Soccer Machine/upcoming_bets.csv") %>%
   group_by(ID) %>% 
   mutate(bets = 1,
          legs = sum(bets)) %>% 
-  filter(legs > 1) %>%
-  filter(Parlay_Odds >= 100)
+  filter(legs > 1)
+
+bets_SGP2 <- bets_SGP %>%
+  mutate(Pick = case_when(is.na(Pick_SpreadTotal) | Pick_SpreadTotal == 0 ~ paste0(Pick),
+                          str_detect(bet_type_full, "Spread") & Pick_SpreadTotal > 0 ~ paste0(Pick, " +", Pick_SpreadTotal),
+                          TRUE ~ paste0(Pick, " ", Pick_SpreadTotal))) %>% 
+  select(ID, gamedate, League, HomeTeam, AwayTeam, bet_type_full, Pick, Pick_Odds, Machine_Odds, Fract_Odds, Pick_WinProb) %>% 
+  group_by(ID) %>% 
+  mutate(Parlay_Odds = floor((prod(Fract_Odds+1)-1)*100),
+         Parlay_WinProb = prod(Pick_WinProb),
+         Parlay_Fract_Odds = (100 / abs(Parlay_Odds))^if_else(Parlay_Odds < 0, 1, -1),
+         Parlay_KC = (Parlay_WinProb * (Parlay_Fract_Odds + 1) - 1) / Parlay_Fract_Odds,
+         Bet = paste0(unique(bet_type_full), collapse = " & "),
+         Pick = paste0(unique(Pick), collapse = " & "),
+         Parlay_Machine_Odds = as.integer(pmax(if_else(Parlay_WinProb < 0.5,
+                                                       (100 / Parlay_WinProb) - 100,
+                                                       -1 * (100 * Parlay_WinProb) / (1 - Parlay_WinProb)),
+                                               100)),
+         Parlay_KC_tier = as.factor(round_any(Parlay_KC, 0.05, floor)),
+         bet_size = case_when(Parlay_KC_tier %in% c(0.1, 0.15) ~ '$5',
+                              Parlay_KC_tier %in% c(0.2, 0.25) ~ '$10',
+                              Parlay_KC_tier %in% c(0.3, 0.35) ~ '$15',
+                              TRUE ~ 'No bet - something went wrong')) %>% 
+  filter(Parlay_Odds >= 100) %>% 
+  ungroup() %>% 
+  select(gamedate, League, HomeTeam, AwayTeam, Bet, Pick, Parlay_Odds, Parlay_Machine_Odds, bet_size) %>% 
+  distinct() %>% 
+  rename(`Game Date` = gamedate,
+         `Home Team` = HomeTeam,
+         `Away Team` = AwayTeam,
+         `Current Pick Odds` = Parlay_Odds,
+         `Don't Bet if Odds Worse Than` = Parlay_Machine_Odds,
+         `Wager Amount` = bet_size)
+
+bets_table2 <- bind_rows(bets_table %>% mutate(`Game Date` = as.Date(`Game Date`)), bets_SGP2)
 
 Parlays <- types %>%
   #filter(League == 'MLS') %>% 
