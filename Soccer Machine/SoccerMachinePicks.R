@@ -1319,7 +1319,7 @@ email_table_2 <- types %>%
 df_html_2 <- print(xtable(email_table_2), type = "html", print.results = FALSE)
 
 email_table_3a <- types %>%
-  filter(Kelly_Criteria >= 0.15 & Kelly_Criteria < 0.4 & EV >= 3 & EV < 7 & !(League %in% c("UCL", "UEL"))) %>%
+  filter(Kelly_Criteria >= 0.15 & Kelly_Criteria < 0.4 & EV >= 2 & EV < 7 & !(League %in% c("UCL", "UEL"))) %>%
   #group_by(Total) %>%
   group_by(Strategy = 'Bet Everything') %>% 
   #group_by(bet_type) %>%
@@ -1333,7 +1333,7 @@ email_table_3a <- types %>%
   print(n=40)
 
 email_table_3b <- types %>% 
-  filter(Kelly_Criteria >= 0.15 & Kelly_Criteria < 0.4 & EV >= 3 & EV < 7 & !(League %in% c("UCL", "UEL"))) %>%
+  filter(Kelly_Criteria >= 0.15 & Kelly_Criteria < 0.4 & EV >= 2 & EV < 7 & !(League %in% c("UCL", "UEL"))) %>%
   arrange(gamedate, ID, desc(Kelly_Criteria)) %>% 
   group_by(ID) %>% 
   mutate(KC_Rank = row_number()) %>% 
@@ -1357,7 +1357,7 @@ email_table_3b <- types %>%
   print(n=40)
 
 email_table_3c <- types %>% 
-  filter(Kelly_Criteria >= 0.15 & Kelly_Criteria < 0.4 & EV >= 3 & EV < 7 & !(League %in% c("UCL", "UEL")) & Pick_Odds > 0) %>%
+  filter(Kelly_Criteria >= 0.15 & Kelly_Criteria < 0.4 & EV >= 2 & EV < 7 & !(League %in% c("UCL", "UEL")) & Pick_Odds > 0) %>%
   arrange(gamedate, ID, desc(Kelly_Criteria)) %>% 
   group_by(ID) %>% 
   mutate(KC_Rank = row_number()) %>% 
@@ -1381,7 +1381,7 @@ email_table_3c <- types %>%
   print(n=40)
 
 email_table_3d <- types %>%
-  filter(Kelly_Criteria >= 0.15 & Kelly_Criteria < 0.4 & EV >= 3 & EV < 7 & !(League %in% c("UCL", "UEL")) & Pick_Odds > 0) %>%
+  filter(Kelly_Criteria >= 0.15 & Kelly_Criteria < 0.4 & EV >= 2 & EV < 7 & !(League %in% c("UCL", "UEL")) & Pick_Odds > 0) %>%
   #group_by(Total) %>%
   group_by(Strategy = 'Bet Everything at Even Odds or Better') %>% 
   #group_by(bet_type) %>%
@@ -1581,7 +1581,7 @@ bets_table <- read.csv("Soccer Machine/upcoming_bets.csv") %>%
   mutate(gamedate = as.Date(gamedate)) %>%
   filter(Kelly_Criteria >= 0.15 & 
            Kelly_Criteria < 0.4 & 
-           EV >= 3 & 
+           EV >= 2 & 
            EV < 7 & 
            !(League %in% c("UCL", "UEL")) &
            Pick_Odds > 0 &
@@ -1720,7 +1720,7 @@ Below are the results for each league:
 </p><br></p>
 %s
 </p><br></p>
-Bets with a KC of at least 0.15 and less than 0.4 and EV of at least 3 and less than 7 have had the best performance so far. This is expected. If there is not a big difference between the Machine projection and the odds then there is not much of an edge. On the other end, if the Machine projections are way off from the odds, then it's more likely that the oddsmakers know something that the Machine doesn't, rather than the other way around. Here are the results for those bets using four different strategies:
+Bets with a KC of at least 0.15 and less than 0.4 and EV of at least 2 and less than 7 have had the best performance so far. This is expected. If there is not a big difference between the Machine projection and the odds then there is not much of an edge. On the other end, if the Machine projections are way off from the odds, then it's more likely that the oddsmakers know something that the Machine doesn't, rather than the other way around. Here are the results for those bets using four different strategies:
 </p><br></p>
 %s
 </p><br></p>
