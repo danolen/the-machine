@@ -452,7 +452,7 @@ Big5_23 <- load_match_results(country = c("ENG", "ESP", "ITA", "GER", "FRA"), ge
                             TRUE ~ League),
          Season = paste0(Season-1,"-",Season))
 
-fixtures <- rbind(Big5_22#, Big5_23
+fixtures <- rbind(Big5_22, Big5_23
                   , mls_22) 
   
 # fixtures$Date <- as.Date(fixtures$Date)
@@ -565,14 +565,14 @@ metrics_df <- metrics %>%
   left_join(metrics, by = c("ID" = "ID", "Date" = "Date", "Day" = "Day", "Time" = "Time",
                             "League" = "League", "Season" = "Season", "Opponent" = "Team"),
             suffix = c("", "_Opp")) %>% 
-  filter(Home_or_Away == "Home" & Date >= today & SplitGP > 1 & SplitGP_Opp > 1) %>%
+  filter(Home_or_Away == "Home" & Date >= today & SplitGP > 0 & SplitGP_Opp > 0, Season != '2022-2023') %>%
   select(-(Home_or_Away:GoalsAllowed), -(Opponent_Opp:GoalsAllowed_Opp))
 
 metrics_tt <- metrics %>% 
   left_join(metrics, by = c("ID" = "ID", "Date" = "Date", "Day" = "Day", "Time" = "Time",
                             "League" = "League", "Season" = "Season", "Opponent" = "Team"),
             suffix = c("", "_Opp")) %>%
-  filter(Date >= today & SplitGP > 1 & SplitGP_Opp > 1) %>% 
+  filter(Date >= today & SplitGP > 0 & SplitGP_Opp > 0, Season != '2022-2023') %>% 
   select(-(xG:GoalsAllowed), -(Opponent_Opp:GoalsAllowed_Opp))
 
 gbm_reg <- readRDS("Soccer Machine/Models/train_gbm.rds")

@@ -738,7 +738,7 @@ saveRDS(pls_mod, "Soccer Machine/Models/train_pls.rds")
 saveRDS(lm_mod, "Soccer Machine/Models/train_lm.rds")
 
 train_prob <- train_df %>% 
-  filter(SeasonGP > 3 & SeasonGP_Opp > 3 & Date < today)%>% 
+  filter(SplitGP > 0 & SplitGP_Opp > 0 & Date < today)%>% 
   select(-ID,
          -Date,
          -Day,
