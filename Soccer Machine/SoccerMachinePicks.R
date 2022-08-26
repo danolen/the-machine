@@ -452,7 +452,8 @@ Big5_23 <- load_match_results(country = c("ENG", "ESP", "ITA", "GER", "FRA"), ge
                             TRUE ~ League),
          Season = paste0(Season-1,"-",Season))
 
-fixtures <- rbind(Big5_22, Big5_23, mls_22) 
+fixtures <- rbind(Big5_22#, Big5_23
+                  , mls_22) 
   
 # fixtures$Date <- as.Date(fixtures$Date)
 today <- Sys.Date()
@@ -1131,7 +1132,7 @@ history <- readRDS("Soccer Machine/PicksHistory.rds") %>%
   bind_rows(bets4) %>% 
   distinct()
 
-# saveRDS(history, "Soccer Machine/PicksHistory.rds")
+saveRDS(history, "Soccer Machine/PicksHistory.rds")
 
 history <- inner_join(history, scores, by = c("gamedate" = "Date", "HomeTeam" = "Home",
                                               "AwayTeam" = "Away", "Day" = "Day",
@@ -1786,9 +1787,9 @@ df_html_bets <- print(xtable(bets_table2), type = "html", print.results = FALSE)
 Outlook <- COMCreate("Outlook.Application")
 
 Email = Outlook$CreateItem(0)
-# Email[["to"]] = paste("dnolen@smu.edu", "jorler@smu.edu", "asnolen@crimson.ua.edu", "jamestodd425@gmail.com",
-#                       "jordanreticker@gmail.com", sep = ";", collapse = NULL)
-Email[["to"]] = "dnolen@smu.edu"
+Email[["to"]] = paste("dnolen@smu.edu", "jorler@smu.edu", "asnolen@crimson.ua.edu", "jamestodd425@gmail.com",
+                      "jordanreticker@gmail.com", "brentcaminiti@gmail.com", "dougmyers4987@gmail.com", sep = ";", collapse = NULL)
+# Email[["to"]] = "dnolen@smu.edu"
 Email[["subject"]] = paste0("Soccer Machine Picks: ", Sys.Date())
 Email[["HTMLbody"]] = sprintf("
 The Machine's picks for upcoming soccer matches are in! The Machine currently offers picks for the Big 5 European Leagues plus MLS. The attached document contains all of the pertinent betting information for the upcoming matches. Good luck!
