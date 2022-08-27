@@ -510,28 +510,49 @@ metrics <- bind_rows(home, away) %>%
          SplitGoals = cumsum(Goals) - Goals,
          SplitGoalsAllowed = cumsum(GoalsAllowed) - GoalsAllowed,
          SplitGP = cumsum(case_when(Date < today ~ 1, TRUE ~ 0)),
-         SplitxG_roll4 = case_when(SplitGP < 5 ~ SplitxG / (SplitGP-1),
+         SplitGP = case_when(Date < today ~ SplitGP - 1, TRUE ~ SplitGP),
+         SplitxG_roll4 = case_when(SplitGP == 1 ~ lag(xG,1),
+                                   SplitGP == 2 ~ (lag(xG,1)+lag(xG,2))/2,
+                                   SplitGP == 3 ~ (lag(xG,1)+lag(xG,2)+lag(xG,3))/3,
                                    TRUE ~ (lag(xG,1)+lag(xG,2)+lag(xG,3)+lag(xG,4))/4),
-         SplitxGA_roll4 = case_when(SplitGP < 5 ~ SplitxG / (SplitGP-1),
+         SplitxGA_roll4 = case_when(SplitGP == 1 ~ lag(xGA,1),
+                                    SplitGP == 2 ~ (lag(xGA,1)+lag(xGA,2))/2,
+                                    SplitGP == 3 ~ (lag(xGA,1)+lag(xGA,2)+lag(xGA,3))/3,
                                     TRUE ~ (lag(xGA,1)+lag(xGA,2)+lag(xGA,3)+lag(xGA,4))/4),
-         SplitGoals_roll4 = case_when(SplitGP < 5 ~ SplitGoals / (SplitGP-1),
+         SplitGoals_roll4 = case_when(SplitGP == 1 ~ lag(Goals,1),
+                                      SplitGP == 2 ~ (lag(Goals,1)+lag(Goals,2))/2,
+                                      SplitGP == 3 ~ (lag(Goals,1)+lag(Goals,2)+lag(Goals,3))/3,
                                       TRUE ~ (lag(Goals,1)+lag(Goals,2)+lag(Goals)+lag(Goals,4))/4),
-         SplitGoalsAllowed_roll4 = case_when(SplitGP < 5 ~ SplitGoalsAllowed / (SplitGP-1),
-                                             TRUE ~ (lag(GoalsAllowed,1)+lag(GoalsAllowed,2)+lag(GoalsAllowed)+lag(GoalsAllowed,4))/4)) %>%
-  
+         SplitGoalsAllowed_roll4 = case_when(SplitGP == 1 ~ lag(GoalsAllowed,1),
+                                             SplitGP == 2 ~ (lag(GoalsAllowed,1)+lag(GoalsAllowed,2))/2,
+                                             SplitGP == 3 ~ (lag(GoalsAllowed,1)+lag(GoalsAllowed,2)+lag(GoalsAllowed,3))/3,
+                                             TRUE ~ (lag(GoalsAllowed,1)+lag(GoalsAllowed,2)+lag(GoalsAllowed,3)+lag(GoalsAllowed,4))/4)) %>%
   group_by(Team, League, Season) %>% 
   mutate(SeasonxG = cumsum(xG) - xG,
          SeasonxGA = cumsum(xGA) - xGA,
          SeasonGoals = cumsum(Goals) - Goals,
          SeasonGoalsAllowed = cumsum(GoalsAllowed) - GoalsAllowed,
          SeasonGP = cumsum(case_when(Date < today ~ 1, TRUE ~ 0)),
-         SeasonxG_roll4 = (lag(xG,1)+lag(xG,2)+lag(xG,3)+lag(xG,4))/4,
-         SeasonxGA_roll4 = (lag(xGA,1)+lag(xGA,2)+lag(xGA,3)+lag(xGA,4))/4,
-         SeasonGoals_roll4 = (lag(Goals,1)+lag(Goals,2)+lag(Goals,3)+lag(Goals,4))/4,
-         SeasonGoalsAllowed_roll4 = (lag(GoalsAllowed,1)+lag(GoalsAllowed,2)+lag(GoalsAllowed,3)+lag(GoalsAllowed,4))/4) %>% 
+         SeasonGP = case_when(Date < today ~ SeasonGP - 1, TRUE ~ SeasonGP),
+         SeasonxG_roll4 = case_when(SeasonGP == 1 ~ lag(xG,1),
+                                    SeasonGP == 2 ~ (lag(xG,1)+lag(xG,2))/2,
+                                    SeasonGP == 3 ~ (lag(xG,1)+lag(xG,2)+lag(xG,3))/4,
+                                    TRUE ~ (lag(xG,1)+lag(xG,2)+lag(xG,3)+lag(xG,4))/4),
+         SeasonxGA_roll4 = case_when(SeasonGP == 1 ~ lag(xGA,1),
+                                     SeasonGP == 2 ~ (lag(xGA,1)+lag(xGA,2))/2,
+                                     SeasonGP == 3 ~ (lag(xGA,1)+lag(xGA,2)+lag(xGA,3))/4,
+                                     TRUE ~ (lag(xGA,1)+lag(xGA,2)+lag(xGA,3)+lag(xGA,4))/4),
+         SeasonGoals_roll4 = case_when(SeasonGP == 1 ~ lag(Goals,1),
+                                       SeasonGP == 2 ~ (lag(Goals,1)+lag(Goals,2))/2,
+                                       SeasonGP == 3 ~ (lag(Goals,1)+lag(Goals,2)+lag(Goals))/4,
+                                       TRUE ~ (lag(Goals,1)+lag(Goals,2)+lag(Goals,3)+lag(Goals,4))/4),
+         SeasonGoalsAllowed_roll4 = case_when(SeasonGP == 1 ~ lag(GoalsAllowed,1),
+                                              SeasonGP == 2 ~ (lag(GoalsAllowed,1)+lag(GoalsAllowed,2))/2,
+                                              SeasonGP == 3 ~ (lag(GoalsAllowed,1)+lag(GoalsAllowed,2)+lag(GoalsAllowed))/4,
+                                              TRUE ~ (lag(GoalsAllowed,1)+lag(GoalsAllowed,2)+lag(GoalsAllowed,3)+lag(GoalsAllowed,4))/4)) %>% 
   ungroup() %>% 
-  mutate(SplitGP = case_when(Date < today ~ SplitGP - 1, TRUE ~ SplitGP),
-         SeasonGP = case_when(Date < today ~ SeasonGP - 1, TRUE ~ SeasonGP)) %>%
+  # mutate(SplitGP = case_when(Date < today ~ SplitGP - 1, TRUE ~ SplitGP),
+  #        SeasonGP = case_when(Date < today ~ SeasonGP - 1, TRUE ~ SeasonGP)) %>%
   mutate(SplitxG = SplitxG / SplitGP,
          SplitxGA = SplitxGA / SplitGP,
          SplitGoals = SplitGoals / SplitGP,
@@ -565,14 +586,14 @@ metrics_df <- metrics %>%
   left_join(metrics, by = c("ID" = "ID", "Date" = "Date", "Day" = "Day", "Time" = "Time",
                             "League" = "League", "Season" = "Season", "Opponent" = "Team"),
             suffix = c("", "_Opp")) %>% 
-  filter(Home_or_Away == "Home" & Date >= today & SplitGP > 0 & SplitGP_Opp > 0, Season != '2022-2023') %>%
+  filter(Home_or_Away == "Home" & Date >= today & SplitGP > 0 & SplitGP_Opp > 0) %>%
   select(-(Home_or_Away:GoalsAllowed), -(Opponent_Opp:GoalsAllowed_Opp))
 
 metrics_tt <- metrics %>% 
   left_join(metrics, by = c("ID" = "ID", "Date" = "Date", "Day" = "Day", "Time" = "Time",
                             "League" = "League", "Season" = "Season", "Opponent" = "Team"),
             suffix = c("", "_Opp")) %>%
-  filter(Date >= today & SplitGP > 0 & SplitGP_Opp > 0, Season != '2022-2023') %>% 
+  filter(Date >= today & SplitGP > 0 & SplitGP_Opp > 0) %>% 
   select(-(xG:GoalsAllowed), -(Opponent_Opp:GoalsAllowed_Opp))
 
 gbm_reg <- readRDS("Soccer Machine/Models/train_gbm.rds")
@@ -1590,7 +1611,7 @@ bets_table <- read.csv("Soccer Machine/upcoming_bets.csv") %>%
            Pick_Odds > 0 &
            Pick_WinProb >= 0.3 &
            bet_type_full != 'Alternate Total - 1.5' &
-           gamedate <= Sys.Date() + 7) %>%
+           gamedate <= Sys.Date() + 3) %>%
   arrange(gamedate, ID, desc(Kelly_Criteria)) %>% 
   group_by(ID) %>% 
   mutate(KC_Rank = row_number()) %>% 
@@ -1637,7 +1658,8 @@ bets_SGP <- read.csv("Soccer Machine/upcoming_bets.csv") %>%
            EV >= 2 &
            EV < 7 &
            !(League %in% c("UCL", "UEL")) &
-           bet_type_full != 'Alternate Total - 1.5') %>% 
+           bet_type_full != 'Alternate Total - 1.5' &
+           gamedate <= Sys.Date() + 3) %>% 
   mutate(Pushable = case_when(Pick_WinProb + Pick_LoseProb < 0.999 ~ 'Y',
                               TRUE ~ 'N')) %>% 
   filter(Pushable == 'N') %>% 
@@ -1708,7 +1730,8 @@ bets_Parlay <- read.csv("Soccer Machine/upcoming_bets.csv") %>%
            EV >= 2 &
            EV < 7 &
            !(League %in% c("UCL", "UEL")) &
-           bet_type_full != 'Alternate Total - 1.5') %>% 
+           bet_type_full != 'Alternate Total - 1.5' &
+           gamedate <= Sys.Date() + 3) %>% 
   mutate(Pushable = case_when(Pick_WinProb + Pick_LoseProb < 0.999 ~ 'Y',
                               TRUE ~ 'N')) %>% 
   filter(Pushable == 'N') %>% 
@@ -1767,7 +1790,8 @@ bets_Parlay2 <- bets_Parlay %>%
          gamedate = as.character(gamedate)) %>% 
   filter(Parlay_Odds >= 100) %>% 
   ungroup() %>% 
-  mutate(HomeTeam = "--",
+  mutate(League = "--",
+         HomeTeam = "--",
          AwayTeam = "--") %>% 
   select(gamedate, League, HomeTeam, AwayTeam, Bet, Pick, Parlay_Odds, Parlay_Machine_Odds, bet_size) %>% 
   distinct() %>% 
@@ -1778,7 +1802,14 @@ bets_Parlay2 <- bets_Parlay %>%
          `Don't Bet if Odds Worse Than` = Parlay_Machine_Odds,
          `Wager Amount` = bet_size)
 
-bets_table2 <- bind_rows(bets_table, bets_SGP2, bets_Parlay2)
+bets_table2 <- bind_rows(bets_table, bets_SGP2, bets_Parlay2) %>% 
+  arrange(`Game Date`, case_when(League == 'EPL' ~ 1,
+                                 League == 'La Liga' ~ 2,
+                                 League == 'Bundesliga' ~ 3,
+                                 League == 'Ligue 1' ~ 4,
+                                 League == 'Serie A' ~ 5,
+                                 League == 'MLS' ~ 6,
+                                 League == '--' ~ 7))
 
 df_html_bets <- print(xtable(bets_table2), type = "html", print.results = FALSE)
 
@@ -1792,13 +1823,11 @@ Email[["to"]] = paste("dnolen@smu.edu", "jorler@smu.edu", "asnolen@crimson.ua.ed
 # Email[["to"]] = "dnolen@smu.edu"
 Email[["subject"]] = paste0("Soccer Machine Picks: ", Sys.Date())
 Email[["HTMLbody"]] = sprintf("
-The Machine's picks for upcoming soccer matches are in! The Machine currently offers picks for the Big 5 European Leagues plus MLS. The attached document contains all of the pertinent betting information for the upcoming matches. Good luck!
+The Machine's picks for upcoming soccer matches are in! The Machine currently offers picks for the Big 5 European Leagues plus MLS. The attached document contains all of the pertinent betting information for the upcoming matches. The European leagues have been reincorporated now that most teams have played a few games. However, be wary of small sample sizes this early in the season. Good luck!
 </p><br></p>
 NEW FEATURE: The Machine will now begin suggesting some Parlays and Same-Game Parlays. The SGPs will all be two leg parlays (one side and one total for each game), and each leg will have negative odds. The Multi-Game Parlays will be 2-4 legs, again with negative odds and all legs occuring on the same day. The Machine has been recommending bets from Strategy #4 below (one bet per game which must have positive odds). This new strategy for Parlays and SGPs will allow us to use some of those negative odds bets that The Machine was passing on before.
 </p><br></p>
-The European Soccer season starts on August 5th. The Machine needs teams to have played at least 4 games before it can start making predictions. So look for European picks around the end of August. Once the Machine reincorporates the European leagues, I should be able to send this on a more regular basis.
-</p><br></p>
-TL;DR: These are the bets that The Machine recommends that you should make for the next week. The bet sizes are based on a unit size of $10. If your regular bet is something other than $10, adjust accordingly.
+TL;DR: These are the bets that The Machine recommends that you should make for the next few days. The bet sizes are based on a unit size of $10. If your regular bet is something other than $10, adjust accordingly.
 </p><br></p>
 %s
 </p><br></p>

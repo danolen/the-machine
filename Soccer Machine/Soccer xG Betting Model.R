@@ -565,17 +565,29 @@ metrics <- bind_rows(home, away) %>%
          SplitGoalsAllowed_roll4 = case_when(SplitGP == 1 ~ lag(GoalsAllowed,1),
                                       SplitGP == 2 ~ (lag(GoalsAllowed,1)+lag(GoalsAllowed,2))/2,
                                       SplitGP == 3 ~ (lag(GoalsAllowed,1)+lag(GoalsAllowed,2)+lag(GoalsAllowed,3))/3,
-                                      TRUE ~ (lag(GoalsAllowed,1)+lag(GoalsAllowed,2)+lag(GoalsAllowed)+lag(GoalsAllowed,4))/4)) %>% 
+                                      TRUE ~ (lag(GoalsAllowed,1)+lag(GoalsAllowed,2)+lag(GoalsAllowed,3)+lag(GoalsAllowed,4))/4)) %>% 
   group_by(Team, League, Season) %>% 
   dplyr::mutate(SeasonxG = cumsum(xG) - xG,
          SeasonxGA = cumsum(xGA) - xGA,
          SeasonGoals = cumsum(Goals) - Goals,
          SeasonGoalsAllowed = cumsum(GoalsAllowed) - GoalsAllowed,
          SeasonGP = row_number() - 1,
-         SeasonxG_roll4 = (lag(xG,1)+lag(xG,2)+lag(xG,3)+lag(xG,4))/4,
-         SeasonxGA_roll4 = (lag(xGA,1)+lag(xGA,2)+lag(xGA,3)+lag(xGA,4))/4,
-         SeasonGoals_roll4 = (lag(Goals,1)+lag(Goals,2)+lag(Goals,3)+lag(Goals,4))/4,
-         SeasonGoalsAllowed_roll4 = (lag(GoalsAllowed,1)+lag(GoalsAllowed,2)+lag(GoalsAllowed,3)+lag(GoalsAllowed,4))/4) %>% 
+         SeasonxG_roll4 = case_when(SeasonGP == 1 ~ lag(xG,1),
+                                    SeasonGP == 2 ~ (lag(xG,1)+lag(xG,2))/2,
+                                    SeasonGP == 3 ~ (lag(xG,1)+lag(xG,2)+lag(xG,3))/4,
+                                    TRUE ~ (lag(xG,1)+lag(xG,2)+lag(xG,3)+lag(xG,4))/4),
+         SeasonxGA_roll4 = case_when(SeasonGP == 1 ~ lag(xGA,1),
+                                     SeasonGP == 2 ~ (lag(xGA,1)+lag(xGA,2))/2,
+                                     SeasonGP == 3 ~ (lag(xGA,1)+lag(xGA,2)+lag(xGA,3))/4,
+                                     TRUE ~ (lag(xGA,1)+lag(xGA,2)+lag(xGA,3)+lag(xGA,4))/4),
+         SeasonGoals_roll4 = case_when(SeasonGP == 1 ~ lag(Goals,1),
+                                       SeasonGP == 2 ~ (lag(Goals,1)+lag(Goals,2))/2,
+                                       SeasonGP == 3 ~ (lag(Goals,1)+lag(Goals,2)+lag(Goals))/4,
+                                       TRUE ~ (lag(Goals,1)+lag(Goals,2)+lag(Goals,3)+lag(Goals,4))/4),
+         SeasonGoalsAllowed_roll4 = case_when(SeasonGP == 1 ~ lag(GoalsAllowed,1),
+                                              SeasonGP == 2 ~ (lag(GoalsAllowed,1)+lag(GoalsAllowed,2))/2,
+                                              SeasonGP == 3 ~ (lag(GoalsAllowed,1)+lag(GoalsAllowed,2)+lag(GoalsAllowed))/4,
+                                              TRUE ~ (lag(GoalsAllowed,1)+lag(GoalsAllowed,2)+lag(GoalsAllowed,3)+lag(GoalsAllowed,4))/4)) %>% 
   ungroup() %>% 
   dplyr::mutate(SplitxG = SplitxG / SplitGP,
          SplitxGA = SplitxGA / SplitGP,
