@@ -31,7 +31,7 @@ urls <- c("https://fbref.com/en/comps/22/schedule/Major-League-Soccer-Scores-and
           "https://fbref.com/en/comps/8/schedule/Champions-League-Scores-and-Fixtures",
           "https://fbref.com/en/comps/19/schedule/Europa-League-Scores-and-Fixtures")
 
-mls_22 <- load_match_results(country = "USA", gender = "M", season_end_year = 2022, tier = "1st") %>% 
+mls_22 <- fb_match_results(country = "USA", gender = "M", season_end_year = 2022, tier = "1st") %>% 
   select(Day, Date, Time, Home, Home_xG, HomeGoals, AwayGoals, Away_xG, Away, Competition_Name, Season_End_Year) %>% 
   rename(xG = Home_xG,
          Home_Score = HomeGoals,
@@ -47,7 +47,7 @@ mls_22 <- load_match_results(country = "USA", gender = "M", season_end_year = 20
          League = "MLS",
          Season = as.character(Season))
 
-Big5 <- load_match_results(country = c("ENG", "ESP", "ITA", "GER", "FRA"), gender = "M", season_end_year = 2022, tier = "1st") %>% 
+Big5 <- fb_match_results(country = c("ENG", "ESP", "ITA", "GER", "FRA"), gender = "M", season_end_year = c(2022, 2023), tier = "1st") %>% 
   select(Day, Date, Time, Home, Home_xG, HomeGoals, AwayGoals, Away_xG, Away, Competition_Name, Season_End_Year) %>% 
   rename(xG = Home_xG,
          Home_Score = HomeGoals,

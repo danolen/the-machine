@@ -1637,7 +1637,7 @@ bets_table <- read.csv("Soccer Machine/upcoming_bets.csv") %>%
   rename(`Game Date` = gamedate,
          `Home Team` = HomeTeam,
          `Away Team` = AwayTeam,
-         `Bet` = bet_type_full,
+         `Bet Type` = bet_type_full,
          `Current Pick Odds` = Pick_Odds,
          `Don't Bet if Odds Worse Than` = Machine_Odds,
          `Wager Amount` = bet_size)
@@ -1682,16 +1682,23 @@ bets_SGP <- read.csv("Soccer Machine/upcoming_bets.csv") %>%
   filter(legs > 1)
 
 bets_SGP2 <- bets_SGP %>%
-  mutate(Pick = case_when(is.na(Pick_SpreadTotal) | Pick_SpreadTotal == 0 ~ paste0(Pick),
+  mutate(Pick = case_when(bet_type == 'Draw No Bet' ~ paste0(Pick, " Draw No Bet"),
+                          is.na(Pick_SpreadTotal) | Pick_SpreadTotal == 0 ~ paste0(Pick),
                           str_detect(bet_type_full, "Spread") & Pick_SpreadTotal > 0 ~ paste0(Pick, " +", Pick_SpreadTotal),
                           TRUE ~ paste0(Pick, " ", Pick_SpreadTotal))) %>% 
+mutate(Pick = case_when(bet_type == 'TT' | bet_type == 'Alt TT' ~ case_when(str_detect(bet_type_full, HomeTeam) ~ paste0(HomeTeam, " TT ", Pick),
+                                                                            TRUE ~ paste0(AwayTeam, " TT ", Pick)),
+                        str_detect(bet_type, "Total") ~ paste0("Total ", Pick),
+                        bet_type == 'ML' ~ paste0(Pick, " ML"),
+                        bet_type == 'BTTS' ~ paste0(" Both Teams to Score - ", Pick),
+                        TRUE ~ Pick)) %>%
   select(ID, gamedate, League, HomeTeam, AwayTeam, bet_type_full, Pick, Pick_Odds, Machine_Odds, Fract_Odds, Pick_WinProb) %>% 
   group_by(ID) %>% 
   mutate(Parlay_Odds = as.integer(floor((prod(Fract_Odds+1)-1)*100)),
          Parlay_WinProb = prod(Pick_WinProb),
          Parlay_Fract_Odds = (100 / abs(Parlay_Odds))^if_else(Parlay_Odds < 0, 1, -1),
          Parlay_KC = (Parlay_WinProb * (Parlay_Fract_Odds + 1) - 1) / Parlay_Fract_Odds,
-         Bet = paste0(bet_type_full, collapse = " & "),
+         Bet = "Same-Game Parlay",
          Pick = paste0(Pick, collapse = " & "),
          Parlay_Machine_Odds = as.integer(pmax(if_else(Parlay_WinProb < 0.5,
                                                        (100 / Parlay_WinProb) - 100,
@@ -1710,6 +1717,7 @@ bets_SGP2 <- bets_SGP %>%
   rename(`Game Date` = gamedate,
          `Home Team` = HomeTeam,
          `Away Team` = AwayTeam,
+         `Bet Type` = Bet,
          `Current Pick Odds` = Parlay_Odds,
          `Don't Bet if Odds Worse Than` = Parlay_Machine_Odds,
          `Wager Amount` = bet_size)
@@ -1767,16 +1775,23 @@ bets_Parlay <- read.csv("Soccer Machine/upcoming_bets.csv") %>%
   filter(legs > 1)
 
 bets_Parlay2 <- bets_Parlay %>%
-  mutate(Pick = case_when(is.na(Pick_SpreadTotal) | Pick_SpreadTotal == 0 ~ paste0(Pick),
+  mutate(Pick = case_when(bet_type == 'Draw No Bet' ~ paste0(Pick, " Draw No Bet"),
+                          is.na(Pick_SpreadTotal) | Pick_SpreadTotal == 0 ~ paste0(Pick),
                           str_detect(bet_type_full, "Spread") & Pick_SpreadTotal > 0 ~ paste0(Pick, " +", Pick_SpreadTotal),
                           TRUE ~ paste0(Pick, " ", Pick_SpreadTotal))) %>% 
+  mutate(Pick = case_when(bet_type == 'TT' | bet_type == 'Alt TT' ~ case_when(str_detect(bet_type_full, HomeTeam) ~ paste0(HomeTeam, " TT ", Pick),
+                                                                              TRUE ~ paste0(AwayTeam, " TT ", Pick)),
+                          str_detect(bet_type, "Total") ~ paste0(HomeTeam, "/", AwayTeam, " Total ", Pick),
+                          bet_type == 'ML' ~ paste0(Pick, " ML"),
+                          bet_type == 'BTTS' ~ paste0(" Both Teams to Score - ", Pick),
+                          TRUE ~ Pick)) %>% 
   select(ID, gamedate, League, HomeTeam, AwayTeam, bet_type_full, Pick, Pick_Odds, Machine_Odds, Fract_Odds, Pick_WinProb) %>% 
   group_by(gamedate) %>% 
   mutate(Parlay_Odds = as.integer(floor((prod(Fract_Odds+1)-1)*100)),
          Parlay_WinProb = prod(Pick_WinProb),
          Parlay_Fract_Odds = (100 / abs(Parlay_Odds))^if_else(Parlay_Odds < 0, 1, -1),
          Parlay_KC = (Parlay_WinProb * (Parlay_Fract_Odds + 1) - 1) / Parlay_Fract_Odds,
-         Bet = paste0(bet_type_full, collapse = " & "),
+         Bet = "Multi-Game Parlay",
          Pick = paste0(Pick, collapse = " & "),
          Parlay_Machine_Odds = as.integer(pmax(if_else(Parlay_WinProb < 0.5,
                                                        (100 / Parlay_WinProb) - 100,
@@ -1798,6 +1813,7 @@ bets_Parlay2 <- bets_Parlay %>%
   rename(`Game Date` = gamedate,
          `Home Team` = HomeTeam,
          `Away Team` = AwayTeam,
+         `Bet Type` = Bet,
          `Current Pick Odds` = Parlay_Odds,
          `Don't Bet if Odds Worse Than` = Parlay_Machine_Odds,
          `Wager Amount` = bet_size)
@@ -1818,7 +1834,7 @@ df_html_bets <- print(xtable(bets_table2), type = "html", print.results = FALSE)
 Outlook <- COMCreate("Outlook.Application")
 
 Email = Outlook$CreateItem(0)
-Email[["to"]] = paste("dnolen@smu.edu", "jorler@smu.edu", "asnolen@crimson.ua.edu", "jamestodd425@gmail.com",
+Email[["to"]] = paste("dnolen@smu.edu", "jamesorler@gmail.com", "asnolen@crimson.ua.edu", "jamestodd425@gmail.com",
                       "jordanreticker@gmail.com", "brentcaminiti@gmail.com", "dougmyers4987@gmail.com", sep = ";", collapse = NULL)
 # Email[["to"]] = "dnolen@smu.edu"
 Email[["subject"]] = paste0("Soccer Machine Picks: ", Sys.Date())
