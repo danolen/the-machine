@@ -1238,7 +1238,7 @@ types <- filter(history2,
          Side_or_Total = case_when(bet_type %in% c('Alt Spread', 'Draw No Bet', 'ML', 'Spread') ~ "Side",
                                    TRUE ~ "Total"))
 
-# ## Create email tables
+## Create email tables
 
 email_table_1 <- types %>%
   filter(Kelly_Criteria >= 0 & !(League %in% c("UCL", "UEL"))) %>%
@@ -1611,7 +1611,7 @@ bets_table <- read.csv("Soccer Machine/upcoming_bets.csv") %>%
            Pick_Odds > 0 &
            Pick_WinProb >= 0.3 &
            bet_type_full != 'Alternate Total - 1.5' &
-           gamedate <= Sys.Date() + 3) %>%
+           gamedate <= Sys.Date() + 4) %>%
   arrange(gamedate, ID, desc(Kelly_Criteria)) %>% 
   group_by(ID) %>% 
   mutate(KC_Rank = row_number()) %>% 
@@ -1839,9 +1839,7 @@ Email[["to"]] = paste("dnolen@smu.edu", "jamesorler@gmail.com", "asnolen@crimson
 # Email[["to"]] = "dnolen@smu.edu"
 Email[["subject"]] = paste0("Soccer Machine Picks: ", Sys.Date())
 Email[["HTMLbody"]] = sprintf("
-The Machine's picks for upcoming soccer matches are in! The Machine currently offers picks for the Big 5 European Leagues plus MLS. The attached document contains all of the pertinent betting information for the upcoming matches. The European leagues have been reincorporated now that most teams have played a few games. However, be wary of small sample sizes this early in the season. Good luck!
-</p><br></p>
-NEW FEATURE: The Machine will now begin suggesting some Parlays and Same-Game Parlays. The SGPs will all be two leg parlays (one side and one total for each game), and each leg will have negative odds. The Multi-Game Parlays will be 2-4 legs, again with negative odds and all legs occuring on the same day. The Machine has been recommending bets from Strategy #4 below (one bet per game which must have positive odds). This new strategy for Parlays and SGPs will allow us to use some of those negative odds bets that The Machine was passing on before.
+The Machine's picks for upcoming soccer matches are in! The Machine currently offers picks for the Big 5 European Leagues plus MLS. The attached document contains all of the pertinent betting information for the upcoming matches. Good luck!
 </p><br></p>
 TL;DR: These are the bets that The Machine recommends that you should make for the next few days. The bet sizes are based on a unit size of $10. If your regular bet is something other than $10, adjust accordingly.
 </p><br></p>
@@ -1855,7 +1853,7 @@ Below are the results for each league:
 </p><br></p>
 %s
 </p><br></p>
-Bets with a KC of at least 0.15 and less than 0.4 and EV of at least 2 and less than 7 have had the best performance so far. This is expected. If there is not a big difference between the Machine projection and the odds then there is not much of an edge. On the other end, if the Machine projections are way off from the odds, then it's more likely that the oddsmakers know something that the Machine doesn't, rather than the other way around. Here are the results for those bets using four different strategies:
+Bets with a KC of at least 0.15 and less than 0.4 and EV of at least 2 and less than 7 have had the best performance so far. This is expected. If there is not a big difference between the Machine projection and the odds then there is not much of an edge. On the other end, if the Machine projections are way off from the odds, then it's more likely that the oddsmakers know something that the Machine doesn't, rather than the other way around. Here are the results for those bets using six different strategies:
 </p><br></p>
 %s
 </p><br></p>
@@ -1867,7 +1865,7 @@ Results grouped by EV rounded to the nearest 1:
 </p><br></p>
 %s
 </p><br></p>
-Here is the Kelly betting results over time for each of the four strategies listed above:
+Here is the Kelly betting results over time for each of the six strategies listed above:
 </p><br></p>
 %s
 </p><br></p>
