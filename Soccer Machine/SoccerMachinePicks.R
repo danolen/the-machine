@@ -1227,7 +1227,11 @@ types <- filter(history2,
                   Pick_WinProb >= 0.3 &
                   bet_type_full != 'Alternate Total - 1.5' &
                   partition == 2) %>%
-  select(gamedate, League, bet_type, Pick_Odds, Pick_WinProb, Pick_LoseProb, Fract_Odds, Kelly_Criteria, EV, KC_tier, Pick_Correct, Units) %>% 
+  mutate(SGP_eligible = case_when(bet_type %in% c('Spread', 'Alt Spread') ~ case_when(HOY.SpreadTotal %in% c(0, 0.5, -0.5) ~ 'Y',
+                                                                                      TRUE ~ 'N'),
+                                  TRUE ~ 'Y')) %>% 
+  select(gamedate, League, bet_type, Pick_Odds, Pick_WinProb, Pick_LoseProb, Fract_Odds,
+         Kelly_Criteria, EV, KC_tier, Pick_Correct, Units, SGP_eligible) %>%
   mutate(Kelly_Bet = if_else(Kelly_Criteria < 0.05, 5, Kelly_Criteria * 100),
          Kelly_Profit = Units * Kelly_Bet,
          WinProb_tier = round_any(Pick_WinProb, 0.05, floor),
@@ -1345,12 +1349,14 @@ email_table_3d <- types %>%
 
 SGPs <- types %>%
   # filter(League == 'MLS') %>% 
-  filter(Pick_Odds < 0 &
+  filter((Pick_Odds < 0 | (Side_or_Total == 'Side' & Pick_Odds <= 140)) &
            Kelly_Criteria >= 0.15 &
            Kelly_Criteria < 0.4 &
            EV >= 2 &
            EV < 7 &
-           !(League %in% c("UCL", "UEL"))) %>%
+           !(League %in% c("UCL", "UEL")) &
+           SGP_eligible == 'Y'
+         ) %>%
   mutate(Pushable = case_when(Pick_WinProb + Pick_LoseProb < 0.999 ~ 'Y',
                               TRUE ~ 'N')) %>% 
   filter(Pushable == 'N') %>% 
@@ -1462,7 +1468,8 @@ email_Parlay_table <- Parlay_performance %>%
   mutate(Units_per_bet = Flat_Profit / bets) %>%
   print(n=40)
 
-email_table_3 <- bind_rows(email_table_3a, email_table_3d, email_table_3b, email_table_3c, email_SGP_table, email_Parlay_table)
+email_table_3 <- bind_rows(email_table_3a, email_table_3d, email_table_3b, email_table_3c, email_SGP_table, email_Parlay_table) %>% 
+  mutate(bets = as.integer(bets))
 
 df_html_3 <- print(xtable(email_table_3), type = "html", print.results = FALSE)
 
@@ -1650,16 +1657,19 @@ bets_SGP <- read.csv("Soccer Machine/upcoming_bets.csv") %>%
   # mutate(partition = row_number()) %>% 
   # filter(partition == 2) %>% 
   mutate(Side_or_Total = case_when(bet_type %in% c('Alt Spread', 'Draw No Bet', 'ML', 'Spread') ~ "Side",
-                                   TRUE ~ "Total")) %>% 
+                                   TRUE ~ "Total"),
+         SGP_eligible = case_when(bet_type %in% c('Spread', 'Alt Spread') ~ case_when(HOY.SpreadTotal %in% c(0, 0.5, -0.5) ~ 'Y',
+                                                                                      TRUE ~ 'N'))) %>% 
   mutate(gamedate = as.Date(gamedate)) %>%
-  filter(Pick_Odds < 0 &
+  filter((Pick_Odds < 0 | (Side_or_Total == 'Side' & Pick_Odds <= 140)) &
            Kelly_Criteria >= 0.15 &
            Kelly_Criteria < 0.4 &
            EV >= 2 &
            EV < 7 &
            !(League %in% c("UCL", "UEL")) &
            bet_type_full != 'Alternate Total - 1.5' &
-           gamedate <= Sys.Date() + 3) %>% 
+           gamedate <= Sys.Date() + 3 &
+           SGP_eligible == 'Y') %>% 
   mutate(Pushable = case_when(Pick_WinProb + Pick_LoseProb < 0.999 ~ 'Y',
                               TRUE ~ 'N')) %>% 
   filter(Pushable == 'N') %>% 
@@ -1840,6 +1850,8 @@ Email[["to"]] = paste("dnolen@smu.edu", "jamesorler@gmail.com", "asnolen@crimson
 Email[["subject"]] = paste0("Soccer Machine Picks: ", Sys.Date())
 Email[["HTMLbody"]] = sprintf("
 The Machine's picks for upcoming soccer matches are in! The Machine currently offers picks for the Big 5 European Leagues plus MLS. The attached document contains all of the pertinent betting information for the upcoming matches. Good luck!
+</p><br></p>
+UPDATE: I haven't been able to find any books that will include spreads within Same-Game Parlays, so from now on the only spreads that will be included in SGPs are +0.5 (since that is the same as a double chance bet, i.e. home team or draw/away team or draw) and -0.5 (since that is the same as a moneyline bet). The historical performance of SGPs has been updated with this change as well.
 </p><br></p>
 TL;DR: These are the bets that The Machine recommends that you should make for the next few days. The bet sizes are based on a unit size of $10. If your regular bet is something other than $10, adjust accordingly.
 </p><br></p>

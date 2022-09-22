@@ -22,16 +22,7 @@ setwd("C:/Users/danie/Desktop/SportsStuff/TheMachine/the-machine")
 
 club_names <- read_excel("Soccer Machine/Club Names.xlsx")
 
-urls <- c("https://fbref.com/en/comps/22/schedule/Major-League-Soccer-Scores-and-Fixtures",
-          "https://fbref.com/en/comps/9/schedule/Premier-League-Scores-and-Fixtures",
-          "https://fbref.com/en/comps/13/schedule/Ligue-1-Scores-and-Fixtures",
-          "https://fbref.com/en/comps/20/schedule/Bundesliga-Scores-and-Fixtures",
-          "https://fbref.com/en/comps/11/schedule/Serie-A-Scores-and-Fixtures",
-          "https://fbref.com/en/comps/12/schedule/La-Liga-Scores-and-Fixtures",
-          "https://fbref.com/en/comps/8/schedule/Champions-League-Scores-and-Fixtures",
-          "https://fbref.com/en/comps/19/schedule/Europa-League-Scores-and-Fixtures")
-
-mls_22 <- fb_match_results(country = "USA", gender = "M", season_end_year = 2022, tier = "1st") %>% 
+mls_22 <- load_match_results(country = "USA", gender = "M", season_end_year = 2022, tier = "1st") %>% 
   select(Day, Date, Time, Home, Home_xG, HomeGoals, AwayGoals, Away_xG, Away, Competition_Name, Season_End_Year) %>% 
   rename(xG = Home_xG,
          Home_Score = HomeGoals,
@@ -47,7 +38,7 @@ mls_22 <- fb_match_results(country = "USA", gender = "M", season_end_year = 2022
          League = "MLS",
          Season = as.character(Season))
 
-Big5 <- fb_match_results(country = c("ENG", "ESP", "ITA", "GER", "FRA"), gender = "M", season_end_year = c(2022, 2023), tier = "1st") %>% 
+Big5 <- load_match_results(country = c("ENG", "ESP", "ITA", "GER", "FRA"), gender = "M", season_end_year = c(2022, 2023), tier = "1st") %>% 
   select(Day, Date, Time, Home, Home_xG, HomeGoals, AwayGoals, Away_xG, Away, Competition_Name, Season_End_Year) %>% 
   rename(xG = Home_xG,
          Home_Score = HomeGoals,
@@ -153,7 +144,11 @@ types <- filter(history2,
                   Pick_WinProb >= 0.3 &
                   bet_type_full != 'Alternate Total - 1.5' &
                   partition == 2) %>%
-  select(gamedate, League, bet_type, Pick_Odds, Pick_WinProb, Pick_LoseProb, Fract_Odds, Kelly_Criteria, EV, KC_tier, Pick_Correct, Units) %>% 
+  mutate(SGP_eligible = case_when(bet_type %in% c('Spread', 'Alt Spread') ~ case_when(HOY.SpreadTotal %in% c(0, 0.5, -0.5) ~ 'Y',
+                                                                                      TRUE ~ 'N'),
+                                  TRUE ~ 'Y')) %>% 
+  select(gamedate, League, bet_type, Pick_Odds, Pick_WinProb, Pick_LoseProb, Fract_Odds,
+         Kelly_Criteria, EV, KC_tier, Pick_Correct, Units, SGP_eligible) %>%
   mutate(Kelly_Bet = if_else(Kelly_Criteria < 0.05, 5, Kelly_Criteria * 100),
          Kelly_Profit = Units * Kelly_Bet,
          WinProb_tier = round_any(Pick_WinProb, 0.05, floor),
@@ -163,13 +158,12 @@ types <- filter(history2,
          Total = "Total",
          Side_or_Total = case_when(bet_type %in% c('Alt Spread', 'Draw No Bet', 'ML', 'Spread') ~ "Side",
                                    TRUE ~ "Total"))
-
 types %>%
-  filter(#Kelly_Criteria >= 0 &
-          Kelly_Criteria >= 0.15 & 
-          Kelly_Criteria < 0.4 & 
-          EV >= 3 & 
-          EV < 7 &
+  filter(Kelly_Criteria >= 0 &
+          # Kelly_Criteria >= 0.15 & 
+          # Kelly_Criteria < 0.4 & 
+          # EV >= 3 & 
+          # EV < 7 &
           !(League %in% c("UCL", "UEL"))) %>%
   #group_by(Total) %>%
   group_by(bet_type) %>%
