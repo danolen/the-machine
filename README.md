@@ -12,5 +12,5 @@ The Machine currently offers betting analysis for the following sports and leagu
   - French Ligue 1
   - Italian Serie A
   
-## Baseball
+## Baseball - Coming Soon
   - Major League Baseball

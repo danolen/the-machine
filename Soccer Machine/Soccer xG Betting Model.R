@@ -461,7 +461,7 @@ intervalStart <- Sys.time()
 #   separate(Score, c("Home_Score", "Away_Score")) %>%
 #   mutate(League = "MLS", Season = "2022")
 
-mls <- fb_match_results(country = "USA", gender = "M", season_end_year = c(2018, 2019, 2020, 2021, 2022), tier = "1st") %>% 
+mls <- load_match_results(country = "USA", gender = "M", season_end_year = c(2018, 2019, 2020, 2021, 2022), tier = "1st") %>% 
   select(Day, Date, Time, Home, Home_xG, HomeGoals, AwayGoals, Away_xG, Away, Competition_Name, Season_End_Year) %>% 
   rename(xG = Home_xG,
          Home_Score = HomeGoals,
@@ -477,7 +477,7 @@ mls <- fb_match_results(country = "USA", gender = "M", season_end_year = c(2018,
          League = "MLS",
          Season = as.character(Season))
 
-Big5 <- fb_match_results(country = c("ENG","ESP","ITA","GER","FRA"), gender = "M", season_end_year = c(2018,2019,2020,2021,2022,2023), tier = "1st") %>% 
+Big5 <- load_match_results(country = c("ENG","ESP","ITA","GER","FRA"), gender = "M", season_end_year = c(2018,2019,2020,2021,2022,2023), tier = "1st") %>% 
   select(Day, Date, Time, Home, Home_xG, HomeGoals, AwayGoals, Away_xG, Away, Competition_Name, Season_End_Year) %>% 
   rename(xG = Home_xG,
          Home_Score = HomeGoals,
