@@ -1249,7 +1249,6 @@ email_table_3d <- types %>%
   print(n=40)
 
 SGPs <- types %>%
-  # filter(League == 'MLS') %>% 
   filter((Pick_Odds < 0 | (Side_or_Total == 'Side' & Pick_Odds <= 140)) &
            Kelly_Criteria >= 0.15 &
            Kelly_Criteria < 0.4 &
@@ -1304,7 +1303,6 @@ email_SGP_table <- SGP_performance %>%
   print(n=40)
 
 Parlays <- types %>%
-  #filter(League == 'MLS') %>% 
   filter(Pick_Odds < 0 & Kelly_Criteria >= 0.15 & Kelly_Criteria < 0.4 & EV >= 2 & EV < 7) %>%
   mutate(Pushable = case_when(Pick_WinProb + Pick_LoseProb < 0.999 ~ 'Y',
                               TRUE ~ 'N')) %>% 
@@ -1556,7 +1554,8 @@ bets_SGP <- read.csv("Soccer Machine/upcoming_bets.csv") %>%
   mutate(Side_or_Total = case_when(bet_type %in% c('Alt Spread', 'Draw No Bet', 'ML', 'Spread') ~ "Side",
                                    TRUE ~ "Total"),
          SGP_eligible = case_when(bet_type %in% c('Spread', 'Alt Spread') ~ case_when(HOY.SpreadTotal %in% c(0, 0.5, -0.5) ~ 'Y',
-                                                                                      TRUE ~ 'N'))) %>% 
+                                                                                      TRUE ~ 'N'),
+                                  TRUE ~ 'Y')) %>% 
   mutate(gamedate = as.Date(gamedate)) %>%
   filter((Pick_Odds < 0 | (Side_or_Total == 'Side' & Pick_Odds <= 140)) &
            Kelly_Criteria >= 0.15 &
@@ -1639,6 +1638,7 @@ bets_Parlay <- read.csv("Soccer Machine/upcoming_bets.csv") %>%
                                    TRUE ~ "Total")) %>% 
   mutate(gamedate = as.Date(gamedate)) %>%
   filter(Pick_Odds < 0 &
+           Pick_Odds >= -250 &
            Kelly_Criteria >= 0.15 &
            Kelly_Criteria < 0.4 &
            EV >= 2 &
