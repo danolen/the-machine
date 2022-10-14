@@ -20,9 +20,11 @@ L7_team_batting <- url %>%
 
 # Last 7 days team batting stats (2022)
 
+L7_batting_file <- read.csv("Baseball Machine/Daily Files/2022/team_batting_L7_2022.csv")
+
 i <- 1
-startdate <- as.Date("2022-04-02")
-enddate <- as.Date("2022-04-08")
+startdate <- as.Date(max(L7_batting_file$Date))-6
+enddate <- as.Date(max(L7_batting_file$Date))
 urls <- list()
 while (enddate < as.Date(Sys.Date())) {
   url = paste0('https://www.fangraphs.com/leaders.aspx?pos=all&stats=bat&lg=all&qual=0&type=c,6,11,12,13,21,34,35,40,41,23,37,38,50,61,305,111,203,199,58,43,44,45,47,102,110,308,311&season=2022&month=1000&season1=2022&ind=0&team=0,ts&rost=0&age=0&filter=&players=0&startdate=',startdate,'&enddate=',enddate)
@@ -33,7 +35,7 @@ while (enddate < as.Date(Sys.Date())) {
 }
 
 tbl <- list()
-dates <- as.Date("2022-04-09")
+dates <- as.Date(max(L7_batting_file$Date))+1
 j = 1
 for (j in seq_along(urls)) {
   tbl[[j]] = urls[[j]] %>%
@@ -62,9 +64,11 @@ write.csv(team_batting_L7, "team_batting_L7_2022.csv", row.names = FALSE)
 
 # Last 14 days team batting stats (2022)
 
+L14_batting_file <- read.csv("Baseball Machine/Daily Files/2022/team_batting_L14_2022.csv")
+
 i <- 1
-startdate <- as.Date("2022-03-26")
-enddate <- as.Date("2022-04-08")
+startdate <- as.Date(max(L14_batting_file$Date))-6
+enddate <- as.Date(max(L14_batting_file$Date))
 urls <- list()
 while (enddate < as.Date(Sys.Date())) {
   url = paste0('https://www.fangraphs.com/leaders.aspx?pos=all&stats=bat&lg=all&qual=0&type=c,6,11,12,13,21,34,35,40,41,23,37,38,50,61,305,111,203,199,58,43,44,45,47,102,110,308,311&season=2022&month=1000&season1=2022&ind=0&team=0,ts&rost=0&age=0&filter=&players=0&startdate=',startdate,'&enddate=',enddate)
@@ -75,7 +79,7 @@ while (enddate < as.Date(Sys.Date())) {
 }
 
 tbl <- list()
-dates <- as.Date("2022-04-09")
+dates <- as.Date(max(L14_batting_file$Date))+1
 j = 1
 for (j in seq_along(urls)) {
   tbl[[j]] = urls[[j]] %>%
@@ -104,9 +108,11 @@ write.csv(team_batting_L14, "team_batting_L14_2022.csv", row.names = FALSE)
 
 # Last 30 days team batting stats (2022)
 
+L30_batting_file <- read.csv("Baseball Machine/Daily Files/2022/team_batting_L30_2022.csv")
+
 i <- 1
-startdate <- as.Date("2022-03-10")
-enddate <- as.Date("2022-04-08")
+startdate <- as.Date(max(L30_batting_file$Date))-6
+enddate <- as.Date(max(L30_batting_file$Date))
 urls <- list()
 while (enddate < as.Date(Sys.Date())) {
   url = paste0('https://www.fangraphs.com/leaders.aspx?pos=all&stats=bat&lg=all&qual=0&type=c,6,11,12,13,21,34,35,40,41,23,37,38,50,61,305,111,203,199,58,43,44,45,47,102,110,308,311&season=2022&month=1000&season1=2022&ind=0&team=0,ts&rost=0&age=0&filter=&players=0&startdate=',startdate,'&enddate=',enddate)
@@ -117,7 +123,7 @@ while (enddate < as.Date(Sys.Date())) {
 }
 
 tbl <- list()
-dates <- as.Date("2022-04-09")
+dates <- as.Date(max(L30_batting_file$Date))+1
 j = 1
 for (j in seq_along(urls)) {
   tbl[[j]] = urls[[j]] %>%
@@ -146,9 +152,11 @@ write.csv(team_batting_L30, "team_batting_L30_2022.csv", row.names = FALSE)
 
 # Season-to-date team batting stats (2022)
 
+s2d_batting_file <- read.csv("Baseball Machine/Daily Files/2022/team_batting_s2d_2022.csv")
+
 i <- 1
-startdate <- as.Date("2022-04-07")
-enddate <- as.Date("2022-04-08")
+startdate <- as.Date(max(s2d_batting_file$Date))-6
+enddate <- as.Date(max(s2d_batting_file$Date))
 urls <- list()
 while (enddate < as.Date(Sys.Date())) {
   url = paste0('https://www.fangraphs.com/leaders.aspx?pos=all&stats=bat&lg=all&qual=0&type=c,6,11,12,13,21,34,35,40,41,23,37,38,50,61,305,111,203,199,58,43,44,45,47,102,110,308,311&season=2022&month=1000&season1=2022&ind=0&team=0,ts&rost=0&age=0&filter=&players=0&startdate=',startdate,'&enddate=',enddate)
@@ -158,7 +166,7 @@ while (enddate < as.Date(Sys.Date())) {
 }
 
 tbl <- list()
-dates <- as.Date("2022-04-09")
+dates <- as.Date(max(s2d_batting_file$Date))
 j = 1
 for (j in seq_along(urls)) {
   tbl[[j]] = urls[[j]] %>%
