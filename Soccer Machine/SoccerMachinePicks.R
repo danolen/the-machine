@@ -1143,6 +1143,8 @@ types <- filter(history2,
          Side_or_Total = case_when(bet_type %in% c('Alt Spread', 'Draw No Bet', 'ML', 'Spread') ~ "Side",
                                    TRUE ~ "Total"))
 
+saveRDS(types, "Soccer Machine/PicksHistory_Types.rds")
+
 ## Create email tables
 
 email_table_1 <- types %>%
@@ -1173,7 +1175,7 @@ email_table_2 <- types %>%
 df_html_2 <- print(xtable(email_table_2), type = "html", print.results = FALSE)
 
 email_table_3a <- types %>%
-  filter(Kelly_Criteria >= 0.15 & Kelly_Criteria < 0.4 & EV >= 2 & EV < 7) %>%
+  filter(Kelly_Criteria >= 0.2 & EV >= 2) %>%
   #group_by(Total) %>%
   group_by(Strategy = 'Bet Everything') %>% 
   #group_by(bet_type) %>%
@@ -1187,7 +1189,7 @@ email_table_3a <- types %>%
   print(n=40)
 
 email_table_3b <- types %>% 
-  filter(Kelly_Criteria >= 0.15 & Kelly_Criteria < 0.4 & EV >= 2 & EV < 7) %>%
+  filter(Kelly_Criteria >= 0.2 & EV >= 2) %>%
   arrange(gamedate, ID, desc(Kelly_Criteria)) %>% 
   group_by(ID) %>% 
   mutate(KC_Rank = row_number()) %>% 
@@ -1211,7 +1213,7 @@ email_table_3b <- types %>%
   print(n=40)
 
 email_table_3c <- types %>% 
-  filter(Kelly_Criteria >= 0.15 & Kelly_Criteria < 0.4 & EV >= 2 & EV < 7 & Pick_Odds > 0) %>%
+  filter(Kelly_Criteria >= 0.2 & EV >= 2 & Pick_Odds > 0) %>%
   arrange(gamedate, ID, desc(Kelly_Criteria)) %>% 
   group_by(ID) %>% 
   mutate(KC_Rank = row_number()) %>% 
@@ -1235,7 +1237,7 @@ email_table_3c <- types %>%
   print(n=40)
 
 email_table_3d <- types %>%
-  filter(Kelly_Criteria >= 0.15 & Kelly_Criteria < 0.4 & EV >= 2 & EV < 7 & Pick_Odds > 0) %>%
+  filter(Kelly_Criteria >= 0.2 & EV >= 2 & Pick_Odds > 0) %>%
   #group_by(Total) %>%
   group_by(Strategy = 'Bet Everything at Even Odds or Better') %>% 
   #group_by(bet_type) %>%
@@ -1250,10 +1252,7 @@ email_table_3d <- types %>%
 
 SGPs <- types %>%
   filter((Pick_Odds < 0 | (Side_or_Total == 'Side' & Pick_Odds <= 140)) &
-           Kelly_Criteria >= 0.15 &
-           Kelly_Criteria < 0.4 &
-           EV >= 2 &
-           EV < 7 &
+           Kelly_Criteria >= 0.2 & EV >= 2 &
            SGP_eligible == 'Y'
          ) %>%
   mutate(Pushable = case_when(Pick_WinProb + Pick_LoseProb < 0.999 ~ 'Y',
@@ -1303,7 +1302,7 @@ email_SGP_table <- SGP_performance %>%
   print(n=40)
 
 Parlays <- types %>%
-  filter(Pick_Odds < 0 & Kelly_Criteria >= 0.15 & Kelly_Criteria < 0.4 & EV >= 2 & EV < 7) %>%
+  filter(Pick_Odds < 0 & Kelly_Criteria >= 0.2 & EV >= 2) %>%
   mutate(Pushable = case_when(Pick_WinProb + Pick_LoseProb < 0.999 ~ 'Y',
                               TRUE ~ 'N')) %>% 
   filter(Pushable == 'N') %>% 
@@ -1402,7 +1401,7 @@ df_html_5 <- print(xtable(email_table_5), type = "html", print.results = FALSE)
 
 graph_data1 <- types %>%
   ungroup() %>%
-  filter(Kelly_Criteria >= 0.15 & Kelly_Criteria < 0.4 & EV >= 2 & EV < 7) %>%
+  filter(Kelly_Criteria >= 0.2 & EV >= 2) %>%
   select(gamedate, Units, Kelly_Profit) %>%
   rename(`Flat Profit: Bet Everything` = Units,
          `Bet Everything` = Kelly_Profit) %>% 
@@ -1414,7 +1413,7 @@ graph_data1 <- types %>%
 
 graph_data2 <- types %>%
   ungroup() %>%
-  filter(Pick_Odds >= 100 & Kelly_Criteria >= 0.15 & Kelly_Criteria < 0.4 & EV >= 2 & EV < 7) %>% 
+  filter(Pick_Odds >= 100 & Kelly_Criteria >= 0.2 & EV >= 2) %>% 
   select(gamedate, Units, Kelly_Profit) %>%
   rename(`Flat Profit: Bet Everything Positive` = Units,
          `Bet Everything Positive` = Kelly_Profit) %>% 
@@ -1425,7 +1424,7 @@ graph_data2 <- types %>%
   mutate(cumulative_value = cumsum(value))
 
 graph_data3 <- types %>%
-  filter(Kelly_Criteria >= 0.15 & Kelly_Criteria < 0.4 & EV >= 2 & EV < 7) %>%
+  filter(Kelly_Criteria >= 0.2 & EV >= 2) %>%
   arrange(gamedate, ID, desc(Kelly_Criteria)) %>% 
   group_by(ID) %>% 
   mutate(KC_Rank = row_number()) %>% 
@@ -1447,7 +1446,7 @@ graph_data3 <- types %>%
   mutate(cumulative_value = cumsum(value))
 
 graph_data4 <- types %>%
-  filter(Pick_Odds >= 100 & Kelly_Criteria >= 0.15 & Kelly_Criteria < 0.4 & EV >= 2 & EV < 7) %>%
+  filter(Pick_Odds >= 100 & Kelly_Criteria >= 0.2 & EV >= 2) %>%
   arrange(gamedate, ID, desc(Kelly_Criteria)) %>% 
   group_by(ID) %>% 
   mutate(KC_Rank = row_number()) %>% 
@@ -1506,10 +1505,7 @@ plot_html <- add_ggplot(plot_object = plot)
 
 bets_table <- read.csv("Soccer Machine/upcoming_bets.csv") %>% 
   mutate(gamedate = as.Date(gamedate)) %>%
-  filter(Kelly_Criteria >= 0.15 & 
-           Kelly_Criteria < 0.4 & 
-           EV >= 2 & 
-           EV < 7 &
+  filter(Kelly_Criteria >= 0.2 & EV >= 2 &
            Pick_Odds > 0 &
            Pick_WinProb >= 0.3 &
            bet_type_full != 'Alternate Total - 1.5' &
@@ -1524,9 +1520,11 @@ bets_table <- read.csv("Soccer Machine/upcoming_bets.csv") %>%
   arrange(gamedate, ID, Rank) %>% 
   mutate(Final_Rank = row_number()) %>% 
   filter(Final_Rank == 1) %>%
-  mutate(bet_size = case_when(KC_tier %in% c(0.1, 0.15) ~ '$5',
-                              KC_tier %in% c(0.2, 0.25) ~ '$10',
-                              KC_tier %in% c(0.3, 0.35) ~ '$15',
+  mutate(bet_size = case_when(#KC_tier %in% c(0.1, 0.15) ~ '$5',
+                              KC_tier %in% c(0.2, 0.25) ~ '$5',
+                              KC_tier %in% c(0.3, 0.35) ~ '$10',
+                              KC_tier %in% c(0.4, 0.45, 0.5, 0.55, 0.6, 0.65,
+                                             0.7, 0.75, 0.8, 0.85, 0.9, 0.95) ~ '$15',
                               TRUE ~ 'No bet - something went wrong')) %>%
   arrange(gamedate, desc(Kelly_Criteria)) %>% 
   ungroup() %>% 
@@ -1558,10 +1556,7 @@ bets_SGP <- read.csv("Soccer Machine/upcoming_bets.csv") %>%
                                   TRUE ~ 'Y')) %>% 
   mutate(gamedate = as.Date(gamedate)) %>%
   filter((Pick_Odds < 0 | (Side_or_Total == 'Side' & Pick_Odds <= 140)) &
-           Kelly_Criteria >= 0.15 &
-           Kelly_Criteria < 0.4 &
-           EV >= 2 &
-           EV < 7 &
+           Kelly_Criteria >= 0.2 & EV >= 2 &
            bet_type_full != 'Alternate Total - 1.5' &
            gamedate <= Sys.Date() + 4 &
            SGP_eligible == 'Y') %>% 
@@ -1591,7 +1586,7 @@ bets_SGP2 <- bets_SGP %>%
                           is.na(Pick_SpreadTotal) | Pick_SpreadTotal == 0 ~ paste0(Pick),
                           str_detect(bet_type_full, "Spread") & Pick_SpreadTotal > 0 ~ paste0(Pick, " +", Pick_SpreadTotal),
                           TRUE ~ paste0(Pick, " ", Pick_SpreadTotal))) %>% 
-mutate(Pick = case_when(bet_type == 'TT' | bet_type == 'Alt TT' ~ case_when(str_detect(bet_type_full, HomeTeam) ~ paste0(HomeTeam, " TT ", Pick),
+  mutate(Pick = case_when(bet_type == 'TT' | bet_type == 'Alt TT' ~ case_when(str_detect(bet_type_full, HomeTeam) ~ paste0(HomeTeam, " TT ", Pick),
                                                                             TRUE ~ paste0(AwayTeam, " TT ", Pick)),
                         str_detect(bet_type, "Total") ~ paste0("Total ", Pick),
                         bet_type == 'ML' ~ paste0(Pick, " ML"),
@@ -1611,8 +1606,10 @@ mutate(Pick = case_when(bet_type == 'TT' | bet_type == 'Alt TT' ~ case_when(str_
                                                100)),
          Parlay_KC_tier = as.factor(round_any(Parlay_KC, 0.05, floor)),
          bet_size = case_when(Parlay_KC_tier %in% c(0.0, 0.05, 0.1, 0.15) ~ '$5',
-                              Parlay_KC_tier %in% c(0.2, 0.25) ~ '$10',
-                              Parlay_KC_tier %in% c(0.3, 0.35) ~ '$15',
+                              Parlay_KC_tier %in% c(0.2, 0.25) ~ '$5',
+                              Parlay_KC_tier %in% c(0.3, 0.35) ~ '$10',
+                              Parlay_KC_tier %in% c(0.4, 0.45, 0.5, 0.55, 0.6, 0.65,
+                                                    0.7, 0.75, 0.8, 0.85, 0.9, 0.95) ~ '$15',
                               TRUE ~ 'No bet - something went wrong'),
          gamedate = as.character(gamedate)) %>% 
   filter(Parlay_Odds >= 100) %>% 
@@ -1639,10 +1636,7 @@ bets_Parlay <- read.csv("Soccer Machine/upcoming_bets.csv") %>%
   mutate(gamedate = as.Date(gamedate)) %>%
   filter(Pick_Odds < 0 &
            Pick_Odds >= -250 &
-           Kelly_Criteria >= 0.15 &
-           Kelly_Criteria < 0.4 &
-           EV >= 2 &
-           EV < 7 &
+           Kelly_Criteria >= 0.2 & EV >= 2 &
            bet_type_full != 'Alternate Total - 1.5' &
            gamedate <= Sys.Date() + 4) %>% 
   mutate(Pushable = case_when(Pick_WinProb + Pick_LoseProb < 0.999 ~ 'Y',
@@ -1704,8 +1698,10 @@ bets_Parlay2 <- bets_Parlay %>%
                                                100)),
          Parlay_KC_tier = as.factor(round_any(Parlay_KC, 0.05, floor)),
          bet_size = case_when(Parlay_KC_tier %in% c(0.0, 0.05, 0.1, 0.15) ~ '$5',
-                              Parlay_KC_tier %in% c(0.2, 0.25) ~ '$10',
-                              Parlay_KC_tier %in% c(0.3, 0.35) ~ '$15',
+                              Parlay_KC_tier %in% c(0.2, 0.25) ~ '$5',
+                              Parlay_KC_tier %in% c(0.3, 0.35) ~ '$10',
+                              Parlay_KC_tier %in% c(0.4, 0.45, 0.5, 0.55, 0.6, 0.65,
+                                                    0.7, 0.75, 0.8, 0.85, 0.9, 0.95) ~ '$15',
                               TRUE ~ 'No bet - something went wrong'),
          gamedate = as.character(gamedate)) %>% 
   filter(Parlay_Odds >= 100) %>% 
@@ -1739,12 +1735,14 @@ df_html_bets <- print(xtable(bets_table2), type = "html", print.results = FALSE)
 Outlook <- COMCreate("Outlook.Application")
 
 Email = Outlook$CreateItem(0)
-Email[["to"]] = paste("dnolen@smu.edu", "jamesorler@gmail.com", "asnolen@crimson.ua.edu", "jamestodd425@gmail.com",
-                      "jordanreticker@gmail.com", "brentcaminiti@gmail.com", "dougmyers4987@gmail.com", sep = ";", collapse = NULL)
-# Email[["to"]] = "dnolen@smu.edu"
+# Email[["to"]] = paste("dnolen@smu.edu", "jamesorler@gmail.com", "asnolen@crimson.ua.edu", "jamestodd425@gmail.com",
+#                       "jordanreticker@gmail.com", "brentcaminiti@gmail.com", "dougmyers4987@gmail.com", sep = ";", collapse = NULL)
+Email[["to"]] = "dnolen@smu.edu"
 Email[["subject"]] = paste0("Soccer Machine Picks: ", Sys.Date())
 Email[["HTMLbody"]] = sprintf("
 The Machine's picks for upcoming soccer matches are in! The Machine currently offers picks for the Big 5 European Leagues plus MLS. The attached document contains all of the pertinent betting information for the upcoming matches. Good luck!
+</p><br></p>
+UPDATE: The website that The Machine uses for gathering xG data (fbref.com, great site) has made a major change. They are switching from using StatsBomb's xG model to Stats Perform Opta's xG model. Both are quality models, so hopefully the performance of the Machine is not impacted too much. They are also adding xG data to many leagues outside of the Big 5 in Europe and the MLS. The Machine might soon be able to start offering picks for other leagues with this enhanced xG data. More coming soon...
 </p><br></p>
 TL;DR: These are the bets that The Machine recommends that you should make for the next few days. The bet sizes are based on a unit size of $10. If your regular bet is something other than $10, adjust accordingly.
 </p><br></p>
@@ -1758,7 +1756,7 @@ Below are the results for each league:
 </p><br></p>
 %s
 </p><br></p>
-Bets with a KC of at least 0.15 and less than 0.4 and EV of at least 2 and less than 7 have had the best performance so far. This is expected. If there is not a big difference between the Machine projection and the odds then there is not much of an edge. On the other end, if the Machine projections are way off from the odds, then it's more likely that the oddsmakers know something that the Machine doesn't, rather than the other way around. Here are the results for those bets using six different strategies:
+UPDATED: Bets with a KC of at least 0.2 and EV of at least 2 have had the best performance so far. Here are the results for those bets using six different strategies:
 </p><br></p>
 %s
 </p><br></p>
