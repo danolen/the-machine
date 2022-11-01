@@ -33,4 +33,4 @@ champ_23 <- fb_match_results(country = "ENG", gender = "M", season_end_year = 20
          League = "MLS",
          Season = as.character(Season))
 
-epl_results <- understat_league_match_results(league = "EPL", season_start_year = 2020)
+

@@ -1735,9 +1735,9 @@ df_html_bets <- print(xtable(bets_table2), type = "html", print.results = FALSE)
 Outlook <- COMCreate("Outlook.Application")
 
 Email = Outlook$CreateItem(0)
-# Email[["to"]] = paste("dnolen@smu.edu", "jamesorler@gmail.com", "asnolen@crimson.ua.edu", "jamestodd425@gmail.com",
-#                       "jordanreticker@gmail.com", "brentcaminiti@gmail.com", "dougmyers4987@gmail.com", sep = ";", collapse = NULL)
-Email[["to"]] = "dnolen@smu.edu"
+Email[["to"]] = paste("dnolen@smu.edu", "jamesorler@gmail.com", "asnolen@crimson.ua.edu", "jamestodd425@gmail.com",
+                      "jordanreticker@gmail.com", "brentcaminiti@gmail.com", "dougmyers4987@gmail.com", sep = ";", collapse = NULL)
+# Email[["to"]] = "dnolen@smu.edu"
 Email[["subject"]] = paste0("Soccer Machine Picks: ", Sys.Date())
 Email[["HTMLbody"]] = sprintf("
 The Machine's picks for upcoming soccer matches are in! The Machine currently offers picks for the Big 5 European Leagues plus MLS. The attached document contains all of the pertinent betting information for the upcoming matches. Good luck!
