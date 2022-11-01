@@ -297,12 +297,12 @@ stopCluster(cluster)
 intervalEnd <- Sys.time()
 paste("Goals regression model training took",intervalEnd - intervalStart,attr(intervalEnd - intervalStart,"units"))
 
-saveRDS(gbm_mod, "Soccer Machine/Models/train_gbm.rds")
-saveRDS(cub_mod, "Soccer Machine/Models/train_cub.rds")
-saveRDS(rf_mod, "Soccer Machine/Models/train_rf.rds")
-saveRDS(ctree_mod, "Soccer Machine/Models/train_ctree.rds")
-saveRDS(pls_mod, "Soccer Machine/Models/train_pls.rds")
-saveRDS(lm_mod, "Soccer Machine/Models/train_lm.rds")
+saveRDS(gbm_mod, "C:/Users/danie/Desktop/SportsStuff/TheMachine/Models/train_gbm.rds")
+saveRDS(cub_mod, "C:/Users/danie/Desktop/SportsStuff/TheMachine/Models/train_cub.rds")
+saveRDS(rf_mod, "C:/Users/danie/Desktop/SportsStuff/TheMachine/Models/train_rf.rds")
+saveRDS(ctree_mod, "C:/Users/danie/Desktop/SportsStuff/TheMachine/Models/train_ctree.rds")
+saveRDS(pls_mod, "C:/Users/danie/Desktop/SportsStuff/TheMachine/Models/train_pls.rds")
+saveRDS(lm_mod, "C:/Users/danie/Desktop/SportsStuff/TheMachine/Models/train_lm.rds")
 
 train_prob <- train_df %>% 
   filter(SplitGP > 0 & SplitGP_Opp > 0 & Date < today)%>% 
@@ -353,9 +353,9 @@ stopCluster(cluster)
 intervalEnd <- Sys.time()
 paste("Outcome classification model training took",intervalEnd - intervalStart,attr(intervalEnd - intervalStart,"units"))
 
-saveRDS(outcome_gbm, "Soccer Machine/Models/outcome_gbm.rds")
-saveRDS(outcome_pls, "Soccer Machine/Models/outcome_pls.rds")
-saveRDS(outcome_xgb, "Soccer Machine/Models/outcome_xgb.rds")
+saveRDS(outcome_gbm, "C:/Users/danie/Desktop/SportsStuff/TheMachine/Models/outcome_gbm.rds")
+saveRDS(outcome_pls, "C:/Users/danie/Desktop/SportsStuff/TheMachine/Models/outcome_pls.rds")
+saveRDS(outcome_xgb, "C:/Users/danie/Desktop/SportsStuff/TheMachine/Models/outcome_xgb.rds")
 
 Minus1_df <- train_prob %>% 
   filter(Home_or_Away == "Home") %>% 
@@ -391,9 +391,9 @@ stopCluster(cluster)
 intervalEnd <- Sys.time()
 paste("Minus1 classification model training took",intervalEnd - intervalStart,attr(intervalEnd - intervalStart,"units"))
 
-saveRDS(minus1_gbm, "Soccer Machine/Models/minus1_gbm.rds")
-saveRDS(minus1_pls, "Soccer Machine/Models/minus1_pls.rds")
-saveRDS(minus1_xgb, "Soccer Machine/Models/minus1_xgb.rds")
+saveRDS(minus1_gbm, "C:/Users/danie/Desktop/SportsStuff/TheMachine/Models/minus1_gbm.rds")
+saveRDS(minus1_pls, "C:/Users/danie/Desktop/SportsStuff/TheMachine/Models/minus1_pls.rds")
+saveRDS(minus1_xgb, "C:/Users/danie/Desktop/SportsStuff/TheMachine/Models/minus1_xgb.rds")
 
 Minus1.5_df <- train_prob %>% 
   filter(Home_or_Away == "Home") %>% 
@@ -429,9 +429,9 @@ stopCluster(cluster)
 intervalEnd <- Sys.time()
 paste("Minus1.5 classification model training took",intervalEnd - intervalStart,attr(intervalEnd - intervalStart,"units"))
 
-saveRDS(minus1.5_gbm, "Soccer Machine/Models/minus1.5_gbm.rds")
-saveRDS(minus1.5_pls, "Soccer Machine/Models/minus1.5_pls.rds")
-saveRDS(minus1.5_xgb, "Soccer Machine/Models/minus1.5_xgb.rds")
+saveRDS(minus1.5_gbm, "C:/Users/danie/Desktop/SportsStuff/TheMachine/Models/minus1.5_gbm.rds")
+saveRDS(minus1.5_pls, "C:/Users/danie/Desktop/SportsStuff/TheMachine/Models/minus1.5_pls.rds")
+saveRDS(minus1.5_xgb, "C:/Users/danie/Desktop/SportsStuff/TheMachine/Models/minus1.5_xgb.rds")
 
 Minus2_df <- train_prob %>% 
   filter(Home_or_Away == "Home") %>% 
@@ -467,9 +467,9 @@ stopCluster(cluster)
 intervalEnd <- Sys.time()
 paste("Minus2 classification model training took",intervalEnd - intervalStart,attr(intervalEnd - intervalStart,"units"))
 
-saveRDS(minus2_gbm, "Soccer Machine/Models/minus2_gbm.rds")
-saveRDS(minus2_pls, "Soccer Machine/Models/minus2_pls.rds")
-saveRDS(minus2_xgb, "Soccer Machine/Models/minus2_xgb.rds")
+saveRDS(minus2_gbm, "C:/Users/danie/Desktop/SportsStuff/TheMachine/Models/minus2_gbm.rds")
+saveRDS(minus2_pls, "C:/Users/danie/Desktop/SportsStuff/TheMachine/Models/minus2_pls.rds")
+saveRDS(minus2_xgb, "C:/Users/danie/Desktop/SportsStuff/TheMachine/Models/minus2_xgb.rds")
 
 Minus2.5_df <- train_prob %>% 
   filter(Home_or_Away == "Home") %>% 
@@ -505,9 +505,9 @@ stopCluster(cluster)
 intervalEnd <- Sys.time()
 paste("Minus2.5 classification model training took",intervalEnd - intervalStart,attr(intervalEnd - intervalStart,"units"))
 
-saveRDS(minus2.5_gbm, "Soccer Machine/Models/minus2.5_gbm.rds")
-saveRDS(minus2.5_pls, "Soccer Machine/Models/minus2.5_pls.rds")
-saveRDS(minus2.5_xgb, "Soccer Machine/Models/minus2.5_xgb.rds")
+saveRDS(minus2.5_gbm, "C:/Users/danie/Desktop/SportsStuff/TheMachine/Models/minus2.5_gbm.rds")
+saveRDS(minus2.5_pls, "C:/Users/danie/Desktop/SportsStuff/TheMachine/Models/minus2.5_pls.rds")
+saveRDS(minus2.5_xgb, "C:/Users/danie/Desktop/SportsStuff/TheMachine/Models/minus2.5_xgb.rds")
 
 Minus3_df <- train_prob %>% 
   filter(Home_or_Away == "Home") %>% 
@@ -543,9 +543,9 @@ stopCluster(cluster)
 intervalEnd <- Sys.time()
 paste("Minus3 classification model training took",intervalEnd - intervalStart,attr(intervalEnd - intervalStart,"units"))
 
-saveRDS(minus3_gbm, "Soccer Machine/Models/minus3_gbm.rds")
-saveRDS(minus3_pls, "Soccer Machine/Models/minus3_pls.rds")
-saveRDS(minus3_xgb, "Soccer Machine/Models/minus3_xgb.rds")
+saveRDS(minus3_gbm, "C:/Users/danie/Desktop/SportsStuff/TheMachine/Models/minus3_gbm.rds")
+saveRDS(minus3_pls, "C:/Users/danie/Desktop/SportsStuff/TheMachine/Models/minus3_pls.rds")
+saveRDS(minus3_xgb, "C:/Users/danie/Desktop/SportsStuff/TheMachine/Models/minus3_xgb.rds")
 
 Minus3.5_df <- train_prob %>% 
   filter(Home_or_Away == "Home") %>% 
@@ -581,9 +581,9 @@ stopCluster(cluster)
 intervalEnd <- Sys.time()
 paste("Minus3.5 classification model training took",intervalEnd - intervalStart,attr(intervalEnd - intervalStart,"units"))
 
-saveRDS(minus3.5_gbm, "Soccer Machine/Models/minus3.5_gbm.rds")
-saveRDS(minus3.5_pls, "Soccer Machine/Models/minus3.5_pls.rds")
-saveRDS(minus3.5_xgb, "Soccer Machine/Models/minus3.5_xgb.rds")
+saveRDS(minus3.5_gbm, "C:/Users/danie/Desktop/SportsStuff/TheMachine/Models/minus3.5_gbm.rds")
+saveRDS(minus3.5_pls, "C:/Users/danie/Desktop/SportsStuff/TheMachine/Models/minus3.5_pls.rds")
+saveRDS(minus3.5_xgb, "C:/Users/danie/Desktop/SportsStuff/TheMachine/Models/minus3.5_xgb.rds")
 
 Plus1_df <- train_prob %>% 
   filter(Home_or_Away == "Home") %>% 
@@ -619,9 +619,9 @@ stopCluster(cluster)
 intervalEnd <- Sys.time()
 paste("Plus1 classification model training took",intervalEnd - intervalStart,attr(intervalEnd - intervalStart,"units"))
 
-saveRDS(plus1_gbm, "Soccer Machine/Models/plus1_gbm.rds")
-saveRDS(plus1_pls, "Soccer Machine/Models/plus1_pls.rds")
-saveRDS(plus1_xgb, "Soccer Machine/Models/plus1_xgb.rds")
+saveRDS(plus1_gbm, "C:/Users/danie/Desktop/SportsStuff/TheMachine/Models/plus1_gbm.rds")
+saveRDS(plus1_pls, "C:/Users/danie/Desktop/SportsStuff/TheMachine/Models/plus1_pls.rds")
+saveRDS(plus1_xgb, "C:/Users/danie/Desktop/SportsStuff/TheMachine/Models/plus1_xgb.rds")
 
 Plus1.5_df <- train_prob %>% 
   filter(Home_or_Away == "Home") %>% 
@@ -657,9 +657,9 @@ stopCluster(cluster)
 intervalEnd <- Sys.time()
 paste("Plus1.5 classification model training took",intervalEnd - intervalStart,attr(intervalEnd - intervalStart,"units"))
 
-saveRDS(plus1.5_gbm, "Soccer Machine/Models/plus1.5_gbm.rds")
-saveRDS(plus1.5_pls, "Soccer Machine/Models/plus1.5_pls.rds")
-saveRDS(plus1.5_xgb, "Soccer Machine/Models/plus1.5_xgb.rds")
+saveRDS(plus1.5_gbm, "C:/Users/danie/Desktop/SportsStuff/TheMachine/Models/plus1.5_gbm.rds")
+saveRDS(plus1.5_pls, "C:/Users/danie/Desktop/SportsStuff/TheMachine/Models/plus1.5_pls.rds")
+saveRDS(plus1.5_xgb, "C:/Users/danie/Desktop/SportsStuff/TheMachine/Models/plus1.5_xgb.rds")
 
 Plus2_df <- train_prob %>% 
   filter(Home_or_Away == "Home") %>% 
@@ -695,9 +695,9 @@ stopCluster(cluster)
 intervalEnd <- Sys.time()
 paste("Plus2 classification model training took",intervalEnd - intervalStart,attr(intervalEnd - intervalStart,"units"))
 
-saveRDS(plus2_gbm, "Soccer Machine/Models/plus2_gbm.rds")
-saveRDS(plus2_pls, "Soccer Machine/Models/plus2_pls.rds")
-saveRDS(plus2_xgb, "Soccer Machine/Models/plus2_xgb.rds")
+saveRDS(plus2_gbm, "C:/Users/danie/Desktop/SportsStuff/TheMachine/Models/plus2_gbm.rds")
+saveRDS(plus2_pls, "C:/Users/danie/Desktop/SportsStuff/TheMachine/Models/plus2_pls.rds")
+saveRDS(plus2_xgb, "C:/Users/danie/Desktop/SportsStuff/TheMachine/Models/plus2_xgb.rds")
 
 Plus2.5_df <- train_prob %>% 
   filter(Home_or_Away == "Home") %>% 
@@ -733,9 +733,9 @@ stopCluster(cluster)
 intervalEnd <- Sys.time()
 paste("Plus2.5 classification model training took",intervalEnd - intervalStart,attr(intervalEnd - intervalStart,"units"))
 
-saveRDS(plus2.5_gbm, "Soccer Machine/Models/plus2.5_gbm.rds")
-saveRDS(plus2.5_pls, "Soccer Machine/Models/plus2.5_pls.rds")
-saveRDS(plus2.5_xgb, "Soccer Machine/Models/plus2.5_xgb.rds")
+saveRDS(plus2.5_gbm, "C:/Users/danie/Desktop/SportsStuff/TheMachine/Models/plus2.5_gbm.rds")
+saveRDS(plus2.5_pls, "C:/Users/danie/Desktop/SportsStuff/TheMachine/Models/plus2.5_pls.rds")
+saveRDS(plus2.5_xgb, "C:/Users/danie/Desktop/SportsStuff/TheMachine/Models/plus2.5_xgb.rds")
 
 Plus3_df <- train_prob %>% 
   filter(Home_or_Away == "Home") %>% 
@@ -771,9 +771,9 @@ stopCluster(cluster)
 intervalEnd <- Sys.time()
 paste("Plus3 classification model training took",intervalEnd - intervalStart,attr(intervalEnd - intervalStart,"units"))
 
-saveRDS(plus3_gbm, "Soccer Machine/Models/plus3_gbm.rds")
-saveRDS(plus3_pls, "Soccer Machine/Models/plus3_pls.rds")
-saveRDS(plus3_xgb, "Soccer Machine/Models/plus3_xgb.rds")
+saveRDS(plus3_gbm, "C:/Users/danie/Desktop/SportsStuff/TheMachine/Models/plus3_gbm.rds")
+saveRDS(plus3_pls, "C:/Users/danie/Desktop/SportsStuff/TheMachine/Models/plus3_pls.rds")
+saveRDS(plus3_xgb, "C:/Users/danie/Desktop/SportsStuff/TheMachine/Models/plus3_xgb.rds")
 
 Plus3.5_df <- train_prob %>% 
   filter(Home_or_Away == "Home") %>% 
@@ -809,9 +809,9 @@ stopCluster(cluster)
 intervalEnd <- Sys.time()
 paste("Plus3.5 classification model training took",intervalEnd - intervalStart,attr(intervalEnd - intervalStart,"units"))
 
-saveRDS(plus3.5_gbm, "Soccer Machine/Models/plus3.5_gbm.rds")
-saveRDS(plus3.5_pls, "Soccer Machine/Models/plus3.5_pls.rds")
-saveRDS(plus3.5_xgb, "Soccer Machine/Models/plus3.5_xgb.rds")
+saveRDS(plus3.5_gbm, "C:/Users/danie/Desktop/SportsStuff/TheMachine/Models/plus3.5_gbm.rds")
+saveRDS(plus3.5_pls, "C:/Users/danie/Desktop/SportsStuff/TheMachine/Models/plus3.5_pls.rds")
+saveRDS(plus3.5_xgb, "C:/Users/danie/Desktop/SportsStuff/TheMachine/Models/plus3.5_xgb.rds")
 
 Total1.5_df <- train_prob %>% 
   filter(Home_or_Away == "Home") %>% 
@@ -847,9 +847,9 @@ stopCluster(cluster)
 intervalEnd <- Sys.time()
 paste("Total1.5 classification model training took",intervalEnd - intervalStart,attr(intervalEnd - intervalStart,"units"))
 
-saveRDS(total1.5_gbm, "Soccer Machine/Models/total1.5_gbm.rds")
-saveRDS(total1.5_pls, "Soccer Machine/Models/total1.5_pls.rds")
-saveRDS(total1.5_xgb, "Soccer Machine/Models/total1.5_xgb.rds")
+saveRDS(total1.5_gbm, "C:/Users/danie/Desktop/SportsStuff/TheMachine/Models/total1.5_gbm.rds")
+saveRDS(total1.5_pls, "C:/Users/danie/Desktop/SportsStuff/TheMachine/Models/total1.5_pls.rds")
+saveRDS(total1.5_xgb, "C:/Users/danie/Desktop/SportsStuff/TheMachine/Models/total1.5_xgb.rds")
 
 Total2_df <- train_prob %>% 
   filter(Home_or_Away == "Home") %>% 
@@ -885,9 +885,9 @@ stopCluster(cluster)
 intervalEnd <- Sys.time()
 paste("Total2 classification model training took",intervalEnd - intervalStart,attr(intervalEnd - intervalStart,"units"))
 
-saveRDS(total2_gbm, "Soccer Machine/Models/total2_gbm.rds")
-saveRDS(total2_pls, "Soccer Machine/Models/total2_pls.rds")
-saveRDS(total2_xgb, "Soccer Machine/Models/total2_xgb.rds")
+saveRDS(total2_gbm, "C:/Users/danie/Desktop/SportsStuff/TheMachine/Models/total2_gbm.rds")
+saveRDS(total2_pls, "C:/Users/danie/Desktop/SportsStuff/TheMachine/Models/total2_pls.rds")
+saveRDS(total2_xgb, "C:/Users/danie/Desktop/SportsStuff/TheMachine/Models/total2_xgb.rds")
 
 Total2.5_df <- train_prob %>% 
   filter(Home_or_Away == "Home") %>% 
@@ -923,9 +923,9 @@ stopCluster(cluster)
 intervalEnd <- Sys.time()
 paste("Total2.5 classification model training took",intervalEnd - intervalStart,attr(intervalEnd - intervalStart,"units"))
 
-saveRDS(total2.5_gbm, "Soccer Machine/Models/total2.5_gbm.rds")
-saveRDS(total2.5_pls, "Soccer Machine/Models/total2.5_pls.rds")
-saveRDS(total2.5_xgb, "Soccer Machine/Models/total2.5_xgb.rds")
+saveRDS(total2.5_gbm, "C:/Users/danie/Desktop/SportsStuff/TheMachine/Models/total2.5_gbm.rds")
+saveRDS(total2.5_pls, "C:/Users/danie/Desktop/SportsStuff/TheMachine/Models/total2.5_pls.rds")
+saveRDS(total2.5_xgb, "C:/Users/danie/Desktop/SportsStuff/TheMachine/Models/total2.5_xgb.rds")
 
 Total3_df <- train_prob %>% 
   filter(Home_or_Away == "Home") %>% 
@@ -961,9 +961,9 @@ stopCluster(cluster)
 intervalEnd <- Sys.time()
 paste("Total3 classification model training took",intervalEnd - intervalStart,attr(intervalEnd - intervalStart,"units"))
 
-saveRDS(total3_gbm, "Soccer Machine/Models/total3_gbm.rds")
-saveRDS(total3_pls, "Soccer Machine/Models/total3_pls.rds")
-saveRDS(total3_xgb, "Soccer Machine/Models/total3_xgb.rds")
+saveRDS(total3_gbm, "C:/Users/danie/Desktop/SportsStuff/TheMachine/Models/total3_gbm.rds")
+saveRDS(total3_pls, "C:/Users/danie/Desktop/SportsStuff/TheMachine/Models/total3_pls.rds")
+saveRDS(total3_xgb, "C:/Users/danie/Desktop/SportsStuff/TheMachine/Models/total3_xgb.rds")
 
 Total3.5_df <- train_prob %>% 
   filter(Home_or_Away == "Home") %>% 
@@ -999,9 +999,9 @@ stopCluster(cluster)
 intervalEnd <- Sys.time()
 paste("Total3.5 classification model training took",intervalEnd - intervalStart,attr(intervalEnd - intervalStart,"units"))
 
-saveRDS(total3.5_gbm, "Soccer Machine/Models/total3.5_gbm.rds")
-saveRDS(total3.5_pls, "Soccer Machine/Models/total3.5_pls.rds")
-saveRDS(total3.5_xgb, "Soccer Machine/Models/total3.5_xgb.rds")
+saveRDS(total3.5_gbm, "C:/Users/danie/Desktop/SportsStuff/TheMachine/Models/total3.5_gbm.rds")
+saveRDS(total3.5_pls, "C:/Users/danie/Desktop/SportsStuff/TheMachine/Models/total3.5_pls.rds")
+saveRDS(total3.5_xgb, "C:/Users/danie/Desktop/SportsStuff/TheMachine/Models/total3.5_xgb.rds")
 
 Total4_df <- train_prob %>% 
   filter(Home_or_Away == "Home") %>% 
@@ -1037,9 +1037,9 @@ stopCluster(cluster)
 intervalEnd <- Sys.time()
 paste("Total4 classification model training took",intervalEnd - intervalStart,attr(intervalEnd - intervalStart,"units"))
 
-saveRDS(total4_gbm, "Soccer Machine/Models/total4_gbm.rds")
-saveRDS(total4_pls, "Soccer Machine/Models/total4_pls.rds")
-saveRDS(total4_xgb, "Soccer Machine/Models/total4_xgb.rds")
+saveRDS(total4_gbm, "C:/Users/danie/Desktop/SportsStuff/TheMachine/Models/total4_gbm.rds")
+saveRDS(total4_pls, "C:/Users/danie/Desktop/SportsStuff/TheMachine/Models/total4_pls.rds")
+saveRDS(total4_xgb, "C:/Users/danie/Desktop/SportsStuff/TheMachine/Models/total4_xgb.rds")
 
 Total4.5_df <- train_prob %>% 
   filter(Home_or_Away == "Home") %>% 
@@ -1075,9 +1075,9 @@ stopCluster(cluster)
 intervalEnd <- Sys.time()
 paste("Total4.5 classification model training took",intervalEnd - intervalStart,attr(intervalEnd - intervalStart,"units"))
 
-saveRDS(total4.5_gbm, "Soccer Machine/Models/total4.5_gbm.rds")
-saveRDS(total4.5_pls, "Soccer Machine/Models/total4.5_pls.rds")
-saveRDS(total4.5_xgb, "Soccer Machine/Models/total4.5_xgb.rds")
+saveRDS(total4.5_gbm, "C:/Users/danie/Desktop/SportsStuff/TheMachine/Models/total4.5_gbm.rds")
+saveRDS(total4.5_pls, "C:/Users/danie/Desktop/SportsStuff/TheMachine/Models/total4.5_pls.rds")
+saveRDS(total4.5_xgb, "C:/Users/danie/Desktop/SportsStuff/TheMachine/Models/total4.5_xgb.rds")
 
 BTTS_df <- train_prob %>% 
   filter(Home_or_Away == "Home") %>% 
@@ -1113,9 +1113,9 @@ stopCluster(cluster)
 intervalEnd <- Sys.time()
 paste("BTTS classification model training took",intervalEnd - intervalStart,attr(intervalEnd - intervalStart,"units"))
 
-saveRDS(BTTS_gbm, "Soccer Machine/Models/BTTS_gbm.rds")
-saveRDS(BTTS_pls, "Soccer Machine/Models/BTTS_pls.rds")
-saveRDS(BTTS_xgb, "Soccer Machine/Models/BTTS_xgb.rds")
+saveRDS(BTTS_gbm, "C:/Users/danie/Desktop/SportsStuff/TheMachine/Models/BTTS_gbm.rds")
+saveRDS(BTTS_pls, "C:/Users/danie/Desktop/SportsStuff/TheMachine/Models/BTTS_pls.rds")
+saveRDS(BTTS_xgb, "C:/Users/danie/Desktop/SportsStuff/TheMachine/Models/BTTS_xgb.rds")
 
 TT0.5_df <- train_prob %>%
   select(-Home_or_Away, -(Outcome:BTTS), -(TT1:TT3.5))
@@ -1150,9 +1150,9 @@ stopCluster(cluster)
 intervalEnd <- Sys.time()
 paste("TT0.5 classification model training took",intervalEnd - intervalStart,attr(intervalEnd - intervalStart,"units"))
 
-saveRDS(tt0.5_gbm, "Soccer Machine/Models/tt0.5_gbm.rds")
-saveRDS(tt0.5_pls, "Soccer Machine/Models/tt0.5_pls.rds")
-saveRDS(tt0.5_xgb, "Soccer Machine/Models/tt0.5_xgb.rds")
+saveRDS(tt0.5_gbm, "C:/Users/danie/Desktop/SportsStuff/TheMachine/Models/tt0.5_gbm.rds")
+saveRDS(tt0.5_pls, "C:/Users/danie/Desktop/SportsStuff/TheMachine/Models/tt0.5_pls.rds")
+saveRDS(tt0.5_xgb, "C:/Users/danie/Desktop/SportsStuff/TheMachine/Models/tt0.5_xgb.rds")
 
 TT1_df <- train_prob %>%
   select(-(Outcome:TT0.5), -(TT1.5:TT3.5))
@@ -1187,9 +1187,9 @@ stopCluster(cluster)
 intervalEnd <- Sys.time()
 paste("TT1 classification model training took",intervalEnd - intervalStart,attr(intervalEnd - intervalStart,"units"))
 
-saveRDS(tt1_gbm, "Soccer Machine/Models/tt1_gbm.rds")
-saveRDS(tt1_pls, "Soccer Machine/Models/tt1_pls.rds")
-saveRDS(tt1_xgb, "Soccer Machine/Models/tt1_xgb.rds")
+saveRDS(tt1_gbm, "C:/Users/danie/Desktop/SportsStuff/TheMachine/Models/tt1_gbm.rds")
+saveRDS(tt1_pls, "C:/Users/danie/Desktop/SportsStuff/TheMachine/Models/tt1_pls.rds")
+saveRDS(tt1_xgb, "C:/Users/danie/Desktop/SportsStuff/TheMachine/Models/tt1_xgb.rds")
 
 TT1.5_df <- train_prob %>%
   select(-(Outcome:TT1), -(TT2:TT3.5))
@@ -1224,9 +1224,9 @@ stopCluster(cluster)
 intervalEnd <- Sys.time()
 paste("TT1.5 classification model training took",intervalEnd - intervalStart,attr(intervalEnd - intervalStart,"units"))
 
-saveRDS(tt1.5_gbm, "Soccer Machine/Models/tt1.5_gbm.rds")
-saveRDS(tt1.5_pls, "Soccer Machine/Models/tt1.5_pls.rds")
-saveRDS(tt1.5_xgb, "Soccer Machine/Models/tt1.5_xgb.rds")
+saveRDS(tt1.5_gbm, "C:/Users/danie/Desktop/SportsStuff/TheMachine/Models/tt1.5_gbm.rds")
+saveRDS(tt1.5_pls, "C:/Users/danie/Desktop/SportsStuff/TheMachine/Models/tt1.5_pls.rds")
+saveRDS(tt1.5_xgb, "C:/Users/danie/Desktop/SportsStuff/TheMachine/Models/tt1.5_xgb.rds")
 
 TT2_df <- train_prob %>%
   select(-(Outcome:TT1.5), -(TT2.5:TT3.5))
@@ -1261,9 +1261,9 @@ stopCluster(cluster)
 intervalEnd <- Sys.time()
 paste("TT2 classification model training took",intervalEnd - intervalStart,attr(intervalEnd - intervalStart,"units"))
 
-saveRDS(tt2_gbm, "Soccer Machine/Models/tt2_gbm.rds")
-saveRDS(tt2_pls, "Soccer Machine/Models/tt2_pls.rds")
-saveRDS(tt2_xgb, "Soccer Machine/Models/tt2_xgb.rds")
+saveRDS(tt2_gbm, "C:/Users/danie/Desktop/SportsStuff/TheMachine/Models/tt2_gbm.rds")
+saveRDS(tt2_pls, "C:/Users/danie/Desktop/SportsStuff/TheMachine/Models/tt2_pls.rds")
+saveRDS(tt2_xgb, "C:/Users/danie/Desktop/SportsStuff/TheMachine/Models/tt2_xgb.rds")
 
 TT2.5_df <- train_prob %>%
   select(-(Outcome:TT2), -(TT3:TT3.5))
@@ -1298,9 +1298,9 @@ stopCluster(cluster)
 intervalEnd <- Sys.time()
 paste("TT2.5 classification model training took",intervalEnd - intervalStart,attr(intervalEnd - intervalStart,"units"))
 
-saveRDS(tt2.5_gbm, "Soccer Machine/Models/tt2.5_gbm.rds")
-saveRDS(tt2.5_pls, "Soccer Machine/Models/tt2.5_pls.rds")
-saveRDS(tt2.5_xgb, "Soccer Machine/Models/tt2.5_xgb.rds")
+saveRDS(tt2.5_gbm, "C:/Users/danie/Desktop/SportsStuff/TheMachine/Models/tt2.5_gbm.rds")
+saveRDS(tt2.5_pls, "C:/Users/danie/Desktop/SportsStuff/TheMachine/Models/tt2.5_pls.rds")
+saveRDS(tt2.5_xgb, "C:/Users/danie/Desktop/SportsStuff/TheMachine/Models/tt2.5_xgb.rds")
 
 TT3_df <- train_prob %>%
   select(-(Outcome:TT2.5), -TT3.5)
@@ -1336,9 +1336,9 @@ intervalEnd <- Sys.time()
 paste("TT3 classification model training took",intervalEnd - intervalStart,attr(intervalEnd - intervalStart,"units"))
 
 
-saveRDS(tt3_gbm, "Soccer Machine/Models/tt3_gbm.rds")
-saveRDS(tt3_pls, "Soccer Machine/Models/tt3_pls.rds")
-saveRDS(tt3_xgb, "Soccer Machine/Models/tt3_xgb.rds")
+saveRDS(tt3_gbm, "C:/Users/danie/Desktop/SportsStuff/TheMachine/Models/tt3_gbm.rds")
+saveRDS(tt3_pls, "C:/Users/danie/Desktop/SportsStuff/TheMachine/Models/tt3_pls.rds")
+saveRDS(tt3_xgb, "C:/Users/danie/Desktop/SportsStuff/TheMachine/Models/tt3_xgb.rds")
 
 TT3.5_df <- train_prob %>%
   select(-(Outcome:TT3))
@@ -1373,9 +1373,9 @@ stopCluster(cluster)
 intervalEnd <- Sys.time()
 paste("TT3.5 classification model training took",intervalEnd - intervalStart,attr(intervalEnd - intervalStart,"units"))
 
-saveRDS(tt3.5_gbm, "Soccer Machine/Models/tt3.5_gbm.rds")
-saveRDS(tt3.5_pls, "Soccer Machine/Models/tt3.5_pls.rds")
-saveRDS(tt3.5_xgb, "Soccer Machine/Models/tt3.5_xgb.rds")
+saveRDS(tt3.5_gbm, "C:/Users/danie/Desktop/SportsStuff/TheMachine/Models/tt3.5_gbm.rds")
+saveRDS(tt3.5_pls, "C:/Users/danie/Desktop/SportsStuff/TheMachine/Models/tt3.5_pls.rds")
+saveRDS(tt3.5_xgb, "C:/Users/danie/Desktop/SportsStuff/TheMachine/Models/tt3.5_xgb.rds")
 
 overallEnd <- Sys.time()
 paste("Entire script took",overallEnd - overallStart,attr(overallEnd - overallStart,"units"))
