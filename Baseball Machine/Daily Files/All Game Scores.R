@@ -13,7 +13,7 @@ end22 <- as.Date('2022-10-05')
 i <- 1
 date <- start22
 gamedates <- list()
-while (date < Sys.Date()+2) {
+while (date <= end22) {
   gamedate = date
   gamedates[[i]] = gamedate
   i <- i+1
