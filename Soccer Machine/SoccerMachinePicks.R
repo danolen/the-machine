@@ -27,6 +27,8 @@ esp_url <- "https://www.bovada.lv/services/sports/event/v2/events/A/description/
 ger_url <- "https://www.bovada.lv/services/sports/event/v2/events/A/description/soccer/europe/germany/1-bundesliga"
 fra_url <- "https://www.bovada.lv/services/sports/event/v2/events/A/description/soccer/europe/france/ligue-1"
 ita_url <- "https://www.bovada.lv/services/sports/event/v2/events/A/description/soccer/europe/italy/serie-a"
+champ_url <- "https://www.bovada.lv/services/sports/event/v2/events/A/description/soccer/europe/england/championship"
+
 
 mls_odds <- fromJSON(mls_url) %>%
   .[[2]] %>%
@@ -295,12 +297,57 @@ ita_odds <- fromJSON(ita_url) %>%
   filter((AUN.Odds >= 100 | AUN.Odds <= -100) & (HOY.Odds >= 100 | HOY.Odds <= -100)) %>%
   select(-D.SpreadTotal)
 
+champ_odds <- fromJSON(champ_url) %>%
+  .[[2]] %>%
+  .[[1]] %>%
+  select(description, link, displayGroups) %>%
+  mutate(gamedate = as.Date(str_sub(link, -12, -5), format = "%Y%m%d")) %>%
+  separate(description, c("HomeTeam", "AwayTeam"), " vs ") %>%
+  select(gamedate, HomeTeam, AwayTeam, displayGroups) %>%
+  unnest(displayGroups) %>%
+  filter(description %in% c("Game Lines", "Alternate Lines", "Both Teams to Score")) %>%
+  select(gamedate, HomeTeam, AwayTeam, markets) %>%
+  unnest(markets) %>%
+  filter(period$live == FALSE & period$description == "Regulation Time") %>%
+  mutate(bet_type = description) %>%
+  select(gamedate, HomeTeam, AwayTeam, bet_type, outcomes) %>%
+  unnest(outcomes) %>%
+  filter(is.na(price$handicap) == TRUE | (is.na(price$handicap) == FALSE & is.na(price$handicap2) == TRUE)) %>%
+  mutate(type = if_else(type == "X",
+                        if_else(description == "Yes", "Y","N"),
+                        type)) %>%
+  mutate(Odds = as.numeric(price$american),
+         SpreadTotal = price$handicap,
+         type = if_else(type == "H" | type == "O" | type == "Y", "HOY",
+                        if_else(type == "D", "D", "AUN"))) %>%
+  mutate(Odds = if_else(is.na(Odds), 100, Odds)) %>%
+  select(gamedate, HomeTeam, AwayTeam, bet_type, type, Odds, any_of("SpreadTotal")) %>%
+  mutate(HomeTeam = iconv(HomeTeam, from = 'UTF-8', to = 'ASCII//TRANSLIT'),
+         AwayTeam = iconv(AwayTeam, from = 'UTF-8', to = 'ASCII//TRANSLIT'),
+         bet_type = iconv(bet_type, from = 'UTF-8', to = 'ASCII//TRANSLIT'),
+         bet_type = case_when(bet_type == "Spread" & type == "HOY" ~ paste0("Alternate Spread - Home: ", as.numeric(SpreadTotal)),
+                              bet_type == "Spread" & type == "AUN" ~ paste0("Alternate Spread - Home: ", as.numeric(SpreadTotal)*-1),
+                              bet_type == "Total Goals O/U" ~ paste0("Alternate Total - ", abs(as.numeric(SpreadTotal))),
+                              grepl("Total Goals O/U - ", bet_type) ~ paste0(bet_type, " - ", abs(as.numeric(SpreadTotal))),
+                              TRUE ~ bet_type)) %>%
+  reshape2::melt(id.vars = c("gamedate", "HomeTeam", "AwayTeam", "bet_type", "type")) %>%
+  mutate(name = paste0(type, ".", variable)) %>%
+  select(-type, -variable) %>%
+  mutate(value = as.numeric(value)) %>%
+  reshape2::dcast(gamedate + HomeTeam + AwayTeam + bet_type ~ name, fun.aggregate = mean) %>%
+  mutate(AUN.Odds = round(AUN.Odds, 0),
+         HOY.Odds = round(HOY.Odds, 0),
+         D.Odds = round(D.Odds, 0)) %>%
+  filter((AUN.Odds >= 100 | AUN.Odds <= -100) & (HOY.Odds >= 100 | HOY.Odds <= -100)) %>%
+  select(-D.SpreadTotal)
+
 bovada_odds <- bind_rows(epl_odds, 
                          esp_odds, 
                          ger_odds, 
                          ita_odds,
                          fra_odds, 
-                         mls_odds
+                         mls_odds,
+                         champ_odds
                          )
 
 club_names <- read_excel("Soccer Machine/Club Names.xlsx")
@@ -310,7 +357,7 @@ bovada_odds <- FindReplace(bovada_odds, Var = "HomeTeam", replaceData = club_nam
 bovada_odds <- FindReplace(bovada_odds, Var = "AwayTeam", replaceData = club_names,
                            from = "Bovada", to = "Name")
 
-mls_22 <- load_match_results(country = "USA", gender = "M", season_end_year = 2022, tier = "1st") %>% 
+mls_22 <- fb_match_results(country = "USA", gender = "M", season_end_year = 2022, tier = "1st") %>% 
   select(Day, Date, Time, Home, Home_xG, HomeGoals, AwayGoals, Away_xG, Away, Competition_Name, Season_End_Year) %>% 
   rename(xG = Home_xG,
          Home_Score = HomeGoals,
@@ -326,7 +373,7 @@ mls_22 <- load_match_results(country = "USA", gender = "M", season_end_year = 20
          League = "MLS",
          Season = as.character(Season))
 
-Big5_22 <- load_match_results(country = c("ENG", "ESP", "ITA", "GER", "FRA"), gender = "M", season_end_year = 2022, tier = "1st") %>% 
+Big5_22 <- fb_match_results(country = c("ENG", "ESP", "ITA", "GER", "FRA"), gender = "M", season_end_year = 2022, tier = "1st") %>% 
   select(Day, Date, Time, Home, Home_xG, HomeGoals, AwayGoals, Away_xG, Away, Competition_Name, Season_End_Year) %>% 
   rename(xG = Home_xG,
          Home_Score = HomeGoals,
@@ -343,7 +390,7 @@ Big5_22 <- load_match_results(country = c("ENG", "ESP", "ITA", "GER", "FRA"), ge
                             TRUE ~ League),
          Season = paste0(Season-1,"-",Season))
 
-Big5_23 <- load_match_results(country = c("ENG", "ESP", "ITA", "GER", "FRA"), gender = "M", season_end_year = 2023, tier = "1st") %>% 
+Big5_23 <- fb_match_results(country = c("ENG", "ESP", "ITA", "GER", "FRA"), gender = "M", season_end_year = 2023, tier = "1st") %>% 
   select(Day, Date, Time, Home, Home_xG, HomeGoals, AwayGoals, Away_xG, Away, Competition_Name, Season_End_Year) %>% 
   rename(xG = Home_xG,
          Home_Score = HomeGoals,
@@ -358,10 +405,26 @@ Big5_23 <- load_match_results(country = c("ENG", "ESP", "ITA", "GER", "FRA"), ge
          League = case_when(League == "Premier League" ~ "EPL",
                             League == "Fußball-Bundesliga" ~ "Bundesliga",
                             TRUE ~ League),
+         Season = paste0(Season-1,"-",Season))
+
+Champ_23 <- fb_match_results(country = "ENG", gender = "M", season_end_year = 2023, tier = "2nd") %>% 
+  select(Day, Date, Time, Home, Home_xG, HomeGoals, AwayGoals, Away_xG, Away, Competition_Name, Season_End_Year) %>% 
+  rename(xG = Home_xG,
+         Home_Score = HomeGoals,
+         Away_Score = AwayGoals,
+         xG.1 = Away_xG,
+         League = Competition_Name,
+         Season = Season_End_Year) %>%
+  mutate(xG = as.numeric(xG),
+         Home_Score = as.numeric(Home_Score),
+         Away_Score = as.numeric(Away_Score),
+         xG.1 = as.numeric(xG.1),
          Season = paste0(Season-1,"-",Season))
 
 fixtures <- rbind(Big5_22, Big5_23
-                  , mls_22) 
+                  , mls_22
+                  , Champ_23
+                  ) 
   
 # fixtures$Date <- as.Date(fixtures$Date)
 today <- Sys.Date()
@@ -1740,9 +1803,9 @@ Email[["to"]] = paste("dnolen@smu.edu", "jamesorler@gmail.com", "asnolen@crimson
 # Email[["to"]] = "dnolen@smu.edu"
 Email[["subject"]] = paste0("Soccer Machine Picks: ", Sys.Date())
 Email[["HTMLbody"]] = sprintf("
-The Machine's picks for upcoming soccer matches are in! The Machine currently offers picks for the Big 5 European Leagues plus MLS. The attached document contains all of the pertinent betting information for the upcoming matches. Good luck!
+The Machine's picks for upcoming soccer matches are in! The Machine currently offers picks for the Big 5 European Leagues plus MLS and (NEW!) the EFL Championship. The attached document contains all of the pertinent betting information for the upcoming matches. Good luck!
 </p><br></p>
-UPDATE: The website that The Machine uses for gathering xG data (fbref.com, great site) has made a major change. They are switching from using StatsBomb's xG model to Stats Perform Opta's xG model. Both are quality models, so hopefully the performance of the Machine is not impacted too much. They are also adding xG data to many leagues outside of the Big 5 in Europe and the MLS. The Machine might soon be able to start offering picks for other leagues with this enhanced xG data. More coming soon...
+UPDATE: The website that The Machine uses for gathering xG data (fbref.com, great site) has made a major change. They are switching from using StatsBomb's xG model to Stats Perform Opta's xG model. Both are quality models, so hopefully the performance of the Machine is not impacted too much. They are also adding xG data to many leagues outside of the Big 5 in Europe and the MLS. This will allow The Machine to start offering picks in more leagues. With that said, The Machine now offers picks for the EFL Championship (the 2nd tier league in England). More coming soon...
 </p><br></p>
 TL;DR: These are the bets that The Machine recommends that you should make for the next few days. The bet sizes are based on a unit size of $10. If your regular bet is something other than $10, adjust accordingly.
 </p><br></p>

@@ -16,7 +16,7 @@ library(worldfootballR) # bring in transfermarkt data?
 
 intervalStart <- Sys.time()
 
-mls <- load_match_results(country = "USA",
+mls <- fb_match_results(country = "USA",
                           gender = "M",
                           season_end_year = c(2018, 2019, 2020, 2021, 2022), tier = "1st") %>% 
   select(Day, Date, Time, Home, Home_xG, HomeGoals, AwayGoals, Away_xG, Away,
@@ -35,7 +35,7 @@ mls <- load_match_results(country = "USA",
          League = "MLS",
          Season = as.character(Season))
 
-Big5 <- load_match_results(country = c("ENG","ESP","ITA","GER","FRA"),
+Big5 <- fb_match_results(country = c("ENG","ESP","ITA","GER","FRA"),
                            gender = "M",
                            season_end_year = c(2018,2019,2020,2021,2022,2023), tier = "1st") %>% 
   select(Day, Date, Time, Home, Home_xG, HomeGoals, AwayGoals, Away_xG, Away,
@@ -55,10 +55,27 @@ Big5 <- load_match_results(country = c("ENG","ESP","ITA","GER","FRA"),
                             TRUE ~ League),
          Season = paste0(Season-1,"-",Season))
 
+Champ <- fb_match_results(country = "ENG",
+                              gender = "M",
+                              season_end_year = c(2019,2020,2021,2022,2023), tier = "2nd") %>% 
+  select(Day, Date, Time, Home, Home_xG, HomeGoals, AwayGoals, Away_xG, Away,
+         Competition_Name, Season_End_Year) %>% 
+  rename(xG = Home_xG,
+         Home_Score = HomeGoals,
+         Away_Score = AwayGoals,
+         xG.1 = Away_xG,
+         League = Competition_Name,
+         Season = Season_End_Year) %>%
+  mutate(xG = as.numeric(xG),
+         Home_Score = as.numeric(Home_Score),
+         Away_Score = as.numeric(Away_Score),
+         xG.1 = as.numeric(xG.1),
+         Season = paste0(Season-1,"-",Season))
+
 intervalEnd <- Sys.time()
 paste("Web scraping took",intervalEnd - intervalStart,attr(intervalEnd - intervalStart,"units"))
 
-fixtures <- rbind(Big5, mls)
+fixtures <- rbind(Big5, mls, Champ)
 fixtures$Date <- as.Date(fixtures$Date)
 today <- Sys.Date()
 
