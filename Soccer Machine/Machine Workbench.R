@@ -3,7 +3,7 @@ library(baseballr)
 library(worldfootballR)
 library(oddsapiR)
 
-baseballr::mlb_probables(game_pk = 715722)
+baseballr::mlb_probables(game_pk = 715718)
 
 today_pks <- get_game_pks_mlb(Sys.Date())
 tomorrow_pks <- get_game_pks_mlb(Sys.Date()+1)
