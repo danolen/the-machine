@@ -159,7 +159,138 @@ setwd("C:/Users/danie/Desktop/SportsStuff/TheMachine/the-machine")
 #          Side_or_Total = case_when(bet_type %in% c('Alt Spread', 'Draw No Bet', 'ML', 'Spread') ~ "Side",
 #                                    TRUE ~ "Total"))
 
-types <- readRDS("Soccer Machine/PicksHistory_Types.rds")
+types <- readRDS("Soccer Machine/PicksHistory_Outcomes.rds") %>%
+  filter(Winner != "Push" &
+           Kelly_Criteria > 0 &
+           Pick_Odds >= -250 &
+           Pick_WinProb >= 0.3 &
+           bet_type_full != 'Alternate Total - 1.5' &
+           partition == 2) %>%
+  mutate(SGP_eligible = case_when(bet_type %in% c('Spread', 'Alt Spread') ~ case_when(HOY.SpreadTotal %in% c(0, 0.5, -0.5) ~ 'Y',
+                                                                                      TRUE ~ 'N'),
+                                  TRUE ~ 'Y'),
+         bet_type = case_when(bet_type_full == 'Alternate Spread - Home: 0' |
+                                (bet_type_full == 'Goal Spread' & Pick_SpreadTotal == 0) ~ 'Draw No Bet',
+                              TRUE ~ bet_type)) %>% 
+  select(gamedate, League, bet_type, Pick_Odds, Pick_WinProb, Pick_LoseProb, Fract_Odds,
+         Kelly_Criteria, EV, KC_tier, Pick_Correct, Units, SGP_eligible) %>%
+  mutate(Kelly_Bet = if_else(Kelly_Criteria < 0.05, 5, Kelly_Criteria * 100),
+         Kelly_Profit = Units * Kelly_Bet,
+         WinProb_tier = round_any(Pick_WinProb, 0.05, floor),
+         Odds_tier = round_any(Pick_Odds, 10, floor),
+         EV_tier = round_any(EV, 1, floor),
+         bets = as.integer(1),
+         Total = "Total",
+         Side_or_Total = case_when(bet_type %in% c('Alt Spread', 'Draw No Bet', 'ML', 'Spread') ~ "Side",
+                                   TRUE ~ "Total")) %>% 
+  mutate(`Bet Grade` = case_when(Side_or_Total == 'Side' ~ case_when(KC_tier %in% c(0.4, 0.45, 0.5, 0.55, 0.6, 0.65,
+                                                             0.7, 0.75, 0.8, 0.85, 0.9, 0.95) ~ 'A+',
+                                                             KC_tier %in% c(0.3, 0.35) ~ 'A',
+                                                             KC_tier %in% c(0.2, 0.25) ~ case_when(as.integer(EV_tier) >= 2 ~ 'B',
+                                                                                                   TRUE ~ 'C'),
+                                                             as.integer(EV_tier) >= 2 & KC_tier %in% c(0.15) ~ 'C',
+                                                             KC_tier %in% c(0.15) ~ 'D',
+                                                             TRUE ~ 'F'),
+                                 TRUE ~ case_when(KC_tier %in% c(0.3, 0.35, 0.4, 0.45, 0.5, 0.55, 0.6,
+                                                                 0.65, 0.7, 0.75, 0.8, 0.85, 0.9, 0.95) ~ 'A+',
+                                                  KC_tier %in% c(0.2, 0.25) ~ 'A',
+                                                  KC_tier %in% c(0.1, 0.15) ~ 'B',
+                                                  KC_tier %in% c(0.05) ~ 'C',
+                                                  KC_tier %in% c(0) ~ 'D',
+                                                  TRUE ~ 'F')),
+         `Graded Risk` = case_when(`Bet Grade` == 'A+' ~ 2,
+                                   `Bet Grade` == 'A' ~ 1.5,
+                                   `Bet Grade` == 'B' ~ 1,
+                                   `Bet Grade` == 'C' ~ 0.5,
+                                   TRUE ~ 0),
+         `Graded Profit` = Units*`Graded Risk`,
+         `Bet Grade` = factor(`Bet Grade`, levels = c('A+', 'A', 'B', 'C', 'D', 'F')))
+
+#### Tiered Grades ####
+
+grades <- types %>% 
+  # filter(Pick_Odds > -200) %>%
+  arrange(gamedate, ID, desc(Kelly_Criteria)) %>%
+  group_by(ID) %>%
+  mutate(KC_Rank = row_number()) %>%
+  arrange(gamedate, ID, desc(EV)) %>%
+  group_by(ID) %>%
+  mutate(EV_Rank = row_number(),
+         Rank = (KC_Rank + EV_Rank) / 2) %>%
+  arrange(gamedate, ID, Rank) %>%
+  mutate(Final_Rank = row_number()) %>%
+  filter(Final_Rank == 1) 
+
+grades %>%
+  # filter(gamedate >= as.Date('2022-08-01')) %>% 
+  group_by(`Bet Grade`,
+           # Side_or_Total,
+           # Odds = case_when(Pick_Odds > 0 ~ "Positive",
+           #                  TRUE ~ "Negative"),
+           `Suggested Wager` = case_when(`Bet Grade` == 'A+' ~ '2 units',
+                                         `Bet Grade` == 'A' ~ '1.5 unit',
+                                         `Bet Grade` == 'B' ~ '1 unit',
+                                         `Bet Grade` == 'C' ~ '0.5 units',
+                                         TRUE ~ 'No bet')) %>% 
+  dplyr::summarise(`Hit Rate` = mean(Pick_Correct),
+                   Bets = sum(bets),
+                   `Profit: 1 Unit Wagers` = sum(Units),
+                   `Profit: Suggested Wagers` = sum(`Graded Profit`)) %>%
+  mutate(ROI = case_when(`Bet Grade` %in% c('D+', 'F+') ~ 0,
+                         TRUE ~ `Profit: 1 Unit Wagers` / Bets)) %>% 
+  mutate(`Hit Rate` = paste0(round_any(`Hit Rate`*100, 1), '%'),
+         Bets = formatC(Bets, format="d", big.mark=","),
+         `Profit: 1 Unit Wagers` = paste0(round_any(`Profit: 1 Unit Wagers`, 0.1), ' units'),
+         `Profit: Suggested Wagers` = paste0(round_any(`Profit: Suggested Wagers`, 0.1), ' units'),
+         ROI = paste0(round_any(ROI*100, 0.01), '%')) %>% 
+  print(n=40)
+
+grades %>%
+  filter(`Bet Grade` %in% c('D')) %>% 
+  # group_by(League) %>%
+  group_by(Odds_tier = round_any(Pick_Odds, 20, floor)) %>%
+  dplyr::summarise(`Hit Rate` = mean(Pick_Correct),
+                   Bets = sum(bets),
+                   `Profit: 1 Unit Wagers` = sum(Units),
+                   `Profit: Suggested Wagers` = sum(`Graded Profit`)) %>%
+  mutate(ROI = `Profit: 1 Unit Wagers` / Bets) %>% 
+  mutate(`Hit Rate` = paste0(round_any(`Hit Rate`*100, 1), '%'),
+         Bets = formatC(Bets, format="d", big.mark=","),
+         `Profit: 1 Unit Wagers` = paste0(round_any(`Profit: 1 Unit Wagers`, 0.1), ' units'),
+         `Profit: Suggested Wagers` = paste0(round_any(`Profit: Suggested Wagers`, 0.1), ' units'),
+         ROI = paste0(round_any(ROI*100, 0.01), '%')) %>% 
+  print(n=40)
+
+grades %>% 
+  filter((str_detect(bet_type, 'Total') | str_detect(bet_type, 'TT') | bet_type == 'BTTS')) %>% 
+  #group_by(bet_type) %>%
+  group_by(KC_tier = as.numeric(as.character(KC_tier))) %>%
+  # group_by(EV_tier = as.integer(EV_tier)) %>%
+  #group_by(WinProb_tier) %>%
+  #group_by(Odds_tier) %>%
+  dplyr::summarise(HitRate = mean(Pick_Correct),
+                   bets = sum(bets),
+                   Flat_Profit = sum(Units),
+                   Kelly_Profit = sum(Kelly_Profit)) %>%
+  mutate(Units_per_bet = Flat_Profit / bets) %>%
+  print(n=40)
+
+plot_data <- grades %>% 
+  filter(`Bet Grade` %in% c('A+', 'A', 'B')) %>% 
+  select(gamedate, Units, `Graded Profit`) %>% 
+  rename(`Profit: 1 Unit Wagers` = Units,
+         `Profit: Suggested Wagers` = `Graded Profit`) %>% 
+  melt("gamedate", c("Profit: 1 Unit Wagers", "Profit: Suggested Wagers")) %>% 
+  group_by(variable) %>% 
+  mutate(cumulative_value = cumsum(value))
+  
+
+ggplot(plot_data) +
+  aes(x = gamedate, y = cumulative_value, group = variable) +
+  geom_line() +
+  theme_minimal()
+
+#### Current Email tables ####
 
 email_table_1 <- types %>%
   filter(Kelly_Criteria >= 0) %>%

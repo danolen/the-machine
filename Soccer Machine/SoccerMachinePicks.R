@@ -1201,375 +1201,479 @@ types <- filter(history2,
   mutate(Kelly_Bet = if_else(Kelly_Criteria < 0.05, 5, Kelly_Criteria * 100),
          Kelly_Profit = Units * Kelly_Bet,
          WinProb_tier = round_any(Pick_WinProb, 0.05, floor),
-         Odds_tier = as.factor(round_any(Pick_Odds, 10, floor)),
+         Odds_tier = round_any(Pick_Odds, 10, floor),
          EV_tier = round_any(EV, 1, floor),
          bets = as.integer(1),
          Total = "Total",
          Side_or_Total = case_when(bet_type %in% c('Alt Spread', 'Draw No Bet', 'ML', 'Spread') ~ "Side",
-                                   TRUE ~ "Total"))
+                                   TRUE ~ "Total")) %>% 
+  mutate(`Bet Grade` = case_when(Side_or_Total == 'Side' ~ case_when(KC_tier %in% c(0.4, 0.45, 0.5, 0.55, 0.6, 0.65,
+                                                                                    0.7, 0.75, 0.8, 0.85, 0.9, 0.95) ~ 'A+',
+                                                                     KC_tier %in% c(0.3, 0.35) ~ 'A',
+                                                                     KC_tier %in% c(0.2, 0.25) ~ case_when(as.integer(EV_tier) >= 2 ~ 'B',
+                                                                                                           TRUE ~ 'C'),
+                                                                     as.integer(EV_tier) >= 2 & KC_tier %in% c(0.15) ~ 'C',
+                                                                     KC_tier %in% c(0.15) ~ 'D',
+                                                                     TRUE ~ 'F'),
+                                 TRUE ~ case_when(KC_tier %in% c(0.3, 0.35, 0.4, 0.45, 0.5, 0.55, 0.6,
+                                                                 0.65, 0.7, 0.75, 0.8, 0.85, 0.9, 0.95) ~ 'A+',
+                                                  KC_tier %in% c(0.2, 0.25) ~ 'A',
+                                                  KC_tier %in% c(0.1, 0.15) ~ 'B',
+                                                  KC_tier %in% c(0.05) ~ 'C',
+                                                  KC_tier %in% c(0) ~ 'D',
+                                                  TRUE ~ 'F')),
+         `Graded Risk` = case_when(`Bet Grade` == 'A+' ~ 2,
+                                   `Bet Grade` == 'A' ~ 1.5,
+                                   `Bet Grade` == 'B' ~ 1,
+                                   # `Bet Grade` == 'C' ~ 0.5,
+                                   TRUE ~ 0),
+         `Graded Profit` = Units*`Graded Risk`,
+         `Bet Grade` = factor(`Bet Grade`, levels = c('A+', 'A', 'B', 'C', 'D', 'F')))
 
-## Create email tables
+grades <- types %>% 
+  filter(Pick_Odds > -220) %>%
+  arrange(gamedate, ID, desc(Kelly_Criteria)) %>%
+  group_by(ID) %>%
+  mutate(KC_Rank = row_number()) %>%
+  arrange(gamedate, ID, desc(EV)) %>%
+  group_by(ID) %>%
+  mutate(EV_Rank = row_number(),
+         Rank = (KC_Rank + EV_Rank) / 2) %>%
+  arrange(gamedate, ID, Rank) %>%
+  mutate(Final_Rank = row_number()) %>%
+  filter(Final_Rank == 1) 
 
-email_table_1 <- types %>%
-  filter(Kelly_Criteria >= 0) %>%
-  #group_by(Total) %>%
-  group_by(bet_type) %>%
-  #group_by(KC_tier = as.numeric(as.character(KC_tier))) %>%
-  #group_by(Odds_tier) %>%
-  dplyr::summarise(HitRate = mean(Pick_Correct),
-                   bets = sum(bets),
-                   Flat_Profit = sum(Units),
-                   Kelly_Profit = sum(Kelly_Profit)) %>%
-  mutate(Units_per_bet = Flat_Profit / bets) %>%
+## Create email tables (New)
+
+email_table_1 <- grades %>%
+  # filter(gamedate >= as.Date('2022-08-01')) %>% 
+  group_by(`Bet Grade`,
+           # Side_or_Total,
+           # Odds = case_when(Pick_Odds > 0 ~ "Positive",
+           #                  TRUE ~ "Negative"),
+           `Suggested Wager` = case_when(`Bet Grade` == 'A+' ~ '2 units',
+                                         `Bet Grade` == 'A' ~ '1.5 unit',
+                                         `Bet Grade` == 'B' ~ '1 unit',
+                                         # `Bet Grade` == 'C' ~ '0.5 units',
+                                         TRUE ~ 'No bet')) %>% 
+  dplyr::summarise(`Hit Rate` = mean(Pick_Correct),
+                   Bets = sum(bets),
+                   `Profit: 1 Unit Wagers` = sum(Units),
+                   `Profit: Suggested Wagers` = sum(`Graded Profit`)) %>%
+  mutate(ROI = case_when(`Bet Grade` %in% c('C', 'D', 'F') ~ 0,
+                         TRUE ~ `Profit: 1 Unit Wagers` / Bets)) %>% 
+  mutate(`Hit Rate` = paste0(round_any(`Hit Rate`*100, 1), '%'),
+         Bets = formatC(Bets, format="d", big.mark=","),
+         `Profit: 1 Unit Wagers` = paste0(round_any(`Profit: 1 Unit Wagers`, 0.1), ' units'),
+         `Profit: Suggested Wagers` = paste0(round_any(`Profit: Suggested Wagers`, 0.1), ' units'),
+         ROI = paste0(round_any(ROI*100, 0.01), '%')) %>% 
   print(n=40)
 
 df_html_1 <- print(xtable(email_table_1), type = "html", print.results = FALSE)
 
-email_table_2 <- types %>%
-  filter(Kelly_Criteria >= 0) %>%
-  group_by(League) %>%
-  dplyr::summarise(HitRate = mean(Pick_Correct),
-                   bets = sum(bets),
-                   Flat_Profit = sum(Units),
-                   Kelly_Profit = sum(Kelly_Profit)) %>%
-  mutate(Units_per_bet = Flat_Profit / bets) %>%
-  print(n=40)
-
-df_html_2 <- print(xtable(email_table_2), type = "html", print.results = FALSE)
-
-email_table_3a <- types %>%
-  filter(Kelly_Criteria >= 0.2 & EV >= 2) %>%
-  #group_by(Total) %>%
-  group_by(Strategy = 'Bet Everything') %>% 
-  #group_by(bet_type) %>%
-  #group_by(KC_tier) %>%
-  #group_by(Odds_tier) %>%
-  dplyr::summarise(HitRate = mean(Pick_Correct),
-                   bets = sum(bets),
-                   Flat_Profit = sum(Units),
-                   Kelly_Profit = sum(Kelly_Profit)) %>%
-  mutate(Units_per_bet = Flat_Profit / bets) %>%
-  print(n=40)
-
-email_table_3b <- types %>% 
-  filter(Kelly_Criteria >= 0.2 & EV >= 2) %>%
-  arrange(gamedate, ID, desc(Kelly_Criteria)) %>% 
-  group_by(ID) %>% 
-  mutate(KC_Rank = row_number()) %>% 
-  arrange(gamedate, ID, desc(EV)) %>% 
-  group_by(ID) %>% 
-  mutate(EV_Rank = row_number(),
-         Rank = (KC_Rank + EV_Rank) / 2) %>% 
-  arrange(gamedate, ID, Rank) %>% 
-  mutate(Final_Rank = row_number()) %>% 
-  filter(Final_Rank == 1) %>%
-  #group_by(Total) %>%
-  group_by(Strategy = 'One Bet Per Game') %>%
-  #group_by(bet_type) %>%
-  #group_by(KC_tier) %>%
-  #group_by(Odds_tier) %>%
-  dplyr::summarise(HitRate = mean(Pick_Correct),
-                   bets = sum(bets),
-                   Flat_Profit = sum(Units),
-                   Kelly_Profit = sum(Kelly_Profit)) %>%
-  mutate(Units_per_bet = Flat_Profit / bets) %>%
-  print(n=40)
-
-email_table_3c <- types %>% 
-  filter(Kelly_Criteria >= 0.2 & EV >= 2 & Pick_Odds > 0) %>%
-  arrange(gamedate, ID, desc(Kelly_Criteria)) %>% 
-  group_by(ID) %>% 
-  mutate(KC_Rank = row_number()) %>% 
-  arrange(gamedate, ID, desc(EV)) %>% 
-  group_by(ID) %>% 
-  mutate(EV_Rank = row_number(),
-         Rank = (KC_Rank + EV_Rank) / 2) %>% 
-  arrange(gamedate, ID, Rank) %>% 
-  mutate(Final_Rank = row_number()) %>% 
-  filter(Final_Rank == 1) %>%
-  #group_by(Total) %>%
-  group_by(Strategy = 'One Bet Per Game at Even Odds or Better') %>%
-  #group_by(bet_type) %>%
-  #group_by(KC_tier) %>%
-  #group_by(Odds_tier) %>%
-  dplyr::summarise(HitRate = mean(Pick_Correct),
-                   bets = sum(bets),
-                   Flat_Profit = sum(Units),
-                   Kelly_Profit = sum(Kelly_Profit)) %>%
-  mutate(Units_per_bet = Flat_Profit / bets) %>%
-  print(n=40)
-
-email_table_3d <- types %>%
-  filter(Kelly_Criteria >= 0.2 & EV >= 2 & Pick_Odds > 0) %>%
-  #group_by(Total) %>%
-  group_by(Strategy = 'Bet Everything at Even Odds or Better') %>% 
-  #group_by(bet_type) %>%
-  #group_by(KC_tier) %>%
-  #group_by(Odds_tier) %>%
-  dplyr::summarise(HitRate = mean(Pick_Correct),
-                   bets = sum(bets),
-                   Flat_Profit = sum(Units),
-                   Kelly_Profit = sum(Kelly_Profit)) %>%
-  mutate(Units_per_bet = Flat_Profit / bets) %>%
-  print(n=40)
-
-SGPs <- types %>%
-  filter((Pick_Odds < 0 | (Side_or_Total == 'Side' & Pick_Odds <= 140)) &
-           Kelly_Criteria >= 0.2 & EV >= 2 &
-           SGP_eligible == 'Y'
-         ) %>%
-  mutate(Pushable = case_when(Pick_WinProb + Pick_LoseProb < 0.999 ~ 'Y',
-                              TRUE ~ 'N')) %>% 
-  filter(Pushable == 'N') %>% 
-  arrange(gamedate, ID, desc(Kelly_Criteria)) %>% 
-  group_by(ID, Side_or_Total) %>% 
-  mutate(KC_Rank = row_number()) %>% 
-  arrange(gamedate, ID, desc(EV)) %>% 
-  group_by(ID, Side_or_Total) %>% 
-  mutate(EV_Rank = row_number()) %>%
-  arrange(gamedate, ID, desc(Pick_WinProb)) %>% 
-  group_by(ID, Side_or_Total) %>% 
-  mutate(WinProb_Rank = row_number(),
-         Rank = (KC_Rank + EV_Rank) / 2) %>%
-  arrange(gamedate, ID, Side_or_Total, Rank) %>% 
-  mutate(Final_Rank = row_number()) %>%  
-  filter(Final_Rank == 1) %>% 
-  group_by(ID) %>% 
-  mutate(legs = sum(bets),
-         hits = sum(Pick_Correct)) %>% 
-  filter(legs > 1) %>%
-  mutate(Parlay_Odds = floor((prod(Fract_Odds+1)-1)*100),
-         winner = if_else(legs==hits,1,0),
-         Parlay_Units = if_else(winner==1,Parlay_Odds/100,-1),
-         Parlay_WinProb = prod(Pick_WinProb),
-         Parlay_Fract_Odds = (100 / abs(Parlay_Odds))^if_else(Parlay_Odds < 0, 1, -1),
-         Parlay_KC = (Parlay_WinProb * (Parlay_Fract_Odds + 1) - 1) / Parlay_Fract_Odds,
-         Parlay_Kelly_Profit = (Parlay_KC*100*Parlay_Units)/2) %>% 
-  filter(Parlay_Odds >= 100)
-
-SGP_performance <- SGPs %>% 
-  distinct(ID, gamedate, Parlay_Odds, winner, Parlay_Units, Parlay_Kelly_Profit) %>% 
-  mutate(bets = 1)
-
-email_SGP_table <- SGP_performance %>%
-  #group_by(Total) %>%
-  group_by(Strategy = 'Same-Game Parlays') %>% 
-  #group_by(bet_type) %>%
-  #group_by(KC_tier) %>%
-  #group_by(Odds_tier) %>%
-  dplyr::summarise(HitRate = mean(winner),
-                   bets = sum(bets),
-                   Flat_Profit = sum(Parlay_Units),
-                   Kelly_Profit = sum(Parlay_Kelly_Profit)) %>%
-  mutate(Units_per_bet = Flat_Profit / bets) %>%
-  print(n=40)
-
-Parlays <- types %>%
-  filter(Pick_Odds < 0 & Kelly_Criteria >= 0.2 & EV >= 2) %>%
-  mutate(Pushable = case_when(Pick_WinProb + Pick_LoseProb < 0.999 ~ 'Y',
-                              TRUE ~ 'N')) %>% 
-  filter(Pushable == 'N') %>% 
-  arrange(gamedate, ID, desc(Kelly_Criteria)) %>% 
-  group_by(ID) %>% 
-  mutate(KC_Rank = row_number()) %>% 
-  arrange(gamedate, ID, desc(EV)) %>% 
-  group_by(ID) %>% 
-  mutate(EV_Rank = row_number()) %>%
-  arrange(gamedate, ID, desc(Pick_WinProb)) %>% 
-  group_by(ID) %>% 
-  mutate(WinProb_Rank = row_number(),
-         Rank = (KC_Rank + EV_Rank) / 2) %>%
-  arrange(gamedate, ID, Rank) %>% 
-  mutate(Final_Rank = row_number()) %>%  
-  filter(Final_Rank == 1) %>%
-  arrange(gamedate, ID, desc(Kelly_Criteria)) %>% 
-  group_by(gamedate) %>% 
-  mutate(KC_Rank = row_number()) %>% 
-  arrange(gamedate, ID, desc(EV)) %>% 
-  group_by(gamedate) %>% 
-  mutate(EV_Rank = row_number()) %>%
-  arrange(gamedate, ID, desc(Pick_WinProb)) %>% 
-  group_by(gamedate) %>% 
-  mutate(WinProb_Rank = row_number(),
-         Rank = (KC_Rank + EV_Rank) / 2) %>%
-  arrange(gamedate, ID, Side_or_Total, Rank) %>% 
-  mutate(Final_Rank = row_number()) %>%  
-  filter(Final_Rank <= 4) %>%
-  group_by(gamedate) %>% 
-  mutate(legs = sum(bets),
-         hits = sum(Pick_Correct)) %>% 
-  filter(legs > 1) %>%
-  mutate(Parlay_Odds = floor((prod(Fract_Odds+1)-1)*100),
-         winner = if_else(legs==hits,1,0),
-         Parlay_Units = if_else(winner==1,Parlay_Odds/100,-1),
-         Parlay_WinProb = prod(Pick_WinProb),
-         Parlay_Fract_Odds = (100 / abs(Parlay_Odds))^if_else(Parlay_Odds < 0, 1, -1),
-         Parlay_KC = (Parlay_WinProb * (Parlay_Fract_Odds + 1) - 1) / Parlay_Fract_Odds,
-         Parlay_Kelly_Profit = (Parlay_KC*100*Parlay_Units)/2) %>% 
-  filter(Parlay_Odds >= 100)
-
-Parlay_performance <- Parlays %>% 
-  group_by(gamedate) %>% 
-  mutate(row_num = row_number()) %>% 
-  filter(row_num == 1) %>% 
-  select(ID, gamedate, Parlay_Odds, winner, Parlay_Units, Parlay_Kelly_Profit, legs) %>% 
-  mutate(bets = 1)
-
-email_Parlay_table <- Parlay_performance %>%
-  #group_by(Total) %>%
-  group_by(Strategy = 'Multi-Game Parlays (2-4 Legs/Day)') %>% 
-  #group_by(bet_type) %>%
-  #group_by(KC_tier) %>%
-  #group_by(Odds_tier) %>%
-  dplyr::summarise(HitRate = mean(winner),
-                   bets = sum(bets),
-                   Flat_Profit = sum(Parlay_Units),
-                   Kelly_Profit = sum(Parlay_Kelly_Profit)) %>%
-  mutate(Units_per_bet = Flat_Profit / bets) %>%
-  print(n=40)
-
-email_table_3 <- bind_rows(email_table_3a, email_table_3d, email_table_3b, email_table_3c, email_SGP_table, email_Parlay_table) %>% 
-  mutate(bets = as.integer(bets))
-
-df_html_3 <- print(xtable(email_table_3), type = "html", print.results = FALSE)
-
-email_table_4 <- types %>%
-  #group_by(bet_type) %>%
-  group_by(KC_tier = as.numeric(as.character(KC_tier))) %>%
-  #group_by(WinProb_tier) %>%
-  #group_by(Odds_tier) %>%
-  dplyr::summarise(HitRate = mean(Pick_Correct),
-                   bets = sum(bets),
-                   Flat_Profit = sum(Units),
-                   Kelly_Profit = sum(Kelly_Profit)) %>%
-  mutate(Units_per_bet = Flat_Profit / bets) %>%
-  print(n=40)
-
-df_html_4 <- print(xtable(email_table_4), type = "html", print.results = FALSE)
-
-email_table_5 <- types %>%
-  #group_by(Total) %>%
-  #group_by(bet_type) %>%
-  #group_by(KC_tier = as.numeric(as.character(KC_tier))) %>%
-  #group_by(Odds_tier) %>%
-  group_by(EV_tier = as.integer(EV_tier)) %>% 
-  dplyr::summarise(HitRate = mean(Pick_Correct),
-                   bets = sum(bets),
-                   Flat_Profit = sum(Units),
-                   Kelly_Profit = sum(Kelly_Profit)) %>%
-  mutate(Units_per_bet = Flat_Profit / bets) %>%
-  print(n=40)
-
-df_html_5 <- print(xtable(email_table_5), type = "html", print.results = FALSE)
-
-graph_data1 <- types %>%
-  ungroup() %>%
-  filter(Kelly_Criteria >= 0.2 & EV >= 2) %>%
-  select(gamedate, Units, Kelly_Profit) %>%
-  rename(`Flat Profit: Bet Everything` = Units,
-         `Bet Everything` = Kelly_Profit) %>% 
-  melt("gamedate", c("Flat Profit: Bet Everything", "Bet Everything")) %>% 
-  group_by(gamedate, variable) %>% 
-  summarise(value = sum(value)) %>% 
+plot_data <- grades %>% 
+  filter(`Bet Grade` %in% c('A+', 'A', 'B')) %>% 
+  select(gamedate, Units, `Graded Profit`) %>% 
+  rename(`Profit: 1 Unit Wagers` = Units,
+         `Profit: Suggested Wagers` = `Graded Profit`) %>% 
+  melt("gamedate", c("Profit: 1 Unit Wagers", "Profit: Suggested Wagers")) %>% 
   group_by(variable) %>% 
   mutate(cumulative_value = cumsum(value))
 
-graph_data2 <- types %>%
-  ungroup() %>%
-  filter(Pick_Odds >= 100 & Kelly_Criteria >= 0.2 & EV >= 2) %>% 
-  select(gamedate, Units, Kelly_Profit) %>%
-  rename(`Flat Profit: Bet Everything Positive` = Units,
-         `Bet Everything Positive` = Kelly_Profit) %>% 
-  melt("gamedate", c("Flat Profit: Bet Everything Positive", "Bet Everything Positive")) %>% 
-  group_by(gamedate, variable) %>% 
-  summarise(value = sum(value)) %>% 
-  group_by(variable) %>% 
-  mutate(cumulative_value = cumsum(value))
-
-graph_data3 <- types %>%
-  filter(Kelly_Criteria >= 0.2 & EV >= 2) %>%
-  arrange(gamedate, ID, desc(Kelly_Criteria)) %>% 
-  group_by(ID) %>% 
-  mutate(KC_Rank = row_number()) %>% 
-  arrange(gamedate, ID, desc(EV)) %>% 
-  group_by(ID) %>% 
-  mutate(EV_Rank = row_number(),
-         Rank = (KC_Rank + EV_Rank) / 2) %>% 
-  arrange(gamedate, ID, Rank) %>% 
-  mutate(Final_Rank = row_number()) %>% 
-  filter(Final_Rank == 1) %>%
-  ungroup() %>% 
-  select(gamedate, Units, Kelly_Profit) %>%
-  rename(`Flat Profit: One per Game` = Units,
-         `One per Game` = Kelly_Profit) %>% 
-  melt("gamedate", c("Flat Profit: One per Game", "One per Game")) %>% 
-  group_by(gamedate, variable) %>% 
-  summarise(value = sum(value)) %>% 
-  group_by(variable) %>% 
-  mutate(cumulative_value = cumsum(value))
-
-graph_data4 <- types %>%
-  filter(Pick_Odds >= 100 & Kelly_Criteria >= 0.2 & EV >= 2) %>%
-  arrange(gamedate, ID, desc(Kelly_Criteria)) %>% 
-  group_by(ID) %>% 
-  mutate(KC_Rank = row_number()) %>% 
-  arrange(gamedate, ID, desc(EV)) %>% 
-  group_by(ID) %>% 
-  mutate(EV_Rank = row_number(),
-         Rank = (KC_Rank + EV_Rank) / 2) %>% 
-  arrange(gamedate, ID, Rank) %>% 
-  mutate(Final_Rank = row_number()) %>% 
-  filter(Final_Rank == 1) %>%
-  ungroup() %>% 
-  select(gamedate, Units, Kelly_Profit) %>%
-  rename(`Flat Profit: One per Game Positive` = Units,
-         `One per Game Positive` = Kelly_Profit) %>% 
-  melt("gamedate", c("Flat Profit: One per Game Positive", "One per Game Positive")) %>% 
-  group_by(gamedate, variable) %>% 
-  summarise(value = sum(value)) %>% 
-  group_by(variable) %>% 
-  mutate(cumulative_value = cumsum(value))
-
-graph_data5 <- SGP_performance %>%
-  select(gamedate, Parlay_Units, Parlay_Kelly_Profit) %>%
-  rename(`Flat Profit: Same-Game Parlays` = Parlay_Units,
-         `Same-Game Parlays` = Parlay_Kelly_Profit) %>% 
-  melt("gamedate", c("Flat Profit: Same-Game Parlays", "Same-Game Parlays")) %>% 
-  group_by(gamedate, variable) %>% 
-  summarise(value = sum(value)) %>% 
-  group_by(variable) %>% 
-  mutate(cumulative_value = cumsum(value))
-
-graph_data6 <- Parlay_performance %>%
-  select(gamedate, Parlay_Units, Parlay_Kelly_Profit) %>%
-  rename(`Flat Profit: Multi-Game Parlays` = Parlay_Units,
-         `Multi-Game Parlays` = Parlay_Kelly_Profit) %>% 
-  melt("gamedate", c("Flat Profit: Multi-Game Parlays", "Multi-Game Parlays")) %>% 
-  group_by(gamedate, variable) %>% 
-  summarise(value = sum(value)) %>% 
-  group_by(variable) %>% 
-  mutate(cumulative_value = cumsum(value))
-
-graph_data <- bind_rows(graph_data1, graph_data2, graph_data3, graph_data4, graph_data5, graph_data6) %>% 
-  filter(!str_detect(variable, 'Flat'))
-
-plot <- ggplot(graph_data) +
+plot <- ggplot(plot_data) +
   aes(x = gamedate, y = cumulative_value, colour = variable) +
-  geom_line(size = 0.5) +
-  scale_color_hue(direction = 1) +
+  geom_line() +
+  theme_minimal() +
   labs(
     x = "Game Date",
-    y = "Cumulative Profit",
+    y = "Cumulative Profit (Units)",
     color = ""
   ) +
-  theme_minimal()
+  theme(legend.position = "bottom")
 
 plot_html <- add_ggplot(plot_object = plot)
 
-bets_table <- read.csv("Soccer Machine/upcoming_bets.csv") %>% 
+## Create email tables (Old)
+
+# email_table_1 <- types %>%
+#   filter(Kelly_Criteria >= 0) %>%
+#   #group_by(Total) %>%
+#   group_by(bet_type) %>%
+#   #group_by(KC_tier = as.numeric(as.character(KC_tier))) %>%
+#   #group_by(Odds_tier) %>%
+#   dplyr::summarise(HitRate = mean(Pick_Correct),
+#                    bets = sum(bets),
+#                    Flat_Profit = sum(Units),
+#                    Kelly_Profit = sum(Kelly_Profit)) %>%
+#   mutate(Units_per_bet = Flat_Profit / bets) %>%
+#   print(n=40)
+# 
+# df_html_1 <- print(xtable(email_table_1), type = "html", print.results = FALSE)
+# 
+# email_table_2 <- types %>%
+#   filter(Kelly_Criteria >= 0) %>%
+#   group_by(League) %>%
+#   dplyr::summarise(HitRate = mean(Pick_Correct),
+#                    bets = sum(bets),
+#                    Flat_Profit = sum(Units),
+#                    Kelly_Profit = sum(Kelly_Profit)) %>%
+#   mutate(Units_per_bet = Flat_Profit / bets) %>%
+#   print(n=40)
+# 
+# df_html_2 <- print(xtable(email_table_2), type = "html", print.results = FALSE)
+# 
+# email_table_3a <- types %>%
+#   filter(Kelly_Criteria >= 0.2 & EV >= 2) %>%
+#   #group_by(Total) %>%
+#   group_by(Strategy = 'Bet Everything') %>% 
+#   #group_by(bet_type) %>%
+#   #group_by(KC_tier) %>%
+#   #group_by(Odds_tier) %>%
+#   dplyr::summarise(HitRate = mean(Pick_Correct),
+#                    bets = sum(bets),
+#                    Flat_Profit = sum(Units),
+#                    Kelly_Profit = sum(Kelly_Profit)) %>%
+#   mutate(Units_per_bet = Flat_Profit / bets) %>%
+#   print(n=40)
+# 
+# email_table_3b <- types %>% 
+#   filter(Kelly_Criteria >= 0.2 & EV >= 2) %>%
+#   arrange(gamedate, ID, desc(Kelly_Criteria)) %>% 
+#   group_by(ID) %>% 
+#   mutate(KC_Rank = row_number()) %>% 
+#   arrange(gamedate, ID, desc(EV)) %>% 
+#   group_by(ID) %>% 
+#   mutate(EV_Rank = row_number(),
+#          Rank = (KC_Rank + EV_Rank) / 2) %>% 
+#   arrange(gamedate, ID, Rank) %>% 
+#   mutate(Final_Rank = row_number()) %>% 
+#   filter(Final_Rank == 1) %>%
+#   #group_by(Total) %>%
+#   group_by(Strategy = 'One Bet Per Game') %>%
+#   #group_by(bet_type) %>%
+#   #group_by(KC_tier) %>%
+#   #group_by(Odds_tier) %>%
+#   dplyr::summarise(HitRate = mean(Pick_Correct),
+#                    bets = sum(bets),
+#                    Flat_Profit = sum(Units),
+#                    Kelly_Profit = sum(Kelly_Profit)) %>%
+#   mutate(Units_per_bet = Flat_Profit / bets) %>%
+#   print(n=40)
+# 
+# email_table_3c <- types %>% 
+#   filter(Kelly_Criteria >= 0.2 & EV >= 2 & Pick_Odds > 0) %>%
+#   arrange(gamedate, ID, desc(Kelly_Criteria)) %>% 
+#   group_by(ID) %>% 
+#   mutate(KC_Rank = row_number()) %>% 
+#   arrange(gamedate, ID, desc(EV)) %>% 
+#   group_by(ID) %>% 
+#   mutate(EV_Rank = row_number(),
+#          Rank = (KC_Rank + EV_Rank) / 2) %>% 
+#   arrange(gamedate, ID, Rank) %>% 
+#   mutate(Final_Rank = row_number()) %>% 
+#   filter(Final_Rank == 1) %>%
+#   #group_by(Total) %>%
+#   group_by(Strategy = 'One Bet Per Game at Even Odds or Better') %>%
+#   #group_by(bet_type) %>%
+#   #group_by(KC_tier) %>%
+#   #group_by(Odds_tier) %>%
+#   dplyr::summarise(HitRate = mean(Pick_Correct),
+#                    bets = sum(bets),
+#                    Flat_Profit = sum(Units),
+#                    Kelly_Profit = sum(Kelly_Profit)) %>%
+#   mutate(Units_per_bet = Flat_Profit / bets) %>%
+#   print(n=40)
+# 
+# email_table_3d <- types %>%
+#   filter(Kelly_Criteria >= 0.2 & EV >= 2 & Pick_Odds > 0) %>%
+#   #group_by(Total) %>%
+#   group_by(Strategy = 'Bet Everything at Even Odds or Better') %>% 
+#   #group_by(bet_type) %>%
+#   #group_by(KC_tier) %>%
+#   #group_by(Odds_tier) %>%
+#   dplyr::summarise(HitRate = mean(Pick_Correct),
+#                    bets = sum(bets),
+#                    Flat_Profit = sum(Units),
+#                    Kelly_Profit = sum(Kelly_Profit)) %>%
+#   mutate(Units_per_bet = Flat_Profit / bets) %>%
+#   print(n=40)
+# 
+# SGPs <- types %>%
+#   filter((Pick_Odds < 0 | (Side_or_Total == 'Side' & Pick_Odds <= 140)) &
+#            Kelly_Criteria >= 0.2 & EV >= 2 &
+#            SGP_eligible == 'Y'
+#          ) %>%
+#   mutate(Pushable = case_when(Pick_WinProb + Pick_LoseProb < 0.999 ~ 'Y',
+#                               TRUE ~ 'N')) %>% 
+#   filter(Pushable == 'N') %>% 
+#   arrange(gamedate, ID, desc(Kelly_Criteria)) %>% 
+#   group_by(ID, Side_or_Total) %>% 
+#   mutate(KC_Rank = row_number()) %>% 
+#   arrange(gamedate, ID, desc(EV)) %>% 
+#   group_by(ID, Side_or_Total) %>% 
+#   mutate(EV_Rank = row_number()) %>%
+#   arrange(gamedate, ID, desc(Pick_WinProb)) %>% 
+#   group_by(ID, Side_or_Total) %>% 
+#   mutate(WinProb_Rank = row_number(),
+#          Rank = (KC_Rank + EV_Rank) / 2) %>%
+#   arrange(gamedate, ID, Side_or_Total, Rank) %>% 
+#   mutate(Final_Rank = row_number()) %>%  
+#   filter(Final_Rank == 1) %>% 
+#   group_by(ID) %>% 
+#   mutate(legs = sum(bets),
+#          hits = sum(Pick_Correct)) %>% 
+#   filter(legs > 1) %>%
+#   mutate(Parlay_Odds = floor((prod(Fract_Odds+1)-1)*100),
+#          winner = if_else(legs==hits,1,0),
+#          Parlay_Units = if_else(winner==1,Parlay_Odds/100,-1),
+#          Parlay_WinProb = prod(Pick_WinProb),
+#          Parlay_Fract_Odds = (100 / abs(Parlay_Odds))^if_else(Parlay_Odds < 0, 1, -1),
+#          Parlay_KC = (Parlay_WinProb * (Parlay_Fract_Odds + 1) - 1) / Parlay_Fract_Odds,
+#          Parlay_Kelly_Profit = (Parlay_KC*100*Parlay_Units)/2) %>% 
+#   filter(Parlay_Odds >= 100)
+# 
+# SGP_performance <- SGPs %>% 
+#   distinct(ID, gamedate, Parlay_Odds, winner, Parlay_Units, Parlay_Kelly_Profit) %>% 
+#   mutate(bets = 1)
+# 
+# email_SGP_table <- SGP_performance %>%
+#   #group_by(Total) %>%
+#   group_by(Strategy = 'Same-Game Parlays') %>% 
+#   #group_by(bet_type) %>%
+#   #group_by(KC_tier) %>%
+#   #group_by(Odds_tier) %>%
+#   dplyr::summarise(HitRate = mean(winner),
+#                    bets = sum(bets),
+#                    Flat_Profit = sum(Parlay_Units),
+#                    Kelly_Profit = sum(Parlay_Kelly_Profit)) %>%
+#   mutate(Units_per_bet = Flat_Profit / bets) %>%
+#   print(n=40)
+# 
+# Parlays <- types %>%
+#   filter(Pick_Odds < 0 & Kelly_Criteria >= 0.2 & EV >= 2) %>%
+#   mutate(Pushable = case_when(Pick_WinProb + Pick_LoseProb < 0.999 ~ 'Y',
+#                               TRUE ~ 'N')) %>% 
+#   filter(Pushable == 'N') %>% 
+#   arrange(gamedate, ID, desc(Kelly_Criteria)) %>% 
+#   group_by(ID) %>% 
+#   mutate(KC_Rank = row_number()) %>% 
+#   arrange(gamedate, ID, desc(EV)) %>% 
+#   group_by(ID) %>% 
+#   mutate(EV_Rank = row_number()) %>%
+#   arrange(gamedate, ID, desc(Pick_WinProb)) %>% 
+#   group_by(ID) %>% 
+#   mutate(WinProb_Rank = row_number(),
+#          Rank = (KC_Rank + EV_Rank) / 2) %>%
+#   arrange(gamedate, ID, Rank) %>% 
+#   mutate(Final_Rank = row_number()) %>%  
+#   filter(Final_Rank == 1) %>%
+#   arrange(gamedate, ID, desc(Kelly_Criteria)) %>% 
+#   group_by(gamedate) %>% 
+#   mutate(KC_Rank = row_number()) %>% 
+#   arrange(gamedate, ID, desc(EV)) %>% 
+#   group_by(gamedate) %>% 
+#   mutate(EV_Rank = row_number()) %>%
+#   arrange(gamedate, ID, desc(Pick_WinProb)) %>% 
+#   group_by(gamedate) %>% 
+#   mutate(WinProb_Rank = row_number(),
+#          Rank = (KC_Rank + EV_Rank) / 2) %>%
+#   arrange(gamedate, ID, Side_or_Total, Rank) %>% 
+#   mutate(Final_Rank = row_number()) %>%  
+#   filter(Final_Rank <= 4) %>%
+#   group_by(gamedate) %>% 
+#   mutate(legs = sum(bets),
+#          hits = sum(Pick_Correct)) %>% 
+#   filter(legs > 1) %>%
+#   mutate(Parlay_Odds = floor((prod(Fract_Odds+1)-1)*100),
+#          winner = if_else(legs==hits,1,0),
+#          Parlay_Units = if_else(winner==1,Parlay_Odds/100,-1),
+#          Parlay_WinProb = prod(Pick_WinProb),
+#          Parlay_Fract_Odds = (100 / abs(Parlay_Odds))^if_else(Parlay_Odds < 0, 1, -1),
+#          Parlay_KC = (Parlay_WinProb * (Parlay_Fract_Odds + 1) - 1) / Parlay_Fract_Odds,
+#          Parlay_Kelly_Profit = (Parlay_KC*100*Parlay_Units)/2) %>% 
+#   filter(Parlay_Odds >= 100)
+# 
+# Parlay_performance <- Parlays %>% 
+#   group_by(gamedate) %>% 
+#   mutate(row_num = row_number()) %>% 
+#   filter(row_num == 1) %>% 
+#   select(ID, gamedate, Parlay_Odds, winner, Parlay_Units, Parlay_Kelly_Profit, legs) %>% 
+#   mutate(bets = 1)
+# 
+# email_Parlay_table <- Parlay_performance %>%
+#   #group_by(Total) %>%
+#   group_by(Strategy = 'Multi-Game Parlays (2-4 Legs/Day)') %>% 
+#   #group_by(bet_type) %>%
+#   #group_by(KC_tier) %>%
+#   #group_by(Odds_tier) %>%
+#   dplyr::summarise(HitRate = mean(winner),
+#                    bets = sum(bets),
+#                    Flat_Profit = sum(Parlay_Units),
+#                    Kelly_Profit = sum(Parlay_Kelly_Profit)) %>%
+#   mutate(Units_per_bet = Flat_Profit / bets) %>%
+#   print(n=40)
+# 
+# email_table_3 <- bind_rows(email_table_3a, email_table_3d, email_table_3b, email_table_3c, email_SGP_table, email_Parlay_table) %>% 
+#   mutate(bets = as.integer(bets))
+# 
+# df_html_3 <- print(xtable(email_table_3), type = "html", print.results = FALSE)
+# 
+# email_table_4 <- types %>%
+#   #group_by(bet_type) %>%
+#   group_by(KC_tier = as.numeric(as.character(KC_tier))) %>%
+#   #group_by(WinProb_tier) %>%
+#   #group_by(Odds_tier) %>%
+#   dplyr::summarise(HitRate = mean(Pick_Correct),
+#                    bets = sum(bets),
+#                    Flat_Profit = sum(Units),
+#                    Kelly_Profit = sum(Kelly_Profit)) %>%
+#   mutate(Units_per_bet = Flat_Profit / bets) %>%
+#   print(n=40)
+# 
+# df_html_4 <- print(xtable(email_table_4), type = "html", print.results = FALSE)
+# 
+# email_table_5 <- types %>%
+#   #group_by(Total) %>%
+#   #group_by(bet_type) %>%
+#   #group_by(KC_tier = as.numeric(as.character(KC_tier))) %>%
+#   #group_by(Odds_tier) %>%
+#   group_by(EV_tier = as.integer(EV_tier)) %>% 
+#   dplyr::summarise(HitRate = mean(Pick_Correct),
+#                    bets = sum(bets),
+#                    Flat_Profit = sum(Units),
+#                    Kelly_Profit = sum(Kelly_Profit)) %>%
+#   mutate(Units_per_bet = Flat_Profit / bets) %>%
+#   print(n=40)
+# 
+# df_html_5 <- print(xtable(email_table_5), type = "html", print.results = FALSE)
+
+# graph_data1 <- types %>%
+#   ungroup() %>%
+#   filter(Kelly_Criteria >= 0.2 & EV >= 2) %>%
+#   select(gamedate, Units, Kelly_Profit) %>%
+#   rename(`Flat Profit: Bet Everything` = Units,
+#          `Bet Everything` = Kelly_Profit) %>% 
+#   melt("gamedate", c("Flat Profit: Bet Everything", "Bet Everything")) %>% 
+#   group_by(gamedate, variable) %>% 
+#   summarise(value = sum(value)) %>% 
+#   group_by(variable) %>% 
+#   mutate(cumulative_value = cumsum(value))
+# 
+# graph_data2 <- types %>%
+#   ungroup() %>%
+#   filter(Pick_Odds >= 100 & Kelly_Criteria >= 0.2 & EV >= 2) %>% 
+#   select(gamedate, Units, Kelly_Profit) %>%
+#   rename(`Flat Profit: Bet Everything Positive` = Units,
+#          `Bet Everything Positive` = Kelly_Profit) %>% 
+#   melt("gamedate", c("Flat Profit: Bet Everything Positive", "Bet Everything Positive")) %>% 
+#   group_by(gamedate, variable) %>% 
+#   summarise(value = sum(value)) %>% 
+#   group_by(variable) %>% 
+#   mutate(cumulative_value = cumsum(value))
+# 
+# graph_data3 <- types %>%
+#   filter(Kelly_Criteria >= 0.2 & EV >= 2) %>%
+#   arrange(gamedate, ID, desc(Kelly_Criteria)) %>% 
+#   group_by(ID) %>% 
+#   mutate(KC_Rank = row_number()) %>% 
+#   arrange(gamedate, ID, desc(EV)) %>% 
+#   group_by(ID) %>% 
+#   mutate(EV_Rank = row_number(),
+#          Rank = (KC_Rank + EV_Rank) / 2) %>% 
+#   arrange(gamedate, ID, Rank) %>% 
+#   mutate(Final_Rank = row_number()) %>% 
+#   filter(Final_Rank == 1) %>%
+#   ungroup() %>% 
+#   select(gamedate, Units, Kelly_Profit) %>%
+#   rename(`Flat Profit: One per Game` = Units,
+#          `One per Game` = Kelly_Profit) %>% 
+#   melt("gamedate", c("Flat Profit: One per Game", "One per Game")) %>% 
+#   group_by(gamedate, variable) %>% 
+#   summarise(value = sum(value)) %>% 
+#   group_by(variable) %>% 
+#   mutate(cumulative_value = cumsum(value))
+# 
+# graph_data4 <- types %>%
+#   filter(Pick_Odds >= 100 & Kelly_Criteria >= 0.2 & EV >= 2) %>%
+#   arrange(gamedate, ID, desc(Kelly_Criteria)) %>% 
+#   group_by(ID) %>% 
+#   mutate(KC_Rank = row_number()) %>% 
+#   arrange(gamedate, ID, desc(EV)) %>% 
+#   group_by(ID) %>% 
+#   mutate(EV_Rank = row_number(),
+#          Rank = (KC_Rank + EV_Rank) / 2) %>% 
+#   arrange(gamedate, ID, Rank) %>% 
+#   mutate(Final_Rank = row_number()) %>% 
+#   filter(Final_Rank == 1) %>%
+#   ungroup() %>% 
+#   select(gamedate, Units, Kelly_Profit) %>%
+#   rename(`Flat Profit: One per Game Positive` = Units,
+#          `One per Game Positive` = Kelly_Profit) %>% 
+#   melt("gamedate", c("Flat Profit: One per Game Positive", "One per Game Positive")) %>% 
+#   group_by(gamedate, variable) %>% 
+#   summarise(value = sum(value)) %>% 
+#   group_by(variable) %>% 
+#   mutate(cumulative_value = cumsum(value))
+# 
+# graph_data5 <- SGP_performance %>%
+#   select(gamedate, Parlay_Units, Parlay_Kelly_Profit) %>%
+#   rename(`Flat Profit: Same-Game Parlays` = Parlay_Units,
+#          `Same-Game Parlays` = Parlay_Kelly_Profit) %>% 
+#   melt("gamedate", c("Flat Profit: Same-Game Parlays", "Same-Game Parlays")) %>% 
+#   group_by(gamedate, variable) %>% 
+#   summarise(value = sum(value)) %>% 
+#   group_by(variable) %>% 
+#   mutate(cumulative_value = cumsum(value))
+# 
+# graph_data6 <- Parlay_performance %>%
+#   select(gamedate, Parlay_Units, Parlay_Kelly_Profit) %>%
+#   rename(`Flat Profit: Multi-Game Parlays` = Parlay_Units,
+#          `Multi-Game Parlays` = Parlay_Kelly_Profit) %>% 
+#   melt("gamedate", c("Flat Profit: Multi-Game Parlays", "Multi-Game Parlays")) %>% 
+#   group_by(gamedate, variable) %>% 
+#   summarise(value = sum(value)) %>% 
+#   group_by(variable) %>% 
+#   mutate(cumulative_value = cumsum(value))
+# 
+# graph_data <- bind_rows(graph_data1, graph_data2, graph_data3, graph_data4, graph_data5, graph_data6) %>% 
+#   filter(!str_detect(variable, 'Flat'))
+# 
+# plot <- ggplot(graph_data) +
+#   aes(x = gamedate, y = cumulative_value, colour = variable) +
+#   geom_line(size = 0.5) +
+#   scale_color_hue(direction = 1) +
+#   labs(
+#     x = "Game Date",
+#     y = "Cumulative Profit",
+#     color = ""
+#   ) +
+#   theme_minimal()
+# 
+# plot_html <- add_ggplot(plot_object = plot)
+
+bets_table <- read.csv("Soccer Machine/upcoming_bets.csv") %>%
   mutate(gamedate = as.Date(gamedate)) %>%
-  filter(Kelly_Criteria >= 0.2 & EV >= 2 &
-           Pick_Odds > 0 &
+  mutate(EV_tier = round_any(EV, 1, floor),
+         Side_or_Total = case_when(bet_type %in% c('Alt Spread', 'Draw No Bet', 'ML', 'Spread') ~ "Side",
+                                   TRUE ~ "Total"),
+         `Bet Grade` = case_when(Side_or_Total == 'Side' ~ case_when(KC_tier %in% c(0.4, 0.45, 0.5, 0.55, 0.6, 0.65,
+                                                                                    0.7, 0.75, 0.8, 0.85, 0.9, 0.95) ~ 'A+',
+                                                                     KC_tier %in% c(0.3, 0.35) ~ 'A',
+                                                                     KC_tier %in% c(0.2, 0.25) ~ case_when(as.integer(EV_tier) >= 2 ~ 'B',
+                                                                                                           TRUE ~ 'C'),
+                                                                     as.integer(EV_tier) >= 2 & KC_tier %in% c(0.15) ~ 'C',
+                                                                     KC_tier %in% c(0.15) ~ 'D',
+                                                                     TRUE ~ 'F'),
+                                 TRUE ~ case_when(KC_tier %in% c(0.3, 0.35, 0.4, 0.45, 0.5, 0.55, 0.6,
+                                                                 0.65, 0.7, 0.75, 0.8, 0.85, 0.9, 0.95) ~ 'A+',
+                                                  KC_tier %in% c(0.2, 0.25) ~ 'A',
+                                                  KC_tier %in% c(0.1, 0.15) ~ 'B',
+                                                  KC_tier %in% c(0.05) ~ 'C',
+                                                  KC_tier %in% c(0) ~ 'D',
+                                                  TRUE ~ 'F')),
+         `Bet Grade` = factor(`Bet Grade`, levels = c('A+', 'A', 'B', 'C', 'D', 'F'))) %>% 
+  filter(Kelly_Criteria > 0 &
+           Pick_Odds > -220 &
            Pick_WinProb >= 0.3 &
            bet_type_full != 'Alternate Total - 1.5' &
            gamedate <= Sys.Date() + 4) %>%
@@ -1582,19 +1686,13 @@ bets_table <- read.csv("Soccer Machine/upcoming_bets.csv") %>%
          Rank = (KC_Rank + EV_Rank) / 2) %>% 
   arrange(gamedate, ID, Rank) %>% 
   mutate(Final_Rank = row_number()) %>% 
-  filter(Final_Rank == 1) %>%
-  mutate(bet_size = case_when(#KC_tier %in% c(0.1, 0.15) ~ '$5',
-                              KC_tier %in% c(0.2, 0.25) ~ '$5',
-                              KC_tier %in% c(0.3, 0.35) ~ '$10',
-                              KC_tier %in% c(0.4, 0.45, 0.5, 0.55, 0.6, 0.65,
-                                             0.7, 0.75, 0.8, 0.85, 0.9, 0.95) ~ '$15',
-                              TRUE ~ 'No bet - something went wrong')) %>%
+  filter(Final_Rank == 1 & `Bet Grade` %in% c('A+', 'A', 'B')) %>%
   arrange(gamedate, desc(Kelly_Criteria)) %>% 
   ungroup() %>% 
   mutate(Pick = case_when(is.na(Pick_SpreadTotal) | Pick_SpreadTotal == 0 ~ paste0(Pick),
                           str_detect(bet_type_full, "Spread") & Pick_SpreadTotal > 0 ~ paste0(Pick, " +", Pick_SpreadTotal),
                           TRUE ~ paste0(Pick, " ", Pick_SpreadTotal))) %>% 
-  select(gamedate, League, HomeTeam, AwayTeam, bet_type_full, Pick, Pick_Odds, Machine_Odds, bet_size) %>% 
+  select(gamedate, League, HomeTeam, AwayTeam, bet_type_full, Pick, Pick_Odds, Machine_Odds, `Bet Grade`) %>% 
   mutate(Machine_Odds =  as.integer(pmax(Machine_Odds, 100)),
          gamedate = as.character(gamedate)) %>% 
   rename(`Game Date` = gamedate,
@@ -1602,194 +1700,196 @@ bets_table <- read.csv("Soccer Machine/upcoming_bets.csv") %>%
          `Away Team` = AwayTeam,
          `Bet Type` = bet_type_full,
          `Current Pick Odds` = Pick_Odds,
-         `Don't Bet if Odds Worse Than` = Machine_Odds,
-         `Wager Amount` = bet_size)
+         `Don't Bet if Odds Worse Than` = Machine_Odds)
 
-bets_SGP <- read.csv("Soccer Machine/upcoming_bets.csv") %>%
-  # history %>% 
-  # filter(gamedate > as.Date("2022-06-17")) %>%
-  # arrange(desc(run_timestamp)) %>%
-  # group_by(ID, bet_type_full) %>%
-  # mutate(partition = row_number()) %>% 
-  # filter(partition == 2) %>% 
-  mutate(Side_or_Total = case_when(bet_type %in% c('Alt Spread', 'Draw No Bet', 'ML', 'Spread') ~ "Side",
-                                   TRUE ~ "Total"),
-         SGP_eligible = case_when(bet_type %in% c('Spread', 'Alt Spread') ~ case_when(HOY.SpreadTotal %in% c(0, 0.5, -0.5) ~ 'Y',
-                                                                                      TRUE ~ 'N'),
-                                  TRUE ~ 'Y')) %>% 
-  mutate(gamedate = as.Date(gamedate)) %>%
-  filter((Pick_Odds < 0 | (Side_or_Total == 'Side' & Pick_Odds <= 140)) &
-           Kelly_Criteria >= 0.2 & EV >= 2 &
-           bet_type_full != 'Alternate Total - 1.5' &
-           gamedate <= Sys.Date() + 4 &
-           SGP_eligible == 'Y') %>% 
-  mutate(Pushable = case_when(Pick_WinProb + Pick_LoseProb < 0.999 ~ 'Y',
-                              TRUE ~ 'N')) %>% 
-  filter(Pushable == 'N') %>% 
-  arrange(gamedate, ID, desc(Kelly_Criteria)) %>% 
-  group_by(ID, Side_or_Total) %>% 
-  mutate(KC_Rank = row_number()) %>% 
-  arrange(gamedate, ID, desc(EV)) %>% 
-  group_by(ID, Side_or_Total) %>% 
-  mutate(EV_Rank = row_number()) %>%
-  arrange(gamedate, ID, desc(Pick_WinProb)) %>% 
-  group_by(ID, Side_or_Total) %>% 
-  mutate(WinProb_Rank = row_number(),
-         Rank = (KC_Rank + EV_Rank) / 2) %>%
-  arrange(gamedate, ID, Side_or_Total, Rank) %>% 
-  mutate(Final_Rank = row_number()) %>%  
-  filter(Final_Rank == 1) %>% 
-  group_by(ID) %>% 
-  mutate(bets = 1,
-         legs = sum(bets)) %>% 
-  filter(legs > 1)
+# bets_SGP <- read.csv("Soccer Machine/upcoming_bets.csv") %>%
+#   # history %>% 
+#   # filter(gamedate > as.Date("2022-06-17")) %>%
+#   # arrange(desc(run_timestamp)) %>%
+#   # group_by(ID, bet_type_full) %>%
+#   # mutate(partition = row_number()) %>% 
+#   # filter(partition == 2) %>% 
+#   mutate(Side_or_Total = case_when(bet_type %in% c('Alt Spread', 'Draw No Bet', 'ML', 'Spread') ~ "Side",
+#                                    TRUE ~ "Total"),
+#          SGP_eligible = case_when(bet_type %in% c('Spread', 'Alt Spread') ~ case_when(HOY.SpreadTotal %in% c(0, 0.5, -0.5) ~ 'Y',
+#                                                                                       TRUE ~ 'N'),
+#                                   TRUE ~ 'Y')) %>% 
+#   mutate(gamedate = as.Date(gamedate)) %>%
+#   filter((Pick_Odds < 0 | (Side_or_Total == 'Side' & Pick_Odds <= 140)) &
+#            Kelly_Criteria >= 0.2 & EV >= 2 &
+#            bet_type_full != 'Alternate Total - 1.5' &
+#            gamedate <= Sys.Date() + 4 &
+#            SGP_eligible == 'Y') %>% 
+#   mutate(Pushable = case_when(Pick_WinProb + Pick_LoseProb < 0.999 ~ 'Y',
+#                               TRUE ~ 'N')) %>% 
+#   filter(Pushable == 'N') %>% 
+#   arrange(gamedate, ID, desc(Kelly_Criteria)) %>% 
+#   group_by(ID, Side_or_Total) %>% 
+#   mutate(KC_Rank = row_number()) %>% 
+#   arrange(gamedate, ID, desc(EV)) %>% 
+#   group_by(ID, Side_or_Total) %>% 
+#   mutate(EV_Rank = row_number()) %>%
+#   arrange(gamedate, ID, desc(Pick_WinProb)) %>% 
+#   group_by(ID, Side_or_Total) %>% 
+#   mutate(WinProb_Rank = row_number(),
+#          Rank = (KC_Rank + EV_Rank) / 2) %>%
+#   arrange(gamedate, ID, Side_or_Total, Rank) %>% 
+#   mutate(Final_Rank = row_number()) %>%  
+#   filter(Final_Rank == 1) %>% 
+#   group_by(ID) %>% 
+#   mutate(bets = 1,
+#          legs = sum(bets)) %>% 
+#   filter(legs > 1)
+# 
+# bets_SGP2 <- bets_SGP %>%
+#   mutate(Pick = case_when(bet_type == 'Draw No Bet' ~ paste0(Pick, " Draw No Bet"),
+#                           is.na(Pick_SpreadTotal) | Pick_SpreadTotal == 0 ~ paste0(Pick),
+#                           str_detect(bet_type_full, "Spread") & Pick_SpreadTotal > 0 ~ paste0(Pick, " +", Pick_SpreadTotal),
+#                           TRUE ~ paste0(Pick, " ", Pick_SpreadTotal))) %>% 
+#   mutate(Pick = case_when(bet_type == 'TT' | bet_type == 'Alt TT' ~ case_when(str_detect(bet_type_full, HomeTeam) ~ paste0(HomeTeam, " TT ", Pick),
+#                                                                             TRUE ~ paste0(AwayTeam, " TT ", Pick)),
+#                         str_detect(bet_type, "Total") ~ paste0("Total ", Pick),
+#                         bet_type == 'ML' ~ paste0(Pick, " ML"),
+#                         bet_type == 'BTTS' ~ paste0(" Both Teams to Score - ", Pick),
+#                         TRUE ~ Pick)) %>%
+#   select(ID, gamedate, League, HomeTeam, AwayTeam, bet_type_full, Pick, Pick_Odds, Machine_Odds, Fract_Odds, Pick_WinProb) %>% 
+#   group_by(ID) %>% 
+#   mutate(Parlay_Odds = as.integer(floor((prod(Fract_Odds+1)-1)*100)),
+#          Parlay_WinProb = prod(Pick_WinProb),
+#          Parlay_Fract_Odds = (100 / abs(Parlay_Odds))^if_else(Parlay_Odds < 0, 1, -1),
+#          Parlay_KC = (Parlay_WinProb * (Parlay_Fract_Odds + 1) - 1) / Parlay_Fract_Odds,
+#          Bet = "Same-Game Parlay",
+#          Pick = paste0(Pick, collapse = " & "),
+#          Parlay_Machine_Odds = as.integer(pmax(if_else(Parlay_WinProb < 0.5,
+#                                                        (100 / Parlay_WinProb) - 100,
+#                                                        -1 * (100 * Parlay_WinProb) / (1 - Parlay_WinProb)),
+#                                                100)),
+#          Parlay_KC_tier = as.factor(round_any(Parlay_KC, 0.05, floor)),
+#          bet_size = case_when(Parlay_KC_tier %in% c(0.0, 0.05, 0.1, 0.15) ~ '$5',
+#                               Parlay_KC_tier %in% c(0.2, 0.25) ~ '$5',
+#                               Parlay_KC_tier %in% c(0.3, 0.35) ~ '$10',
+#                               Parlay_KC_tier %in% c(0.4, 0.45, 0.5, 0.55, 0.6, 0.65,
+#                                                     0.7, 0.75, 0.8, 0.85, 0.9, 0.95) ~ '$15',
+#                               TRUE ~ 'No bet - something went wrong'),
+#          gamedate = as.character(gamedate)) %>% 
+#   filter(Parlay_Odds >= 100) %>% 
+#   ungroup() %>% 
+#   select(gamedate, League, HomeTeam, AwayTeam, Bet, Pick, Parlay_Odds, Parlay_Machine_Odds, bet_size) %>% 
+#   distinct() %>% 
+#   rename(`Game Date` = gamedate,
+#          `Home Team` = HomeTeam,
+#          `Away Team` = AwayTeam,
+#          `Bet Type` = Bet,
+#          `Current Pick Odds` = Parlay_Odds,
+#          `Don't Bet if Odds Worse Than` = Parlay_Machine_Odds,
+#          `Wager Amount` = bet_size)
+# 
+# bets_Parlay <- read.csv("Soccer Machine/upcoming_bets.csv") %>%
+#   # history %>%
+#   # filter(gamedate > as.Date("2022-06-17")) %>%
+#   # arrange(desc(run_timestamp)) %>%
+#   # group_by(ID, bet_type_full) %>%
+#   # mutate(partition = row_number()) %>%
+#   # filter(partition == 2) %>%
+#   mutate(Side_or_Total = case_when(bet_type %in% c('Alt Spread', 'Draw No Bet', 'ML', 'Spread') ~ "Side",
+#                                    TRUE ~ "Total")) %>% 
+#   mutate(gamedate = as.Date(gamedate)) %>%
+#   filter(Pick_Odds < 0 &
+#            Pick_Odds >= -250 &
+#            Kelly_Criteria >= 0.2 & EV >= 2 &
+#            bet_type_full != 'Alternate Total - 1.5' &
+#            gamedate <= Sys.Date() + 4) %>% 
+#   mutate(Pushable = case_when(Pick_WinProb + Pick_LoseProb < 0.999 ~ 'Y',
+#                               TRUE ~ 'N')) %>% 
+#   filter(Pushable == 'N') %>% 
+#   arrange(gamedate, ID, desc(Kelly_Criteria)) %>% 
+#   group_by(ID) %>% 
+#   mutate(KC_Rank = row_number()) %>% 
+#   arrange(gamedate, ID, desc(EV)) %>% 
+#   group_by(ID) %>% 
+#   mutate(EV_Rank = row_number()) %>%
+#   arrange(gamedate, ID, desc(Pick_WinProb)) %>% 
+#   group_by(ID) %>% 
+#   mutate(WinProb_Rank = row_number(),
+#          Rank = (KC_Rank + EV_Rank) / 2) %>%
+#   arrange(gamedate, ID, Rank) %>% 
+#   mutate(Final_Rank = row_number()) %>%  
+#   filter(Final_Rank == 1) %>%
+#   arrange(gamedate, ID, desc(Kelly_Criteria)) %>% 
+#   group_by(gamedate) %>% 
+#   mutate(KC_Rank = row_number()) %>% 
+#   arrange(gamedate, ID, desc(EV)) %>% 
+#   group_by(gamedate) %>% 
+#   mutate(EV_Rank = row_number()) %>%
+#   arrange(gamedate, ID, desc(Pick_WinProb)) %>% 
+#   group_by(gamedate) %>% 
+#   mutate(WinProb_Rank = row_number(),
+#          Rank = (KC_Rank + EV_Rank) / 2) %>%
+#   arrange(gamedate, ID, Side_or_Total, Rank) %>% 
+#   mutate(Final_Rank = row_number()) %>%  
+#   filter(Final_Rank <= 4) %>%
+#   group_by(gamedate) %>% 
+#   mutate(bets = 1,
+#          legs = sum(bets)) %>% 
+#   filter(legs > 1)
+# 
+# bets_Parlay2 <- bets_Parlay %>%
+#   mutate(Pick = case_when(bet_type == 'Draw No Bet' ~ paste0(Pick, " Draw No Bet"),
+#                           is.na(Pick_SpreadTotal) | Pick_SpreadTotal == 0 ~ paste0(Pick),
+#                           str_detect(bet_type_full, "Spread") & Pick_SpreadTotal > 0 ~ paste0(Pick, " +", Pick_SpreadTotal),
+#                           TRUE ~ paste0(Pick, " ", Pick_SpreadTotal))) %>% 
+#   mutate(Pick = case_when(bet_type == 'TT' | bet_type == 'Alt TT' ~ case_when(str_detect(bet_type_full, HomeTeam) ~ paste0(HomeTeam, " TT ", Pick),
+#                                                                               TRUE ~ paste0(AwayTeam, " TT ", Pick)),
+#                           str_detect(bet_type, "Total") ~ paste0(HomeTeam, "/", AwayTeam, " Total ", Pick),
+#                           bet_type == 'ML' ~ paste0(Pick, " ML"),
+#                           bet_type == 'BTTS' ~ paste0(" Both Teams to Score - ", Pick),
+#                           TRUE ~ Pick)) %>% 
+#   select(ID, gamedate, League, HomeTeam, AwayTeam, bet_type_full, Pick, Pick_Odds, Machine_Odds, Fract_Odds, Pick_WinProb) %>% 
+#   group_by(gamedate) %>% 
+#   mutate(Parlay_Odds = as.integer(floor((prod(Fract_Odds+1)-1)*100)),
+#          Parlay_WinProb = prod(Pick_WinProb),
+#          Parlay_Fract_Odds = (100 / abs(Parlay_Odds))^if_else(Parlay_Odds < 0, 1, -1),
+#          Parlay_KC = (Parlay_WinProb * (Parlay_Fract_Odds + 1) - 1) / Parlay_Fract_Odds,
+#          Bet = "Multi-Game Parlay",
+#          Pick = paste0(Pick, collapse = " & "),
+#          Parlay_Machine_Odds = as.integer(pmax(if_else(Parlay_WinProb < 0.5,
+#                                                        (100 / Parlay_WinProb) - 100,
+#                                                        -1 * (100 * Parlay_WinProb) / (1 - Parlay_WinProb)),
+#                                                100)),
+#          Parlay_KC_tier = as.factor(round_any(Parlay_KC, 0.05, floor)),
+#          bet_size = case_when(Parlay_KC_tier %in% c(0.0, 0.05, 0.1, 0.15) ~ '$5',
+#                               Parlay_KC_tier %in% c(0.2, 0.25) ~ '$5',
+#                               Parlay_KC_tier %in% c(0.3, 0.35) ~ '$10',
+#                               Parlay_KC_tier %in% c(0.4, 0.45, 0.5, 0.55, 0.6, 0.65,
+#                                                     0.7, 0.75, 0.8, 0.85, 0.9, 0.95) ~ '$15',
+#                               TRUE ~ 'No bet - something went wrong'),
+#          gamedate = as.character(gamedate)) %>% 
+#   filter(Parlay_Odds >= 100) %>% 
+#   ungroup() %>% 
+#   mutate(League = "--",
+#          HomeTeam = "--",
+#          AwayTeam = "--") %>% 
+#   select(gamedate, League, HomeTeam, AwayTeam, Bet, Pick, Parlay_Odds, Parlay_Machine_Odds, bet_size) %>% 
+#   distinct() %>% 
+#   rename(`Game Date` = gamedate,
+#          `Home Team` = HomeTeam,
+#          `Away Team` = AwayTeam,
+#          `Bet Type` = Bet,
+#          `Current Pick Odds` = Parlay_Odds,
+#          `Don't Bet if Odds Worse Than` = Parlay_Machine_Odds,
+#          `Wager Amount` = bet_size)
 
-bets_SGP2 <- bets_SGP %>%
-  mutate(Pick = case_when(bet_type == 'Draw No Bet' ~ paste0(Pick, " Draw No Bet"),
-                          is.na(Pick_SpreadTotal) | Pick_SpreadTotal == 0 ~ paste0(Pick),
-                          str_detect(bet_type_full, "Spread") & Pick_SpreadTotal > 0 ~ paste0(Pick, " +", Pick_SpreadTotal),
-                          TRUE ~ paste0(Pick, " ", Pick_SpreadTotal))) %>% 
-  mutate(Pick = case_when(bet_type == 'TT' | bet_type == 'Alt TT' ~ case_when(str_detect(bet_type_full, HomeTeam) ~ paste0(HomeTeam, " TT ", Pick),
-                                                                            TRUE ~ paste0(AwayTeam, " TT ", Pick)),
-                        str_detect(bet_type, "Total") ~ paste0("Total ", Pick),
-                        bet_type == 'ML' ~ paste0(Pick, " ML"),
-                        bet_type == 'BTTS' ~ paste0(" Both Teams to Score - ", Pick),
-                        TRUE ~ Pick)) %>%
-  select(ID, gamedate, League, HomeTeam, AwayTeam, bet_type_full, Pick, Pick_Odds, Machine_Odds, Fract_Odds, Pick_WinProb) %>% 
-  group_by(ID) %>% 
-  mutate(Parlay_Odds = as.integer(floor((prod(Fract_Odds+1)-1)*100)),
-         Parlay_WinProb = prod(Pick_WinProb),
-         Parlay_Fract_Odds = (100 / abs(Parlay_Odds))^if_else(Parlay_Odds < 0, 1, -1),
-         Parlay_KC = (Parlay_WinProb * (Parlay_Fract_Odds + 1) - 1) / Parlay_Fract_Odds,
-         Bet = "Same-Game Parlay",
-         Pick = paste0(Pick, collapse = " & "),
-         Parlay_Machine_Odds = as.integer(pmax(if_else(Parlay_WinProb < 0.5,
-                                                       (100 / Parlay_WinProb) - 100,
-                                                       -1 * (100 * Parlay_WinProb) / (1 - Parlay_WinProb)),
-                                               100)),
-         Parlay_KC_tier = as.factor(round_any(Parlay_KC, 0.05, floor)),
-         bet_size = case_when(Parlay_KC_tier %in% c(0.0, 0.05, 0.1, 0.15) ~ '$5',
-                              Parlay_KC_tier %in% c(0.2, 0.25) ~ '$5',
-                              Parlay_KC_tier %in% c(0.3, 0.35) ~ '$10',
-                              Parlay_KC_tier %in% c(0.4, 0.45, 0.5, 0.55, 0.6, 0.65,
-                                                    0.7, 0.75, 0.8, 0.85, 0.9, 0.95) ~ '$15',
-                              TRUE ~ 'No bet - something went wrong'),
-         gamedate = as.character(gamedate)) %>% 
-  filter(Parlay_Odds >= 100) %>% 
-  ungroup() %>% 
-  select(gamedate, League, HomeTeam, AwayTeam, Bet, Pick, Parlay_Odds, Parlay_Machine_Odds, bet_size) %>% 
-  distinct() %>% 
-  rename(`Game Date` = gamedate,
-         `Home Team` = HomeTeam,
-         `Away Team` = AwayTeam,
-         `Bet Type` = Bet,
-         `Current Pick Odds` = Parlay_Odds,
-         `Don't Bet if Odds Worse Than` = Parlay_Machine_Odds,
-         `Wager Amount` = bet_size)
-
-bets_Parlay <- read.csv("Soccer Machine/upcoming_bets.csv") %>%
-  # history %>%
-  # filter(gamedate > as.Date("2022-06-17")) %>%
-  # arrange(desc(run_timestamp)) %>%
-  # group_by(ID, bet_type_full) %>%
-  # mutate(partition = row_number()) %>%
-  # filter(partition == 2) %>%
-  mutate(Side_or_Total = case_when(bet_type %in% c('Alt Spread', 'Draw No Bet', 'ML', 'Spread') ~ "Side",
-                                   TRUE ~ "Total")) %>% 
-  mutate(gamedate = as.Date(gamedate)) %>%
-  filter(Pick_Odds < 0 &
-           Pick_Odds >= -250 &
-           Kelly_Criteria >= 0.2 & EV >= 2 &
-           bet_type_full != 'Alternate Total - 1.5' &
-           gamedate <= Sys.Date() + 4) %>% 
-  mutate(Pushable = case_when(Pick_WinProb + Pick_LoseProb < 0.999 ~ 'Y',
-                              TRUE ~ 'N')) %>% 
-  filter(Pushable == 'N') %>% 
-  arrange(gamedate, ID, desc(Kelly_Criteria)) %>% 
-  group_by(ID) %>% 
-  mutate(KC_Rank = row_number()) %>% 
-  arrange(gamedate, ID, desc(EV)) %>% 
-  group_by(ID) %>% 
-  mutate(EV_Rank = row_number()) %>%
-  arrange(gamedate, ID, desc(Pick_WinProb)) %>% 
-  group_by(ID) %>% 
-  mutate(WinProb_Rank = row_number(),
-         Rank = (KC_Rank + EV_Rank) / 2) %>%
-  arrange(gamedate, ID, Rank) %>% 
-  mutate(Final_Rank = row_number()) %>%  
-  filter(Final_Rank == 1) %>%
-  arrange(gamedate, ID, desc(Kelly_Criteria)) %>% 
-  group_by(gamedate) %>% 
-  mutate(KC_Rank = row_number()) %>% 
-  arrange(gamedate, ID, desc(EV)) %>% 
-  group_by(gamedate) %>% 
-  mutate(EV_Rank = row_number()) %>%
-  arrange(gamedate, ID, desc(Pick_WinProb)) %>% 
-  group_by(gamedate) %>% 
-  mutate(WinProb_Rank = row_number(),
-         Rank = (KC_Rank + EV_Rank) / 2) %>%
-  arrange(gamedate, ID, Side_or_Total, Rank) %>% 
-  mutate(Final_Rank = row_number()) %>%  
-  filter(Final_Rank <= 4) %>%
-  group_by(gamedate) %>% 
-  mutate(bets = 1,
-         legs = sum(bets)) %>% 
-  filter(legs > 1)
-
-bets_Parlay2 <- bets_Parlay %>%
-  mutate(Pick = case_when(bet_type == 'Draw No Bet' ~ paste0(Pick, " Draw No Bet"),
-                          is.na(Pick_SpreadTotal) | Pick_SpreadTotal == 0 ~ paste0(Pick),
-                          str_detect(bet_type_full, "Spread") & Pick_SpreadTotal > 0 ~ paste0(Pick, " +", Pick_SpreadTotal),
-                          TRUE ~ paste0(Pick, " ", Pick_SpreadTotal))) %>% 
-  mutate(Pick = case_when(bet_type == 'TT' | bet_type == 'Alt TT' ~ case_when(str_detect(bet_type_full, HomeTeam) ~ paste0(HomeTeam, " TT ", Pick),
-                                                                              TRUE ~ paste0(AwayTeam, " TT ", Pick)),
-                          str_detect(bet_type, "Total") ~ paste0(HomeTeam, "/", AwayTeam, " Total ", Pick),
-                          bet_type == 'ML' ~ paste0(Pick, " ML"),
-                          bet_type == 'BTTS' ~ paste0(" Both Teams to Score - ", Pick),
-                          TRUE ~ Pick)) %>% 
-  select(ID, gamedate, League, HomeTeam, AwayTeam, bet_type_full, Pick, Pick_Odds, Machine_Odds, Fract_Odds, Pick_WinProb) %>% 
-  group_by(gamedate) %>% 
-  mutate(Parlay_Odds = as.integer(floor((prod(Fract_Odds+1)-1)*100)),
-         Parlay_WinProb = prod(Pick_WinProb),
-         Parlay_Fract_Odds = (100 / abs(Parlay_Odds))^if_else(Parlay_Odds < 0, 1, -1),
-         Parlay_KC = (Parlay_WinProb * (Parlay_Fract_Odds + 1) - 1) / Parlay_Fract_Odds,
-         Bet = "Multi-Game Parlay",
-         Pick = paste0(Pick, collapse = " & "),
-         Parlay_Machine_Odds = as.integer(pmax(if_else(Parlay_WinProb < 0.5,
-                                                       (100 / Parlay_WinProb) - 100,
-                                                       -1 * (100 * Parlay_WinProb) / (1 - Parlay_WinProb)),
-                                               100)),
-         Parlay_KC_tier = as.factor(round_any(Parlay_KC, 0.05, floor)),
-         bet_size = case_when(Parlay_KC_tier %in% c(0.0, 0.05, 0.1, 0.15) ~ '$5',
-                              Parlay_KC_tier %in% c(0.2, 0.25) ~ '$5',
-                              Parlay_KC_tier %in% c(0.3, 0.35) ~ '$10',
-                              Parlay_KC_tier %in% c(0.4, 0.45, 0.5, 0.55, 0.6, 0.65,
-                                                    0.7, 0.75, 0.8, 0.85, 0.9, 0.95) ~ '$15',
-                              TRUE ~ 'No bet - something went wrong'),
-         gamedate = as.character(gamedate)) %>% 
-  filter(Parlay_Odds >= 100) %>% 
-  ungroup() %>% 
-  mutate(League = "--",
-         HomeTeam = "--",
-         AwayTeam = "--") %>% 
-  select(gamedate, League, HomeTeam, AwayTeam, Bet, Pick, Parlay_Odds, Parlay_Machine_Odds, bet_size) %>% 
-  distinct() %>% 
-  rename(`Game Date` = gamedate,
-         `Home Team` = HomeTeam,
-         `Away Team` = AwayTeam,
-         `Bet Type` = Bet,
-         `Current Pick Odds` = Parlay_Odds,
-         `Don't Bet if Odds Worse Than` = Parlay_Machine_Odds,
-         `Wager Amount` = bet_size)
-
-bets_table2 <- bind_rows(bets_table, bets_SGP2, bets_Parlay2) %>% 
+bets_table2 <- bind_rows(bets_table
+                         # , bets_SGP2, bets_Parlay2
+                         ) %>% 
   arrange(`Game Date`, case_when(League == 'EPL' ~ 1,
                                  League == 'La Liga' ~ 2,
                                  League == 'Bundesliga' ~ 3,
                                  League == 'Ligue 1' ~ 4,
                                  League == 'Serie A' ~ 5,
                                  League == 'MLS' ~ 6,
-                                 League == '--' ~ 7))
+                                 League == 'EFL Championship' ~ 7,
+                                 League == '--' ~ 8))
 
 df_html_bets <- print(xtable(bets_table2), type = "html", print.results = FALSE)
 
@@ -1798,46 +1898,28 @@ df_html_bets <- print(xtable(bets_table2), type = "html", print.results = FALSE)
 Outlook <- COMCreate("Outlook.Application")
 
 Email = Outlook$CreateItem(0)
-Email[["to"]] = paste("dnolen@smu.edu", "jamesorler@gmail.com", "asnolen@crimson.ua.edu", "jamestodd425@gmail.com",
-                      "jordanreticker@gmail.com", "brentcaminiti@gmail.com", "dougmyers4987@gmail.com", 
-                      "ralphmstudley@gmail.com", "johnpavese@gmail.com", sep = ";", collapse = NULL)
-# Email[["to"]] = "dnolen@smu.edu"
+# Email[["to"]] = paste("dnolen@smu.edu", "jamesorler@gmail.com", "asnolen@crimson.ua.edu", "jamestodd425@gmail.com",
+#                       "jordanreticker@gmail.com", "brentcaminiti@gmail.com", "dougmyers4987@gmail.com", 
+#                       "ralphmstudley@gmail.com", "johnpavese@gmail.com", sep = ";", collapse = NULL)
+Email[["to"]] = "dnolen@smu.edu"
 Email[["subject"]] = paste0("Soccer Machine Picks: ", Sys.Date())
 Email[["HTMLbody"]] = sprintf("
 The Machine's picks for upcoming soccer matches are in! The Machine currently offers picks for the Big 5 European Leagues plus MLS and the EFL Championship. The attached document contains all of the pertinent betting information for the upcoming matches. Good luck!
 </p><br></p>
-The World Cup is nearly here! With that, there won't be much club soccer action until the Premier League season resumes on Boxing Day. There will be some Championship games in December, so time to get more familiar with England's second division!
-</p><br></p>
-TL;DR: These are the bets that The Machine recommends that you should make for the next few days. The bet sizes are based on a unit size of $10. If your regular bet is something other than $10, adjust accordingly.
+UPDATE: The Machine has updated they way that it grades bets, and will now take a more targeted approach. Bets are now graded from A+ down to F. The table below shows the historical results for each bet grade along with a suggested bet size (in terms of units). The bets that will be recommended going forward will be graded B or better.
 </p><br></p>
 %s
 </p><br></p>
-Below are the results for each bet type:
+These are the bets that The Machine recommends that you should make for the next few days.
 </p><br></p>
 %s
 </p><br></p>
-Below are the results for each league:
+Below are the historical results for both a flat betting strategy (1 unit wagers), and the suggested wager sizes from above:
 </p><br></p>
 %s
 </p><br></p>
-UPDATED: Bets with a KC of at least 0.2 and EV of at least 2 have had the best performance so far. Here are the results for those bets using six different strategies:
-</p><br></p>
-%s
-</p><br></p>
-Results grouped by KC rounded to the nearest 0.05:
-</p><br></p>
-%s
-</p><br></p>
-Results grouped by EV rounded to the nearest 1:
-</p><br></p>
-%s
-</p><br></p>
-Here is the Kelly betting results over time for each of the six strategies listed above:
-</p><br></p>
-%s
-</p><br></p>
-NOTE: I filtered out bets where the odds are less than -250 from this analysis. I suggest never betting juice higher than -250. I also filtered out bets that have less than a 30%% win probability. I don't believe it is worth it to bet on these huge underdogs. I also removed any bets on Alternate Totals set at 1.5 goals. The Machine almost always suggests an under bet on those. The performance on those bets was not very good, and that is also a very lame bet. Nobody likes cheering for a game to be that low scoring.
-", df_html_bets, df_html_1, df_html_2, df_html_3, df_html_4, df_html_5, plot_html)
+NOTE: I filtered out bets where the odds are less than -220 from this analysis. I suggest never betting juice higher than -220. I also filtered out bets that have less than a 30%% win probability. I don't believe it is worth it to bet on these huge underdogs. I also removed any bets on Alternate Totals set at 1.5 goals. The Machine almost always suggests an under bet on those. The performance on those bets was not very good, and that is also a very lame bet. Nobody likes cheering for a game to be that low scoring.
+", df_html_1, df_html_bets, plot_html)
 Email[["attachments"]]$Add("C:/Users/danie/Desktop/SportsStuff/TheMachine/the-machine/Soccer Machine/upcoming_bets.csv")
 
 Email$Send()
