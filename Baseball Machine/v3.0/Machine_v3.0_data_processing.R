@@ -8,13 +8,13 @@ p_load("tidyverse", "readr", "DataCombine", "readxl")
 
 ##2019
 
-team_batting_L7_2019 <- read.csv("team_batting_L7_2019.csv")
+team_batting_L7_2019 <- read.csv("Baseball Machine/Daily Files/2019/team_batting_L7_2019.csv")
 team_batting_L7_2019$Date <- as.Date(team_batting_L7_2019$Date)
-team_batting_L14_2019 <- read.csv("team_batting_L14_2019.csv")
+team_batting_L14_2019 <- read.csv("Baseball Machine/Daily Files/2019/team_batting_L14_2019.csv")
 team_batting_L14_2019$Date <- as.Date(team_batting_L14_2019$Date)
-team_batting_L30_2019 <- read.csv("team_batting_L30_2019.csv")
+team_batting_L30_2019 <- read.csv("Baseball Machine/Daily Files/2019/team_batting_L30_2019.csv")
 team_batting_L30_2019$Date <- as.Date(team_batting_L30_2019$Date)
-team_batting_s2d_2019 <- read.csv("team_batting_s2d_2019.csv")
+team_batting_s2d_2019 <- read.csv("Baseball Machine/Daily Files/2019/team_batting_s2d_2019.csv")
 team_batting_s2d_2019$Date <- as.Date(team_batting_s2d_2019$Date)
 
 daily_team_batting_2019 <- full_join(team_batting_L7_2019, team_batting_L14_2019, by = c("Team", "Date"), suffix = c("_L7", "_L14")) %>%
@@ -22,13 +22,13 @@ daily_team_batting_2019 <- full_join(team_batting_L7_2019, team_batting_L14_2019
 colnames(daily_team_batting_2019)[57:83] <- paste0(colnames(daily_team_batting_2019)[57:83],'_L30')
 daily_team_batting_2019 <- full_join(daily_team_batting_2019, team_batting_s2d_2019, by = c("Team", "Date"))
 
-team_bullpen_L7_2019 <- read.csv("team_bullpen_L7_2019.csv")
+team_bullpen_L7_2019 <- read.csv("Baseball Machine/Daily Files/2019/team_bullpen_L7_2019.csv")
 team_bullpen_L7_2019$Date <- as.Date(team_bullpen_L7_2019$Date)
-team_bullpen_L14_2019 <- read.csv("team_bullpen_L14_2019.csv")
+team_bullpen_L14_2019 <- read.csv("Baseball Machine/Daily Files/2019/team_bullpen_L14_2019.csv")
 team_bullpen_L14_2019$Date <- as.Date(team_bullpen_L14_2019$Date)
-team_bullpen_L30_2019 <- read.csv("team_bullpen_L30_2019.csv")
+team_bullpen_L30_2019 <- read.csv("Baseball Machine/Daily Files/2019/team_bullpen_L30_2019.csv")
 team_bullpen_L30_2019$Date <- as.Date(team_bullpen_L30_2019$Date)
-team_bullpen_s2d_2019 <- read.csv("team_bullpen_s2d_2019.csv")
+team_bullpen_s2d_2019 <- read.csv("Baseball Machine/Daily Files/2019/team_bullpen_s2d_2019.csv")
 team_bullpen_s2d_2019$Date <- as.Date(team_bullpen_s2d_2019$Date)
 
 daily_team_bullpen_2019 <- full_join(team_bullpen_L7_2019, team_bullpen_L14_2019, by = c("Team", "Date"), suffix = c("_L7", "_L14")) %>%
@@ -36,18 +36,18 @@ daily_team_bullpen_2019 <- full_join(team_bullpen_L7_2019, team_bullpen_L14_2019
 colnames(daily_team_bullpen_2019)[51:74] <- paste0(colnames(daily_team_bullpen_2019)[51:74],'_L30')
 daily_team_bullpen_2019 <- full_join(daily_team_bullpen_2019, team_bullpen_s2d_2019, by = c("Team", "Date"))
 
-daily_pitchers_2019 <- read.csv("pitchers_s2d_2019.csv")
+daily_pitchers_2019 <- read.csv("Baseball Machine/Daily Files/2019/pitchers_s2d_2019.csv")
 daily_pitchers_2019$Date <- as.Date(daily_pitchers_2019$Date)
 
 ##2020
 
-team_batting_L7_2020 <- read.csv("team_batting_L7_2020.csv")
+team_batting_L7_2020 <- read.csv("Baseball Machine/Daily Files/2020/team_batting_L7_2020.csv")
 team_batting_L7_2020$Date <- as.Date(team_batting_L7_2020$Date)
-team_batting_L14_2020 <- read.csv("team_batting_L14_2020.csv")
+team_batting_L14_2020 <- read.csv("Baseball Machine/Daily Files/2020/team_batting_L14_2020.csv")
 team_batting_L14_2020$Date <- as.Date(team_batting_L14_2020$Date)
-team_batting_L30_2020 <- read.csv("team_batting_L30_2020.csv")
+team_batting_L30_2020 <- read.csv("Baseball Machine/Daily Files/2020/team_batting_L30_2020.csv")
 team_batting_L30_2020$Date <- as.Date(team_batting_L30_2020$Date)
-team_batting_s2d_2020 <- read.csv("team_batting_s2d_2020.csv")
+team_batting_s2d_2020 <- read.csv("Baseball Machine/Daily Files/2020/team_batting_s2d_2020.csv")
 team_batting_s2d_2020$Date <- as.Date(team_batting_s2d_2020$Date)
 
 daily_team_batting_2020 <- full_join(team_batting_L7_2020, team_batting_L14_2020, by = c("Team", "Date"), suffix = c("_L7", "_L14")) %>%
@@ -55,13 +55,13 @@ daily_team_batting_2020 <- full_join(team_batting_L7_2020, team_batting_L14_2020
 colnames(daily_team_batting_2020)[57:83] <- paste0(colnames(daily_team_batting_2020)[57:83],'_L30')
 daily_team_batting_2020 <- full_join(daily_team_batting_2020, team_batting_s2d_2020, by = c("Team", "Date"))
 
-team_bullpen_L7_2020 <- read.csv("team_bullpen_L7_2020.csv")
+team_bullpen_L7_2020 <- read.csv("Baseball Machine/Daily Files/2020/team_bullpen_L7_2020.csv")
 team_bullpen_L7_2020$Date <- as.Date(team_bullpen_L7_2020$Date)
-team_bullpen_L14_2020 <- read.csv("team_bullpen_L14_2020.csv")
+team_bullpen_L14_2020 <- read.csv("Baseball Machine/Daily Files/2020/team_bullpen_L14_2020.csv")
 team_bullpen_L14_2020$Date <- as.Date(team_bullpen_L14_2020$Date)
-team_bullpen_L30_2020 <- read.csv("team_bullpen_L30_2020.csv")
+team_bullpen_L30_2020 <- read.csv("Baseball Machine/Daily Files/2020/team_bullpen_L30_2020.csv")
 team_bullpen_L30_2020$Date <- as.Date(team_bullpen_L30_2020$Date)
-team_bullpen_s2d_2020 <- read.csv("team_bullpen_s2d_2020.csv")
+team_bullpen_s2d_2020 <- read.csv("Baseball Machine/Daily Files/2020/team_bullpen_s2d_2020.csv")
 team_bullpen_s2d_2020$Date <- as.Date(team_bullpen_s2d_2020$Date)
 
 daily_team_bullpen_2020 <- full_join(team_bullpen_L7_2020, team_bullpen_L14_2020, by = c("Team", "Date"), suffix = c("_L7", "_L14")) %>%
@@ -69,18 +69,18 @@ daily_team_bullpen_2020 <- full_join(team_bullpen_L7_2020, team_bullpen_L14_2020
 colnames(daily_team_bullpen_2020)[51:74] <- paste0(colnames(daily_team_bullpen_2020)[51:74],'_L30')
 daily_team_bullpen_2020 <- full_join(daily_team_bullpen_2020, team_bullpen_s2d_2020, by = c("Team", "Date"))
 
-daily_pitchers_2020 <- read.csv("pitchers_s2d_2020.csv")
+daily_pitchers_2020 <- read.csv("Baseball Machine/Daily Files/2020/pitchers_s2d_2020.csv")
 daily_pitchers_2020$Date <- as.Date(daily_pitchers_2020$Date)
 
 ##2021
 
-team_batting_L7_2021 <- read.csv("team_batting_L7_2021.csv")
+team_batting_L7_2021 <- read.csv("Baseball Machine/Daily Files/2021/team_batting_L7_2021.csv")
 team_batting_L7_2021$Date <- as.Date(team_batting_L7_2021$Date)
-team_batting_L14_2021 <- read.csv("team_batting_L14_2021.csv")
+team_batting_L14_2021 <- read.csv("Baseball Machine/Daily Files/2021/team_batting_L14_2021.csv")
 team_batting_L14_2021$Date <- as.Date(team_batting_L14_2021$Date)
-team_batting_L30_2021 <- read.csv("team_batting_L30_2021.csv")
+team_batting_L30_2021 <- read.csv("Baseball Machine/Daily Files/2021/team_batting_L30_2021.csv")
 team_batting_L30_2021$Date <- as.Date(team_batting_L30_2021$Date)
-team_batting_s2d_2021 <- read.csv("team_batting_s2d_2021.csv")
+team_batting_s2d_2021 <- read.csv("Baseball Machine/Daily Files/2021/team_batting_s2d_2021.csv")
 team_batting_s2d_2021$Date <- as.Date(team_batting_s2d_2021$Date)
 
 daily_team_batting_2021 <- full_join(team_batting_L7_2021, team_batting_L14_2021, by = c("Team", "Date"), suffix = c("_L7", "_L14")) %>%
@@ -88,13 +88,13 @@ daily_team_batting_2021 <- full_join(team_batting_L7_2021, team_batting_L14_2021
 colnames(daily_team_batting_2021)[57:83] <- paste0(colnames(daily_team_batting_2021)[57:83],'_L30')
 daily_team_batting_2021 <- full_join(daily_team_batting_2021, team_batting_s2d_2021, by = c("Team", "Date"))
 
-team_bullpen_L7_2021 <- read.csv("team_bullpen_L7_2021.csv")
+team_bullpen_L7_2021 <- read.csv("Baseball Machine/Daily Files/2021/team_bullpen_L7_2021.csv")
 team_bullpen_L7_2021$Date <- as.Date(team_bullpen_L7_2021$Date)
-team_bullpen_L14_2021 <- read.csv("team_bullpen_L14_2021.csv")
+team_bullpen_L14_2021 <- read.csv("Baseball Machine/Daily Files/2021/team_bullpen_L14_2021.csv")
 team_bullpen_L14_2021$Date <- as.Date(team_bullpen_L14_2021$Date)
-team_bullpen_L30_2021 <- read.csv("team_bullpen_L30_2021.csv")
+team_bullpen_L30_2021 <- read.csv("Baseball Machine/Daily Files/2021/team_bullpen_L30_2021.csv")
 team_bullpen_L30_2021$Date <- as.Date(team_bullpen_L30_2021$Date)
-team_bullpen_s2d_2021 <- read.csv("team_bullpen_s2d_2021.csv")
+team_bullpen_s2d_2021 <- read.csv("Baseball Machine/Daily Files/2021/team_bullpen_s2d_2021.csv")
 team_bullpen_s2d_2021$Date <- as.Date(team_bullpen_s2d_2021$Date)
 
 daily_team_bullpen_2021 <- full_join(team_bullpen_L7_2021, team_bullpen_L14_2021, by = c("Team", "Date"), suffix = c("_L7", "_L14")) %>%
@@ -102,18 +102,18 @@ daily_team_bullpen_2021 <- full_join(team_bullpen_L7_2021, team_bullpen_L14_2021
 colnames(daily_team_bullpen_2021)[51:74] <- paste0(colnames(daily_team_bullpen_2021)[51:74],'_L30')
 daily_team_bullpen_2021 <- full_join(daily_team_bullpen_2021, team_bullpen_s2d_2021, by = c("Team", "Date"))
 
-daily_pitchers_2021 <- read.csv("pitchers_s2d_2021.csv")
+daily_pitchers_2021 <- read.csv("Baseball Machine/Daily Files/2021/pitchers_s2d_2021.csv")
 daily_pitchers_2021$Date <- as.Date(daily_pitchers_2021$Date)
 
 ##2022
 
-team_batting_L7_2022 <- read.csv("team_batting_L7_2022.csv")
+team_batting_L7_2022 <- read.csv("Baseball Machine/Daily Files/2022/team_batting_L7_2022.csv")
 team_batting_L7_2022$Date <- as.Date(team_batting_L7_2022$Date)
-team_batting_L14_2022 <- read.csv("team_batting_L14_2022.csv")
+team_batting_L14_2022 <- read.csv("Baseball Machine/Daily Files/2022/team_batting_L14_2022.csv")
 team_batting_L14_2022$Date <- as.Date(team_batting_L14_2022$Date)
-team_batting_L30_2022 <- read.csv("team_batting_L30_2022.csv")
+team_batting_L30_2022 <- read.csv("Baseball Machine/Daily Files/2022/team_batting_L30_2022.csv")
 team_batting_L30_2022$Date <- as.Date(team_batting_L30_2022$Date)
-team_batting_s2d_2022 <- read.csv("team_batting_s2d_2022.csv")
+team_batting_s2d_2022 <- read.csv("Baseball Machine/Daily Files/2022/team_batting_s2d_2022.csv")
 team_batting_s2d_2022$Date <- as.Date(team_batting_s2d_2022$Date)
 
 daily_team_batting_2022 <- full_join(team_batting_L7_2022, team_batting_L14_2022, by = c("Team", "Date"), suffix = c("_L7", "_L14")) %>%
@@ -121,13 +121,13 @@ daily_team_batting_2022 <- full_join(team_batting_L7_2022, team_batting_L14_2022
 colnames(daily_team_batting_2022)[57:83] <- paste0(colnames(daily_team_batting_2022)[57:83],'_L30')
 daily_team_batting_2022 <- full_join(daily_team_batting_2022, team_batting_s2d_2022, by = c("Team", "Date"))
 
-team_bullpen_L7_2022 <- read.csv("team_bullpen_L7_2022.csv")
+team_bullpen_L7_2022 <- read.csv("Baseball Machine/Daily Files/2022/team_bullpen_L7_2022.csv")
 team_bullpen_L7_2022$Date <- as.Date(team_bullpen_L7_2022$Date)
-team_bullpen_L14_2022 <- read.csv("team_bullpen_L14_2022.csv")
+team_bullpen_L14_2022 <- read.csv("Baseball Machine/Daily Files/2022/team_bullpen_L14_2022.csv")
 team_bullpen_L14_2022$Date <- as.Date(team_bullpen_L14_2022$Date)
-team_bullpen_L30_2022 <- read.csv("team_bullpen_L30_2022.csv")
+team_bullpen_L30_2022 <- read.csv("Baseball Machine/Daily Files/2022/team_bullpen_L30_2022.csv")
 team_bullpen_L30_2022$Date <- as.Date(team_bullpen_L30_2022$Date)
-team_bullpen_s2d_2022 <- read.csv("team_bullpen_s2d_2022.csv")
+team_bullpen_s2d_2022 <- read.csv("Baseball Machine/Daily Files/2022/team_bullpen_s2d_2022.csv")
 team_bullpen_s2d_2022$Date <- as.Date(team_bullpen_s2d_2022$Date)
 
 daily_team_bullpen_2022 <- full_join(team_bullpen_L7_2022, team_bullpen_L14_2022, by = c("Team", "Date"), suffix = c("_L7", "_L14")) %>%
@@ -135,8 +135,41 @@ daily_team_bullpen_2022 <- full_join(team_bullpen_L7_2022, team_bullpen_L14_2022
 colnames(daily_team_bullpen_2022)[51:74] <- paste0(colnames(daily_team_bullpen_2022)[51:74],'_L30')
 daily_team_bullpen_2022 <- full_join(daily_team_bullpen_2022, team_bullpen_s2d_2022, by = c("Team", "Date"))
 
-daily_pitchers_2022 <- read.csv("pitchers_s2d_2022.csv")
+daily_pitchers_2022 <- read.csv("Baseball Machine/Daily Files/2022/pitchers_s2d_2022.csv")
 daily_pitchers_2022$Date <- as.Date(daily_pitchers_2022$Date)
+
+## Load Game scorelines
+
+pks_19 <- read.csv("Baseball Machine/Daily Files/2019/game_pks_2019.csv")
+gms_19 <- read.csv("Baseball Machine/Daily Files/2019/games_scores_2019.csv")
+pks_20 <- read.csv("Baseball Machine/Daily Files/2020/game_pks_2020.csv")
+gms_20 <- read.csv("Baseball Machine/Daily Files/2020/games_scores_2020.csv")
+pks_21 <- read.csv("Baseball Machine/Daily Files/2021/game_pks_2021.csv")
+gms_21 <- read.csv("Baseball Machine/Daily Files/2021/games_scores_2021.csv")
+pks_22 <- read.csv("Baseball Machine/Daily Files/2022/game_pks_2022.csv")
+gms_22 <- read.csv("Baseball Machine/Daily Files/2022/games_scores_2022.csv")
+
+scores_19 <- pks_19 %>% 
+  filter(status.detailedState == 'Final' &
+           is.na(resumeDate) &
+           is.na(resumedFrom) &
+           seriesDescription == 'Regular Season' &
+           scheduledInnings == 9) %>% 
+  select(game_pk, officialDate, doubleHeader, gameNumber, dayNight, scheduledInnings,
+         seriesDescription, status.detailedState, venue.name) %>%
+  group_by(game_pk) %>% 
+  mutate(row_num = row_number())
+
+scores_20 <- pks_20 %>% 
+  filter(status.detailedState == 'Final' &
+           is.na(resumeDate) &
+           is.na(resumedFrom) &
+           seriesDescription == 'Regular Season' &
+           scheduledInnings == 9) %>% 
+  select(game_pk, officialDate, doubleHeader, gameNumber, dayNight, scheduledInnings,
+         seriesDescription, status.detailedState, venue.name) %>%
+  group_by(game_pk) %>% 
+  mutate(row_num = row_number())
 
 ## Load Game Logs
 
