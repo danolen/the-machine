@@ -1676,7 +1676,7 @@ bets_table <- read.csv("Soccer Machine/upcoming_bets.csv") %>%
            Pick_Odds > -220 &
            Pick_WinProb >= 0.3 &
            bet_type_full != 'Alternate Total - 1.5' &
-           gamedate <= Sys.Date() + 7) %>%
+           gamedate <= Sys.Date() + 6) %>%
   arrange(gamedate, ID, desc(Kelly_Criteria)) %>% 
   group_by(ID) %>% 
   mutate(KC_Rank = row_number()) %>% 
@@ -1891,7 +1891,9 @@ bets_table2 <- bind_rows(bets_table
                                  League == 'EFL Championship' ~ 7,
                                  League == '--' ~ 8))
 
-df_html_bets <- print(xtable(bets_table2), type = "html", print.results = FALSE)
+df_html_bets <- if_else(nrow(bets_table2)==0,
+                        "<b>At the odds currently available, no bets are recommended</b>",
+                        print(xtable(bets_table2), type = "html", print.results = FALSE))
 
 ## Send an email
 
@@ -1901,7 +1903,7 @@ Email = Outlook$CreateItem(0)
 Email[["to"]] = "dnolen@smu.edu"
 Email[["bcc"]] = paste("jamesorler@gmail.com", "asnolen@crimson.ua.edu", "jamestodd425@gmail.com",
                        "jordanreticker@gmail.com", "brentcaminiti@gmail.com", "dougmyers4987@gmail.com",
-                       "ralphmstudley@gmail.com", "johnpavese@gmail.com", sep = ";", collapse = NULL)
+                       "ralphmstudley@gmail.com", "johnpavese@gmail.com", "amishra1293@gmail.com", sep = ";", collapse = NULL)
 Email[["subject"]] = paste0("Soccer Machine Picks: ", Sys.Date())
 Email[["HTMLbody"]] = sprintf("
 The Machine's picks for upcoming soccer matches are in! The Machine currently offers picks for the Big 5 European Leagues plus MLS and the EFL Championship. The attached document contains all of the pertinent betting information for the upcoming matches. Good luck!
@@ -1910,7 +1912,7 @@ UPDATE: The Machine has updated they way that it grades bets, and will now take 
 </p><br></p>
 %s
 </p><br></p>
-These are the bets that The Machine recommends that you should make for the next few days.
+These are the bets that The Machine recommends that you should make for games coming up in the next week.
 </p><br></p>
 %s
 </p><br></p>
