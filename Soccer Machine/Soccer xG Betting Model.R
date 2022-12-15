@@ -72,10 +72,28 @@ Champ <- fb_match_results(country = "ENG",
          xG.1 = as.numeric(xG.1),
          Season = paste0(Season-1,"-",Season))
 
+MX <- fb_match_results(country = "MEX",
+                          gender = "M",
+                          season_end_year = c(2019,2020,2021,2022,2023), tier = "1st") %>% 
+  select(Day, Date, Time, Home, Home_xG, HomeGoals, AwayGoals, Away_xG, Away,
+         Competition_Name, Season_End_Year) %>% 
+  rename(xG = Home_xG,
+         Home_Score = HomeGoals,
+         Away_Score = AwayGoals,
+         xG.1 = Away_xG,
+         League = Competition_Name,
+         Season = Season_End_Year) %>%
+  mutate(xG = as.numeric(xG),
+         Home_Score = as.numeric(Home_Score),
+         Away_Score = as.numeric(Away_Score),
+         xG.1 = as.numeric(xG.1),
+         Season = paste0(Season-1,"-",Season))
+
+
 intervalEnd <- Sys.time()
 paste("Web scraping took",intervalEnd - intervalStart,attr(intervalEnd - intervalStart,"units"))
 
-fixtures <- rbind(Big5, mls, Champ)
+fixtures <- rbind(Big5, mls, Champ, MX)
 fixtures$Date <- as.Date(fixtures$Date)
 today <- Sys.Date()
 

@@ -1271,6 +1271,12 @@ email_table_1 <- grades %>%
 
 df_html_1 <- print(xtable(email_table_1), type = "html", print.results = FALSE)
 
+email_table_2 <- scores %>% 
+  group_by(League) %>% 
+  summarise(`Most Recent Game Data` = as.character(max(Date)))
+
+df_html_2 <- print(xtable(email_table_2), type = "html", print.results = FALSE)
+
 plot_data <- grades %>% 
   filter(`Bet Grade` %in% c('A+', 'A', 'B')) %>% 
   select(gamedate, Units, `Graded Profit`) %>% 
@@ -1651,7 +1657,8 @@ plot_html <- add_ggplot(plot_object = plot)
 # 
 # plot_html <- add_ggplot(plot_object = plot)
 
-bets_table <- read.csv("Soccer Machine/upcoming_bets.csv") %>%
+bets_table <- #read.csv("Soccer Machine/upcoming_bets.csv") %>%
+  bets4 %>%
   mutate(gamedate = as.Date(gamedate)) %>%
   mutate(EV_tier = round_any(EV, 1, floor),
          Side_or_Total = case_when(bet_type %in% c('Alt Spread', 'Draw No Bet', 'ML', 'Spread') ~ "Side",
@@ -1700,7 +1707,7 @@ bets_table <- read.csv("Soccer Machine/upcoming_bets.csv") %>%
          `Away Team` = AwayTeam,
          `Bet Type` = bet_type_full,
          `Current Pick Odds` = Pick_Odds,
-         `Don't Bet if Odds Worse Than` = Machine_Odds)
+         `Odds Should Be` = Machine_Odds)
 
 # bets_SGP <- read.csv("Soccer Machine/upcoming_bets.csv") %>%
 #   # history %>% 
@@ -1906,9 +1913,9 @@ Email[["bcc"]] = paste("jamesorler@gmail.com", "asnolen@crimson.ua.edu", "jamest
                        "ralphmstudley@gmail.com", "johnpavese@gmail.com", "amishra1293@gmail.com", sep = ";", collapse = NULL)
 Email[["subject"]] = paste0("Soccer Machine Picks: ", Sys.Date())
 Email[["HTMLbody"]] = sprintf("
-The Machine's picks for upcoming soccer matches are in! The Machine currently offers picks for the Big 5 European Leagues plus MLS and the EFL Championship. The attached document contains all of the pertinent betting information for the upcoming matches. Good luck!
+The Machine's picks for upcoming soccer matches are in! The Machine currently offers picks for the Big 5 European Leagues plus MLS and the EFL Championship. The attached documents contains all of the pertinent betting information for the upcoming matches, as well as a glossary. Good luck!
 </p><br></p>
-UPDATE: The Machine has updated they way that it grades bets, and will now take a more targeted approach. Bets are now graded from A+ down to F. The table below shows the historical results for each bet grade along with a suggested bet size (in terms of units). The bets that will be recommended going forward will be graded B or better. This is a work in progress. The Machine used to only recommend bets with positive odds. Now the Machine will recommend odds all the way down to -220. I still do not like betting big favorites, and would recommend parlaying some of these big negative odds bets with something else.
+UPDATE: The Machine has updated the way that it grades bets, and will now take a more targeted approach. Bets are now graded from A+ down to F. The table below shows the historical results for each bet grade along with a suggested bet size (in terms of units). The bets that will be recommended going forward will be graded B or better. This is a work in progress. The Machine used to only recommend bets with positive odds. Now the Machine will recommend odds all the way down to -220. I still do not like betting big favorites, and would recommend parlaying some of these big negative odds bets with something else.
 </p><br></p>
 %s
 </p><br></p>
@@ -1921,8 +1928,14 @@ Below are the historical results for both a flat betting strategy (1 unit wagers
 %s
 </p><br></p>
 NOTE: I filtered out bets where the odds are less than -220 from this analysis. I suggest never betting juice higher than -220. I also filtered out bets that have less than a 30%% win probability. I don't believe it is worth it to bet on these huge underdogs. I also removed any bets on Alternate Totals set at 1.5 goals. The Machine almost always suggests an under bet on those. The performance on those bets was not very good, and that is also a very lame bet. Nobody likes cheering for a game to be that low scoring.
-", df_html_1, df_html_bets, plot_html)
+</p><br></p>
+Most recent date with complete game data for each league:
+</p><br></p>
+%s
+</p><br></p>
+", df_html_1, df_html_bets, plot_html, df_html_2)
 Email[["attachments"]]$Add("C:/Users/danie/Desktop/SportsStuff/TheMachine/the-machine/Soccer Machine/upcoming_bets.csv")
+Email[["attachments"]]$Add("C:/Users/danie/Desktop/SportsStuff/TheMachine/the-machine/Soccer Machine/Glossary.pdf")
 
 Email$Send()
 
