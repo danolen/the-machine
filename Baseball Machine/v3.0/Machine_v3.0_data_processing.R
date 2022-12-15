@@ -149,27 +149,153 @@ gms_21 <- read.csv("Baseball Machine/Daily Files/2021/games_scores_2021.csv")
 pks_22 <- read.csv("Baseball Machine/Daily Files/2022/game_pks_2022.csv")
 gms_22 <- read.csv("Baseball Machine/Daily Files/2022/games_scores_2022.csv")
 
-scores_19 <- pks_19 %>% 
-  filter(status.detailedState == 'Final' &
-           is.na(resumeDate) &
-           is.na(resumedFrom) &
-           seriesDescription == 'Regular Season' &
-           scheduledInnings == 9) %>% 
-  select(game_pk, officialDate, doubleHeader, gameNumber, dayNight, scheduledInnings,
-         seriesDescription, status.detailedState, venue.name) %>%
+scores_19 <- gms_19 %>% 
+  distinct(game_pk, home_team_name, away_team_name, num, ordinal_num, home_runs, home_hits,
+         home_errors, away_runs, away_hits, away_errors, home_team_season, home_team_league_name,
+         home_team_division_name, away_team_league_name, away_team_division_name) %>%
+  inner_join(pks_19 %>% 
+               filter(status.detailedState %in% c('Final', 'Completed Early') &
+                        is.na(resumeDate) &
+                        is.na(resumedFrom) &
+                        seriesDescription == 'Regular Season' &
+                        scheduledInnings == 9) %>% 
+               select(game_pk, officialDate, doubleHeader, gameNumber, dayNight, scheduledInnings, venue.name)) %>% 
+  filter(!is.na(num)) %>% 
+  replace(is.na(.),0) %>% 
   group_by(game_pk) %>% 
-  mutate(row_num = row_number())
+  mutate(home_runs = cumsum(home_runs),
+         home_hits = cumsum(home_hits),
+         home_errors = cumsum(home_errors),
+         away_runs = cumsum(away_runs),
+         away_hits = cumsum(away_hits),
+         away_errors = cumsum(away_errors)) %>% 
+  filter(num <= 9) %>%
+  select(-num) %>%  
+  pivot_wider(names_from = ordinal_num, values_from = c(home_runs, home_hits, home_errors, away_runs, away_hits, away_errors)) %>% 
+  left_join(gms_19 %>% 
+              distinct(game_pk, home_team_name, away_team_name, num, ordinal_num, home_runs, home_hits,
+                       home_errors, away_runs, away_hits, away_errors, home_team_season, home_team_league_name,
+                       home_team_division_name, away_team_league_name, away_team_division_name) %>%
+              filter(!is.na(num)) %>% 
+              replace(is.na(.),0) %>% 
+              group_by(game_pk) %>% 
+              summarise(home_runs_final = sum(home_runs),
+                        home_hits_final = sum(home_hits),
+                        home_errors_final = sum(home_errors),
+                        away_runs_final = sum(away_runs),
+                        away_hits_final = sum(away_hits),
+                        away_errors_final = sum(away_errors)))
 
-scores_20 <- pks_20 %>% 
-  filter(status.detailedState == 'Final' &
-           is.na(resumeDate) &
-           is.na(resumedFrom) &
-           seriesDescription == 'Regular Season' &
-           scheduledInnings == 9) %>% 
-  select(game_pk, officialDate, doubleHeader, gameNumber, dayNight, scheduledInnings,
-         seriesDescription, status.detailedState, venue.name) %>%
+scores_20 <- gms_20 %>% 
+  distinct(game_pk, home_team_name, away_team_name, num, ordinal_num, home_runs, home_hits,
+           home_errors, away_runs, away_hits, away_errors, home_team_season, home_team_league_name,
+           home_team_division_name, away_team_league_name, away_team_division_name) %>%
+  inner_join(pks_20 %>% 
+               filter(status.detailedState %in% c('Final', 'Completed Early') &
+                        is.na(resumeDate) &
+                        is.na(resumedFrom) &
+                        seriesDescription == 'Regular Season' &
+                        scheduledInnings == 9) %>% 
+               select(game_pk, officialDate, doubleHeader, gameNumber, dayNight, scheduledInnings, venue.name)) %>% 
+  filter(!is.na(num)) %>% 
+  replace(is.na(.),0) %>% 
   group_by(game_pk) %>% 
-  mutate(row_num = row_number())
+  mutate(home_runs = cumsum(home_runs),
+         home_hits = cumsum(home_hits),
+         home_errors = cumsum(home_errors),
+         away_runs = cumsum(away_runs),
+         away_hits = cumsum(away_hits),
+         away_errors = cumsum(away_errors)) %>% 
+  filter(num <= 9) %>%
+  select(-num) %>%  
+  pivot_wider(names_from = ordinal_num, values_from = c(home_runs, home_hits, home_errors, away_runs, away_hits, away_errors)) %>% 
+  left_join(gms_20 %>% 
+              distinct(game_pk, home_team_name, away_team_name, num, ordinal_num, home_runs, home_hits,
+                       home_errors, away_runs, away_hits, away_errors, home_team_season, home_team_league_name,
+                       home_team_division_name, away_team_league_name, away_team_division_name) %>%
+              filter(!is.na(num)) %>% 
+              replace(is.na(.),0) %>% 
+              group_by(game_pk) %>% 
+              summarise(home_runs_final = sum(home_runs),
+                        home_hits_final = sum(home_hits),
+                        home_errors_final = sum(home_errors),
+                        away_runs_final = sum(away_runs),
+                        away_hits_final = sum(away_hits),
+                        away_errors_final = sum(away_errors)))
+
+scores_21 <- gms_21 %>% 
+  distinct(game_pk, home_team_name, away_team_name, num, ordinal_num, home_runs, home_hits,
+           home_errors, away_runs, away_hits, away_errors, home_team_season, home_team_league_name,
+           home_team_division_name, away_team_league_name, away_team_division_name) %>%
+  inner_join(pks_21 %>% 
+               filter(status.detailedState %in% c('Final', 'Completed Early') &
+                        is.na(resumeDate) &
+                        is.na(resumedFrom) &
+                        seriesDescription == 'Regular Season' &
+                        scheduledInnings == 9) %>% 
+               select(game_pk, officialDate, doubleHeader, gameNumber, dayNight, scheduledInnings, venue.name)) %>% 
+  filter(!is.na(num)) %>% 
+  replace(is.na(.),0) %>% 
+  group_by(game_pk) %>% 
+  mutate(home_runs = cumsum(home_runs),
+         home_hits = cumsum(home_hits),
+         home_errors = cumsum(home_errors),
+         away_runs = cumsum(away_runs),
+         away_hits = cumsum(away_hits),
+         away_errors = cumsum(away_errors)) %>% 
+  filter(num <= 9) %>%
+  select(-num) %>%  
+  pivot_wider(names_from = ordinal_num, values_from = c(home_runs, home_hits, home_errors, away_runs, away_hits, away_errors)) %>% 
+  left_join(gms_21 %>% 
+              distinct(game_pk, home_team_name, away_team_name, num, ordinal_num, home_runs, home_hits,
+                       home_errors, away_runs, away_hits, away_errors, home_team_season, home_team_league_name,
+                       home_team_division_name, away_team_league_name, away_team_division_name) %>%
+              filter(!is.na(num)) %>% 
+              replace(is.na(.),0) %>% 
+              group_by(game_pk) %>% 
+              summarise(home_runs_final = sum(home_runs),
+                        home_hits_final = sum(home_hits),
+                        home_errors_final = sum(home_errors),
+                        away_runs_final = sum(away_runs),
+                        away_hits_final = sum(away_hits),
+                        away_errors_final = sum(away_errors)))
+
+scores_22 <- gms_22 %>% 
+  distinct(game_pk, home_team_name, away_team_name, num, ordinal_num, home_runs, home_hits,
+           home_errors, away_runs, away_hits, away_errors, home_team_season, home_team_league_name,
+           home_team_division_name, away_team_league_name, away_team_division_name) %>%
+  inner_join(pks_22 %>% 
+               filter(status.detailedState %in% c('Final', 'Completed Early') &
+                        is.na(resumeDate) &
+                        is.na(resumedFrom) &
+                        seriesDescription == 'Regular Season' &
+                        scheduledInnings == 9) %>% 
+               select(game_pk, officialDate, doubleHeader, gameNumber, dayNight, scheduledInnings, venue.name)) %>% 
+  filter(!is.na(num)) %>% 
+  replace(is.na(.),0) %>% 
+  group_by(game_pk) %>% 
+  mutate(home_runs = cumsum(home_runs),
+         home_hits = cumsum(home_hits),
+         home_errors = cumsum(home_errors),
+         away_runs = cumsum(away_runs),
+         away_hits = cumsum(away_hits),
+         away_errors = cumsum(away_errors)) %>% 
+  filter(num <= 9) %>%
+  select(-num) %>%  
+  pivot_wider(names_from = ordinal_num, values_from = c(home_runs, home_hits, home_errors, away_runs, away_hits, away_errors)) %>% 
+  left_join(gms_22 %>% 
+              distinct(game_pk, home_team_name, away_team_name, num, ordinal_num, home_runs, home_hits,
+                       home_errors, away_runs, away_hits, away_errors, home_team_season, home_team_league_name,
+                       home_team_division_name, away_team_league_name, away_team_division_name) %>%
+              filter(!is.na(num)) %>% 
+              replace(is.na(.),0) %>% 
+              group_by(game_pk) %>% 
+              summarise(home_runs_final = sum(home_runs),
+                        home_hits_final = sum(home_hits),
+                        home_errors_final = sum(home_errors),
+                        away_runs_final = sum(away_runs),
+                        away_hits_final = sum(away_hits),
+                        away_errors_final = sum(away_errors)))
 
 ## Load Game Logs
 
