@@ -3,6 +3,7 @@
 
 library("pacman")
 p_load("tidyverse", "readr", "DataCombine", "readxl")
+team_names <- read.csv("Baseball Machine/team_names.csv")
 
 ## Load and join data from FanGraphs
 
@@ -38,6 +39,16 @@ daily_team_bullpen_2019 <- full_join(daily_team_bullpen_2019, team_bullpen_s2d_2
 
 daily_pitchers_2019 <- read.csv("Baseball Machine/Daily Files/2019/pitchers_s2d_2019.csv")
 daily_pitchers_2019$Date <- as.Date(daily_pitchers_2019$Date)
+dupe_SPs_19 <- daily_pitchers_2019 %>% 
+  filter(Date == max(daily_pitchers_2019$Date)) %>% 
+  group_by(Name) %>% 
+  summarise(records = n()) %>% 
+  filter(records > 1) %>% 
+  left_join(daily_pitchers_2019 %>% distinct(Name, Team))
+daily_pitchers_2019 <- daily_pitchers_2019 %>% 
+  mutate(Name = case_when(Name == "Austin Adams" & Team == "Twins" ~ "Austin Adams (MIN)",
+                          Name == "Hyun-Jin Ryu" ~ "Hyun Jin Ryu",
+                          TRUE ~ Name))
 
 ##2020
 
@@ -71,6 +82,15 @@ daily_team_bullpen_2020 <- full_join(daily_team_bullpen_2020, team_bullpen_s2d_2
 
 daily_pitchers_2020 <- read.csv("Baseball Machine/Daily Files/2020/pitchers_s2d_2020.csv")
 daily_pitchers_2020$Date <- as.Date(daily_pitchers_2020$Date)
+dupe_SPs_20 <- daily_pitchers_2020 %>% 
+  filter(Date == max(daily_pitchers_2020$Date)) %>% 
+  group_by(Name) %>% 
+  summarise(records = n()) %>% 
+  filter(records > 1) %>% 
+  left_join(daily_pitchers_2020 %>% distinct(Name, Team))
+daily_pitchers_2020 <- daily_pitchers_2020 %>% 
+  mutate(Name = case_when(Name == "Luis Garcia" & Team == "Astros" ~ "Luis Garcia (HOU)",
+                          TRUE ~ Name))
 
 ##2021
 
@@ -104,6 +124,15 @@ daily_team_bullpen_2021 <- full_join(daily_team_bullpen_2021, team_bullpen_s2d_2
 
 daily_pitchers_2021 <- read.csv("Baseball Machine/Daily Files/2021/pitchers_s2d_2021.csv")
 daily_pitchers_2021$Date <- as.Date(daily_pitchers_2021$Date)
+dupe_SPs_21 <- daily_pitchers_2021 %>% 
+  filter(Date == max(daily_pitchers_2021$Date)) %>% 
+  group_by(Name) %>% 
+  summarise(records = n()) %>% 
+  filter(records > 1) %>% 
+  left_join(daily_pitchers_2021 %>% distinct(Name, Team))
+daily_pitchers_2021 <- daily_pitchers_2021 %>% 
+  mutate(Name = case_when(Name == "Luis Garcia" & Team == "HOU" ~ "Luis Garcia (HOU)",
+                          TRUE ~ Name))
 
 ##2022
 
@@ -137,6 +166,17 @@ daily_team_bullpen_2022 <- full_join(daily_team_bullpen_2022, team_bullpen_s2d_2
 
 daily_pitchers_2022 <- read.csv("Baseball Machine/Daily Files/2022/pitchers_s2d_2022.csv")
 daily_pitchers_2022$Date <- as.Date(daily_pitchers_2022$Date)
+dupe_SPs_22 <- daily_pitchers_2022 %>% 
+  filter(Date == max(daily_pitchers_2022$Date)) %>% 
+  group_by(Name) %>% 
+  summarise(records = n()) %>% 
+  filter(records > 1) %>% 
+  left_join(daily_pitchers_2022 %>% distinct(Name, Team))
+daily_pitchers_2022 <- daily_pitchers_2022 %>% 
+  mutate(Name = case_when(Name == "Luis Garcia" & Team == "HOU" ~ "Luis Garcia (HOU)",
+                          Name == "Luis Castillo" & Team == "DET" ~ "Luis Castillo (DET)",
+                          Name == "Luis Ortiz" & Team == "SFG" ~ "Luis Ortiz (SFG)",
+                          TRUE ~ Name))
 
 ## Load Game scorelines
 
@@ -296,6 +336,122 @@ scores_22 <- gms_22 %>%
                         away_runs_final = sum(away_runs),
                         away_hits_final = sum(away_hits),
                         away_errors_final = sum(away_errors)))
+
+## Get Starting Pitchers
+
+# SPs19 <- data.frame()
+# for (i in seq_along(unique(scores_19$game_pk))) {
+#   sps = baseballr::mlb_probables(unique(scores_19$game_pk)[i])
+#   SPs19 = SPs19 %>% 
+#     bind_rows(sps)
+#   print(paste0("Retrieved SPs for game ", i,"/",length(unique(scores_19$game_pk))))
+# }
+# 
+# write.csv(SPs19, "Baseball Machine/Daily Files/2019/starting_pitchers_2019.csv")
+# 
+# SPs20 <- data.frame()
+# for (i in seq_along(unique(scores_20$game_pk))) {
+#   sps = baseballr::mlb_probables(unique(scores_20$game_pk)[i])
+#   SPs20 = SPs20 %>% 
+#     bind_rows(sps)
+#   print(paste0("Retrieved SPs for game ", i,"/",length(unique(scores_20$game_pk))))
+# }
+# 
+# write.csv(SPs20, "Baseball Machine/Daily Files/2020/starting_pitchers_2020.csv")
+# 
+# SPs21 <- data.frame()
+# for (i in seq_along(unique(scores_21$game_pk))) {
+#   sps = baseballr::mlb_probables(unique(scores_21$game_pk)[i])
+#   SPs21 = SPs21 %>% 
+#     bind_rows(sps)
+#   print(paste0("Retrieved SPs for game ", i,"/",length(unique(scores_21$game_pk))))
+# }
+# 
+# write.csv(SPs21, "Baseball Machine/Daily Files/2021/starting_pitchers_2021.csv")
+# 
+# SPs22 <- data.frame()
+# for (i in seq_along(unique(scores_22$game_pk))) {
+#   sps = baseballr::mlb_probables(unique(scores_22$game_pk)[i])
+#   SPs22 = SPs22 %>% 
+#     bind_rows(sps)
+#   print(paste0("Retrieved SPs for game ", i,"/",length(unique(scores_22$game_pk))))
+# }
+# 
+# write.csv(SPs22, "Baseball Machine/Daily Files/2022/starting_pitchers_2022.csv")
+
+SPs19 <- read.csv("Baseball Machine/Daily Files/2019/starting_pitchers_2019.csv")
+SPs20 <- read.csv("Baseball Machine/Daily Files/2020/starting_pitchers_2020.csv")
+SPs21 <- read.csv("Baseball Machine/Daily Files/2021/starting_pitchers_2021.csv")
+SPs22 <- read.csv("Baseball Machine/Daily Files/2022/starting_pitchers_2022.csv")
+
+gamescores19 <- scores_19 %>% 
+  left_join(SPs19 %>% 
+              select(-team_id, -home_plate_full_name, -home_plate_id),
+            by = c("game_pk" = "game_pk",
+                   "officialDate" = "game_date",
+                   "home_team_name" = "team")) %>% 
+  rename(HomeSP_fullName = fullName,
+         HomeSP_id = id) %>% 
+  left_join(SPs19 %>% 
+              select(-team_id, -home_plate_full_name, -home_plate_id),
+            by = c("game_pk" = "game_pk",
+                   "officialDate" = "game_date",
+                   "away_team_name" = "team")) %>% 
+  rename(AwaySP_fullName = fullName,
+         AwaySP_id = id) %>% 
+  mutate(officialDate = as.Date(officialDate)) %>% 
+  filter(!is.na(HomeSP_fullName) & !is.na(AwaySP_fullName)) %>% 
+  left_join(daily_pitchers_2019, by = c("officialDate" = "Date", "HomeSP_fullName" = "Name")) %>% 
+  left_join(daily_pitchers_2019, by = c("officialDate" = "Date", "AwaySP_fullName" = "Name"), suffix = c("_HomeSP", "_AwaySP"))
+
+gamescores20 <- scores_20 %>% 
+  left_join(SPs20 %>% 
+              select(-team_id, -home_plate_full_name, -home_plate_id),
+            by = c("game_pk" = "game_pk",
+                   "officialDate" = "game_date",
+                   "home_team_name" = "team")) %>% 
+  rename(HomeSP_fullName = fullName,
+         HomeSP_id = id) %>% 
+  left_join(SPs20 %>% 
+              select(-team_id, -home_plate_full_name, -home_plate_id),
+            by = c("game_pk" = "game_pk",
+                   "officialDate" = "game_date",
+                   "away_team_name" = "team")) %>% 
+  rename(AwaySP_fullName = fullName,
+         AwaySP_id = id)
+
+gamescores21 <- scores_21 %>% 
+  left_join(SPs21 %>% 
+              select(-team_id, -home_plate_full_name, -home_plate_id),
+            by = c("game_pk" = "game_pk",
+                   "officialDate" = "game_date",
+                   "home_team_name" = "team")) %>% 
+  rename(HomeSP_fullName = fullName,
+         HomeSP_id = id) %>% 
+  left_join(SPs21 %>% 
+              select(-team_id, -home_plate_full_name, -home_plate_id),
+            by = c("game_pk" = "game_pk",
+                   "officialDate" = "game_date",
+                   "away_team_name" = "team")) %>% 
+  rename(AwaySP_fullName = fullName,
+         AwaySP_id = id)
+
+gamescores22 <- scores_22 %>% 
+  left_join(SPs22 %>% 
+              select(-team_id, -home_plate_full_name, -home_plate_id),
+            by = c("game_pk" = "game_pk",
+                   "officialDate" = "game_date",
+                   "home_team_name" = "team")) %>% 
+  rename(HomeSP_fullName = fullName,
+         HomeSP_id = id) %>% 
+  left_join(SPs22 %>% 
+              select(-team_id, -home_plate_full_name, -home_plate_id),
+            by = c("game_pk" = "game_pk",
+                   "officialDate" = "game_date",
+                   "away_team_name" = "team")) %>% 
+  rename(AwaySP_fullName = fullName,
+         AwaySP_id = id)
+
 
 ## Load Game Logs
 

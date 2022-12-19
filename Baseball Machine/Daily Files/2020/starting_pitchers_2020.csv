@@ -1,0 +1,1571 @@
+game_pk,game_date,fullName,id,team,team_id,home_plate_full_name,home_plate_id
+630851,2020-07-23,Gerrit Cole,543037,New York Yankees,147,Angel Hernandez,427220
+630851,2020-07-23,Max Scherzer,453286,Washington Nationals,120,Angel Hernandez,427220
+631377,2020-07-23,Johnny Cueto,456501,San Francisco Giants,137,Bill Miller,427344
+631377,2020-07-23,Dustin May,669160,Los Angeles Dodgers,119,Bill Miller,427344
+631242,2020-07-24,Mike Soroka,647336,Atlanta Braves,144,Paul Nauert,427361
+631242,2020-07-24,Jacob deGrom,594798,New York Mets,121,Paul Nauert,427361
+631589,2020-07-24,Matthew Boyd,571510,Detroit Tigers,116,Larry Vanover,427520
+631589,2020-07-24,Sonny Gray,543243,Cincinnati Reds,113,Larry Vanover,427520
+630966,2020-07-24,Hyun Jin Ryu,547943,Toronto Blue Jays,141,Joe West,427538
+630966,2020-07-24,Charlie Morton,450203,Tampa Bay Rays,139,Joe West,427538
+631121,2020-07-24,Sandy Alcantara,645261,Miami Marlins,146,Tim Timmons,427509
+631121,2020-07-24,Aaron Nola,605400,Philadelphia Phillies,143,Tim Timmons,427509
+631563,2020-07-24,Danny Duffy,518633,Kansas City Royals,118,Dan Iassogna,427248
+631563,2020-07-24,Shane Bieber,669456,Cleveland Indians,114,Dan Iassogna,427248
+631641,2020-07-24,Brandon Woodruff,605540,Milwaukee Brewers,158,Jeff Nelson,427362
+631641,2020-07-24,Kyle Hendricks,543294,Chicago Cubs,112,Jeff Nelson,427362
+631664,2020-07-24,Tommy Milone,543548,Baltimore Orioles,110,Mark Wegner,427533
+631664,2020-07-24,Nathan Eovaldi,543135,Boston Red Sox,111,Mark Wegner,427533
+630941,2020-07-24,German Marquez,608566,Colorado Rockies,115,Jim Reynolds,427424
+630941,2020-07-24,Lance Lynn,458681,Texas Rangers,140,Jim Reynolds,427424
+631514,2020-07-24,Jose Berrios,621244,Minnesota Twins,142,Bill Welke,427534
+631514,2020-07-24,Lucas Giolito,608337,Chicago White Sox,145,Bill Welke,427534
+630989,2020-07-24,Joe Musgrove,605397,Pittsburgh Pirates,134,Jerry Meals,427339
+630989,2020-07-24,Jack Flaherty,656427,St. Louis Cardinals,138,Jerry Meals,427339
+631091,2020-07-24,Madison Bumgarner,518516,Arizona Diamondbacks,109,Ted Barrett,427019
+631091,2020-07-24,Chris Paddack,663978,San Diego Padres,135,Ted Barrett,427019
+631438,2020-07-24,Marco Gonzales,594835,Seattle Mariners,136,Alfonso Marquez,427315
+631438,2020-07-24,Justin Verlander,434378,Houston Astros,117,Alfonso Marquez,427315
+631378,2020-07-24,Tyler Anderson,542881,San Francisco Giants,137,Edwin Moscoso,554242
+631378,2020-07-24,Ross Stripling,548389,Los Angeles Dodgers,119,Edwin Moscoso,554242
+631182,2020-07-24,Andrew Heaney,571760,Los Angeles Angels,108,Brian Knight,427286
+631182,2020-07-24,Frankie Montas,593423,Oakland Athletics,133,Brian Knight,427286
+631642,2020-07-25,Corbin Burnes,669203,Milwaukee Brewers,158,CB Bucknor,427044
+631642,2020-07-25,Yu Darvish,506433,Chicago Cubs,112,CB Bucknor,427044
+631666,2020-07-25,Alex Cobb,502171,Baltimore Orioles,110,Marty Foster,427168
+631666,2020-07-25,Martin Perez,527048,Boston Red Sox,111,Marty Foster,427168
+631515,2020-07-25,Randy Dobnak,677976,Minnesota Twins,142,Pat Hoberg,573596
+631515,2020-07-25,Dallas Keuchel,572971,Chicago White Sox,145,Pat Hoberg,573596
+630992,2020-07-25,Trevor Williams,592866,Pittsburgh Pirates,134,Ed Hickox,427224
+630992,2020-07-25,Adam Wainwright,425794,St. Louis Cardinals,138,Ed Hickox,427224
+630967,2020-07-25,Matt Shoemaker,533167,Toronto Blue Jays,141,Hunter Wendelstedt,427537
+630967,2020-07-25,Ryan Yarbrough,642232,Tampa Bay Rays,139,Hunter Wendelstedt,427537
+630942,2020-07-25,Jon Gray,592351,Colorado Rockies,115,Jim Wolf,427554
+630942,2020-07-25,Mike Minor,501985,Texas Rangers,140,Jim Wolf,427554
+631108,2020-07-25,Caleb Smith,592761,Miami Marlins,146,D.J. Reyburn,482666
+631108,2020-07-25,Zack Wheeler,554430,Philadelphia Phillies,143,D.J. Reyburn,482666
+631181,2020-07-25,Dylan Bundy,605164,Los Angeles Angels,108,Mike Muchlinski,483912
+631181,2020-07-25,Sean Manaea,640455,Oakland Athletics,133,Mike Muchlinski,483912
+631453,2020-07-25,Taijuan Walker,592836,Seattle Mariners,136,Chris Guccione,427197
+631453,2020-07-25,Lance McCullers Jr.,621121,Houston Astros,117,Chris Guccione,427197
+631382,2020-07-25,Logan Webb,657277,San Francisco Giants,137,Doug Eddings,427139
+631382,2020-07-25,Alex Wood,622072,Los Angeles Dodgers,119,Doug Eddings,427139
+631241,2020-07-25,Max Fried,608331,Atlanta Braves,144,Chad Fairchild,431232
+631241,2020-07-25,Steven Matz,571927,New York Mets,121,Chad Fairchild,431232
+631603,2020-07-25,Ivan Nova,467100,Detroit Tigers,116,Lance Barksdale,427013
+631603,2020-07-25,Luis Castillo,622491,Cincinnati Reds,113,Lance Barksdale,427013
+631565,2020-07-25,Brady Singer,663903,Kansas City Royals,118,Andy Fletcher,427164
+631565,2020-07-25,Mike Clevinger,605182,Cleveland Indians,114,Andy Fletcher,427164
+630899,2020-07-25,James Paxton,572020,New York Yankees,147,Dan Bellino,483564
+630899,2020-07-25,Erick Fedde,607200,Washington Nationals,120,Dan Bellino,483564
+631092,2020-07-25,Robbie Ray,592662,Arizona Diamondbacks,109,Adrian Johnson,482641
+631092,2020-07-25,Dinelson Lamet,659275,San Diego Padres,135,Adrian Johnson,482641
+631126,2020-07-26,Robert Dugger,667498,Miami Marlins,146,Ryan Blakney,503502
+631126,2020-07-26,Vince Velasquez,592826,Philadelphia Phillies,143,Ryan Blakney,503502
+630856,2020-07-26,Jonathan Loaisiga,642528,New York Yankees,147,Will Little,504381
+630856,2020-07-26,Patrick Corbin,571578,Washington Nationals,120,Will Little,504381
+631591,2020-07-26,Spencer Turnbull,605513,Detroit Tigers,116,Chris Conroy,482620
+631591,2020-07-26,Trevor Bauer,545333,Cincinnati Reds,113,Chris Conroy,482620
+631566,2020-07-26,Ronald Bolanos,671790,Kansas City Royals,118,Tripp Gibson,503586
+631566,2020-07-26,Carlos Carrasco,471911,Cleveland Indians,114,Tripp Gibson,503586
+630968,2020-07-26,Thomas Hatch,641672,Toronto Blue Jays,141,Vic Carapazza,483569
+630968,2020-07-26,Blake Snell,605483,Tampa Bay Rays,139,Vic Carapazza,483569
+631668,2020-07-26,Wade LeBlanc,453281,Baltimore Orioles,110,Alan Porter,484198
+631668,2020-07-26,Ryan Weber,543901,Boston Red Sox,111,Alan Porter,484198
+631441,2020-07-26,Yusei Kikuchi,579328,Seattle Mariners,136,Cory Blaser,484183
+631441,2020-07-26,Zack Greinke,425844,Houston Astros,117,Cory Blaser,484183
+631517,2020-07-26,Kenta Maeda,628317,Minnesota Twins,142,Ramon De Jesus,594151
+631517,2020-07-26,Reynaldo Lopez,625643,Chicago White Sox,145,Ramon De Jesus,594151
+630993,2020-07-26,Mitch Keller,656605,Pittsburgh Pirates,134,Jordan Baker,490319
+630993,2020-07-26,Dakota Hudson,641712,St. Louis Cardinals,138,Jordan Baker,490319
+631643,2020-07-26,Freddy Peralta,642547,Milwaukee Brewers,158,John Tumpane,483630
+631643,2020-07-26,Tyler Chatwood,543022,Chicago Cubs,112,John Tumpane,483630
+630943,2020-07-26,Kyle Freeland,607536,Colorado Rockies,115,Lance Barrett,483561
+630943,2020-07-26,Corey Kluber,446372,Texas Rangers,140,Lance Barrett,483561
+631165,2020-07-26,Shohei Ohtani,660271,Los Angeles Angels,108,Marvin Hudson,427243
+631165,2020-07-26,Mike Fiers,571666,Oakland Athletics,133,Marvin Hudson,427243
+631097,2020-07-26,Zac Gallen,668678,Arizona Diamondbacks,109,Mark Ripperger,483919
+631097,2020-07-26,Garrett Richards,572070,San Diego Padres,135,Mark Ripperger,483919
+631240,2020-07-26,Sean Newcomb,656794,Atlanta Braves,144,Carlos Torres,547380
+631240,2020-07-26,Rick Porcello,519144,New York Mets,121,Carlos Torres,547380
+631384,2020-07-26,Drew Smyly,592767,San Francisco Giants,137,Rob Drake,427128
+631384,2020-07-26,Julio Urias,628711,Los Angeles Dodgers,119,Rob Drake,427128
+631168,2020-07-27,Griffin Canning,656288,Los Angeles Angels,108,Adam Hamari,503077
+631168,2020-07-27,Chris Bassitt,605135,Oakland Athletics,133,Adam Hamari,503077
+631098,2020-07-27,Luke Weaver,596133,Arizona Diamondbacks,109,Quinn Wolcott,511890
+631098,2020-07-27,Joey Lucchesi,664192,San Diego Padres,135,Quinn Wolcott,511890
+630861,2020-07-27,Trent Thornton,663423,Toronto Blue Jays,141,Ron Kulpa,427292
+630861,2020-07-27,Anibal Sanchez,434671,Washington Nationals,120,Ron Kulpa,427292
+631592,2020-07-27,Jon Lester,452657,Chicago Cubs,112,David Rackley,482663
+631592,2020-07-27,Wade Miley,489119,Cincinnati Reds,113,David Rackley,482663
+630969,2020-07-27,Mike Foltynewicz,592314,Atlanta Braves,144,Ryan Additon,596809
+630969,2020-07-27,Tyler Glasnow,607192,Tampa Bay Rays,139,Ryan Additon,596809
+631130,2020-07-27,Adrian Houser,605288,Milwaukee Brewers,158,Jose Navas,664265
+631130,2020-07-27,Steven Brault,643230,Pittsburgh Pirates,134,Jose Navas,664265
+631489,2020-07-27,Mike Montgomery,543557,Kansas City Royals,118,Shane Livensparger,575629
+631489,2020-07-27,Michael Fulmer,605242,Detroit Tigers,116,Shane Livensparger,575629
+631442,2020-07-27,Kendall Graveman,608665,Seattle Mariners,136,Gabe Morales,573597
+631442,2020-07-27,Josh James,657624,Houston Astros,117,Gabe Morales,573597
+631669,2020-07-27,Michael Wacha,608379,New York Mets,121,Mark Carlson,427053
+631669,2020-07-27,Josh Osich,592612,Boston Red Sox,111,Mark Carlson,427053
+631573,2020-07-28,Dylan Cease,656302,Chicago White Sox,145,Ben May,521251
+631573,2020-07-28,Aaron Civale,650644,Cleveland Indians,114,Ben May,521251
+631567,2020-07-28,Carlos Rodon,607074,Chicago White Sox,145,Andy Fletcher,427164
+631567,2020-07-28,Adam Plutko,592644,Cleveland Indians,114,Andy Fletcher,427164
+630866,2020-07-28,Tanner Roark,543699,Toronto Blue Jays,141,Todd Tichenor,429805
+630866,2020-07-28,Austin Voth,608723,Washington Nationals,120,Todd Tichenor,429805
+631593,2020-07-28,Alec Mills,621219,Chicago Cubs,112,Larry Vanover,427520
+631593,2020-07-28,Tyler Mahle,641816,Cincinnati Reds,113,Larry Vanover,427520
+630970,2020-07-28,Kyle Wright,657140,Atlanta Braves,144,Paul Nauert,427361
+630970,2020-07-28,Yonny Chirinos,630023,Tampa Bay Rays,139,Paul Nauert,427361
+631132,2020-07-28,Josh Lindblom,458676,Milwaukee Brewers,158,Jeff Nelson,427362
+631132,2020-07-28,Derek Holland,502706,Pittsburgh Pirates,134,Jeff Nelson,427362
+631490,2020-07-28,Kyle Zimmer,622092,Kansas City Royals,118,Bill Welke,427534
+631490,2020-07-28,Rony Garcia,665621,Detroit Tigers,116,Bill Welke,427534
+631663,2020-07-28,David Peterson,656849,New York Mets,121,James Hoye,428442
+631663,2020-07-28,Matt Hall,664180,Boston Red Sox,111,James Hoye,428442
+631269,2020-07-28,Carlos Martinez,593372,St. Louis Cardinals,138,Jeremie Rehak,605672
+631269,2020-07-28,Homer Bailey,456701,Minnesota Twins,142,Jeremie Rehak,605672
+630944,2020-07-28,Merrill Kelly,518876,Arizona Diamondbacks,109,Ted Barrett,427019
+630944,2020-07-28,Kyle Gibson,502043,Texas Rangers,140,Ted Barrett,427019
+631443,2020-07-28,Walker Buehler,621111,Los Angeles Dodgers,119,Alfonso Marquez,427315
+631443,2020-07-28,Framber Valdez,664285,Houston Astros,117,Alfonso Marquez,427315
+631171,2020-07-28,Antonio Senzatela,622608,Colorado Rockies,115,John Libka,596805
+631171,2020-07-28,Daniel Mengden,596043,Oakland Athletics,133,John Libka,596805
+631387,2020-07-28,Justus Sheffield,656954,Seattle Mariners,136,Bill Miller,427344
+631387,2020-07-28,Patrick Sandoval,663776,Los Angeles Angels,108,Bill Miller,427344
+631014,2020-07-28,Zach Davies,605200,San Diego Padres,135,Brian Knight,427286
+631014,2020-07-28,Jeff Samardzija,502188,San Francisco Giants,137,Brian Knight,427286
+631172,2020-07-29,German Marquez,608566,Colorado Rockies,115,Jim Reynolds,427424
+631172,2020-07-29,Frankie Montas,593423,Oakland Athletics,133,Jim Reynolds,427424
+630940,2020-07-29,Madison Bumgarner,518516,Arizona Diamondbacks,109,Adrian Johnson,482641
+630940,2020-07-29,Lance Lynn,458681,Texas Rangers,140,Adrian Johnson,482641
+630916,2020-07-29,Max Scherzer,453286,Washington Nationals,120,Stu Scheurwater,521889
+630916,2020-07-29,Nate Pearson,663878,Toronto Blue Jays,141,Stu Scheurwater,521889
+631569,2020-07-29,Lucas Giolito,608337,Chicago White Sox,145,Dan Iassogna,427248
+631569,2020-07-29,Zach Plesac,668676,Cleveland Indians,114,Dan Iassogna,427248
+631594,2020-07-29,Kyle Hendricks,543294,Chicago Cubs,112,Lance Barksdale,427013
+631594,2020-07-29,Sonny Gray,543243,Cincinnati Reds,113,Lance Barksdale,427013
+631137,2020-07-29,Brandon Woodruff,605540,Milwaukee Brewers,158,CB Bucknor,427044
+631137,2020-07-29,Joe Musgrove,605397,Pittsburgh Pirates,134,CB Bucknor,427044
+631492,2020-07-29,Danny Duffy,518633,Kansas City Royals,118,Pat Hoberg,573596
+631492,2020-07-29,Matthew Boyd,571510,Detroit Tigers,116,Pat Hoberg,573596
+631444,2020-07-29,Dustin May,669160,Los Angeles Dodgers,119,Chris Guccione,427197
+631444,2020-07-29,Cristian Javier,664299,Houston Astros,117,Chris Guccione,427197
+631239,2020-07-29,Nathan Eovaldi,543135,Boston Red Sox,111,Mike Estabrook,482631
+631239,2020-07-29,Jacob deGrom,594798,New York Mets,121,Mike Estabrook,482631
+630272,2020-07-29,Charlie Morton,450203,Tampa Bay Rays,139,Chad Fairchild,431232
+630272,2020-07-29,Mike Soroka,647336,Atlanta Braves,144,Chad Fairchild,431232
+630495,2020-07-29,Gerrit Cole,543037,New York Yankees,147,Manny Gonzalez,484499
+630495,2020-07-29,Asher Wojciechowski,592879,Baltimore Orioles,110,Manny Gonzalez,484499
+631270,2020-07-29,Daniel Ponce de Leon,594965,St. Louis Cardinals,138,Jerry Meals,427339
+631270,2020-07-29,Rich Hill,448179,Minnesota Twins,142,Jerry Meals,427339
+631033,2020-07-29,Chris Paddack,663978,San Diego Padres,135,Mike Muchlinski,483912
+631033,2020-07-29,Johnny Cueto,456501,San Francisco Giants,137,Mike Muchlinski,483912
+631389,2020-07-29,Justin Dunn,643290,Seattle Mariners,136,Edwin Moscoso,554242
+631389,2020-07-29,Andrew Heaney,571760,Los Angeles Angels,108,Edwin Moscoso,554242
+630917,2020-07-30,Erick Fedde,607200,Washington Nationals,120,Joe West,427538
+630917,2020-07-30,Hyun Jin Ryu,547943,Toronto Blue Jays,141,Joe West,427538
+630496,2020-07-30,J.A. Happ,457918,New York Yankees,147,Chris Segal,503490
+630496,2020-07-30,John Means,607644,Baltimore Orioles,110,Chris Segal,503490
+631238,2020-07-30,Martin Perez,527048,Boston Red Sox,111,Sean Barber,503493
+631238,2020-07-30,Steven Matz,571927,New York Mets,121,Sean Barber,503493
+631271,2020-07-30,Shane Bieber,669456,Cleveland Indians,114,Ed Hickox,427224
+631271,2020-07-30,Jose Berrios,621244,Minnesota Twins,142,Ed Hickox,427224
+631494,2020-07-30,Brady Singer,663903,Kansas City Royals,118,Ramon De Jesus,594151
+631494,2020-07-30,Ivan Nova,467100,Detroit Tigers,116,Ramon De Jesus,594151
+630346,2020-07-30,Ryan Yarbrough,642232,Tampa Bay Rays,139,Carlos Torres,547380
+630346,2020-07-30,Max Fried,608331,Atlanta Braves,144,Carlos Torres,547380
+630145,2020-07-30,Ross Stripling,548389,Los Angeles Dodgers,119,Mark Ripperger,483919
+630145,2020-07-30,Robbie Ray,592662,Arizona Diamondbacks,109,Mark Ripperger,483919
+631390,2020-07-30,Marco Gonzales,594835,Seattle Mariners,136,Doug Eddings,427139
+631390,2020-07-30,Dylan Bundy,605164,Los Angeles Angels,108,Doug Eddings,427139
+631018,2020-07-30,Dinelson Lamet,659275,San Diego Padres,135,Tom Woodring,524988
+631018,2020-07-30,Kevin Gausman,592332,San Francisco Giants,137,Tom Woodring,524988
+631222,2020-07-31,Ryan Weber,543901,Boston Red Sox,111,Chad Whitson,489985
+631222,2020-07-31,Jordan Montgomery,656756,New York Yankees,147,Chad Whitson,489985
+631480,2020-07-31,Luis Castillo,622491,Cincinnati Reds,113,David Rackley,482663
+631480,2020-07-31,Spencer Turnbull,605513,Detroit Tigers,116,David Rackley,482663
+630275,2020-07-31,Rick Porcello,519144,New York Mets,121,Mark Wegner,427533
+630275,2020-07-31,Sean Newcomb,656794,Atlanta Braves,144,Mark Wegner,427533
+630592,2020-07-31,Blake Snell,605483,Tampa Bay Rays,139,Ryan Additon,596809
+630592,2020-07-31,Alex Cobb,502171,Baltimore Orioles,110,Ryan Additon,596809
+631410,2020-07-31,Dallas Keuchel,572971,Chicago White Sox,145,Tripp Gibson,503586
+631410,2020-07-31,Kris Bubic,663460,Kansas City Royals,118,Tripp Gibson,503586
+631539,2020-07-31,Garrett Richards,572070,San Diego Padres,135,Marvin Hudson,427243
+631539,2020-07-31,Jon Gray,592351,Colorado Rockies,115,Marvin Hudson,427243
+631272,2020-07-31,Mike Clevinger,605182,Cleveland Indians,114,Jordan Baker,490319
+631272,2020-07-31,Randy Dobnak,677976,Minnesota Twins,142,Jordan Baker,490319
+631647,2020-07-31,Trevor Williams,592866,Pittsburgh Pirates,134,Shane Livensparger,575629
+631647,2020-07-31,Yu Darvish,506433,Chicago Cubs,112,Shane Livensparger,575629
+631391,2020-07-31,Lance McCullers Jr.,621121,Houston Astros,117,Cory Blaser,484183
+631391,2020-07-31,Matt Andriese,542882,Los Angeles Angels,108,Cory Blaser,484183
+631019,2020-07-31,Mike Minor,501985,Texas Rangers,140,Jim Wolf,427554
+631019,2020-07-31,Logan Webb,657277,San Francisco Giants,137,Jim Wolf,427554
+630201,2020-07-31,Tony Gonsolin,664062,Los Angeles Dodgers,119,Quinn Wolcott,511890
+630201,2020-07-31,Zac Gallen,668678,Arizona Diamondbacks,109,Quinn Wolcott,511890
+631066,2020-07-31,Sean Manaea,640455,Oakland Athletics,133,Rob Drake,427128
+631066,2020-07-31,Taijuan Walker,592836,Seattle Mariners,136,Rob Drake,427128
+631413,2020-08-01,Gio Gonzalez,461829,Chicago White Sox,145,Ben May,521251
+631413,2020-08-01,Ronald Bolanos,671790,Kansas City Royals,118,Ben May,521251
+631392,2020-08-01,Zack Greinke,425844,Houston Astros,117,Gabe Morales,573597
+631392,2020-08-01,Griffin Canning,656288,Los Angeles Angels,108,Gabe Morales,573597
+631224,2020-08-01,Zack Godley,643327,Boston Red Sox,111,Mark Carlson,427053
+631224,2020-08-01,Masahiro Tanaka,547888,New York Yankees,147,Mark Carlson,427053
+631273,2020-08-01,Carlos Carrasco,471911,Cleveland Indians,114,Jeremie Rehak,605672
+631273,2020-08-01,Kenta Maeda,628317,Minnesota Twins,142,Jeremie Rehak,605672
+630278,2020-08-01,Michael Wacha,608379,New York Mets,121,Marty Foster,427168
+630278,2020-08-01,Touki Toussaint,657053,Atlanta Braves,144,Marty Foster,427168
+630492,2020-08-01,Tyler Glasnow,607192,Tampa Bay Rays,139,Paul Nauert,427361
+630492,2020-08-01,Wade LeBlanc,453281,Baltimore Orioles,110,Paul Nauert,427361
+630100,2020-08-01,Julio Urias,628711,Los Angeles Dodgers,119,Ted Barrett,427019
+630100,2020-08-01,Luke Weaver,596133,Arizona Diamondbacks,109,Ted Barrett,427019
+631540,2020-08-01,Joey Lucchesi,664192,San Diego Padres,135,Brian Knight,427286
+631540,2020-08-01,Kyle Freeland,607536,Colorado Rockies,115,Brian Knight,427286
+631622,2020-08-01,Mitch Keller,656605,Pittsburgh Pirates,134,Bill Welke,427534
+631622,2020-08-01,Tyler Chatwood,543022,Chicago Cubs,112,Bill Welke,427534
+631067,2020-08-01,Mike Fiers,571666,Oakland Athletics,133,Bill Miller,427344
+631067,2020-08-01,Yusei Kikuchi,579328,Seattle Mariners,136,Bill Miller,427344
+631020,2020-08-01,Jordan Lyles,543475,Texas Rangers,140,Lance Barrett,483561
+631020,2020-08-01,Drew Smyly,592767,San Francisco Giants,137,Lance Barrett,483561
+630493,2020-08-02,Yonny Chirinos,630023,Tampa Bay Rays,139,Chad Fairchild,431232
+630493,2020-08-02,Tommy Milone,543548,Baltimore Orioles,110,Chad Fairchild,431232
+630280,2020-08-02,David Peterson,656849,New York Mets,121,Alan Porter,484198
+630280,2020-08-02,Kyle Wright,657140,Atlanta Braves,144,Alan Porter,484198
+631415,2020-08-02,Dylan Cease,656302,Chicago White Sox,145,Andy Fletcher,427164
+631415,2020-08-02,Jakob Junis,596001,Kansas City Royals,118,Andy Fletcher,427164
+631274,2020-08-02,Aaron Civale,650644,Cleveland Indians,114,Jerry Meals,427339
+631274,2020-08-02,Tyler Clippard,461325,Minnesota Twins,142,Jerry Meals,427339
+631606,2020-08-02,Steven Brault,643230,Pittsburgh Pirates,134,Pat Hoberg,573596
+631606,2020-08-02,Jon Lester,452657,Chicago Cubs,112,Pat Hoberg,573596
+631541,2020-08-02,Zach Davies,605200,San Diego Padres,135,Adam Hamari,503077
+631541,2020-08-02,Antonio Senzatela,622608,Colorado Rockies,115,Adam Hamari,503077
+631021,2020-08-02,Kolby Allard,663465,Texas Rangers,140,John Libka,596805
+631021,2020-08-02,Jeff Samardzija,502188,San Francisco Giants,137,John Libka,596805
+631393,2020-08-02,Josh James,657624,Houston Astros,117,Alfonso Marquez,427315
+631393,2020-08-02,Shohei Ohtani,660271,Los Angeles Angels,108,Alfonso Marquez,427315
+630101,2020-08-02,Clayton Kershaw,477132,Los Angeles Dodgers,119,Adrian Johnson,482641
+630101,2020-08-02,Merrill Kelly,518876,Arizona Diamondbacks,109,Adrian Johnson,482641
+631068,2020-08-02,Chris Bassitt,605135,Oakland Athletics,133,Edwin Moscoso,554242
+631068,2020-08-02,Kendall Graveman,608665,Seattle Mariners,136,Edwin Moscoso,554242
+631210,2020-08-02,Austin Brice,592169,Boston Red Sox,111,James Hoye,428442
+631210,2020-08-02,James Paxton,572020,New York Yankees,147,James Hoye,428442
+631596,2020-08-03,Zach Plesac,668676,Cleveland Indians,114,Ed Hickox,427224
+631596,2020-08-03,Sonny Gray,543243,Cincinnati Reds,113,Ed Hickox,427224
+631219,2020-08-03,Jake Arrieta,453562,Philadelphia Phillies,143,Nic Lentz,544728
+631219,2020-08-03,Gerrit Cole,543037,New York Yankees,147,Nic Lentz,544728
+630281,2020-08-03,Jacob deGrom,594798,New York Mets,121,Sean Barber,503493
+630281,2020-08-03,Mike Soroka,647336,Atlanta Braves,144,Sean Barber,503493
+631275,2020-08-03,Derek Holland,502706,Pittsburgh Pirates,134,John Tumpane,483630
+631275,2020-08-03,Lewis Thorpe,626929,Minnesota Twins,142,John Tumpane,483630
+631293,2020-08-03,Carlos Rodon,607074,Chicago White Sox,145,Dan Iassogna,427248
+631293,2020-08-03,Brett Anderson,474463,Milwaukee Brewers,158,Dan Iassogna,427248
+631645,2020-08-03,Danny Duffy,518633,Kansas City Royals,118,Chris Conroy,482620
+631645,2020-08-03,Alec Mills,621219,Chicago Cubs,112,Chris Conroy,482620
+631542,2020-08-03,Johnny Cueto,456501,San Francisco Giants,137,Jim Reynolds,427424
+631542,2020-08-03,Chi Chi Gonzalez,592346,Colorado Rockies,115,Jim Reynolds,427424
+631090,2020-08-03,Walker Buehler,621111,Los Angeles Dodgers,119,Tom Woodring,524988
+631090,2020-08-03,Chris Paddack,663978,San Diego Padres,135,Tom Woodring,524988
+631070,2020-08-03,Frankie Montas,593423,Oakland Athletics,133,Doug Eddings,427139
+631070,2020-08-03,Justus Sheffield,656954,Seattle Mariners,136,Doug Eddings,427139
+631276,2020-08-04,Joe Musgrove,605397,Pittsburgh Pirates,134,Jose Navas,664265
+631276,2020-08-04,Jose Berrios,621244,Minnesota Twins,142,Jose Navas,664265
+631597,2020-08-04,Shane Bieber,669456,Cleveland Indians,114,Jordan Baker,490319
+631597,2020-08-04,Tyler Mahle,641816,Cincinnati Reds,113,Jordan Baker,490319
+630971,2020-08-04,Nathan Eovaldi,543135,Boston Red Sox,111,Randy Rosenberg,622329
+630971,2020-08-04,Charlie Morton,450203,Tampa Bay Rays,139,Randy Rosenberg,622329
+630874,2020-08-04,Steven Matz,571927,New York Mets,121,Laz Diaz,427113
+630874,2020-08-04,Patrick Corbin,571578,Washington Nationals,120,Laz Diaz,427113
+630284,2020-08-04,Matt Shoemaker,533167,Toronto Blue Jays,141,Mark Wegner,427533
+630284,2020-08-04,Max Fried,608331,Atlanta Braves,144,Mark Wegner,427533
+630575,2020-08-04,Pablo Lopez,641154,Miami Marlins,146,Ron Kulpa,427292
+630575,2020-08-04,John Means,607644,Baltimore Orioles,110,Ron Kulpa,427292
+631294,2020-08-04,Lucas Giolito,608337,Chicago White Sox,145,Tripp Gibson,503586
+631294,2020-08-04,Brandon Woodruff,605540,Milwaukee Brewers,158,Tripp Gibson,503586
+631608,2020-08-04,Brady Singer,663903,Kansas City Royals,118,David Rackley,482663
+631608,2020-08-04,Kyle Hendricks,543294,Chicago Cubs,112,David Rackley,482663
+631543,2020-08-04,Kevin Gausman,592332,San Francisco Giants,137,Lance Barrett,483561
+631543,2020-08-04,German Marquez,608566,Colorado Rockies,115,Lance Barrett,483561
+630109,2020-08-04,Cristian Javier,664299,Houston Astros,117,Quinn Wolcott,511890
+630109,2020-08-04,Madison Bumgarner,518516,Arizona Diamondbacks,109,Quinn Wolcott,511890
+631069,2020-08-04,Dustin May,669160,Los Angeles Dodgers,119,Mike Muchlinski,483912
+631069,2020-08-04,Dinelson Lamet,659275,San Diego Padres,135,Mike Muchlinski,483912
+631173,2020-08-04,Lance Lynn,458681,Texas Rangers,140,Rob Drake,427128
+631173,2020-08-04,Jesus Luzardo,666200,Oakland Athletics,133,Rob Drake,427128
+631057,2020-08-04,Andrew Heaney,571760,Los Angeles Angels,108,Chris Guccione,427197
+631057,2020-08-04,Justin Dunn,643290,Seattle Mariners,136,Chris Guccione,427197
+630878,2020-08-05,Rick Porcello,519144,New York Mets,121,Tim Timmons,427509
+630878,2020-08-05,Max Scherzer,453286,Washington Nationals,120,Tim Timmons,427509
+630972,2020-08-05,Martin Perez,527048,Boston Red Sox,111,Joe West,427538
+630972,2020-08-05,Ryan Yarbrough,642232,Tampa Bay Rays,139,Joe West,427538
+631140,2020-08-05,Randy Dobnak,677976,Minnesota Twins,142,Jeff Nelson,427362
+631140,2020-08-05,Trevor Williams,592866,Pittsburgh Pirates,134,Jeff Nelson,427362
+631570,2020-08-05,Tejay Antone,622088,Cincinnati Reds,113,Jeremie Rehak,605672
+631570,2020-08-05,Mike Clevinger,605182,Cleveland Indians,114,Jeremie Rehak,605672
+630307,2020-08-05,Hyun Jin Ryu,547943,Toronto Blue Jays,141,Marty Foster,427168
+630307,2020-08-05,Sean Newcomb,656794,Atlanta Braves,144,Marty Foster,427168
+631417,2020-08-05,Yu Darvish,506433,Chicago Cubs,112,Alex Tosi,605673
+631417,2020-08-05,Kris Bubic,663460,Kansas City Royals,118,Alex Tosi,605673
+631518,2020-08-05,Adrian Houser,605288,Milwaukee Brewers,158,Ben May,521251
+631518,2020-08-05,Dallas Keuchel,572971,Chicago White Sox,145,Ben May,521251
+631544,2020-08-05,Logan Webb,657277,San Francisco Giants,137,Adam Hamari,503077
+631544,2020-08-05,Jon Gray,592351,Colorado Rockies,115,Adam Hamari,503077
+630110,2020-08-05,Lance McCullers Jr.,621121,Houston Astros,117,Nick Mahrley,521051
+630110,2020-08-05,Robbie Ray,592662,Arizona Diamondbacks,109,Nick Mahrley,521051
+631085,2020-08-05,Ross Stripling,548389,Los Angeles Dodgers,119,Mark Ripperger,483919
+631085,2020-08-05,Garrett Richards,572070,San Diego Padres,135,Mark Ripperger,483919
+631174,2020-08-05,Kyle Gibson,502043,Texas Rangers,140,Bill Miller,427344
+631174,2020-08-05,Sean Manaea,640455,Oakland Athletics,133,Bill Miller,427344
+631043,2020-08-05,Julio Teheran,527054,Los Angeles Angels,108,Cory Blaser,484183
+631043,2020-08-05,Marco Gonzales,594835,Seattle Mariners,136,Cory Blaser,484183
+631148,2020-08-06,Kenta Maeda,628317,Minnesota Twins,142,CB Bucknor,427044
+631148,2020-08-06,JT Brubaker,664141,Pittsburgh Pirates,134,CB Bucknor,427044
+631545,2020-08-06,Tyler Anderson,542881,San Francisco Giants,137,John Libka,596805
+631545,2020-08-06,Kyle Freeland,607536,Colorado Rockies,115,John Libka,596805
+631175,2020-08-06,Mike Minor,501985,Texas Rangers,140,Edwin Moscoso,554242
+631175,2020-08-06,Mike Fiers,571666,Oakland Athletics,133,Edwin Moscoso,554242
+631042,2020-08-06,Dylan Bundy,605164,Los Angeles Angels,108,Gabe Morales,573597
+631042,2020-08-06,Taijuan Walker,592836,Seattle Mariners,136,Gabe Morales,573597
+631129,2020-08-06,Jordan Montgomery,656756,New York Yankees,147,Will Little,504381
+631129,2020-08-06,Zach Eflin,621107,Philadelphia Phillies,143,Will Little,504381
+631571,2020-08-06,Luis Castillo,622491,Cincinnati Reds,113,Jerry Meals,427339
+631571,2020-08-06,Carlos Carrasco,471911,Cleveland Indians,114,Jerry Meals,427339
+630111,2020-08-06,Brandon Bielak,656232,Houston Astros,117,Ted Barrett,427019
+630111,2020-08-06,Zac Gallen,668678,Arizona Diamondbacks,109,Ted Barrett,427019
+631425,2020-08-06,Tyler Chatwood,543022,Chicago Cubs,112,Lance Barksdale,427013
+631425,2020-08-06,Brad Keller,641745,Kansas City Royals,118,Lance Barksdale,427013
+630313,2020-08-06,Nate Pearson,663878,Toronto Blue Jays,141,Alan Porter,484198
+630313,2020-08-06,Touki Toussaint,657053,Atlanta Braves,144,Alan Porter,484198
+631340,2020-08-06,Wade LeBlanc,453281,Baltimore Orioles,110,Chris Segal,503490
+631340,2020-08-06,Jordan Yamamoto,657141,Miami Marlins,146,Chris Segal,503490
+631513,2020-08-06,Josh Lindblom,458676,Milwaukee Brewers,158,Andy Fletcher,427164
+631513,2020-08-06,Gio Gonzalez,461829,Chicago White Sox,145,Andy Fletcher,427164
+630879,2020-08-07,Tommy Milone,543548,Baltimore Orioles,110,D.J. Reyburn,482666
+630879,2020-08-07,Anibal Sanchez,434671,Washington Nationals,120,D.J. Reyburn,482666
+630974,2020-08-07,Masahiro Tanaka,547888,New York Yankees,147,Stu Scheurwater,521889
+630974,2020-08-07,Blake Snell,605483,Tampa Bay Rays,139,Stu Scheurwater,521889
+631105,2020-08-07,Matthew Boyd,571510,Detroit Tigers,116,Ramon De Jesus,594151
+631105,2020-08-07,Chad Kuhl,641771,Pittsburgh Pirates,134,Ramon De Jesus,594151
+631237,2020-08-07,Humberto Mejia,650668,Miami Marlins,146,Mike Estabrook,482631
+631237,2020-08-07,Michael Wacha,608379,New York Mets,121,Mike Estabrook,482631
+631623,2020-08-07,Tanner Roark,543699,Toronto Blue Jays,141,Carlos Torres,547380
+631623,2020-08-07,Ryan Weber,543901,Boston Red Sox,111,Carlos Torres,547380
+631419,2020-08-07,Devin Smeltzer,656970,Minnesota Twins,142,John Tumpane,483630
+631419,2020-08-07,Jakob Junis,596001,Kansas City Royals,118,John Tumpane,483630
+631504,2020-08-07,Aaron Civale,650644,Cleveland Indians,114,Jordan Baker,490319
+631504,2020-08-07,Dylan Cease,656302,Chicago White Sox,145,Jordan Baker,490319
+631295,2020-08-07,Trevor Bauer,545333,Cincinnati Reds,113,Tripp Gibson,503586
+631295,2020-08-07,Eric Lauer,641778,Milwaukee Brewers,158,Tripp Gibson,503586
+630920,2020-08-07,Griffin Canning,656288,Los Angeles Angels,108,Doug Eddings,427139
+630920,2020-08-07,Jordan Lyles,543475,Texas Rangers,140,Doug Eddings,427139
+631176,2020-08-07,Zack Greinke,425844,Houston Astros,117,Adrian Johnson,482641
+631176,2020-08-07,Chris Bassitt,605135,Oakland Athletics,133,Adrian Johnson,482641
+631073,2020-08-07,Luke Weaver,596133,Arizona Diamondbacks,109,Marvin Hudson,427243
+631073,2020-08-07,Zach Davies,605200,San Diego Padres,135,Marvin Hudson,427243
+631045,2020-08-07,Antonio Senzatela,622608,Colorado Rockies,115,Alfonso Marquez,427315
+631045,2020-08-07,Yusei Kikuchi,579328,Seattle Mariners,136,Alfonso Marquez,427315
+631358,2020-08-07,Jeff Samardzija,502188,San Francisco Giants,137,Jim Reynolds,427424
+631358,2020-08-07,Julio Urias,628711,Los Angeles Dodgers,119,Jim Reynolds,427424
+631503,2020-08-08,Zach Plesac,668676,Cleveland Indians,114,David Rackley,482663
+631503,2020-08-08,Matt Foster,641582,Chicago White Sox,145,David Rackley,482663
+631106,2020-08-08,Ivan Nova,467100,Detroit Tigers,116,Jansen Visconti,596740
+631106,2020-08-08,Derek Holland,502706,Pittsburgh Pirates,134,Jansen Visconti,596740
+631177,2020-08-08,Framber Valdez,664285,Houston Astros,117,Quinn Wolcott,511890
+631177,2020-08-08,Frankie Montas,593423,Oakland Athletics,133,Quinn Wolcott,511890
+630880,2020-08-08,Thomas Eshelman,664045,Baltimore Orioles,110,Ryan Blakney,503502
+630880,2020-08-08,Austin Voth,608723,Washington Nationals,120,Ryan Blakney,503502
+631133,2020-08-08,Kyle Wright,657140,Atlanta Braves,144,Ron Kulpa,427292
+631133,2020-08-08,Jake Arrieta,453562,Philadelphia Phillies,143,Ron Kulpa,427292
+630935,2020-08-08,Patrick Sandoval,663776,Los Angeles Angels,108,Bill Miller,427344
+630935,2020-08-08,Kolby Allard,663465,Texas Rangers,140,Bill Miller,427344
+631420,2020-08-08,Jake Odorizzi,543606,Minnesota Twins,142,Jose Navas,664265
+631420,2020-08-08,Danny Duffy,518633,Kansas City Royals,118,Jose Navas,664265
+631236,2020-08-08,Daniel Castano,641447,Miami Marlins,146,Chad Whitson,489985
+631236,2020-08-08,David Peterson,656849,New York Mets,121,Chad Whitson,489985
+631296,2020-08-08,Anthony DeSclafani,543101,Cincinnati Reds,113,Ben May,521251
+631296,2020-08-08,Brett Anderson,474463,Milwaukee Brewers,158,Ben May,521251
+631658,2020-08-08,Chase Anderson,502624,Toronto Blue Jays,141,Paul Nauert,427361
+631658,2020-08-08,Zack Godley,643327,Boston Red Sox,111,Paul Nauert,427361
+631074,2020-08-08,Merrill Kelly,518876,Arizona Diamondbacks,109,Tom Woodring,524988
+631074,2020-08-08,Chris Paddack,663978,San Diego Padres,135,Tom Woodring,524988
+631046,2020-08-08,Ryan Castellani,624418,Colorado Rockies,115,Chris Guccione,427197
+631046,2020-08-08,Nick Margevicius,676606,Seattle Mariners,136,Chris Guccione,427197
+631343,2020-08-08,Johnny Cueto,456501,San Francisco Giants,137,Lance Barrett,483561
+631343,2020-08-08,Clayton Kershaw,477132,Los Angeles Dodgers,119,Lance Barrett,483561
+631235,2020-08-09,Pablo Lopez,641154,Miami Marlins,146,Mark Carlson,427053
+631235,2020-08-09,Jacob deGrom,594798,New York Mets,121,Mark Carlson,427053
+630946,2020-08-09,James Paxton,572020,New York Yankees,147,Joe West,427538
+630946,2020-08-09,Charlie Morton,450203,Tampa Bay Rays,139,Joe West,427538
+631110,2020-08-09,Spencer Turnbull,605513,Detroit Tigers,116,Bill Welke,427534
+631110,2020-08-09,Steven Brault,643230,Pittsburgh Pirates,134,Bill Welke,427534
+631630,2020-08-09,Matt Shoemaker,533167,Toronto Blue Jays,141,Ryan Additon,596809
+631630,2020-08-09,Nathan Eovaldi,543135,Boston Red Sox,111,Ryan Additon,596809
+631421,2020-08-09,Jose Berrios,621244,Minnesota Twins,142,Jeff Nelson,427362
+631421,2020-08-09,Brady Singer,663903,Kansas City Royals,118,Jeff Nelson,427362
+631297,2020-08-09,Sonny Gray,543243,Cincinnati Reds,113,Erich Bacchus,623938
+631297,2020-08-09,Brandon Woodruff,605540,Milwaukee Brewers,158,Erich Bacchus,623938
+630922,2020-08-09,Andrew Heaney,571760,Los Angeles Angels,108,Nate Tomlinson,608158
+630922,2020-08-09,Lance Lynn,458681,Texas Rangers,140,Nate Tomlinson,608158
+631178,2020-08-09,Cristian Javier,664299,Houston Astros,117,Nick Mahrley,521051
+631178,2020-08-09,Jesus Luzardo,666200,Oakland Athletics,133,Nick Mahrley,521051
+631075,2020-08-09,Madison Bumgarner,518516,Arizona Diamondbacks,109,Mike Muchlinski,483912
+631075,2020-08-09,Dinelson Lamet,659275,San Diego Padres,135,Mike Muchlinski,483912
+631047,2020-08-09,German Marquez,608566,Colorado Rockies,115,Cory Blaser,484183
+631047,2020-08-09,Justus Sheffield,656954,Seattle Mariners,136,Cory Blaser,484183
+631373,2020-08-09,Kevin Gausman,592332,San Francisco Giants,137,Adam Hamari,503077
+631373,2020-08-09,Walker Buehler,621111,Los Angeles Dodgers,119,Adam Hamari,503077
+631506,2020-08-09,Shane Bieber,669456,Cleveland Indians,114,Jeremie Rehak,605672
+631506,2020-08-09,Lucas Giolito,608337,Chicago White Sox,145,Jeremie Rehak,605672
+631138,2020-08-10,Sean Newcomb,656794,Atlanta Braves,144,Chris Segal,503490
+631138,2020-08-10,Aaron Nola,605400,Philadelphia Phillies,143,Chris Segal,503490
+631233,2020-08-10,Patrick Corbin,571578,Washington Nationals,120,Chad Fairchild,431232
+631233,2020-08-10,Steven Matz,571927,New York Mets,121,Chad Fairchild,431232
+631473,2020-08-10,Dallas Keuchel,572971,Chicago White Sox,145,Dan Iassogna,427248
+631473,2020-08-10,Michael Fulmer,605242,Detroit Tigers,116,Dan Iassogna,427248
+631631,2020-08-10,Ryan Yarbrough,642232,Tampa Bay Rays,139,Stu Scheurwater,521889
+631631,2020-08-10,Ryan Brasier,518489,Boston Red Sox,111,Stu Scheurwater,521889
+631298,2020-08-10,Randy Dobnak,677976,Minnesota Twins,142,Ed Hickox,427224
+631298,2020-08-10,Adrian Houser,605288,Milwaukee Brewers,158,Ed Hickox,427224
+631546,2020-08-10,Robbie Ray,592662,Arizona Diamondbacks,109,Gabe Morales,573597
+631546,2020-08-10,Jon Gray,592351,Colorado Rockies,115,Gabe Morales,573597
+630923,2020-08-10,Justin Dunn,643290,Seattle Mariners,136,Edwin Moscoso,554242
+630923,2020-08-10,Kyle Gibson,502043,Texas Rangers,140,Edwin Moscoso,554242
+631445,2020-08-10,Logan Webb,657277,San Francisco Giants,137,Ted Barrett,427019
+631445,2020-08-10,Lance McCullers Jr.,621121,Houston Astros,117,Ted Barrett,427019
+631395,2020-08-10,Sean Manaea,640455,Oakland Athletics,133,Mark Ripperger,483919
+631395,2020-08-10,Julio Teheran,527054,Los Angeles Angels,108,Mark Ripperger,483919
+631346,2020-08-10,Luis Perdomo,606131,San Diego Padres,135,John Libka,596805
+631346,2020-08-10,Dustin May,669160,Los Angeles Dodgers,119,John Libka,596805
+630901,2020-08-11,Elieser Hernandez,622694,Miami Marlins,146,James Hoye,428442
+630901,2020-08-11,Hyun Jin Ryu,547943,Toronto Blue Jays,141,James Hoye,428442
+631598,2020-08-11,Kris Bubic,663460,Kansas City Royals,118,CB Bucknor,427044
+631598,2020-08-11,Luis Castillo,622491,Cincinnati Reds,113,CB Bucknor,427044
+631139,2020-08-11,Alex Cobb,502171,Baltimore Orioles,110,Pat Hoberg,573596
+631139,2020-08-11,Zack Wheeler,554430,Philadelphia Phillies,143,Pat Hoberg,573596
+631192,2020-08-11,Touki Toussaint,657053,Atlanta Braves,144,Ron Kulpa,427292
+631192,2020-08-11,Jordan Montgomery,656756,New York Yankees,147,Ron Kulpa,427292
+631572,2020-08-11,Jon Lester,452657,Chicago Cubs,112,D.J. Reyburn,482666
+631572,2020-08-11,Adam Plutko,592644,Cleveland Indians,114,D.J. Reyburn,482666
+631243,2020-08-11,Max Scherzer,453286,Washington Nationals,120,Jansen Visconti,596740
+631243,2020-08-11,Rick Porcello,519144,New York Mets,121,Jansen Visconti,596740
+631474,2020-08-11,Gio Gonzalez,461829,Chicago White Sox,145,Andy Fletcher,427164
+631474,2020-08-11,Tyler Alexander,641302,Detroit Tigers,116,Andy Fletcher,427164
+631646,2020-08-11,Andrew Kittredge,552640,Tampa Bay Rays,139,Hunter Wendelstedt,427537
+631646,2020-08-11,Martin Perez,527048,Boston Red Sox,111,Hunter Wendelstedt,427537
+631299,2020-08-11,Tyler Clippard,461325,Minnesota Twins,142,Jerry Meals,427339
+631299,2020-08-11,Josh Lindblom,458676,Milwaukee Brewers,158,Jerry Meals,427339
+631547,2020-08-11,Zac Gallen,668678,Arizona Diamondbacks,109,Alfonso Marquez,427315
+631547,2020-08-11,Kyle Freeland,607536,Colorado Rockies,115,Alfonso Marquez,427315
+630924,2020-08-11,Marco Gonzales,594835,Seattle Mariners,136,Rob Drake,427128
+630924,2020-08-11,Mike Minor,501985,Texas Rangers,140,Rob Drake,427128
+631446,2020-08-11,Tyler Anderson,542881,San Francisco Giants,137,Adrian Johnson,482641
+631446,2020-08-11,Brandon Bielak,656232,Houston Astros,117,Adrian Johnson,482641
+631396,2020-08-11,Mike Fiers,571666,Oakland Athletics,133,Marvin Hudson,427243
+631396,2020-08-11,Dylan Bundy,605164,Los Angeles Angels,108,Marvin Hudson,427243
+631347,2020-08-11,Garrett Richards,572070,San Diego Padres,135,Jim Reynolds,427424
+631347,2020-08-11,Ross Stripling,548389,Los Angeles Dodgers,119,Jim Reynolds,427424
+631475,2020-08-12,Dylan Cease,656302,Chicago White Sox,145,Tripp Gibson,503586
+631475,2020-08-12,Matthew Boyd,571510,Detroit Tigers,116,Tripp Gibson,503586
+631535,2020-08-12,Luke Weaver,596133,Arizona Diamondbacks,109,Chris Guccione,427197
+631535,2020-08-12,Antonio Senzatela,622608,Colorado Rockies,115,Chris Guccione,427197
+631397,2020-08-12,Chris Bassitt,605135,Oakland Athletics,133,Brian Knight,427286
+631397,2020-08-12,Griffin Canning,656288,Los Angeles Angels,108,Brian Knight,427286
+631568,2020-08-12,Kyle Hendricks,543294,Chicago Cubs,112,Tim Timmons,427509
+631568,2020-08-12,Carlos Carrasco,471911,Cleveland Indians,114,Tim Timmons,427509
+630902,2020-08-12,Jordan Yamamoto,657141,Miami Marlins,146,Roberto Ortiz,577468
+630902,2020-08-12,Nate Pearson,663878,Toronto Blue Jays,141,Roberto Ortiz,577468
+631599,2020-08-12,Brad Keller,641745,Kansas City Royals,118,Chris Conroy,482620
+631599,2020-08-12,Wade Miley,489119,Cincinnati Reds,113,Chris Conroy,482620
+631141,2020-08-12,Wade LeBlanc,453281,Baltimore Orioles,110,Ramon De Jesus,594151
+631141,2020-08-12,Zach Eflin,621107,Philadelphia Phillies,143,Ramon De Jesus,594151
+631208,2020-08-12,Huascar Ynoa,660623,Atlanta Braves,144,Todd Tichenor,429805
+631208,2020-08-12,Masahiro Tanaka,547888,New York Yankees,147,Todd Tichenor,429805
+631232,2020-08-12,Anibal Sanchez,434671,Washington Nationals,120,Ryan Additon,596809
+631232,2020-08-12,Robert Gsellman,607229,New York Mets,121,Ryan Additon,596809
+631447,2020-08-12,Trevor Cahill,502239,San Francisco Giants,137,Clint Vondrak,623949
+631447,2020-08-12,Zack Greinke,425844,Houston Astros,117,Clint Vondrak,623949
+631300,2020-08-12,Kenta Maeda,628317,Minnesota Twins,142,Jordan Baker,490319
+631300,2020-08-12,Eric Lauer,641778,Milwaukee Brewers,158,Jordan Baker,490319
+631648,2020-08-12,Blake Snell,605483,Tampa Bay Rays,139,Vic Carapazza,483569
+631648,2020-08-12,Zack Godley,643327,Boston Red Sox,111,Vic Carapazza,483569
+630926,2020-08-12,Taijuan Walker,592836,Seattle Mariners,136,Bill Miller,427344
+630926,2020-08-12,Jordan Lyles,543475,Texas Rangers,140,Bill Miller,427344
+631350,2020-08-12,Zach Davies,605200,San Diego Padres,135,Lance Barrett,483561
+631350,2020-08-12,Tony Gonsolin,664062,Los Angeles Dodgers,119,Lance Barrett,483561
+631231,2020-08-13,Austin Voth,608723,Washington Nationals,120,Carlos Torres,547380
+631231,2020-08-13,David Peterson,656849,New York Mets,121,Carlos Torres,547380
+631142,2020-08-13,Thomas Eshelman,664045,Baltimore Orioles,110,Sean Barber,503493
+631142,2020-08-13,Jake Arrieta,453562,Philadelphia Phillies,143,Sean Barber,503493
+631650,2020-08-13,Tyler Glasnow,607192,Tampa Bay Rays,139,Brennan Miller,639723
+631650,2020-08-13,Kyle Hart,606996,Boston Red Sox,111,Brennan Miller,639723
+631600,2020-08-13,Trevor Williams,592866,Pittsburgh Pirates,134,Ben May,521251
+631600,2020-08-13,Anthony DeSclafani,543101,Cincinnati Reds,113,Ben May,521251
+631609,2020-08-13,Brett Anderson,474463,Milwaukee Brewers,158,Jeremie Rehak,605672
+631609,2020-08-13,Yu Darvish,506433,Chicago Cubs,112,Jeremie Rehak,605672
+631351,2020-08-13,Chris Paddack,663978,San Diego Padres,135,Adam Hamari,503077
+631351,2020-08-13,Julio Urias,628711,Los Angeles Dodgers,119,Adam Hamari,503077
+630903,2020-08-14,Trevor Richards,670950,Tampa Bay Rays,139,Stu Scheurwater,521889
+630903,2020-08-14,Tanner Roark,543699,Toronto Blue Jays,141,Stu Scheurwater,521889
+631683,2020-08-14,Stephen Strasburg,544931,Washington Nationals,120,Angel Hernandez,427220
+631683,2020-08-14,Tommy Milone,543548,Baltimore Orioles,110,Angel Hernandez,427220
+631150,2020-08-14,Walker Lockett,621141,New York Mets,121,Mark Wegner,427533
+631150,2020-08-14,Spencer Howard,675921,Philadelphia Phillies,143,Mark Wegner,427533
+631196,2020-08-14,Colten Brewer,605155,Boston Red Sox,111,Chad Fairchild,431232
+631196,2020-08-14,Gerrit Cole,543037,New York Yankees,147,Chad Fairchild,431232
+631476,2020-08-14,Aaron Civale,650644,Cleveland Indians,114,Ryan Blakney,503502
+631476,2020-08-14,Ivan Nova,467100,Detroit Tigers,116,Ryan Blakney,503502
+631601,2020-08-14,Chad Kuhl,641771,Pittsburgh Pirates,134,Dan Iassogna,427248
+631601,2020-08-14,Sonny Gray,543243,Cincinnati Reds,113,Dan Iassogna,427248
+631322,2020-08-14,Kyle Wright,657140,Atlanta Braves,144,Mike Estabrook,482631
+631322,2020-08-14,Pablo Lopez,641154,Miami Marlins,146,Mike Estabrook,482631
+631610,2020-08-14,Brandon Woodruff,605540,Milwaukee Brewers,158,Ed Hickox,427224
+631610,2020-08-14,Alec Mills,621219,Chicago Cubs,112,Ed Hickox,427224
+631516,2020-08-14,Lance Lynn,458681,Texas Rangers,140,Doug Eddings,427139
+631516,2020-08-14,Ryan Castellani,624418,Colorado Rockies,115,Doug Eddings,427139
+631448,2020-08-14,Nestor Cortes,641482,Seattle Mariners,136,Nick Mahrley,521051
+631448,2020-08-14,Framber Valdez,664285,Houston Astros,117,Nick Mahrley,521051
+631381,2020-08-14,Clayton Kershaw,477132,Los Angeles Dodgers,119,John Libka,596805
+631381,2020-08-14,Patrick Sandoval,663776,Los Angeles Angels,108,John Libka,596805
+630115,2020-08-14,Dinelson Lamet,659275,San Diego Padres,135,Cory Blaser,484183
+630115,2020-08-14,Merrill Kelly,518876,Arizona Diamondbacks,109,Cory Blaser,484183
+631022,2020-08-14,Jesus Luzardo,666200,Oakland Athletics,133,Mike Muchlinski,483912
+631022,2020-08-14,Johnny Cueto,456501,San Francisco Giants,137,Mike Muchlinski,483912
+631611,2020-08-15,Adrian Houser,605288,Milwaukee Brewers,158,Jerry Meals,427339
+631611,2020-08-15,Colin Rea,607067,Chicago Cubs,112,Jerry Meals,427339
+631151,2020-08-15,Steven Matz,571927,New York Mets,121,Marty Foster,427168
+631151,2020-08-15,Aaron Nola,605400,Philadelphia Phillies,143,Marty Foster,427168
+631477,2020-08-15,Shane Bieber,669456,Cleveland Indians,114,Laz Diaz,427113
+631477,2020-08-15,Spencer Turnbull,605513,Detroit Tigers,116,Laz Diaz,427113
+631330,2020-08-15,Max Fried,608331,Atlanta Braves,144,Mark Carlson,427053
+631330,2020-08-15,Daniel Castano,641447,Miami Marlins,146,Mark Carlson,427053
+631023,2020-08-15,Sean Manaea,640455,Oakland Athletics,133,Marvin Hudson,427243
+631023,2020-08-15,Kevin Gausman,592332,San Francisco Giants,137,Marvin Hudson,427243
+631197,2020-08-15,Nathan Eovaldi,543135,Boston Red Sox,111,Jansen Visconti,596740
+631197,2020-08-15,James Paxton,572020,New York Yankees,147,Jansen Visconti,596740
+631449,2020-08-15,Nick Margevicius,676606,Seattle Mariners,136,Ted Barrett,427019
+631449,2020-08-15,Cristian Javier,664299,Houston Astros,117,Ted Barrett,427019
+630568,2020-08-15,Patrick Corbin,571578,Washington Nationals,120,Dan Bellino,483564
+630568,2020-08-15,Asher Wojciechowski,592879,Baltimore Orioles,110,Dan Bellino,483564
+630116,2020-08-15,Cal Quantrill,615698,San Diego Padres,135,Alfonso Marquez,427315
+630116,2020-08-15,Alex Young,622065,Arizona Diamondbacks,109,Alfonso Marquez,427315
+631533,2020-08-15,Kyle Gibson,502043,Texas Rangers,140,Nate Tomlinson,608158
+631533,2020-08-15,German Marquez,608566,Colorado Rockies,115,Nate Tomlinson,608158
+631363,2020-08-15,Walker Buehler,621111,Los Angeles Dodgers,119,Jim Reynolds,427424
+631363,2020-08-15,Andrew Heaney,571760,Los Angeles Angels,108,Jim Reynolds,427424
+631679,2020-08-16,Max Scherzer,453286,Washington Nationals,120,Will Little,504381
+631679,2020-08-16,John Means,607644,Baltimore Orioles,110,Will Little,504381
+631124,2020-08-16,Rick Porcello,519144,New York Mets,121,Alan Porter,484198
+631124,2020-08-16,Zack Wheeler,554430,Philadelphia Phillies,143,Alan Porter,484198
+631479,2020-08-16,Adam Plutko,592644,Cleveland Indians,114,D.J. Reyburn,482666
+631479,2020-08-16,Michael Fulmer,605242,Detroit Tigers,116,D.J. Reyburn,482666
+631324,2020-08-16,Robbie Erlin,572362,Atlanta Braves,144,James Hoye,428442
+631324,2020-08-16,Elieser Hernandez,622694,Miami Marlins,146,James Hoye,428442
+631450,2020-08-16,Justus Sheffield,656954,Seattle Mariners,136,Adrian Johnson,482641
+631450,2020-08-16,Lance McCullers Jr.,621121,Houston Astros,117,Adrian Johnson,482641
+631252,2020-08-16,Brady Singer,663903,Kansas City Royals,118,John Bacon,545402
+631252,2020-08-16,Randy Dobnak,677976,Minnesota Twins,142,John Bacon,545402
+631491,2020-08-16,Dakota Hudson,641712,St. Louis Cardinals,138,Alex Tosi,605673
+631491,2020-08-16,Dallas Keuchel,572971,Chicago White Sox,145,Alex Tosi,605673
+631612,2020-08-16,Josh Lindblom,458676,Milwaukee Brewers,158,Jordan Baker,490319
+631612,2020-08-16,Jon Lester,452657,Chicago Cubs,112,Jordan Baker,490319
+631521,2020-08-16,Kolby Allard,663465,Texas Rangers,140,Edwin Moscoso,554242
+631521,2020-08-16,Jon Gray,592351,Colorado Rockies,115,Edwin Moscoso,554242
+631024,2020-08-16,Mike Fiers,571666,Oakland Athletics,133,Lew Williams,607886
+631024,2020-08-16,Logan Webb,657277,San Francisco Giants,137,Lew Williams,607886
+631364,2020-08-16,Dustin May,669160,Los Angeles Dodgers,119,Lance Barrett,483561
+631364,2020-08-16,Julio Teheran,527054,Los Angeles Angels,108,Lance Barrett,483561
+630117,2020-08-16,Garrett Richards,572070,San Diego Padres,135,Chris Guccione,427197
+630117,2020-08-16,Robbie Ray,592662,Arizona Diamondbacks,109,Chris Guccione,427197
+631198,2020-08-16,Chris Mazza,607391,Boston Red Sox,111,Ryan Additon,596809
+631198,2020-08-16,J.A. Happ,457918,New York Yankees,147,Ryan Additon,596809
+631199,2020-08-17,Martin Perez,527048,Boston Red Sox,111,Carlos Torres,547380
+631199,2020-08-17,Jordan Montgomery,656756,New York Yankees,147,Carlos Torres,547380
+630316,2020-08-17,Anibal Sanchez,434671,Washington Nationals,120,Chad Whitson,489985
+630316,2020-08-17,Touki Toussaint,657053,Atlanta Braves,144,Chad Whitson,489985
+631325,2020-08-17,Robert Gsellman,607229,New York Mets,121,Sean Barber,503493
+631325,2020-08-17,Jordan Yamamoto,657141,Miami Marlins,146,Sean Barber,503493
+631678,2020-08-17,Hyun Jin Ryu,547943,Toronto Blue Jays,141,Nic Lentz,544728
+631678,2020-08-17,Alex Cobb,502171,Baltimore Orioles,110,Nic Lentz,544728
+631258,2020-08-17,Kris Bubic,663460,Kansas City Royals,118,Jeff Nelson,427362
+631258,2020-08-17,Matt Wisler,605538,Minnesota Twins,142,Jeff Nelson,427362
+631493,2020-08-17,Matthew Boyd,571510,Detroit Tigers,116,Chris Conroy,482620
+631493,2020-08-17,Gio Gonzalez,461829,Chicago White Sox,145,Chris Conroy,482620
+630927,2020-08-17,Zach Davies,605200,San Diego Padres,135,Nestor Ceja,598411
+630927,2020-08-17,Jordan Lyles,543475,Texas Rangers,140,Nestor Ceja,598411
+631451,2020-08-17,Kyle Freeland,607536,Colorado Rockies,115,Rob Drake,427128
+631451,2020-08-17,Brandon Bielak,656232,Houston Astros,117,Rob Drake,427128
+630118,2020-08-17,Chris Bassitt,605135,Oakland Athletics,133,Brian Knight,427286
+630118,2020-08-17,Zac Gallen,668678,Arizona Diamondbacks,109,Brian Knight,427286
+631352,2020-08-17,Justin Dunn,643290,Seattle Mariners,136,Quinn Wolcott,511890
+631352,2020-08-17,Ross Stripling,548389,Los Angeles Dodgers,119,Quinn Wolcott,511890
+631365,2020-08-17,Tyler Anderson,542881,San Francisco Giants,137,Adam Hamari,503077
+631365,2020-08-17,Griffin Canning,656288,Los Angeles Angels,108,Adam Hamari,503077
+631452,2020-08-18,Antonio Senzatela,622608,Colorado Rockies,115,Doug Eddings,427139
+631452,2020-08-18,Zack Greinke,425844,Houston Astros,117,Doug Eddings,427139
+630928,2020-08-18,Adrian Morejon,670970,San Diego Padres,135,Cory Blaser,484183
+630928,2020-08-18,Mike Minor,501985,Texas Rangers,140,Cory Blaser,484183
+631366,2020-08-18,Trevor Cahill,502239,San Francisco Giants,137,John Libka,596805
+631366,2020-08-18,Dylan Bundy,605164,Los Angeles Angels,108,John Libka,596805
+630174,2020-08-18,Frankie Montas,593423,Oakland Athletics,133,Mike Muchlinski,483912
+630174,2020-08-18,Luke Weaver,596133,Arizona Diamondbacks,109,Mike Muchlinski,483912
+631114,2020-08-18,Carlos Carrasco,471911,Cleveland Indians,114,Andy Fletcher,427164
+631114,2020-08-18,JT Brubaker,664141,Pittsburgh Pirates,134,Andy Fletcher,427164
+631200,2020-08-18,Blake Snell,605483,Tampa Bay Rays,139,Chad Fairchild,431232
+631200,2020-08-18,Masahiro Tanaka,547888,New York Yankees,147,Chad Fairchild,431232
+631353,2020-08-18,Marco Gonzales,594835,Seattle Mariners,136,Nick Mahrley,521051
+631353,2020-08-18,Tony Gonsolin,664062,Los Angeles Dodgers,119,Nick Mahrley,521051
+630322,2020-08-18,Austin Voth,608723,Washington Nationals,120,Roberto Ortiz,577468
+630322,2020-08-18,Josh Tomlin,458708,Atlanta Braves,144,Roberto Ortiz,577468
+631326,2020-08-18,Corey Oswalt,621261,New York Mets,121,Mark Wegner,427533
+631326,2020-08-18,Humberto Mejia,650668,Miami Marlins,146,Mark Wegner,427533
+631651,2020-08-18,Zach Eflin,621107,Philadelphia Phillies,143,Stu Scheurwater,521889
+631651,2020-08-18,Zack Godley,643327,Boston Red Sox,111,Stu Scheurwater,521889
+631681,2020-08-18,Nate Pearson,663878,Toronto Blue Jays,141,Angel Hernandez,427220
+631681,2020-08-18,Wade LeBlanc,453281,Baltimore Orioles,110,Angel Hernandez,427220
+631496,2020-08-18,Tarik Skubal,669373,Detroit Tigers,116,David Rackley,482663
+631496,2020-08-18,Dylan Cease,656302,Chicago White Sox,145,David Rackley,482663
+631260,2020-08-18,Corbin Burnes,669203,Milwaukee Brewers,158,Jeremie Rehak,605672
+631260,2020-08-18,Kenta Maeda,628317,Minnesota Twins,142,Jeremie Rehak,605672
+631620,2020-08-18,Daniel Ponce de Leon,594965,St. Louis Cardinals,138,Laz Diaz,427113
+631620,2020-08-18,Yu Darvish,506433,Chicago Cubs,112,Laz Diaz,427113
+631682,2020-08-19,Tanner Roark,543699,Toronto Blue Jays,141,Dan Bellino,483564
+631682,2020-08-19,Tommy Milone,543548,Baltimore Orioles,110,Dan Bellino,483564
+631652,2020-08-19,Jake Arrieta,453562,Philadelphia Phillies,143,Hunter Wendelstedt,427537
+631652,2020-08-19,Kyle Hart,606996,Boston Red Sox,111,Hunter Wendelstedt,427537
+631120,2020-08-19,Aaron Civale,650644,Cleveland Indians,114,Tripp Gibson,503586
+631120,2020-08-19,Steven Brault,643230,Pittsburgh Pirates,134,Tripp Gibson,503586
+631201,2020-08-19,Tyler Glasnow,607192,Tampa Bay Rays,139,Jansen Visconti,596740
+631201,2020-08-19,Gerrit Cole,543037,New York Yankees,147,Jansen Visconti,596740
+631327,2020-08-19,Jacob deGrom,594798,New York Mets,121,Randy Rosenberg,622329
+631327,2020-08-19,Pablo Lopez,641154,Miami Marlins,146,Randy Rosenberg,622329
+631497,2020-08-19,Casey Mize,663554,Detroit Tigers,116,Lance Barksdale,427013
+631497,2020-08-19,Dane Dunning,641540,Chicago White Sox,145,Lance Barksdale,427013
+631249,2020-08-19,Brett Anderson,474463,Milwaukee Brewers,158,Ed Hickox,427224
+631249,2020-08-19,Rich Hill,448179,Minnesota Twins,142,Ed Hickox,427224
+631522,2020-08-19,Framber Valdez,664285,Houston Astros,117,Bill Miller,427344
+631522,2020-08-19,Ryan Castellani,624418,Colorado Rockies,115,Bill Miller,427344
+631076,2020-08-19,Lance Lynn,458681,Texas Rangers,140,Alfonso Marquez,427315
+631076,2020-08-19,Chris Paddack,663978,San Diego Padres,135,Alfonso Marquez,427315
+631179,2020-08-19,Merrill Kelly,518876,Arizona Diamondbacks,109,Malachi Moore,623946
+631179,2020-08-19,Jesus Luzardo,666200,Oakland Athletics,133,Malachi Moore,623946
+631048,2020-08-19,Julio Urias,628711,Los Angeles Dodgers,119,Mark Ripperger,483919
+631048,2020-08-19,Taijuan Walker,592836,Seattle Mariners,136,Mark Ripperger,483919
+631025,2020-08-19,Patrick Sandoval,663776,Los Angeles Angels,108,Jim Reynolds,427424
+631025,2020-08-19,Johnny Cueto,456501,San Francisco Giants,137,Jim Reynolds,427424
+631202,2020-08-20,John Curtiss,595928,Tampa Bay Rays,139,Ryan Additon,596809
+631202,2020-08-20,James Paxton,572020,New York Yankees,147,Ryan Additon,596809
+631498,2020-08-20,Spencer Turnbull,605513,Detroit Tigers,116,Alex Tosi,605673
+631498,2020-08-20,Lucas Giolito,608337,Chicago White Sox,145,Alex Tosi,605673
+631523,2020-08-20,Cristian Javier,664299,Houston Astros,117,Edwin Moscoso,554242
+631523,2020-08-20,German Marquez,608566,Colorado Rockies,115,Edwin Moscoso,554242
+631118,2020-08-20,Shane Bieber,669456,Cleveland Indians,114,Ben May,521251
+631118,2020-08-20,Trevor Williams,592866,Pittsburgh Pirates,134,Ben May,521251
+631049,2020-08-20,Clayton Kershaw,477132,Los Angeles Dodgers,119,Adrian Johnson,482641
+631049,2020-08-20,Yusei Kikuchi,579328,Seattle Mariners,136,Adrian Johnson,482641
+631248,2020-08-20,Brandon Woodruff,605540,Milwaukee Brewers,158,Jerry Meals,427339
+631248,2020-08-20,Jose Berrios,621244,Minnesota Twins,142,Jerry Meals,427339
+631684,2020-08-20,Nathan Eovaldi,543135,Boston Red Sox,111,Will Little,504381
+631684,2020-08-20,Asher Wojciechowski,592879,Baltimore Orioles,110,Will Little,504381
+631077,2020-08-20,Kyle Gibson,502043,Texas Rangers,140,Chris Guccione,427197
+631077,2020-08-20,Dinelson Lamet,659275,San Diego Padres,135,Chris Guccione,427197
+630986,2020-08-20,Sonny Gray,543243,Cincinnati Reds,113,CB Bucknor,427044
+630986,2020-08-20,Adam Wainwright,425794,St. Louis Cardinals,138,CB Bucknor,427044
+631180,2020-08-20,Alex Young,622065,Arizona Diamondbacks,109,Marvin Hudson,427243
+631180,2020-08-20,Sean Manaea,640455,Oakland Athletics,133,Marvin Hudson,427243
+631026,2020-08-20,Jose Suarez,660761,Los Angeles Angels,108,Lance Barrett,483561
+631026,2020-08-20,Kevin Gausman,592332,San Francisco Giants,137,Lance Barrett,483561
+630886,2020-08-21,Elieser Hernandez,622694,Miami Marlins,146,Ron Kulpa,427292
+630886,2020-08-21,Patrick Corbin,571578,Washington Nationals,120,Ron Kulpa,427292
+630960,2020-08-21,Matt Shoemaker,533167,Toronto Blue Jays,141,Marty Foster,427168
+630960,2020-08-21,Ryan Yarbrough,642232,Tampa Bay Rays,139,Marty Foster,427168
+631103,2020-08-21,Adrian Houser,605288,Milwaukee Brewers,158,Nic Lentz,544728
+631103,2020-08-21,Chad Kuhl,641771,Pittsburgh Pirates,134,Nic Lentz,544728
+631548,2020-08-21,Michael Fulmer,605242,Detroit Tigers,116,Chris Conroy,482620
+631548,2020-08-21,Adam Plutko,592644,Cleveland Indians,114,Chris Conroy,482620
+630324,2020-08-21,Aaron Nola,605400,Philadelphia Phillies,143,Mike Estabrook,482631
+630324,2020-08-21,Max Fried,608331,Atlanta Braves,144,Mike Estabrook,482631
+631665,2020-08-21,Colten Brewer,605155,Boston Red Sox,111,Dan Iassogna,427248
+631665,2020-08-21,John Means,607644,Baltimore Orioles,110,Dan Iassogna,427248
+631409,2020-08-21,Jake Odorizzi,543606,Minnesota Twins,142,Jeremie Rehak,605672
+631409,2020-08-21,Danny Duffy,518633,Kansas City Royals,118,Jeremie Rehak,605672
+630990,2020-08-21,Anthony DeSclafani,543101,Cincinnati Reds,113,Paul Clemons,607884
+630990,2020-08-21,Dakota Hudson,641712,St. Louis Cardinals,138,Paul Clemons,607884
+631633,2020-08-21,Dallas Keuchel,572971,Chicago White Sox,145,D.J. Reyburn,482666
+631633,2020-08-21,Jon Lester,452657,Chicago Cubs,112,D.J. Reyburn,482666
+631078,2020-08-21,Lance McCullers Jr.,621121,Houston Astros,117,Tom Woodring,524988
+631078,2020-08-21,Garrett Richards,572070,San Diego Padres,135,Tom Woodring,524988
+631050,2020-08-21,Kolby Allard,663465,Texas Rangers,140,Quinn Wolcott,511890
+631050,2020-08-21,Nick Margevicius,676606,Seattle Mariners,136,Quinn Wolcott,511890
+631348,2020-08-21,Jon Gray,592351,Colorado Rockies,115,Rob Drake,427128
+631348,2020-08-21,Walker Buehler,621111,Los Angeles Dodgers,119,Rob Drake,427128
+631186,2020-08-21,Andrew Heaney,571760,Los Angeles Angels,108,Gabe Morales,573597
+631186,2020-08-21,Mike Fiers,571666,Oakland Athletics,133,Gabe Morales,573597
+631027,2020-08-21,Robbie Ray,592662,Arizona Diamondbacks,109,Brian Knight,427286
+631027,2020-08-21,Logan Webb,657277,San Francisco Giants,137,Brian Knight,427286
+631104,2020-08-22,Josh Lindblom,458676,Milwaukee Brewers,158,Angel Hernandez,427220
+631104,2020-08-22,Derek Holland,502706,Pittsburgh Pirates,134,Angel Hernandez,427220
+631154,2020-08-22,Griffin Canning,656288,Los Angeles Angels,108,John Libka,596805
+631154,2020-08-22,Chris Bassitt,605135,Oakland Athletics,133,John Libka,596805
+630948,2020-08-22,Hyun Jin Ryu,547943,Toronto Blue Jays,141,Sean Barber,503493
+630948,2020-08-22,Aaron Slegers,642083,Tampa Bay Rays,139,Sean Barber,503493
+631403,2020-08-22,Randy Dobnak,677976,Minnesota Twins,142,Ed Hickox,427224
+631403,2020-08-22,Brady Singer,663903,Kansas City Royals,118,Ed Hickox,427224
+631564,2020-08-22,Matthew Boyd,571510,Detroit Tigers,116,Lance Barksdale,427013
+631564,2020-08-22,Triston McKenzie,663474,Cleveland Indians,114,Lance Barksdale,427013
+630338,2020-08-22,Zack Wheeler,554430,Philadelphia Phillies,143,Chad Whitson,489985
+630338,2020-08-22,Robbie Erlin,572362,Atlanta Braves,144,Chad Whitson,489985
+631667,2020-08-22,Martin Perez,527048,Boston Red Sox,111,Andy Fletcher,427164
+631667,2020-08-22,Alex Cobb,502171,Baltimore Orioles,110,Andy Fletcher,427164
+630991,2020-08-22,Wade Miley,489119,Cincinnati Reds,113,John Tumpane,483630
+630991,2020-08-22,Kwang Hyun Kim,547942,St. Louis Cardinals,138,John Tumpane,483630
+631638,2020-08-22,Reynaldo Lopez,625643,Chicago White Sox,145,Tim Timmons,427509
+631638,2020-08-22,Kyle Hendricks,543294,Chicago Cubs,112,Tim Timmons,427509
+631349,2020-08-22,Kyle Freeland,607536,Colorado Rockies,115,Doug Eddings,427139
+631349,2020-08-22,Dustin May,669160,Los Angeles Dodgers,119,Doug Eddings,427139
+631079,2020-08-22,Brandon Bielak,656232,Houston Astros,117,Nestor Ceja,598411
+631079,2020-08-22,Zach Davies,605200,San Diego Padres,135,Nestor Ceja,598411
+631051,2020-08-22,Jordan Lyles,543475,Texas Rangers,140,Nick Mahrley,521051
+631051,2020-08-22,Justus Sheffield,656954,Seattle Mariners,136,Nick Mahrley,521051
+631028,2020-08-22,Zac Gallen,668678,Arizona Diamondbacks,109,Mike Muchlinski,483912
+631028,2020-08-22,Tyler Anderson,542881,San Francisco Giants,137,Mike Muchlinski,483912
+630897,2020-08-23,Humberto Mejia,650668,Miami Marlins,146,Ramon De Jesus,594151
+630897,2020-08-23,Anibal Sanchez,434671,Washington Nationals,120,Ramon De Jesus,594151
+631670,2020-08-23,Zack Godley,643327,Boston Red Sox,111,Tripp Gibson,503586
+631670,2020-08-23,Wade LeBlanc,453281,Baltimore Orioles,110,Tripp Gibson,503586
+631551,2020-08-23,Tarik Skubal,669373,Detroit Tigers,116,Alex Tosi,605673
+631551,2020-08-23,Carlos Carrasco,471911,Cleveland Indians,114,Alex Tosi,605673
+630949,2020-08-23,Trent Thornton,663423,Toronto Blue Jays,141,Todd Tichenor,429805
+630949,2020-08-23,Josh Fleming,676596,Tampa Bay Rays,139,Todd Tichenor,429805
+631107,2020-08-23,Corbin Burnes,669203,Milwaukee Brewers,158,Dan Bellino,483564
+631107,2020-08-23,JT Brubaker,664141,Pittsburgh Pirates,134,Dan Bellino,483564
+631412,2020-08-23,Matt Wisler,605538,Minnesota Twins,142,Jordan Baker,490319
+631412,2020-08-23,Kris Bubic,663460,Kansas City Royals,118,Jordan Baker,490319
+630976,2020-08-23,Tyler Mahle,641816,Cincinnati Reds,113,Jose Navas,664265
+630976,2020-08-23,Daniel Ponce de Leon,594965,St. Louis Cardinals,138,Jose Navas,664265
+631639,2020-08-23,Dylan Cease,656302,Chicago White Sox,145,Laz Diaz,427113
+631639,2020-08-23,Yu Darvish,506433,Chicago Cubs,112,Laz Diaz,427113
+631354,2020-08-23,Antonio Senzatela,622608,Colorado Rockies,115,Bill Miller,427344
+631354,2020-08-23,Ross Stripling,548389,Los Angeles Dodgers,119,Bill Miller,427344
+631170,2020-08-23,Dylan Bundy,605164,Los Angeles Angels,108,Jim Reynolds,427424
+631170,2020-08-23,Frankie Montas,593423,Oakland Athletics,133,Jim Reynolds,427424
+631080,2020-08-23,Zack Greinke,425844,Houston Astros,117,Cory Blaser,484183
+631080,2020-08-23,Adrian Morejon,670970,San Diego Padres,135,Cory Blaser,484183
+631029,2020-08-23,Luke Weaver,596133,Arizona Diamondbacks,109,Adam Hamari,503077
+631029,2020-08-23,Trevor Cahill,502239,San Francisco Giants,137,Adam Hamari,503077
+631052,2020-08-23,Mike Minor,501985,Texas Rangers,140,Mark Ripperger,483919
+631052,2020-08-23,Justin Dunn,643290,Seattle Mariners,136,Mark Ripperger,483919
+630273,2020-08-23,Zach Eflin,621107,Philadelphia Phillies,143,Roberto Ortiz,577468
+630273,2020-08-23,Josh Tomlin,458708,Atlanta Braves,144,Roberto Ortiz,577468
+630950,2020-08-24,Tanner Roark,543699,Toronto Blue Jays,141,Randy Rosenberg,622329
+630950,2020-08-24,Blake Snell,605483,Tampa Bay Rays,139,Randy Rosenberg,622329
+630898,2020-08-24,Pablo Lopez,641154,Miami Marlins,146,David Rackley,482663
+630898,2020-08-24,Austin Voth,608723,Washington Nationals,120,David Rackley,482663
+631468,2020-08-24,Alec Mills,621219,Chicago Cubs,112,Will Little,504381
+631468,2020-08-24,Casey Mize,663554,Detroit Tigers,116,Will Little,504381
+631552,2020-08-24,Kenta Maeda,628317,Minnesota Twins,142,Ron Kulpa,427292
+631552,2020-08-24,Aaron Civale,650644,Cleveland Indians,114,Ron Kulpa,427292
+630929,2020-08-24,Jesus Luzardo,666200,Oakland Athletics,133,Lance Barrett,483561
+630929,2020-08-24,Lance Lynn,458681,Texas Rangers,140,Lance Barrett,483561
+631301,2020-08-24,Trevor Bauer,545333,Cincinnati Reds,113,Ryan Blakney,503502
+631301,2020-08-24,Brett Anderson,474463,Milwaukee Brewers,158,Ryan Blakney,503502
+630977,2020-08-24,Brad Keller,641745,Kansas City Royals,118,Jerry Meals,427339
+630977,2020-08-24,Jack Flaherty,656427,St. Louis Cardinals,138,Jerry Meals,427339
+631439,2020-08-24,Patrick Sandoval,663776,Los Angeles Angels,108,Alfonso Marquez,427315
+631439,2020-08-24,Framber Valdez,664285,Houston Astros,117,Alfonso Marquez,427315
+630193,2020-08-24,Ryan Castellani,624418,Colorado Rockies,115,Edwin Moscoso,554242
+630193,2020-08-24,Taylor Clarke,664199,Arizona Diamondbacks,109,Edwin Moscoso,554242
+630855,2020-08-25,Jake Arrieta,453562,Philadelphia Phillies,143,Chris Conroy,482620
+630855,2020-08-25,Erick Fedde,607200,Washington Nationals,120,Chris Conroy,482620
+630862,2020-08-25,Kyle Hart,606996,Boston Red Sox,111,Dan Iassogna,427248
+630862,2020-08-25,Chase Anderson,502624,Toronto Blue Jays,141,Dan Iassogna,427248
+630951,2020-08-25,Tommy Milone,543548,Baltimore Orioles,110,Marty Foster,427168
+630951,2020-08-25,Tyler Glasnow,607192,Tampa Bay Rays,139,Marty Foster,427168
+631467,2020-08-25,Tyler Chatwood,543022,Chicago Cubs,112,Nic Lentz,544728
+631467,2020-08-25,Spencer Turnbull,605513,Detroit Tigers,116,Nic Lentz,544728
+631553,2020-08-25,Rich Hill,448179,Minnesota Twins,142,Chris Segal,503490
+631553,2020-08-25,Shane Bieber,669456,Cleveland Indians,114,Chris Segal,503490
+630930,2020-08-25,Sean Manaea,640455,Oakland Athletics,133,Gabe Morales,573597
+630930,2020-08-25,Kyle Gibson,502043,Texas Rangers,140,Gabe Morales,573597
+631499,2020-08-25,Steven Brault,643230,Pittsburgh Pirates,134,CB Bucknor,427044
+631499,2020-08-25,Lucas Giolito,608337,Chicago White Sox,145,CB Bucknor,427044
+631302,2020-08-25,Luis Castillo,622491,Cincinnati Reds,113,Shane Livensparger,575629
+631302,2020-08-25,Brandon Woodruff,605540,Milwaukee Brewers,158,Shane Livensparger,575629
+630978,2020-08-25,Matt Harvey,518774,Kansas City Royals,118,Jeremie Rehak,605672
+630978,2020-08-25,Adam Wainwright,425794,St. Louis Cardinals,138,Jeremie Rehak,605672
+631081,2020-08-25,Marco Gonzales,594835,Seattle Mariners,136,Ted Barrett,427019
+631081,2020-08-25,Chris Paddack,663978,San Diego Padres,135,Ted Barrett,427019
+630194,2020-08-25,German Marquez,608566,Colorado Rockies,115,Rob Drake,427128
+630194,2020-08-25,Alex Young,622065,Arizona Diamondbacks,109,Rob Drake,427128
+631015,2020-08-25,Julio Urias,628711,Los Angeles Dodgers,119,Marvin Hudson,427243
+631015,2020-08-25,Johnny Cueto,456501,San Francisco Giants,137,Marvin Hudson,427243
+631500,2020-08-26,Trevor Williams,592866,Pittsburgh Pirates,134,Erich Bacchus,623938
+631500,2020-08-26,Dallas Keuchel,572971,Chicago White Sox,145,Erich Bacchus,623938
+630853,2020-08-26,Aaron Nola,605400,Philadelphia Phillies,143,Larry Vanover,427520
+630853,2020-08-26,Patrick Corbin,571578,Washington Nationals,120,Larry Vanover,427520
+630863,2020-08-26,Colten Brewer,605155,Boston Red Sox,111,Ben May,521251
+630863,2020-08-26,Julian Merryweather,657240,Toronto Blue Jays,141,Ben May,521251
+630952,2020-08-26,Asher Wojciechowski,592879,Baltimore Orioles,110,Sean Barber,503493
+630952,2020-08-26,Trevor Richards,670950,Tampa Bay Rays,139,Sean Barber,503493
+631455,2020-08-26,Jon Lester,452657,Chicago Cubs,112,Angel Hernandez,427220
+631455,2020-08-26,Michael Fulmer,605242,Detroit Tigers,116,Angel Hernandez,427220
+631554,2020-08-26,Jose Berrios,621244,Minnesota Twins,142,Manny Gonzalez,484499
+631554,2020-08-26,Mike Clevinger,605182,Cleveland Indians,114,Manny Gonzalez,484499
+631226,2020-08-26,Elieser Hernandez,622694,Miami Marlins,146,Jansen Visconti,596740
+631226,2020-08-26,Jacob deGrom,594798,New York Mets,121,Jansen Visconti,596740
+630931,2020-08-26,Mike Fiers,571666,Oakland Athletics,133,John Libka,596805
+630931,2020-08-26,Kolby Allard,663465,Texas Rangers,140,John Libka,596805
+630979,2020-08-26,Jakob Junis,596001,Kansas City Royals,118,Ed Hickox,427224
+630979,2020-08-26,Dakota Hudson,641712,St. Louis Cardinals,138,Ed Hickox,427224
+630099,2020-08-26,Jon Gray,592351,Colorado Rockies,115,Doug Eddings,427139
+630099,2020-08-26,Robbie Ray,592662,Arizona Diamondbacks,109,Doug Eddings,427139
+630871,2020-08-28,John Means,607644,Baltimore Orioles,110,Alan Porter,484198
+630871,2020-08-28,Hyun Jin Ryu,547943,Toronto Blue Jays,141,Alan Porter,484198
+631125,2020-08-28,Robbie Erlin,572362,Atlanta Braves,144,Bill Welke,427534
+631125,2020-08-28,Zack Wheeler,554430,Philadelphia Phillies,143,Bill Welke,427534
+631582,2020-08-28,Kyle Hendricks,543294,Chicago Cubs,112,Dan Bellino,483564
+631582,2020-08-28,Tyler Mahle,641816,Cincinnati Reds,113,Dan Bellino,483564
+631501,2020-08-28,Danny Duffy,518633,Kansas City Royals,118,Laz Diaz,427113
+631501,2020-08-28,Reynaldo Lopez,625643,Chicago White Sox,145,Laz Diaz,427113
+631304,2020-08-28,Ryan Yarbrough,642232,Tampa Bay Rays,139,Paul Nauert,427361
+631304,2020-08-28,Sixto Sanchez,664350,Miami Marlins,146,Paul Nauert,427361
+631653,2020-08-28,Max Scherzer,453286,Washington Nationals,120,Tripp Gibson,503586
+631653,2020-08-28,Martin Perez,527048,Boston Red Sox,111,Tripp Gibson,503586
+630933,2020-08-28,Dustin May,669160,Los Angeles Dodgers,119,Nate Tomlinson,608158
+630933,2020-08-28,Mike Minor,501985,Texas Rangers,140,Nate Tomlinson,608158
+631291,2020-08-28,Derek Holland,502706,Pittsburgh Pirates,134,John Tumpane,483630
+631291,2020-08-28,Corbin Burnes,669203,Milwaukee Brewers,158,John Tumpane,483630
+630980,2020-08-28,Triston McKenzie,663474,Cleveland Indians,114,Paul Clemons,607884
+630980,2020-08-28,Daniel Ponce de Leon,594965,St. Louis Cardinals,138,Paul Clemons,607884
+631524,2020-08-28,Zach Davies,605200,San Diego Padres,135,Mark Ripperger,483919
+631524,2020-08-28,Kyle Freeland,607536,Colorado Rockies,115,Mark Ripperger,483919
+631394,2020-08-28,Nick Margevicius,676606,Seattle Mariners,136,Cory Blaser,484183
+631394,2020-08-28,Andrew Heaney,571760,Los Angeles Angels,108,Cory Blaser,484183
+630216,2020-08-28,Tyler Anderson,542881,San Francisco Giants,137,Bill Miller,427344
+630216,2020-08-28,Zac Gallen,668678,Arizona Diamondbacks,109,Bill Miller,427344
+631204,2020-08-29,Robert Gsellman,607229,New York Mets,121,Ryan Additon,596809
+631204,2020-08-29,J.A. Happ,457918,New York Yankees,147,Ryan Additon,596809
+630981,2020-08-29,Carlos Carrasco,471911,Cleveland Indians,114,Jeremie Rehak,605672
+630981,2020-08-29,Jack Flaherty,656427,St. Louis Cardinals,138,Jeremie Rehak,605672
+631134,2020-08-29,Josh Tomlin,458708,Atlanta Braves,144,Pat Hoberg,573596
+631134,2020-08-29,Zach Eflin,621107,Philadelphia Phillies,143,Pat Hoberg,573596
+631502,2020-08-29,Brady Singer,663903,Kansas City Royals,118,Ryan Blakney,503502
+631502,2020-08-29,Dylan Cease,656302,Chicago White Sox,145,Ryan Blakney,503502
+631319,2020-08-29,Josh Fleming,676596,Tampa Bay Rays,139,Carlos Torres,547380
+631319,2020-08-29,Pablo Lopez,641154,Miami Marlins,146,Carlos Torres,547380
+630906,2020-08-29,Alex Cobb,502171,Baltimore Orioles,110,Marty Foster,427168
+630906,2020-08-29,Taijuan Walker,592836,Toronto Blue Jays,141,Marty Foster,427168
+630934,2020-08-29,Ross Stripling,548389,Los Angeles Dodgers,119,Adam Hamari,503077
+630934,2020-08-29,Lance Lynn,458681,Texas Rangers,140,Adam Hamari,503077
+631277,2020-08-29,JT Brubaker,664141,Pittsburgh Pirates,134,Jose Navas,664265
+631277,2020-08-29,Brett Anderson,474463,Milwaukee Brewers,158,Jose Navas,664265
+631654,2020-08-29,Anibal Sanchez,434671,Washington Nationals,120,Andy Fletcher,427164
+631654,2020-08-29,Chris Mazza,607391,Boston Red Sox,111,Andy Fletcher,427164
+631525,2020-08-29,Michel Baez,673258,San Diego Padres,135,Ted Barrett,427019
+631525,2020-08-29,Antonio Senzatela,622608,Colorado Rockies,115,Ted Barrett,427019
+630217,2020-08-29,Trevor Cahill,502239,San Francisco Giants,137,Edwin Moscoso,554242
+630217,2020-08-29,Luke Weaver,596133,Arizona Diamondbacks,109,Edwin Moscoso,554242
+631369,2020-08-29,Justus Sheffield,656954,Seattle Mariners,136,Alfonso Marquez,427315
+631369,2020-08-29,Dylan Bundy,605164,Los Angeles Angels,108,Alfonso Marquez,427315
+631584,2020-08-30,Tyler Chatwood,543022,Chicago Cubs,112,Angel Hernandez,427220
+631584,2020-08-30,Luis Castillo,622491,Cincinnati Reds,113,Angel Hernandez,427220
+631459,2020-08-30,Kenta Maeda,628317,Minnesota Twins,142,Ron Kulpa,427292
+631459,2020-08-30,Casey Mize,663554,Detroit Tigers,116,Ron Kulpa,427292
+631306,2020-08-30,Blake Snell,605483,Tampa Bay Rays,139,Randy Rosenberg,622329
+631306,2020-08-30,Sandy Alcantara,645261,Miami Marlins,146,Randy Rosenberg,622329
+631655,2020-08-30,Austin Voth,608723,Washington Nationals,120,Dan Iassogna,427248
+631655,2020-08-30,Zack Godley,643327,Boston Red Sox,111,Dan Iassogna,427248
+631505,2020-08-30,Kris Bubic,663460,Kansas City Royals,118,Shane Livensparger,575629
+631505,2020-08-30,Dane Dunning,641540,Chicago White Sox,145,Shane Livensparger,575629
+631278,2020-08-30,Steven Brault,643230,Pittsburgh Pirates,134,CB Bucknor,427044
+631278,2020-08-30,Brandon Woodruff,605540,Milwaukee Brewers,158,CB Bucknor,427044
+630982,2020-08-30,Aaron Civale,650644,Cleveland Indians,114,Ed Hickox,427224
+630982,2020-08-30,Adam Wainwright,425794,St. Louis Cardinals,138,Ed Hickox,427224
+630921,2020-08-30,Tony Gonsolin,664062,Los Angeles Dodgers,119,Marvin Hudson,427243
+630921,2020-08-30,Kyle Gibson,502043,Texas Rangers,140,Marvin Hudson,427243
+630852,2020-08-30,Jorge Lopez,605347,Baltimore Orioles,110,Sean Barber,503493
+630852,2020-08-30,Tanner Roark,543699,Toronto Blue Jays,141,Sean Barber,503493
+631526,2020-08-30,Chris Paddack,663978,San Diego Padres,135,Tom Woodring,524988
+631526,2020-08-30,Ryan Castellani,624418,Colorado Rockies,115,Tom Woodring,524988
+631371,2020-08-30,Justin Dunn,643290,Seattle Mariners,136,Chris Guccione,427197
+631371,2020-08-30,Griffin Canning,656288,Los Angeles Angels,108,Chris Guccione,427197
+630219,2020-08-30,Johnny Cueto,456501,San Francisco Giants,137,Rob Drake,427128
+630219,2020-08-30,Taylor Clarke,664199,Arizona Diamondbacks,109,Rob Drake,427128
+631135,2020-08-30,Tommy Milone,543548,Atlanta Braves,144,Ramon De Jesus,594151
+631135,2020-08-30,Jake Arrieta,453562,Philadelphia Phillies,143,Ramon De Jesus,594151
+631223,2020-08-31,Trevor Rogers,669432,Miami Marlins,146,Lance Barksdale,427013
+631223,2020-08-31,Jacob deGrom,594798,New York Mets,121,Lance Barksdale,427013
+630900,2020-08-31,Keegan Akin,669211,Baltimore Orioles,110,Jeremy Riggs,573769
+630900,2020-08-31,Chase Anderson,502624,Toronto Blue Jays,141,Jeremy Riggs,573769
+631374,2020-08-31,Marco Gonzales,594835,Seattle Mariners,136,Malachi Moore,623946
+631374,2020-08-31,Jaime Barria,642545,Los Angeles Angels,108,Malachi Moore,623946
+631585,2020-08-31,Dakota Hudson,641712,St. Louis Cardinals,138,Dan Merzel,605670
+631585,2020-08-31,Anthony DeSclafani,543101,Cincinnati Reds,113,Dan Merzel,605670
+631143,2020-08-31,Erick Fedde,607200,Washington Nationals,120,Chad Whitson,489985
+631143,2020-08-31,Spencer Howard,675921,Philadelphia Phillies,143,Chad Whitson,489985
+631206,2020-08-31,Tyler Glasnow,607192,Tampa Bay Rays,139,Jansen Visconti,596740
+631206,2020-08-31,Gerrit Cole,543037,New York Yankees,147,Jansen Visconti,596740
+631656,2020-08-31,Max Fried,608331,Atlanta Braves,144,Stu Scheurwater,521889
+631656,2020-08-31,Colten Brewer,605155,Boston Red Sox,111,Stu Scheurwater,521889
+631281,2020-08-31,Trevor Williams,592866,Pittsburgh Pirates,134,Jeff Nelson,427362
+631281,2020-08-31,Brent Suter,608718,Milwaukee Brewers,158,Jeff Nelson,427362
+631414,2020-08-31,Shane Bieber,669456,Cleveland Indians,114,Paul Clemons,607884
+631414,2020-08-31,Brad Keller,641745,Kansas City Royals,118,Paul Clemons,607884
+631247,2020-08-31,Lucas Giolito,608337,Chicago White Sox,145,D.J. Reyburn,482666
+631247,2020-08-31,Rich Hill,448179,Minnesota Twins,142,D.J. Reyburn,482666
+631527,2020-08-31,Garrett Richards,572070,San Diego Padres,135,Nick Mahrley,521051
+631527,2020-08-31,German Marquez,608566,Colorado Rockies,115,Nick Mahrley,521051
+631586,2020-09-01,Kwang Hyun Kim,547942,St. Louis Cardinals,138,Will Little,504381
+631586,2020-09-01,Sonny Gray,543243,Cincinnati Reds,113,Will Little,504381
+631307,2020-09-01,Julian Merryweather,657240,Toronto Blue Jays,141,Alan Porter,484198
+631307,2020-09-01,Elieser Hernandez,622694,Miami Marlins,146,Alan Porter,484198
+631109,2020-09-01,Jon Lester,452657,Chicago Cubs,112,John Tumpane,483630
+631109,2020-09-01,Chad Kuhl,641771,Pittsburgh Pirates,134,John Tumpane,483630
+631153,2020-09-01,Patrick Corbin,571578,Washington Nationals,120,Mark Carlson,427053
+631153,2020-09-01,Aaron Nola,605400,Philadelphia Phillies,143,Mark Carlson,427053
+631207,2020-09-01,Trevor Richards,670950,Tampa Bay Rays,139,Roberto Ortiz,577468
+631207,2020-09-01,Masahiro Tanaka,547888,New York Yankees,147,Roberto Ortiz,577468
+631657,2020-09-01,Ian Anderson,666120,Atlanta Braves,144,Joe West,427538
+631657,2020-09-01,Ryan Weber,543901,Boston Red Sox,111,Joe West,427538
+631671,2020-09-01,Ariel Jurado,642558,New York Mets,121,Ryan Additon,596809
+631671,2020-09-01,Asher Wojciechowski,592879,Baltimore Orioles,110,Ryan Additon,596809
+631287,2020-09-01,Michael Fulmer,605242,Detroit Tigers,116,Alex Tosi,605673
+631287,2020-09-01,Josh Lindblom,458676,Milwaukee Brewers,158,Alex Tosi,605673
+631416,2020-09-01,Zach Plesac,668676,Cleveland Indians,114,Jordan Baker,490319
+631416,2020-09-01,Matt Harvey,518774,Kansas City Royals,118,Jordan Baker,490319
+631430,2020-09-01,Luis Garcia,472610,Texas Rangers,140,Brian Knight,427286
+631430,2020-09-01,Framber Valdez,664285,Houston Astros,117,Brian Knight,427286
+631261,2020-09-01,Dallas Keuchel,572971,Chicago White Sox,145,Laz Diaz,427113
+631261,2020-09-01,Michael Pineda,501381,Minnesota Twins,142,Laz Diaz,427113
+631528,2020-09-01,Kevin Gausman,592332,San Francisco Giants,137,Doug Eddings,427139
+631528,2020-09-01,Jon Gray,592351,Colorado Rockies,115,Doug Eddings,427139
+631355,2020-09-01,Alex Young,622065,Arizona Diamondbacks,109,Cory Blaser,484183
+631355,2020-09-01,Julio Urias,628711,Los Angeles Dodgers,119,Cory Blaser,484183
+631529,2020-09-02,Logan Webb,657277,San Francisco Giants,137,Bill Miller,427344
+631529,2020-09-02,Kyle Freeland,607536,Colorado Rockies,115,Bill Miller,427344
+631673,2020-09-02,Michael Wacha,608379,New York Mets,121,Chris Conroy,482620
+631673,2020-09-02,John Means,607644,Baltimore Orioles,110,Chris Conroy,482620
+631587,2020-09-02,Johan Oviedo,670912,St. Louis Cardinals,138,Nic Lentz,544728
+631587,2020-09-02,Tyler Mahle,641816,Cincinnati Reds,113,Nic Lentz,544728
+631308,2020-09-02,Hyun Jin Ryu,547943,Toronto Blue Jays,141,Mark Wegner,427533
+631308,2020-09-02,Sixto Sanchez,664350,Miami Marlins,146,Mark Wegner,427533
+631111,2020-09-02,Kyle Hendricks,543294,Chicago Cubs,112,Jose Navas,664265
+631111,2020-09-02,Joe Musgrove,605397,Pittsburgh Pirates,134,Jose Navas,664265
+631145,2020-09-02,Max Scherzer,453286,Washington Nationals,120,James Hoye,428442
+631145,2020-09-02,Zack Wheeler,554430,Philadelphia Phillies,143,James Hoye,428442
+631194,2020-09-02,Charlie Morton,450203,Tampa Bay Rays,139,Carlos Torres,547380
+631194,2020-09-02,Jordan Montgomery,656756,New York Yankees,147,Carlos Torres,547380
+631624,2020-09-02,Robbie Erlin,572362,Atlanta Braves,144,Hunter Wendelstedt,427537
+631624,2020-09-02,Robinson Leyer,622490,Boston Red Sox,111,Hunter Wendelstedt,427537
+631283,2020-09-02,Spencer Turnbull,605513,Detroit Tigers,116,Manny Gonzalez,484499
+631283,2020-09-02,Adrian Houser,605288,Milwaukee Brewers,158,Manny Gonzalez,484499
+631404,2020-09-02,Triston McKenzie,663474,Cleveland Indians,114,Jeremie Rehak,605672
+631404,2020-09-02,Jakob Junis,596001,Kansas City Royals,118,Jeremie Rehak,605672
+631431,2020-09-02,Kolby Allard,663465,Texas Rangers,140,Mike Muchlinski,483912
+631431,2020-09-02,Cristian Javier,664299,Houston Astros,117,Mike Muchlinski,483912
+631253,2020-09-02,Reynaldo Lopez,625643,Chicago White Sox,145,Ryan Blakney,503502
+631253,2020-09-02,Jose Berrios,621244,Minnesota Twins,142,Ryan Blakney,503502
+631356,2020-09-02,Zac Gallen,668678,Arizona Diamondbacks,109,Alfonso Marquez,427315
+631356,2020-09-02,Walker Buehler,621111,Los Angeles Dodgers,119,Alfonso Marquez,427315
+631379,2020-09-02,Dinelson Lamet,659275,San Diego Padres,135,Adrian Johnson,482641
+631379,2020-09-02,Julio Teheran,527054,Los Angeles Angels,108,Adrian Johnson,482641
+631112,2020-09-03,Alec Mills,621219,Chicago Cubs,112,CB Bucknor,427044
+631112,2020-09-03,JT Brubaker,664141,Pittsburgh Pirates,134,CB Bucknor,427044
+631432,2020-09-03,Lance Lynn,458681,Texas Rangers,140,Adam Hamari,503077
+631432,2020-09-03,Zack Greinke,425844,Houston Astros,117,Adam Hamari,503077
+631146,2020-09-03,Anibal Sanchez,434671,Washington Nationals,120,Mike Estabrook,482631
+631146,2020-09-03,Zach Eflin,621107,Philadelphia Phillies,143,Mike Estabrook,482631
+631234,2020-09-03,J.A. Happ,457918,New York Yankees,147,Chad Fairchild,431232
+631234,2020-09-03,Robert Gsellman,607229,New York Mets,121,Chad Fairchild,431232
+631368,2020-09-03,Mike Clevinger,605182,San Diego Padres,135,Ted Barrett,427019
+631368,2020-09-03,Andrew Heaney,571760,Los Angeles Angels,108,Ted Barrett,427019
+631614,2020-09-03,Taijuan Walker,592836,Toronto Blue Jays,141,Adam Beck,644760
+631614,2020-09-03,Martin Perez,527048,Boston Red Sox,111,Adam Beck,644760
+631405,2020-09-03,Dylan Cease,656302,Chicago White Sox,145,Shane Livensparger,575629
+631405,2020-09-03,Danny Duffy,518633,Kansas City Royals,118,Shane Livensparger,575629
+631370,2020-09-03,Luke Weaver,596133,Arizona Diamondbacks,109,Malachi Moore,623946
+631370,2020-09-03,Clayton Kershaw,477132,Los Angeles Dodgers,119,Malachi Moore,623946
+630954,2020-09-04,Pablo Lopez,641154,Miami Marlins,146,Marty Foster,427168
+630954,2020-09-04,Josh Fleming,676596,Tampa Bay Rays,139,Marty Foster,427168
+631221,2020-09-04,Jake Arrieta,453562,Philadelphia Phillies,143,Paul Nauert,427361
+631221,2020-09-04,Rick Porcello,519144,New York Mets,121,Paul Nauert,427361
+631555,2020-09-04,Corbin Burnes,669203,Milwaukee Brewers,158,Jerry Meals,427339
+631555,2020-09-04,Carlos Carrasco,471911,Cleveland Indians,114,Jerry Meals,427339
+631406,2020-09-04,Dane Dunning,641540,Chicago White Sox,145,D.J. Reyburn,482666
+631406,2020-09-04,Brady Singer,663903,Kansas City Royals,118,D.J. Reyburn,482666
+631644,2020-09-04,Jack Flaherty,656427,St. Louis Cardinals,138,Angel Hernandez,427220
+631644,2020-09-04,Yu Darvish,506433,Chicago Cubs,112,Angel Hernandez,427220
+631357,2020-09-04,Lance McCullers Jr.,621121,Houston Astros,117,Marvin Hudson,427243
+631357,2020-09-04,Dylan Bundy,605164,Los Angeles Angels,108,Marvin Hudson,427243
+631041,2020-09-04,Kyle Cody,621129,Texas Rangers,140,John Libka,596805
+631041,2020-09-04,Yusei Kikuchi,579328,Seattle Mariners,136,John Libka,596805
+631345,2020-09-04,Antonio Senzatela,622608,Colorado Rockies,115,Gabe Morales,573597
+631345,2020-09-04,Dustin May,669160,Los Angeles Dodgers,119,Gabe Morales,573597
+631156,2020-09-04,Zach Davies,605200,San Diego Padres,135,Mark Ripperger,483919
+631156,2020-09-04,Jesus Luzardo,666200,Oakland Athletics,133,Mark Ripperger,483919
+631003,2020-09-04,Taylor Clarke,664199,Arizona Diamondbacks,109,Edwin Moscoso,554242
+631003,2020-09-04,Tyler Anderson,542881,San Francisco Giants,137,Edwin Moscoso,554242
+631157,2020-09-05,Chris Paddack,663978,San Diego Padres,135,Quinn Wolcott,511890
+631157,2020-09-05,Sean Manaea,640455,Oakland Athletics,133,Quinn Wolcott,511890
+630955,2020-09-05,Sandy Alcantara,645261,Miami Marlins,146,Sean Barber,503493
+630955,2020-09-05,Blake Snell,605483,Tampa Bay Rays,139,Sean Barber,503493
+631115,2020-09-05,Anthony DeSclafani,543101,Cincinnati Reds,113,James Hoye,428442
+631115,2020-09-05,Trevor Williams,592866,Pittsburgh Pirates,134,James Hoye,428442
+631408,2020-09-05,Lucas Giolito,608337,Chicago White Sox,145,Laz Diaz,427113
+631408,2020-09-05,Kris Bubic,663460,Kansas City Royals,118,Laz Diaz,427113
+631264,2020-09-05,Tarik Skubal,669373,Detroit Tigers,116,Alex Tosi,605673
+631264,2020-09-05,Kenta Maeda,628317,Minnesota Twins,142,Alex Tosi,605673
+631228,2020-09-05,Spencer Howard,675921,Philadelphia Phillies,143,Jansen Visconti,596740
+631228,2020-09-05,Seth Lugo,607625,New York Mets,121,Jansen Visconti,596740
+630383,2020-09-05,Erick Fedde,607200,Washington Nationals,120,Stu Scheurwater,521889
+630383,2020-09-05,Max Fried,608331,Atlanta Braves,144,Stu Scheurwater,521889
+631556,2020-09-05,Brandon Woodruff,605540,Milwaukee Brewers,158,Jordan Baker,490319
+631556,2020-09-05,Aaron Civale,650644,Cleveland Indians,114,Jordan Baker,490319
+631625,2020-09-05,Chase Anderson,502624,Toronto Blue Jays,141,Bill Welke,427534
+631625,2020-09-05,Ryan Weber,543901,Boston Red Sox,111,Bill Welke,427534
+631675,2020-09-05,Gerrit Cole,543037,New York Yankees,147,Jose Navas,664265
+631675,2020-09-05,Keegan Akin,669211,Baltimore Orioles,110,Jose Navas,664265
+631328,2020-09-05,German Marquez,608566,Colorado Rockies,115,Alfonso Marquez,427315
+631328,2020-09-05,Tony Gonsolin,664062,Los Angeles Dodgers,119,Alfonso Marquez,427315
+631044,2020-09-05,Kyle Gibson,502043,Texas Rangers,140,Tripp Gibson,503586
+631044,2020-09-05,Justus Sheffield,656954,Seattle Mariners,136,Tripp Gibson,503586
+631004,2020-09-05,Madison Bumgarner,518516,Arizona Diamondbacks,109,Rob Drake,427128
+631004,2020-09-05,Trevor Cahill,502239,San Francisco Giants,137,Rob Drake,427128
+631676,2020-09-06,Masahiro Tanaka,547888,New York Yankees,147,CB Bucknor,427044
+631676,2020-09-06,Dean Kremer,665152,Baltimore Orioles,110,CB Bucknor,427044
+631209,2020-09-06,Aaron Nola,605400,Philadelphia Phillies,143,Roberto Ortiz,577468
+631209,2020-09-06,Jacob deGrom,594798,New York Mets,121,Roberto Ortiz,577468
+630491,2020-09-06,Patrick Corbin,571578,Washington Nationals,120,Hunter Wendelstedt,427537
+630491,2020-09-06,Josh Tomlin,458708,Atlanta Braves,144,Hunter Wendelstedt,427537
+630956,2020-09-06,Trevor Rogers,669432,Miami Marlins,146,Alan Porter,484198
+630956,2020-09-06,Tyler Glasnow,607192,Tampa Bay Rays,139,Alan Porter,484198
+631557,2020-09-06,Brett Anderson,474463,Milwaukee Brewers,158,Jeremy Riggs,573769
+631557,2020-09-06,Shane Bieber,669456,Cleveland Indians,114,Jeremy Riggs,573769
+631116,2020-09-06,Tejay Antone,622088,Cincinnati Reds,113,Mike Estabrook,482631
+631116,2020-09-06,Chad Kuhl,641771,Pittsburgh Pirates,134,Mike Estabrook,482631
+631626,2020-09-06,Robbie Ray,592662,Toronto Blue Jays,141,Ramon De Jesus,594151
+631626,2020-09-06,Andrew Triggs,592811,Boston Red Sox,111,Ramon De Jesus,594151
+631407,2020-09-06,Dallas Keuchel,572971,Chicago White Sox,145,Ryan Blakney,503502
+631407,2020-09-06,Matt Harvey,518774,Kansas City Royals,118,Ryan Blakney,503502
+631254,2020-09-06,Casey Mize,663554,Detroit Tigers,116,Ron Kulpa,427292
+631254,2020-09-06,Rich Hill,448179,Minnesota Twins,142,Ron Kulpa,427292
+631005,2020-09-06,Alex Young,622065,Arizona Diamondbacks,109,Doug Eddings,427139
+631005,2020-09-06,Johnny Cueto,456501,San Francisco Giants,137,Doug Eddings,427139
+631359,2020-09-06,Framber Valdez,664285,Houston Astros,117,Tom Woodring,524988
+631359,2020-09-06,Jaime Barria,642545,Los Angeles Angels,108,Tom Woodring,524988
+631158,2020-09-06,Garrett Richards,572070,San Diego Padres,135,Nick Mahrley,521051
+631158,2020-09-06,Mike Fiers,571666,Oakland Athletics,133,Nick Mahrley,521051
+631030,2020-09-06,Jordan Lyles,543475,Texas Rangers,140,Lance Barrett,483561
+631030,2020-09-06,Justin Dunn,643290,Seattle Mariners,136,Lance Barrett,483561
+631604,2020-09-06,Dakota Hudson,641712,St. Louis Cardinals,138,Erich Bacchus,623938
+631604,2020-09-06,Jon Lester,452657,Chicago Cubs,112,Erich Bacchus,623938
+631344,2020-09-06,Ryan Castellani,624418,Colorado Rockies,115,Malachi Moore,623946
+631344,2020-09-06,Julio Urias,628711,Los Angeles Dodgers,119,Malachi Moore,623946
+631225,2020-09-07,Zack Wheeler,554430,Philadelphia Phillies,143,Chad Fairchild,431232
+631225,2020-09-07,David Peterson,656849,New York Mets,121,Chad Fairchild,431232
+630415,2020-09-07,Jose Urena,570632,Miami Marlins,146,Junior Valentine,608093
+630415,2020-09-07,Ian Anderson,666120,Atlanta Braves,144,Junior Valentine,608093
+631255,2020-09-07,Michael Fulmer,605242,Detroit Tigers,116,Manny Gonzalez,484499
+631255,2020-09-07,Michael Pineda,501381,Minnesota Twins,142,Manny Gonzalez,484499
+631605,2020-09-07,Johan Oviedo,670912,St. Louis Cardinals,138,Nic Lentz,544728
+631605,2020-09-07,Kyle Hendricks,543294,Chicago Cubs,112,Nic Lentz,544728
+631031,2020-09-07,Kolby Allard,663465,Texas Rangers,140,Kyle McCrady,644661
+631031,2020-09-07,Marco Gonzales,594835,Seattle Mariners,136,Kyle McCrady,644661
+630857,2020-09-07,Charlie Morton,450203,Tampa Bay Rays,139,Mark Wegner,427533
+630857,2020-09-07,Max Scherzer,453286,Washington Nationals,120,Mark Wegner,427533
+631558,2020-09-07,Brad Keller,641745,Kansas City Royals,118,Chad Whitson,489985
+631558,2020-09-07,Zach Plesac,668676,Cleveland Indians,114,Chad Whitson,489985
+630859,2020-09-07,Jordan Montgomery,656756,New York Yankees,147,Pat Hoberg,573596
+630859,2020-09-07,Hyun Jin Ryu,547943,Toronto Blue Jays,141,Pat Hoberg,573596
+631006,2020-09-07,Zac Gallen,668678,Arizona Diamondbacks,109,Bill Miller,427344
+631006,2020-09-07,Kevin Gausman,592332,San Francisco Giants,137,Bill Miller,427344
+631159,2020-09-07,Cristian Javier,664299,Houston Astros,117,Adrian Johnson,482641
+631159,2020-09-07,Chris Bassitt,605135,Oakland Athletics,133,Adrian Johnson,482641
+631084,2020-09-07,Kyle Freeland,607536,Colorado Rockies,115,Adam Hamari,503077
+631084,2020-09-07,Dinelson Lamet,659275,San Diego Padres,135,Adam Hamari,503077
+630867,2020-09-08,Ryan Yarbrough,642232,Tampa Bay Rays,139,Marty Foster,427168
+630867,2020-09-08,Anibal Sanchez,434671,Washington Nationals,120,Marty Foster,427168
+631559,2020-09-08,Jakob Junis,596001,Kansas City Royals,118,Mark Carlson,427053
+631559,2020-09-08,Triston McKenzie,663474,Cleveland Indians,114,Mark Carlson,427053
+630860,2020-09-08,J.A. Happ,457918,New York Yankees,147,Brennan Miller,639723
+630860,2020-09-08,Taijuan Walker,592836,Toronto Blue Jays,141,Brennan Miller,639723
+631096,2020-09-08,Dylan Cease,656302,Chicago White Sox,145,Jeremie Rehak,605672
+631096,2020-09-08,Joe Musgrove,605397,Pittsburgh Pirates,134,Jeremie Rehak,605672
+631211,2020-09-08,John Means,607644,Baltimore Orioles,110,Carlos Torres,547380
+631211,2020-09-08,Michael Wacha,608379,New York Mets,121,Carlos Torres,547380
+630438,2020-09-08,Sixto Sanchez,664350,Miami Marlins,146,Vic Carapazza,483569
+630438,2020-09-08,Kyle Wright,657140,Atlanta Braves,144,Vic Carapazza,483569
+631460,2020-09-08,Adrian Houser,605288,Milwaukee Brewers,158,Dan Bellino,483564
+631460,2020-09-08,Spencer Turnbull,605513,Detroit Tigers,116,Dan Bellino,483564
+630904,2020-09-08,Andrew Heaney,571760,Los Angeles Angels,108,Marvin Hudson,427243
+630904,2020-09-08,Lance Lynn,458681,Texas Rangers,140,Marvin Hudson,427243
+631615,2020-09-08,Tyler Mahle,641816,Cincinnati Reds,113,Todd Tichenor,429805
+631615,2020-09-08,Alec Mills,621219,Chicago Cubs,112,Todd Tichenor,429805
+631071,2020-09-08,Chi Chi Gonzalez,592346,Colorado Rockies,115,Gabe Morales,573597
+631071,2020-09-08,Mike Clevinger,605182,San Diego Padres,135,Gabe Morales,573597
+630220,2020-09-08,Walker Buehler,621111,Los Angeles Dodgers,119,Edwin Moscoso,554242
+630220,2020-09-08,Luke Weaver,596133,Arizona Diamondbacks,109,Edwin Moscoso,554242
+631007,2020-09-08,Ljay Newsome,664714,Seattle Mariners,136,John Libka,596805
+631007,2020-09-08,Logan Webb,657277,San Francisco Giants,137,John Libka,596805
+631461,2020-09-09,Corbin Burnes,669203,Milwaukee Brewers,158,Will Little,504381
+631461,2020-09-09,Matthew Boyd,571510,Detroit Tigers,116,Will Little,504381
+631560,2020-09-09,Danny Duffy,518633,Kansas City Royals,118,James Hoye,428442
+631560,2020-09-09,Carlos Carrasco,471911,Cleveland Indians,114,James Hoye,428442
+630864,2020-09-09,Deivi Garcia,665620,New York Yankees,147,Bill Welke,427534
+630864,2020-09-09,Tanner Roark,543699,Toronto Blue Jays,141,Bill Welke,427534
+631100,2020-09-09,Dane Dunning,641540,Chicago White Sox,145,Jerry Meals,427339
+631100,2020-09-09,JT Brubaker,664141,Pittsburgh Pirates,134,Jerry Meals,427339
+631212,2020-09-09,Jorge Lopez,605347,Baltimore Orioles,110,Roberto Ortiz,577468
+631212,2020-09-09,Rick Porcello,519144,New York Mets,121,Roberto Ortiz,577468
+630439,2020-09-09,Pablo Lopez,641154,Miami Marlins,146,Stu Scheurwater,521889
+630439,2020-09-09,Tommy Milone,543548,Atlanta Braves,144,Stu Scheurwater,521889
+630925,2020-09-09,Julio Teheran,527054,Los Angeles Angels,108,Brian Knight,427286
+630925,2020-09-09,Kyle Cody,621129,Texas Rangers,140,Brian Knight,427286
+631056,2020-09-09,Antonio Senzatela,622608,Colorado Rockies,115,Alfonso Marquez,427315
+631056,2020-09-09,Zach Davies,605200,San Diego Padres,135,Alfonso Marquez,427315
+631616,2020-09-09,Trevor Bauer,545333,Cincinnati Reds,113,Chris Segal,503490
+631616,2020-09-09,Yu Darvish,506433,Chicago Cubs,112,Chris Segal,503490
+631161,2020-09-09,Luis Garcia,677651,Houston Astros,117,Nick Mahrley,521051
+631161,2020-09-09,Jesus Luzardo,666200,Oakland Athletics,133,Nick Mahrley,521051
+630221,2020-09-09,Clayton Kershaw,477132,Los Angeles Dodgers,119,Rob Drake,427128
+630221,2020-09-09,Taylor Clarke,664199,Arizona Diamondbacks,109,Rob Drake,427128
+631008,2020-09-09,Nick Margevicius,676606,Seattle Mariners,136,Lance Barrett,483561
+631008,2020-09-09,Tyler Anderson,542881,San Francisco Giants,137,Lance Barrett,483561
+631162,2020-09-10,Jose Urquidy,664353,Houston Astros,117,Quinn Wolcott,511890
+631162,2020-09-10,Sean Manaea,640455,Oakland Athletics,133,Quinn Wolcott,511890
+630908,2020-09-10,Dylan Bundy,605164,Los Angeles Angels,108,Mike Muchlinski,483912
+630908,2020-09-10,Kyle Gibson,502043,Texas Rangers,140,Mike Muchlinski,483912
+630869,2020-09-10,Robbie Erlin,572362,Atlanta Braves,144,Larry Vanover,427520
+630869,2020-09-10,Austin Voth,608723,Washington Nationals,120,Larry Vanover,427520
+631561,2020-09-10,Brady Singer,663903,Kansas City Royals,118,Mike Estabrook,482631
+631561,2020-09-10,Aaron Civale,650644,Cleveland Indians,114,Mike Estabrook,482631
+630957,2020-09-10,Mike Kickham,592464,Boston Red Sox,111,Dan Iassogna,427248
+630957,2020-09-10,Josh Fleming,676596,Tampa Bay Rays,139,Dan Iassogna,427248
+631309,2020-09-10,Jake Arrieta,453562,Philadelphia Phillies,143,Randy Rosenberg,622329
+631309,2020-09-10,Sandy Alcantara,645261,Miami Marlins,146,Randy Rosenberg,622329
+631634,2020-09-10,Sonny Gray,543243,Cincinnati Reds,113,Ron Kulpa,427292
+631634,2020-09-10,Adbert Alzolay,640470,Chicago Cubs,112,Ron Kulpa,427292
+631072,2020-09-10,Trevor Cahill,502239,San Francisco Giants,137,Jim Reynolds,427424
+631072,2020-09-10,Chris Paddack,663978,San Diego Padres,135,Jim Reynolds,427424
+630223,2020-09-10,Dustin May,669160,Los Angeles Dodgers,119,Doug Eddings,427139
+630223,2020-09-10,Madison Bumgarner,518516,Arizona Diamondbacks,109,Doug Eddings,427139
+630873,2020-09-11,Josh Tomlin,458708,Atlanta Braves,144,David Rackley,482663
+630873,2020-09-11,Erick Fedde,607200,Washington Nationals,120,David Rackley,482663
+630868,2020-09-11,Jacob deGrom,594798,New York Mets,121,Paul Nauert,427361
+630868,2020-09-11,Chase Anderson,502624,Toronto Blue Jays,141,Paul Nauert,427361
+630958,2020-09-11,Andrew Triggs,592811,Boston Red Sox,111,Tripp Gibson,503586
+630958,2020-09-11,Blake Snell,605483,Tampa Bay Rays,139,Tripp Gibson,503586
+631399,2020-09-11,Steven Brault,643230,Pittsburgh Pirates,134,Ed Hickox,427224
+631399,2020-09-11,Kris Bubic,663460,Kansas City Royals,118,Ed Hickox,427224
+630909,2020-09-11,Mike Fiers,571666,Oakland Athletics,133,Tom Woodring,524988
+630909,2020-09-11,Luis Garcia,472610,Texas Rangers,140,Tom Woodring,524988
+631256,2020-09-11,Shane Bieber,669456,Cleveland Indians,114,Chad Whitson,489985
+631256,2020-09-11,Kenta Maeda,628317,Minnesota Twins,142,Chad Whitson,489985
+631478,2020-09-11,Casey Mize,663554,Detroit Tigers,116,Erich Bacchus,623938
+631478,2020-09-11,Lucas Giolito,608337,Chicago White Sox,145,Erich Bacchus,623938
+631284,2020-09-11,Jon Lester,452657,Chicago Cubs,112,Manny Gonzalez,484499
+631284,2020-09-11,Brandon Woodruff,605540,Milwaukee Brewers,158,Manny Gonzalez,484499
+630985,2020-09-11,Luis Castillo,622491,Cincinnati Reds,113,Laz Diaz,427113
+630985,2020-09-11,Adam Wainwright,425794,St. Louis Cardinals,138,Laz Diaz,427113
+631530,2020-09-11,Griffin Canning,656288,Los Angeles Angels,108,Cory Blaser,484183
+631530,2020-09-11,German Marquez,608566,Colorado Rockies,115,Cory Blaser,484183
+630224,2020-09-11,Yusei Kikuchi,579328,Seattle Mariners,136,Bill Miller,427344
+630224,2020-09-11,Caleb Smith,592761,Arizona Diamondbacks,109,Bill Miller,427344
+631185,2020-09-12,Dean Kremer,665152,Baltimore Orioles,110,Brennan Miller,639723
+631185,2020-09-12,Jordan Montgomery,656756,New York Yankees,147,Brennan Miller,639723
+630877,2020-09-12,Ian Anderson,666120,Atlanta Braves,144,Lance Barksdale,427013
+630877,2020-09-12,Patrick Corbin,571578,Washington Nationals,120,Lance Barksdale,427013
+631311,2020-09-12,Spencer Howard,675921,Philadelphia Phillies,143,David Arrieta,486200
+631311,2020-09-12,Jose Urena,570632,Miami Marlins,146,David Arrieta,486200
+630870,2020-09-12,Seth Lugo,607625,New York Mets,121,Jansen Visconti,596740
+630870,2020-09-12,Robbie Ray,592662,Toronto Blue Jays,141,Jansen Visconti,596740
+630959,2020-09-12,Nathan Eovaldi,543135,Boston Red Sox,111,Ben May,521251
+630959,2020-09-12,Tyler Glasnow,607192,Tampa Bay Rays,139,Ben May,521251
+631400,2020-09-12,Trevor Williams,592866,Pittsburgh Pirates,134,Jordan Baker,490319
+631400,2020-09-12,Carlos Hernandez,672578,Kansas City Royals,118,Jordan Baker,490319
+631495,2020-09-12,Michael Fulmer,605242,Detroit Tigers,116,Nic Lentz,544728
+631495,2020-09-12,Reynaldo Lopez,625643,Chicago White Sox,145,Nic Lentz,544728
+631285,2020-09-12,Kyle Hendricks,543294,Chicago Cubs,112,Todd Tichenor,429805
+631285,2020-09-12,Brent Suter,608718,Milwaukee Brewers,158,Todd Tichenor,429805
+631331,2020-09-12,Framber Valdez,664285,Houston Astros,117,Adrian Johnson,482641
+631331,2020-09-12,Julio Urias,628711,Los Angeles Dodgers,119,Adrian Johnson,482641
+631257,2020-09-12,Zach Plesac,668676,Cleveland Indians,114,Mark Carlson,427053
+631257,2020-09-12,Rich Hill,448179,Minnesota Twins,142,Mark Carlson,427053
+631531,2020-09-12,Jaime Barria,642545,Los Angeles Angels,108,Adam Hamari,503077
+631531,2020-09-12,Kyle Freeland,607536,Colorado Rockies,115,Adam Hamari,503077
+630225,2020-09-12,Justus Sheffield,656954,Seattle Mariners,136,Nestor Ceja,598411
+630225,2020-09-12,Zac Gallen,668678,Arizona Diamondbacks,109,Nestor Ceja,598411
+630988,2020-09-12,Tejay Antone,622088,Cincinnati Reds,113,D.J. Reyburn,482666
+630988,2020-09-12,Dakota Hudson,641712,St. Louis Cardinals,138,D.J. Reyburn,482666
+630883,2020-09-13,Kyle Wright,657140,Atlanta Braves,144,Chris Conroy,482620
+630883,2020-09-13,Max Scherzer,453286,Washington Nationals,120,Chris Conroy,482620
+631187,2020-09-13,John Means,607644,Baltimore Orioles,110,Bill Welke,427534
+631187,2020-09-13,J.A. Happ,457918,New York Yankees,147,Bill Welke,427534
+630947,2020-09-13,Martin Perez,527048,Boston Red Sox,111,Andy Fletcher,427164
+630947,2020-09-13,Charlie Morton,450203,Tampa Bay Rays,139,Andy Fletcher,427164
+631401,2020-09-13,Chad Kuhl,641771,Pittsburgh Pirates,134,Jeremie Rehak,605672
+631401,2020-09-13,Brad Keller,641745,Kansas City Royals,118,Jeremie Rehak,605672
+631259,2020-09-13,Triston McKenzie,663474,Cleveland Indians,114,James Hoye,428442
+631259,2020-09-13,Michael Pineda,501381,Minnesota Twins,142,James Hoye,428442
+631481,2020-09-13,Spencer Turnbull,605513,Detroit Tigers,116,Dan Bellino,483564
+631481,2020-09-13,Jonathan Stiever,680692,Chicago White Sox,145,Dan Bellino,483564
+631286,2020-09-13,Alec Mills,621219,Chicago Cubs,112,Chris Segal,503490
+631286,2020-09-13,Adrian Houser,605288,Milwaukee Brewers,158,Chris Segal,503490
+630961,2020-09-13,Tyler Mahle,641816,Cincinnati Reds,113,Paul Clemons,607884
+630961,2020-09-13,Carlos Martinez,593372,St. Louis Cardinals,138,Paul Clemons,607884
+630911,2020-09-13,Frankie Montas,593423,Oakland Athletics,133,Mike Muchlinski,483912
+630911,2020-09-13,Lance Lynn,458681,Texas Rangers,140,Mike Muchlinski,483912
+630875,2020-09-13,David Peterson,656849,New York Mets,121,Chad Fairchild,431232
+630875,2020-09-13,Hyun Jin Ryu,547943,Toronto Blue Jays,141,Chad Fairchild,431232
+631532,2020-09-13,Andrew Heaney,571760,Los Angeles Angels,108,Gabe Morales,573597
+631532,2020-09-13,Ryan Castellani,624418,Colorado Rockies,115,Gabe Morales,573597
+630226,2020-09-13,Justin Dunn,643290,Seattle Mariners,136,Edwin Moscoso,554242
+630226,2020-09-13,Luke Weaver,596133,Arizona Diamondbacks,109,Edwin Moscoso,554242
+631332,2020-09-13,Zack Greinke,425844,Houston Astros,117,Ted Barrett,427019
+631332,2020-09-13,Brusdar Graterol,660813,Los Angeles Dodgers,119,Ted Barrett,427019
+631321,2020-09-14,Vince Velasquez,592826,Philadelphia Phillies,143,Randy Rosenberg,622329
+631321,2020-09-14,Pablo Lopez,641154,Miami Marlins,146,Randy Rosenberg,622329
+631677,2020-09-14,Touki Toussaint,657053,Atlanta Braves,144,Ramon De Jesus,594151
+631677,2020-09-14,Jorge Lopez,605347,Baltimore Orioles,110,Ramon De Jesus,594151
+631482,2020-09-14,Jose Berrios,621244,Minnesota Twins,142,Angel Hernandez,427220
+631482,2020-09-14,Dylan Cease,656302,Chicago White Sox,145,Angel Hernandez,427220
+631061,2020-09-14,Clayton Kershaw,477132,Los Angeles Dodgers,119,Mark Ripperger,483919
+631061,2020-09-14,Dinelson Lamet,659275,San Diego Padres,135,Mark Ripperger,483919
+631574,2020-09-15,Joe Musgrove,605397,Pittsburgh Pirates,134,Ryan Blakney,503502
+631574,2020-09-15,Michael Lorenzen,547179,Cincinnati Reds,113,Ryan Blakney,503502
+630936,2020-09-15,Anibal Sanchez,434671,Washington Nationals,120,Dan Iassogna,427248
+630936,2020-09-15,John Curtiss,595928,Tampa Bay Rays,139,Dan Iassogna,427248
+631314,2020-09-15,Tanner Houck,656557,Boston Red Sox,111,Andy Fletcher,427164
+631314,2020-09-15,Sandy Alcantara,645261,Miami Marlins,146,Andy Fletcher,427164
+631144,2020-09-15,Rick Porcello,519144,New York Mets,121,Sean Barber,503493
+631144,2020-09-15,Jake Arrieta,453562,Philadelphia Phillies,143,Sean Barber,503493
+631195,2020-09-15,Taijuan Walker,592836,Toronto Blue Jays,141,Jeff Nelson,427362
+631195,2020-09-15,Deivi Garcia,665620,New York Yankees,147,Jeff Nelson,427362
+631462,2020-09-15,Jakob Junis,596001,Kansas City Royals,118,Jerry Meals,427339
+631462,2020-09-15,Matthew Boyd,571510,Detroit Tigers,116,Jerry Meals,427339
+631680,2020-09-15,Huascar Ynoa,660623,Atlanta Braves,144,Ryan Additon,596809
+631680,2020-09-15,Thomas Eshelman,664045,Baltimore Orioles,110,Ryan Additon,596809
+631263,2020-09-15,Jack Flaherty,656427,St. Louis Cardinals,138,John Bacon,545402
+631263,2020-09-15,Brett Anderson,474463,Milwaukee Brewers,158,John Bacon,545402
+631433,2020-09-15,Kyle Cody,621129,Texas Rangers,140,Marvin Hudson,427243
+631433,2020-09-15,Jose Urquidy,664353,Houston Astros,117,Marvin Hudson,427243
+631483,2020-09-15,Randy Dobnak,677976,Minnesota Twins,142,Will Little,504381
+631483,2020-09-15,Dane Dunning,641540,Chicago White Sox,145,Will Little,504381
+631618,2020-09-15,Carlos Carrasco,471911,Cleveland Indians,114,Mike Estabrook,482631
+631618,2020-09-15,Yu Darvish,506433,Chicago Cubs,112,Mike Estabrook,482631
+631520,2020-09-15,Sean Manaea,640455,Oakland Athletics,133,Chris Guccione,427197
+631520,2020-09-15,Antonio Senzatela,622608,Colorado Rockies,115,Chris Guccione,427197
+631062,2020-09-15,Tony Gonsolin,664062,Los Angeles Dodgers,119,Quinn Wolcott,511890
+631062,2020-09-15,Zach Davies,605200,San Diego Padres,135,Quinn Wolcott,511890
+631360,2020-09-15,Madison Bumgarner,518516,Arizona Diamondbacks,109,Lance Barrett,483561
+631360,2020-09-15,Julio Teheran,527054,Los Angeles Angels,108,Lance Barrett,483561
+630937,2020-09-16,Austin Voth,608723,Washington Nationals,120,Tripp Gibson,503586
+630937,2020-09-16,Pete Fairbanks,664126,Tampa Bay Rays,139,Tripp Gibson,503586
+631509,2020-09-16,Mike Fiers,571666,Oakland Athletics,133,Cory Blaser,484183
+631509,2020-09-16,German Marquez,608566,Colorado Rockies,115,Cory Blaser,484183
+631063,2020-09-16,Brusdar Graterol,660813,Los Angeles Dodgers,119,Adrian Johnson,482641
+631063,2020-09-16,Adrian Morejon,670970,San Diego Padres,135,Adrian Johnson,482641
+631575,2020-09-16,JT Brubaker,664141,Pittsburgh Pirates,134,D.J. Reyburn,482666
+631575,2020-09-16,Luis Castillo,622491,Cincinnati Reds,113,D.J. Reyburn,482666
+631315,2020-09-16,Mike Kickham,592464,Boston Red Sox,111,Jansen Visconti,596740
+631315,2020-09-16,Trevor Rogers,669432,Miami Marlins,146,Jansen Visconti,596740
+631119,2020-09-16,Jacob deGrom,594798,New York Mets,121,Alan Porter,484198
+631119,2020-09-16,Zack Wheeler,554430,Philadelphia Phillies,143,Alan Porter,484198
+631189,2020-09-16,Tanner Roark,543699,Toronto Blue Jays,141,John Tumpane,483630
+631189,2020-09-16,Gerrit Cole,543037,New York Yankees,147,John Tumpane,483630
+631463,2020-09-16,Brady Singer,663903,Kansas City Royals,118,Ed Hickox,427224
+631463,2020-09-16,Tarik Skubal,669373,Detroit Tigers,116,Ed Hickox,427224
+631659,2020-09-16,Cole Hamels,430935,Atlanta Braves,144,Brennan Miller,639723
+631659,2020-09-16,Keegan Akin,669211,Baltimore Orioles,110,Brennan Miller,639723
+631434,2020-09-16,Kyle Gibson,502043,Texas Rangers,140,Adam Hamari,503077
+631434,2020-09-16,Lance McCullers Jr.,621121,Houston Astros,117,Adam Hamari,503077
+631484,2020-09-16,Jake Odorizzi,543606,Minnesota Twins,142,Nic Lentz,544728
+631484,2020-09-16,Lucas Giolito,608337,Chicago White Sox,145,Nic Lentz,544728
+631619,2020-09-16,Aaron Civale,650644,Cleveland Indians,114,Chad Whitson,489985
+631619,2020-09-16,Jon Lester,452657,Chicago Cubs,112,Chad Whitson,489985
+631361,2020-09-16,Caleb Smith,592761,Arizona Diamondbacks,109,Jim Reynolds,427424
+631361,2020-09-16,Dylan Bundy,605164,Los Angeles Angels,108,Jim Reynolds,427424
+631032,2020-09-16,Drew Smyly,592767,San Francisco Giants,137,Bill Miller,427344
+631032,2020-09-16,Ljay Newsome,664714,Seattle Mariners,136,Bill Miller,427344
+631313,2020-09-17,Nathan Eovaldi,543135,Boston Red Sox,111,Stu Scheurwater,521889
+631313,2020-09-17,Jose Urena,570632,Miami Marlins,146,Stu Scheurwater,521889
+631485,2020-09-17,Kenta Maeda,628317,Minnesota Twins,142,Dan Bellino,483564
+631485,2020-09-17,Reynaldo Lopez,625643,Chicago White Sox,145,Dan Bellino,483564
+631362,2020-09-17,Alex Young,622065,Arizona Diamondbacks,109,Kyle McCrady,644661
+631362,2020-09-17,Griffin Canning,656288,Los Angeles Angels,108,Kyle McCrady,644661
+631034,2020-09-17,Tyler Anderson,542881,San Francisco Giants,137,Edwin Moscoso,554242
+631034,2020-09-17,Nick Margevicius,676606,Seattle Mariners,136,Edwin Moscoso,554242
+631101,2020-09-17,Dakota Hudson,641712,St. Louis Cardinals,138,Roberto Ortiz,577468
+631101,2020-09-17,Steven Brault,643230,Pittsburgh Pirates,134,Roberto Ortiz,577468
+631117,2020-09-17,Seth Lugo,607625,New York Mets,121,Mark Wegner,427533
+631117,2020-09-17,Aaron Nola,605400,Philadelphia Phillies,143,Mark Wegner,427533
+631190,2020-09-17,Chase Anderson,502624,Toronto Blue Jays,141,CB Bucknor,427044
+631190,2020-09-17,Masahiro Tanaka,547888,New York Yankees,147,CB Bucknor,427044
+631464,2020-09-17,Shane Bieber,669456,Cleveland Indians,114,Tim Timmons,427509
+631464,2020-09-17,Casey Mize,663554,Detroit Tigers,116,Tim Timmons,427509
+631435,2020-09-17,Jordan Lyles,543475,Texas Rangers,140,Tom Woodring,524988
+631435,2020-09-17,Framber Valdez,664285,Houston Astros,117,Tom Woodring,524988
+631510,2020-09-17,Julio Urias,628711,Los Angeles Dodgers,119,Ted Barrett,427019
+631510,2020-09-17,Kyle Freeland,607536,Colorado Rockies,115,Ted Barrett,427019
+631465,2020-09-18,Zach Plesac,668676,Cleveland Indians,114,Laz Diaz,427113
+631465,2020-09-18,Michael Fulmer,605242,Detroit Tigers,116,Laz Diaz,427113
+631213,2020-09-18,Max Fried,608331,Atlanta Braves,144,Adam Beck,644760
+631213,2020-09-18,Steven Matz,571927,New York Mets,121,Adam Beck,644760
+631576,2020-09-18,Jonathan Stiever,680692,Chicago White Sox,145,Mark Carlson,427053
+631576,2020-09-18,Tyler Mahle,641816,Cincinnati Reds,113,Mark Carlson,427053
+631627,2020-09-18,Jordan Montgomery,656756,New York Yankees,147,Carlos Torres,547380
+631627,2020-09-18,Martin Perez,527048,Boston Red Sox,111,Carlos Torres,547380
+631661,2020-09-18,Tyler Glasnow,607192,Tampa Bay Rays,139,Ryan Wills,605674
+631661,2020-09-18,Alex Cobb,502171,Baltimore Orioles,110,Ryan Wills,605674
+631436,2020-09-18,Zac Gallen,668678,Arizona Diamondbacks,109,Mike Muchlinski,483912
+631436,2020-09-18,Zack Greinke,425844,Houston Astros,117,Mike Muchlinski,483912
+631511,2020-09-18,Alex Wood,622072,Los Angeles Dodgers,119,Mark Ripperger,483919
+631511,2020-09-18,Ryan Castellani,624418,Colorado Rockies,115,Mark Ripperger,483919
+631266,2020-09-18,Danny Duffy,518633,Kansas City Royals,118,Todd Tichenor,429805
+631266,2020-09-18,Adrian Houser,605288,Milwaukee Brewers,158,Todd Tichenor,429805
+631629,2020-09-18,Rich Hill,448179,Minnesota Twins,142,Angel Hernandez,427220
+631629,2020-09-18,Kyle Hendricks,543294,Chicago Cubs,112,Angel Hernandez,427220
+631367,2020-09-18,Jimmy Herget,623474,Texas Rangers,140,John Libka,596805
+631367,2020-09-18,Jaime Barria,642545,Los Angeles Angels,108,John Libka,596805
+631040,2020-09-18,Chris Paddack,663978,San Diego Padres,135,Rob Drake,427128
+631040,2020-09-18,Yusei Kikuchi,579328,Seattle Mariners,136,Rob Drake,427128
+631163,2020-09-18,Logan Webb,657277,San Francisco Giants,137,Alfonso Marquez,427315
+631163,2020-09-18,Chris Bassitt,605135,Oakland Athletics,133,Alfonso Marquez,427315
+631164,2020-09-19,Kevin Gausman,592332,San Francisco Giants,137,Gabe Morales,573597
+631164,2020-09-19,Jesus Luzardo,666200,Oakland Athletics,133,Gabe Morales,573597
+631123,2020-09-19,Hyun Jin Ryu,547943,Toronto Blue Jays,141,Chris Conroy,482620
+631123,2020-09-19,Vince Velasquez,592826,Philadelphia Phillies,143,Chris Conroy,482620
+631466,2020-09-19,Triston McKenzie,663474,Cleveland Indians,114,Ryan Blakney,503502
+631466,2020-09-19,Spencer Turnbull,605513,Detroit Tigers,116,Ryan Blakney,503502
+631317,2020-09-19,Patrick Corbin,571578,Washington Nationals,120,Junior Valentine,608093
+631317,2020-09-19,Pablo Lopez,641154,Miami Marlins,146,Junior Valentine,608093
+631147,2020-09-19,Kwang Hyun Kim,547942,St. Louis Cardinals,138,Jerry Meals,427339
+631147,2020-09-19,Mitch Keller,656605,Pittsburgh Pirates,134,Jerry Meals,427339
+631214,2020-09-19,Ian Anderson,666120,Atlanta Braves,144,Sean Barber,503493
+631214,2020-09-19,David Peterson,656849,New York Mets,121,Sean Barber,503493
+631577,2020-09-19,Dallas Keuchel,572971,Chicago White Sox,145,James Hoye,428442
+631577,2020-09-19,Trevor Bauer,545333,Cincinnati Reds,113,James Hoye,428442
+631437,2020-09-19,Luke Weaver,596133,Arizona Diamondbacks,109,Marvin Hudson,427243
+631437,2020-09-19,Cristian Javier,664299,Houston Astros,117,Marvin Hudson,427243
+631267,2020-09-19,Kris Bubic,663460,Kansas City Royals,118,John Bacon,545402
+631267,2020-09-19,Corbin Burnes,669203,Milwaukee Brewers,158,John Bacon,545402
+631628,2020-09-19,J.A. Happ,457918,New York Yankees,147,Paul Nauert,427361
+631628,2020-09-19,Chris Mazza,607391,Boston Red Sox,111,Paul Nauert,427361
+631662,2020-09-19,Charlie Morton,450203,Tampa Bay Rays,139,Dan Iassogna,427248
+631662,2020-09-19,Jorge Lopez,605347,Baltimore Orioles,110,Dan Iassogna,427248
+631512,2020-09-19,Clayton Kershaw,477132,Los Angeles Dodgers,119,Quinn Wolcott,511890
+631512,2020-09-19,Chi Chi Gonzalez,592346,Colorado Rockies,115,Quinn Wolcott,511890
+631632,2020-09-19,Michael Pineda,501381,Minnesota Twins,142,Will Little,504381
+631632,2020-09-19,Alec Mills,621219,Chicago Cubs,112,Will Little,504381
+631036,2020-09-19,Luis Patino,672715,San Diego Padres,135,Doug Eddings,427139
+631036,2020-09-19,Justus Sheffield,656954,Seattle Mariners,136,Doug Eddings,427139
+631372,2020-09-19,Lance Lynn,458681,Texas Rangers,140,Lance Barrett,483561
+631372,2020-09-19,Andrew Heaney,571760,Los Angeles Angels,108,Lance Barrett,483561
+631672,2020-09-20,Ryan Yarbrough,642232,Tampa Bay Rays,139,Tripp Gibson,503586
+631672,2020-09-20,John Means,607644,Baltimore Orioles,110,Tripp Gibson,503586
+631635,2020-09-20,Deivi Garcia,665620,New York Yankees,147,Jansen Visconti,596740
+631635,2020-09-20,Tanner Houck,656557,Boston Red Sox,111,Jansen Visconti,596740
+631454,2020-09-20,Carlos Carrasco,471911,Cleveland Indians,114,D.J. Reyburn,482666
+631454,2020-09-20,Matthew Boyd,571510,Detroit Tigers,116,D.J. Reyburn,482666
+631215,2020-09-20,Kyle Wright,657140,Atlanta Braves,144,Alan Porter,484198
+631215,2020-09-20,Rick Porcello,519144,New York Mets,121,Alan Porter,484198
+631578,2020-09-20,Dylan Cease,656302,Chicago White Sox,145,Mike Estabrook,482631
+631578,2020-09-20,Michael Lorenzen,547179,Cincinnati Reds,113,Mike Estabrook,482631
+631424,2020-09-20,Madison Bumgarner,518516,Arizona Diamondbacks,109,Adam Hamari,503077
+631424,2020-09-20,Jose Urquidy,664353,Houston Astros,117,Adam Hamari,503077
+631268,2020-09-20,Brad Keller,641745,Kansas City Royals,118,Chris Segal,503490
+631268,2020-09-20,Josh Lindblom,458676,Milwaukee Brewers,158,Chris Segal,503490
+631128,2020-09-20,Taijuan Walker,592836,Toronto Blue Jays,141,Brennan Miller,639723
+631128,2020-09-20,Adonis Medina,658431,Philadelphia Phillies,143,Brennan Miller,639723
+631519,2020-09-20,Tony Gonsolin,664062,Los Angeles Dodgers,119,Adrian Johnson,482641
+631519,2020-09-20,Antonio Senzatela,622608,Colorado Rockies,115,Adrian Johnson,482641
+631086,2020-09-20,Jack Flaherty,656427,St. Louis Cardinals,138,Ed Hickox,427224
+631086,2020-09-20,Joe Musgrove,605397,Pittsburgh Pirates,134,Ed Hickox,427224
+631037,2020-09-20,Dinelson Lamet,659275,San Diego Padres,135,Bill Miller,427344
+631037,2020-09-20,Justin Dunn,643290,Seattle Mariners,136,Bill Miller,427344
+631166,2020-09-20,Tyler Anderson,542881,San Francisco Giants,137,Chris Guccione,427197
+631166,2020-09-20,Mike Minor,501985,Oakland Athletics,133,Chris Guccione,427197
+631375,2020-09-20,Kyle Cody,621129,Texas Rangers,140,Jim Reynolds,427424
+631375,2020-09-20,Julio Teheran,527054,Los Angeles Angels,108,Jim Reynolds,427424
+631617,2020-09-20,Jose Berrios,621244,Minnesota Twins,142,Nic Lentz,544728
+631617,2020-09-20,Yu Darvish,506433,Chicago Cubs,112,Nic Lentz,544728
+631376,2020-09-21,Kyle Gibson,502043,Texas Rangers,140,Kyle McCrady,644661
+631376,2020-09-21,Dylan Bundy,605164,Los Angeles Angels,108,Kyle McCrady,644661
+630884,2020-09-21,Zack Wheeler,554430,Philadelphia Phillies,143,Junior Valentine,608093
+630884,2020-09-21,Anibal Sanchez,434671,Washington Nationals,120,Junior Valentine,608093
+631562,2020-09-21,Dane Dunning,641540,Chicago White Sox,145,Dan Bellino,483564
+631562,2020-09-21,Aaron Civale,650644,Cleveland Indians,114,Dan Bellino,483564
+630876,2020-09-21,Michael King,650633,New York Yankees,147,Chad Fairchild,431232
+630876,2020-09-21,Matt Shoemaker,533167,Toronto Blue Jays,141,Chad Fairchild,431232
+631579,2020-09-21,Brandon Woodruff,605540,Milwaukee Brewers,158,Chad Whitson,489985
+631579,2020-09-21,Luis Castillo,622491,Cincinnati Reds,113,Chad Whitson,489985
+631087,2020-09-21,Jon Lester,452657,Chicago Cubs,112,Pat Hoberg,573596
+631087,2020-09-21,JT Brubaker,664141,Pittsburgh Pirates,134,Pat Hoberg,573596
+631216,2020-09-21,Pete Fairbanks,664126,Tampa Bay Rays,139,Larry Vanover,427520
+631216,2020-09-21,Jacob deGrom,594798,New York Mets,121,Larry Vanover,427520
+630440,2020-09-21,Trevor Rogers,669432,Miami Marlins,146,Mark Wegner,427533
+630440,2020-09-21,Huascar Ynoa,660623,Atlanta Braves,144,Mark Wegner,427533
+631402,2020-09-21,Adam Wainwright,425794,St. Louis Cardinals,138,Ron Kulpa,427292
+631402,2020-09-21,Carlos Hernandez,672578,Kansas City Royals,118,Ron Kulpa,427292
+631038,2020-09-21,Lance McCullers Jr.,621121,Houston Astros,117,Brian Knight,427286
+631038,2020-09-21,Marco Gonzales,594835,Seattle Mariners,136,Brian Knight,427286
+631009,2020-09-21,German Marquez,608566,Colorado Rockies,115,Ted Barrett,427019
+631009,2020-09-21,Johnny Cueto,456501,San Francisco Giants,137,Ted Barrett,427019
+631550,2020-09-22,Reynaldo Lopez,625643,Chicago White Sox,145,Angel Hernandez,427220
+631550,2020-09-22,Cal Quantrill,615698,Cleveland Indians,114,Angel Hernandez,427220
+630881,2020-09-22,Gerrit Cole,543037,New York Yankees,147,Carlos Torres,547380
+630881,2020-09-22,Tanner Roark,543699,Toronto Blue Jays,141,Carlos Torres,547380
+631580,2020-09-22,Brett Anderson,474463,Milwaukee Brewers,158,Mark Carlson,427053
+631580,2020-09-22,Sonny Gray,543243,Cincinnati Reds,113,Mark Carlson,427053
+631088,2020-09-22,Jose Quintana,500779,Chicago Cubs,112,Bill Welke,427534
+631088,2020-09-22,Steven Brault,643230,Pittsburgh Pirates,134,Bill Welke,427534
+631217,2020-09-22,Blake Snell,605483,Tampa Bay Rays,139,David Rackley,482663
+631217,2020-09-22,Seth Lugo,607625,New York Mets,121,David Rackley,482663
+630385,2020-09-22,Jose Urena,570632,Miami Marlins,146,Sean Barber,503493
+630385,2020-09-22,Bryse Wilson,669060,Atlanta Braves,144,Sean Barber,503493
+631636,2020-09-22,Keegan Akin,669211,Baltimore Orioles,110,Ben May,521251
+631636,2020-09-22,Nick Pivetta,601713,Boston Red Sox,111,Ben May,521251
+631251,2020-09-22,Tarik Skubal,669373,Detroit Tigers,116,Tim Timmons,427509
+631251,2020-09-22,Homer Bailey,456701,Minnesota Twins,142,Tim Timmons,427509
+631411,2020-09-22,Austin Gomber,596295,St. Louis Cardinals,138,Manny Gonzalez,484499
+631411,2020-09-22,Brady Singer,663903,Kansas City Royals,118,Manny Gonzalez,484499
+631064,2020-09-22,Griffin Canning,656288,Los Angeles Angels,108,Edwin Moscoso,554242
+631064,2020-09-22,Zach Davies,605200,San Diego Padres,135,Edwin Moscoso,554242
+631039,2020-09-22,Framber Valdez,664285,Houston Astros,117,Mike Muchlinski,483912
+631039,2020-09-22,Ljay Newsome,664714,Seattle Mariners,136,Mike Muchlinski,483912
+630243,2020-09-22,Jordan Lyles,543475,Texas Rangers,140,John Libka,596805
+630243,2020-09-22,Caleb Smith,592761,Arizona Diamondbacks,109,John Libka,596805
+631333,2020-09-22,Frankie Montas,593423,Oakland Athletics,133,Cory Blaser,484183
+631333,2020-09-22,Dustin May,669160,Los Angeles Dodgers,119,Cory Blaser,484183
+631010,2020-09-22,Kyle Freeland,607536,Colorado Rockies,115,Mark Ripperger,483919
+631010,2020-09-22,Drew Smyly,592767,San Francisco Giants,137,Mark Ripperger,483919
+631065,2020-09-23,Jaime Barria,642545,Los Angeles Angels,108,Rob Drake,427128
+631065,2020-09-23,Mike Clevinger,605182,San Diego Padres,135,Rob Drake,427128
+630892,2020-09-23,Zach Eflin,621107,Philadelphia Phillies,143,Joe West,427538
+630892,2020-09-23,Erick Fedde,607200,Washington Nationals,120,Joe West,427538
+630263,2020-09-23,Wes Benjamin,605138,Texas Rangers,140,Nick Mahrley,521051
+630263,2020-09-23,Alex Young,622065,Arizona Diamondbacks,109,Nick Mahrley,521051
+631534,2020-09-23,Lucas Giolito,608337,Chicago White Sox,145,Will Little,504381
+631534,2020-09-23,Shane Bieber,669456,Cleveland Indians,114,Will Little,504381
+630885,2020-09-23,Masahiro Tanaka,547888,New York Yankees,147,Ryan Additon,596809
+630885,2020-09-23,Robbie Ray,592662,Toronto Blue Jays,141,Ryan Additon,596809
+631035,2020-09-23,Zack Greinke,425844,Houston Astros,117,Marvin Hudson,427243
+631035,2020-09-23,Nick Margevicius,676606,Seattle Mariners,136,Marvin Hudson,427243
+631583,2020-09-23,Adrian Houser,605288,Milwaukee Brewers,158,James Hoye,428442
+631583,2020-09-23,Trevor Bauer,545333,Cincinnati Reds,113,James Hoye,428442
+631089,2020-09-23,Kyle Hendricks,543294,Chicago Cubs,112,Ramon De Jesus,594151
+631089,2020-09-23,Trevor Williams,592866,Pittsburgh Pirates,134,Ramon De Jesus,594151
+631218,2020-09-23,Tyler Glasnow,607192,Tampa Bay Rays,139,Lance Barksdale,427013
+631218,2020-09-23,Michael Wacha,608379,New York Mets,121,Lance Barksdale,427013
+630554,2020-09-23,Sixto Sanchez,664350,Miami Marlins,146,Adam Beck,644760
+630554,2020-09-23,Max Fried,608331,Atlanta Braves,144,Adam Beck,644760
+631637,2020-09-23,Dean Kremer,665152,Baltimore Orioles,110,Andy Fletcher,427164
+631637,2020-09-23,Nathan Eovaldi,543135,Boston Red Sox,111,Andy Fletcher,427164
+631250,2020-09-23,Casey Mize,663554,Detroit Tigers,116,Laz Diaz,427113
+631250,2020-09-23,Kenta Maeda,628317,Minnesota Twins,142,Laz Diaz,427113
+631380,2020-09-23,Carlos Martinez,593372,St. Louis Cardinals,138,Todd Tichenor,429805
+631380,2020-09-23,Danny Duffy,518633,Kansas City Royals,118,Todd Tichenor,429805
+631334,2020-09-23,Sean Manaea,640455,Oakland Athletics,133,Alfonso Marquez,427315
+631334,2020-09-23,Joe Kelly,523260,Los Angeles Dodgers,119,Alfonso Marquez,427315
+631011,2020-09-23,Ryan Castellani,624418,Colorado Rockies,115,Quinn Wolcott,511890
+631011,2020-09-23,Caleb Baragar,670056,San Francisco Giants,137,Quinn Wolcott,511890
+631099,2020-09-24,Alec Mills,621219,Chicago Cubs,112,Brennan Miller,639723
+631099,2020-09-24,Chad Kuhl,641771,Pittsburgh Pirates,134,Brennan Miller,639723
+631012,2020-09-24,Chi Chi Gonzalez,592346,Colorado Rockies,115,Adrian Johnson,482641
+631012,2020-09-24,Kevin Gausman,592332,San Francisco Giants,137,Adrian Johnson,482641
+630893,2020-09-24,David Peterson,656849,New York Mets,121,Stu Scheurwater,521889
+630893,2020-09-24,Patrick Corbin,571578,Washington Nationals,120,Stu Scheurwater,521889
+631549,2020-09-24,Dallas Keuchel,572971,Chicago White Sox,145,Nic Lentz,544728
+631549,2020-09-24,Zach Plesac,668676,Cleveland Indians,114,Nic Lentz,544728
+630887,2020-09-24,Jordan Montgomery,656756,New York Yankees,147,Jansen Visconti,596740
+630887,2020-09-24,Hyun Jin Ryu,547943,Toronto Blue Jays,141,Jansen Visconti,596740
+631685,2020-09-24,Pablo Lopez,641154,Miami Marlins,146,Alan Porter,484198
+631685,2020-09-24,Ian Anderson,666120,Atlanta Braves,144,Alan Porter,484198
+631640,2020-09-24,Alex Cobb,502171,Baltimore Orioles,110,Ryan Wills,605674
+631640,2020-09-24,Martin Perez,527048,Boston Red Sox,111,Ryan Wills,605674
+631398,2020-09-24,Michael Fulmer,605242,Detroit Tigers,116,Chris Segal,503490
+631398,2020-09-24,Kris Bubic,663460,Kansas City Royals,118,Chris Segal,503490
+630912,2020-09-24,Cristian Javier,664299,Houston Astros,117,Adam Hamari,503077
+630912,2020-09-24,Lance Lynn,458681,Texas Rangers,140,Adam Hamari,503077
+630975,2020-09-24,Corbin Burnes,669203,Milwaukee Brewers,158,Dan Merzel,605670
+630975,2020-09-24,Kwang Hyun Kim,547942,St. Louis Cardinals,138,Dan Merzel,605670
+631335,2020-09-24,Mike Fiers,571666,Oakland Athletics,133,Gabe Morales,573597
+631335,2020-09-24,Walker Buehler,621111,Los Angeles Dodgers,119,Gabe Morales,573597
+630889,2020-09-25,Jorge Lopez,605347,Baltimore Orioles,110,Paul Nauert,427361
+630889,2020-09-25,Taijuan Walker,592836,Toronto Blue Jays,141,Paul Nauert,427361
+630938,2020-09-25,Vince Velasquez,592826,Philadelphia Phillies,143,Chris Conroy,482620
+630938,2020-09-25,Charlie Morton,450203,Tampa Bay Rays,139,Chris Conroy,482620
+631191,2020-09-25,Sandy Alcantara,645261,Miami Marlins,146,John Tumpane,483630
+631191,2020-09-25,J.A. Happ,457918,New York Yankees,147,John Tumpane,483630
+631536,2020-09-25,Mitch Keller,656605,Pittsburgh Pirates,134,Pat Hoberg,573596
+631536,2020-09-25,Carlos Carrasco,471911,Cleveland Indians,114,Pat Hoberg,573596
+630569,2020-09-25,Chris Mazza,607391,Boston Red Sox,111,Mark Wegner,427533
+630569,2020-09-25,Kyle Wright,657140,Atlanta Braves,144,Mark Wegner,427533
+631383,2020-09-25,Spencer Turnbull,605513,Detroit Tigers,116,Ron Kulpa,427292
+631383,2020-09-25,Brad Keller,641745,Kansas City Royals,118,Ron Kulpa,427292
+630913,2020-09-25,Jose Urquidy,664353,Houston Astros,117,Brian Knight,427286
+630913,2020-09-25,Kyle Cody,621129,Texas Rangers,140,Brian Knight,427286
+631246,2020-09-25,Tyler Mahle,641816,Cincinnati Reds,113,Ryan Blakney,503502
+631246,2020-09-25,Jose Berrios,621244,Minnesota Twins,142,Ryan Blakney,503502
+631486,2020-09-25,Yu Darvish,506433,Chicago Cubs,112,Dan Bellino,483564
+631486,2020-09-25,Dylan Cease,656302,Chicago White Sox,145,Dan Bellino,483564
+631336,2020-09-25,Andrew Heaney,571760,Los Angeles Angels,108,Chris Guccione,427197
+631336,2020-09-25,Clayton Kershaw,477132,Los Angeles Dodgers,119,Chris Guccione,427197
+631167,2020-09-25,Yusei Kikuchi,579328,Seattle Mariners,136,Ted Barrett,427019
+631167,2020-09-25,Chris Bassitt,605135,Oakland Athletics,133,Ted Barrett,427019
+631193,2020-09-26,Trevor Rogers,669432,Miami Marlins,146,Jeff Nelson,427362
+631193,2020-09-26,Deivi Garcia,665620,New York Yankees,147,Jeff Nelson,427362
+630891,2020-09-26,John Means,607644,Baltimore Orioles,110,Carlos Torres,547380
+630891,2020-09-26,T.J. Zeuch,643615,Toronto Blue Jays,141,Carlos Torres,547380
+631385,2020-09-26,Matthew Boyd,571510,Detroit Tigers,116,Manny Gonzalez,484499
+631385,2020-09-26,Carlos Hernandez,672578,Kansas City Royals,118,Manny Gonzalez,484499
+630914,2020-09-26,Lance McCullers Jr.,621121,Houston Astros,117,Mike Muchlinski,483912
+630914,2020-09-26,Kyle Gibson,502043,Texas Rangers,140,Mike Muchlinski,483912
+630939,2020-09-26,Zack Wheeler,554430,Philadelphia Phillies,143,Larry Vanover,427520
+630939,2020-09-26,John Curtiss,595928,Tampa Bay Rays,139,Larry Vanover,427520
+630964,2020-09-26,Brandon Woodruff,605540,Milwaukee Brewers,158,Mike Estabrook,482631
+630964,2020-09-26,Adam Wainwright,425794,St. Louis Cardinals,138,Mike Estabrook,482631
+631537,2020-09-26,Joe Musgrove,605397,Pittsburgh Pirates,134,Bill Welke,427534
+631537,2020-09-26,Aaron Civale,650644,Cleveland Indians,114,Bill Welke,427534
+631245,2020-09-26,Luis Castillo,622491,Cincinnati Reds,113,D.J. Reyburn,482666
+631245,2020-09-26,Michael Pineda,501381,Minnesota Twins,142,D.J. Reyburn,482666
+630570,2020-09-26,Tanner Houck,656557,Boston Red Sox,111,Adam Beck,644760
+630570,2020-09-26,Tucker Davidson,656353,Atlanta Braves,144,Adam Beck,644760
+631487,2020-09-26,Jon Lester,452657,Chicago Cubs,112,Angel Hernandez,427220
+631487,2020-09-26,Dane Dunning,641540,Chicago White Sox,145,Angel Hernandez,427220
+630271,2020-09-26,German Marquez,608566,Colorado Rockies,115,Lance Barrett,483561
+630271,2020-09-26,Luke Weaver,596133,Arizona Diamondbacks,109,Lance Barrett,483561
+631337,2020-09-26,Julio Teheran,527054,Los Angeles Angels,108,Cory Blaser,484183
+631337,2020-09-26,Tony Gonsolin,664062,Los Angeles Dodgers,119,Cory Blaser,484183
+631016,2020-09-26,Zach Davies,605200,San Diego Padres,135,Bill Miller,427344
+631016,2020-09-26,Johnny Cueto,456501,San Francisco Giants,137,Bill Miller,427344
+631386,2020-09-27,Jordan Zimmermann,519455,Detroit Tigers,116,Erich Bacchus,623938
+631386,2020-09-27,Brady Singer,663903,Kansas City Royals,118,Erich Bacchus,623938
+630854,2020-09-27,Seth Lugo,607625,New York Mets,121,Junior Valentine,608093
+630854,2020-09-27,Austin Voth,608723,Washington Nationals,120,Junior Valentine,608093
+631002,2020-09-27,Adrian Morejon,670970,San Diego Padres,135,Rob Drake,427128
+631002,2020-09-27,Drew Smyly,592767,San Francisco Giants,137,Rob Drake,427128
+630915,2020-09-27,Chase De Jong,608328,Houston Astros,117,Marvin Hudson,427243
+630915,2020-09-27,Jordan Lyles,543475,Texas Rangers,140,Marvin Hudson,427243
+631188,2020-09-27,Jose Urena,570632,Miami Marlins,146,CB Bucknor,427044
+631188,2020-09-27,Clarke Schmidt,657376,New York Yankees,147,CB Bucknor,427044
+630858,2020-09-27,Keegan Akin,669211,Baltimore Orioles,110,John Bacon,545402
+630858,2020-09-27,Tanner Roark,543699,Toronto Blue Jays,141,John Bacon,545402
+630202,2020-09-27,Kyle Freeland,607536,Colorado Rockies,115,Nick Mahrley,521051
+630202,2020-09-27,Madison Bumgarner,518516,Arizona Diamondbacks,109,Nick Mahrley,521051
+631338,2020-09-27,Patrick Sandoval,663776,Los Angeles Angels,108,Malachi Moore,623946
+631338,2020-09-27,Victor Gonzalez,624647,Los Angeles Dodgers,119,Malachi Moore,623946
+631538,2020-09-27,JT Brubaker,664141,Pittsburgh Pirates,134,Ramon De Jesus,594151
+631538,2020-09-27,Cal Quantrill,615698,Cleveland Indians,114,Ramon De Jesus,594151
+631155,2020-09-27,Marco Gonzales,594835,Seattle Mariners,136,Adrian Johnson,482641
+631155,2020-09-27,Frankie Montas,593423,Oakland Athletics,133,Adrian Johnson,482641
+631244,2020-09-27,Sonny Gray,543243,Cincinnati Reds,113,Tim Timmons,427509
+631244,2020-09-27,Rich Hill,448179,Minnesota Twins,142,Tim Timmons,427509
+630945,2020-09-27,Aaron Nola,605400,Philadelphia Phillies,143,David Rackley,482663
+630945,2020-09-27,Josh Fleming,676596,Tampa Bay Rays,139,David Rackley,482663
+630573,2020-09-27,Nick Pivetta,601713,Boston Red Sox,111,Marty Foster,427168
+630573,2020-09-27,Bryse Wilson,669060,Atlanta Braves,144,Marty Foster,427168
+631488,2020-09-27,Adbert Alzolay,640470,Chicago Cubs,112,Will Little,504381
+631488,2020-09-27,Reynaldo Lopez,625643,Chicago White Sox,145,Will Little,504381
+630965,2020-09-27,Brett Anderson,474463,Milwaukee Brewers,158,Mark Carlson,427053
+630965,2020-09-27,Austin Gomber,596295,St. Louis Cardinals,138,Mark Carlson,427053
