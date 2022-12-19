@@ -1683,7 +1683,7 @@ bets_table <- #read.csv("Soccer Machine/upcoming_bets.csv") %>%
            Pick_Odds > -220 &
            Pick_WinProb >= 0.3 &
            bet_type_full != 'Alternate Total - 1.5' &
-           gamedate <= Sys.Date() + 6) %>%
+           gamedate <= Sys.Date() + 7) %>%
   arrange(gamedate, ID, desc(Kelly_Criteria)) %>% 
   group_by(ID) %>% 
   mutate(KC_Rank = row_number()) %>% 

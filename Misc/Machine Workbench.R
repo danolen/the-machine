@@ -4,7 +4,7 @@ library(tidyverse)
 
 library(baseballr)
 
-baseballr::mlb_probables(game_pk = 715718)
+baseballr::mlb_probables(game_pk = 663178)
 
 today_pks <- get_game_pks_mlb(Sys.Date())
 tomorrow_pks <- get_game_pks_mlb(Sys.Date()+1)
