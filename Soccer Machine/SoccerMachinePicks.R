@@ -28,6 +28,7 @@ ger_url <- "https://www.bovada.lv/services/sports/event/v2/events/A/description/
 fra_url <- "https://www.bovada.lv/services/sports/event/v2/events/A/description/soccer/europe/france/ligue-1"
 ita_url <- "https://www.bovada.lv/services/sports/event/v2/events/A/description/soccer/europe/italy/serie-a"
 champ_url <- "https://www.bovada.lv/services/sports/event/v2/events/A/description/soccer/europe/england/championship"
+mex_url <- "https://www.bovada.lv/services/sports/event/v2/events/A/description/soccer/north-america/mexico/liga-mx-clausura"
 
 
 # mls_odds <- fromJSON(mls_url) %>%
@@ -341,13 +342,58 @@ champ_odds <- fromJSON(champ_url) %>%
   filter((AUN.Odds >= 100 | AUN.Odds <= -100) & (HOY.Odds >= 100 | HOY.Odds <= -100)) %>%
   select(-D.SpreadTotal)
 
+mex_odds <- fromJSON(mex_url) %>%
+  .[[2]] %>%
+  .[[1]] %>%
+  select(description, link, displayGroups) %>%
+  mutate(gamedate = as.Date(str_sub(link, -12, -5), format = "%Y%m%d")) %>%
+  separate(description, c("HomeTeam", "AwayTeam"), " vs ") %>%
+  select(gamedate, HomeTeam, AwayTeam, displayGroups) %>%
+  unnest(displayGroups) %>%
+  filter(description %in% c("Game Lines", "Alternate Lines", "Both Teams to Score")) %>%
+  select(gamedate, HomeTeam, AwayTeam, markets) %>%
+  unnest(markets) %>%
+  filter(period$live == FALSE & period$description == "Regulation Time") %>%
+  mutate(bet_type = description) %>%
+  select(gamedate, HomeTeam, AwayTeam, bet_type, outcomes) %>%
+  unnest(outcomes) %>%
+  filter(is.na(price$handicap) == TRUE | (is.na(price$handicap) == FALSE & is.na(price$handicap2) == TRUE)) %>%
+  mutate(type = if_else(type == "X",
+                        if_else(description == "Yes", "Y","N"),
+                        type)) %>%
+  mutate(Odds = as.numeric(price$american),
+         SpreadTotal = price$handicap,
+         type = if_else(type == "H" | type == "O" | type == "Y", "HOY",
+                        if_else(type == "D", "D", "AUN"))) %>%
+  mutate(Odds = if_else(is.na(Odds), 100, Odds)) %>%
+  select(gamedate, HomeTeam, AwayTeam, bet_type, type, Odds, any_of("SpreadTotal")) %>%
+  mutate(HomeTeam = iconv(HomeTeam, from = 'UTF-8', to = 'ASCII//TRANSLIT'),
+         AwayTeam = iconv(AwayTeam, from = 'UTF-8', to = 'ASCII//TRANSLIT'),
+         bet_type = iconv(bet_type, from = 'UTF-8', to = 'ASCII//TRANSLIT'),
+         bet_type = case_when(bet_type == "Spread" & type == "HOY" ~ paste0("Alternate Spread - Home: ", as.numeric(SpreadTotal)),
+                              bet_type == "Spread" & type == "AUN" ~ paste0("Alternate Spread - Home: ", as.numeric(SpreadTotal)*-1),
+                              bet_type == "Total Goals O/U" ~ paste0("Alternate Total - ", abs(as.numeric(SpreadTotal))),
+                              grepl("Total Goals O/U - ", bet_type) ~ paste0(bet_type, " - ", abs(as.numeric(SpreadTotal))),
+                              TRUE ~ bet_type)) %>%
+  reshape2::melt(id.vars = c("gamedate", "HomeTeam", "AwayTeam", "bet_type", "type")) %>%
+  mutate(name = paste0(type, ".", variable)) %>%
+  select(-type, -variable) %>%
+  mutate(value = as.numeric(value)) %>%
+  reshape2::dcast(gamedate + HomeTeam + AwayTeam + bet_type ~ name, fun.aggregate = mean) %>%
+  mutate(AUN.Odds = round(AUN.Odds, 0),
+         HOY.Odds = round(HOY.Odds, 0),
+         D.Odds = round(D.Odds, 0)) %>%
+  filter((AUN.Odds >= 100 | AUN.Odds <= -100) & (HOY.Odds >= 100 | HOY.Odds <= -100)) %>%
+  select(-D.SpreadTotal)
+
 bovada_odds <- bind_rows(epl_odds, 
                          esp_odds,
                          # ger_odds,
                          ita_odds,
                          fra_odds,
                          # mls_odds,
-                         champ_odds
+                         champ_odds,
+                         mex_odds
                          )
 
 club_names <- read_excel("Soccer Machine/Club Names.xlsx")
@@ -421,9 +467,24 @@ Champ_23 <- load_match_results(country = "ENG", gender = "M", season_end_year = 
          xG.1 = as.numeric(xG.1),
          Season = paste0(Season-1,"-",Season))
 
+Mex_23 <- load_match_results(country = "MEX", gender = "M", season_end_year = 2023, tier = "1st") %>% 
+  select(Day, Date, Time, Home, Home_xG, HomeGoals, AwayGoals, Away_xG, Away, Competition_Name, Season_End_Year) %>% 
+  rename(xG = Home_xG,
+         Home_Score = HomeGoals,
+         Away_Score = AwayGoals,
+         xG.1 = Away_xG,
+         League = Competition_Name,
+         Season = Season_End_Year) %>%
+  mutate(xG = as.numeric(xG),
+         Home_Score = as.numeric(Home_Score),
+         Away_Score = as.numeric(Away_Score),
+         xG.1 = as.numeric(xG.1),
+         Season = paste0(Season-1,"-",Season))
+
 fixtures <- rbind(Big5_22, Big5_23
                   , mls_22
                   , Champ_23
+                  , Mex_23
                   ) 
   
 # fixtures$Date <- as.Date(fixtures$Date)
@@ -1896,7 +1957,8 @@ bets_table2 <- bind_rows(bets_table
                                  League == 'Serie A' ~ 5,
                                  League == 'MLS' ~ 6,
                                  League == 'EFL Championship' ~ 7,
-                                 League == '--' ~ 8))
+                                 League == 'Liga MX' ~ 8,
+                                 League == '--' ~ 9))
 
 df_html_bets <- if_else(nrow(bets_table2)==0,
                         "<b>At the odds currently available, no bets are recommended</b>",
@@ -1913,7 +1975,7 @@ Email[["bcc"]] = paste("jamesorler@gmail.com", "asnolen@crimson.ua.edu", "jamest
                        "ralphmstudley@gmail.com", "johnpavese@gmail.com", "amishra1293@gmail.com", sep = ";", collapse = NULL)
 Email[["subject"]] = paste0("Soccer Machine Picks: ", Sys.Date())
 Email[["HTMLbody"]] = sprintf("
-The Machine's picks for upcoming soccer matches are in! The Machine currently offers picks for the Big 5 European Leagues plus MLS and the EFL Championship. The attached documents contains all of the pertinent betting information for the upcoming matches, as well as a glossary. Good luck!
+The Machine's picks for upcoming soccer matches are in! The Machine currently offers picks for the Big 5 European Leagues plus MLS, the EFL Championship, and starting in January, Liga MX!. The attached documents contains all of the pertinent betting information for the upcoming matches, as well as a glossary. Good luck!
 </p><br></p>
 UPDATE: The Machine has updated the way that it grades bets, and will now take a more targeted approach. Bets are now graded from A+ down to F. The table below shows the historical results for each bet grade along with a suggested bet size (in terms of units). The bets that will be recommended going forward will be graded B or better. This is a work in progress. The Machine used to only recommend bets with positive odds. Now the Machine will recommend odds all the way down to -220. I still do not like betting big favorites, and would recommend parlaying some of these big negative odds bets with something else.
 </p><br></p>
