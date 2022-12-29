@@ -1975,7 +1975,7 @@ Email[["bcc"]] = paste("jamesorler@gmail.com", "asnolen@crimson.ua.edu", "jamest
                        "ralphmstudley@gmail.com", "johnpavese@gmail.com", "amishra1293@gmail.com", sep = ";", collapse = NULL)
 Email[["subject"]] = paste0("Soccer Machine Picks: ", Sys.Date())
 Email[["HTMLbody"]] = sprintf("
-The Machine's picks for upcoming soccer matches are in! The Machine currently offers picks for the Big 5 European Leagues plus MLS, the EFL Championship, and starting in January, Liga MX!. The attached documents contains all of the pertinent betting information for the upcoming matches, as well as a glossary. Good luck!
+The Machine's picks for upcoming soccer matches are in! The Machine currently offers picks for the Big 5 European Leagues plus MLS, the EFL Championship, and starting in January, Liga MX! The attached documents contains all of the pertinent betting information for the upcoming matches, as well as a glossary. Good luck!
 </p><br></p>
 UPDATE: The Machine has updated the way that it grades bets, and will now take a more targeted approach. Bets are now graded from A+ down to F. The table below shows the historical results for each bet grade along with a suggested bet size (in terms of units). The bets that will be recommended going forward will be graded B or better. This is a work in progress. The Machine used to only recommend bets with positive odds. Now the Machine will recommend odds all the way down to -220. I still do not like betting big favorites, and would recommend parlaying some of these big negative odds bets with something else.
 </p><br></p>

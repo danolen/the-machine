@@ -12,7 +12,7 @@ The Machine currently offers betting analysis for the following sports and leagu
   - Spanish La Liga
   - French Ligue 1
   - Italian Serie A
-  - Mexican Liga MX - Coming Soon
+  - Mexican Liga MX
   
 ## Baseball - Coming Soon
   - Major League Baseball
