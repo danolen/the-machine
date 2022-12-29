@@ -90,6 +90,7 @@ dupe_SPs_20 <- daily_pitchers_2020 %>%
   left_join(daily_pitchers_2020 %>% distinct(Name, Team))
 daily_pitchers_2020 <- daily_pitchers_2020 %>% 
   mutate(Name = case_when(Name == "Luis Garcia" & Team == "Astros" ~ "Luis Garcia (HOU)",
+                          Name == "Hyun-Jin Ryu" ~ "Hyun Jin Ryu",
                           TRUE ~ Name))
 
 ##2021
@@ -132,6 +133,7 @@ dupe_SPs_21 <- daily_pitchers_2021 %>%
   left_join(daily_pitchers_2021 %>% distinct(Name, Team))
 daily_pitchers_2021 <- daily_pitchers_2021 %>% 
   mutate(Name = case_when(Name == "Luis Garcia" & Team == "HOU" ~ "Luis Garcia (HOU)",
+                          Name == "Hyun-Jin Ryu" ~ "Hyun Jin Ryu",
                           TRUE ~ Name))
 
 ##2022
@@ -176,6 +178,7 @@ daily_pitchers_2022 <- daily_pitchers_2022 %>%
   mutate(Name = case_when(Name == "Luis Garcia" & Team == "HOU" ~ "Luis Garcia (HOU)",
                           Name == "Luis Castillo" & Team == "DET" ~ "Luis Castillo (DET)",
                           Name == "Luis Ortiz" & Team == "SFG" ~ "Luis Ortiz (SFG)",
+                          Name == "Hyun-Jin Ryu" ~ "Hyun Jin Ryu",
                           TRUE ~ Name))
 
 ## Load Game scorelines
@@ -418,7 +421,12 @@ gamescores20 <- scores_20 %>%
                    "officialDate" = "game_date",
                    "away_team_name" = "team")) %>% 
   rename(AwaySP_fullName = fullName,
-         AwaySP_id = id)
+         AwaySP_id = id)%>% 
+  mutate(officialDate = as.Date(officialDate)) %>% 
+  filter(!is.na(HomeSP_fullName) & !is.na(AwaySP_fullName)) %>% 
+  left_join(daily_pitchers_2020, by = c("officialDate" = "Date", "HomeSP_fullName" = "Name")) %>% 
+  left_join(daily_pitchers_2020, by = c("officialDate" = "Date", "AwaySP_fullName" = "Name"), suffix = c("_HomeSP", "_AwaySP"))
+
 
 gamescores21 <- scores_21 %>% 
   left_join(SPs21 %>% 
@@ -434,7 +442,12 @@ gamescores21 <- scores_21 %>%
                    "officialDate" = "game_date",
                    "away_team_name" = "team")) %>% 
   rename(AwaySP_fullName = fullName,
-         AwaySP_id = id)
+         AwaySP_id = id )%>% 
+  mutate(officialDate = as.Date(officialDate)) %>% 
+  filter(!is.na(HomeSP_fullName) & !is.na(AwaySP_fullName)) %>% 
+  left_join(daily_pitchers_2021, by = c("officialDate" = "Date", "HomeSP_fullName" = "Name")) %>% 
+  left_join(daily_pitchers_2021, by = c("officialDate" = "Date", "AwaySP_fullName" = "Name"), suffix = c("_HomeSP", "_AwaySP"))
+
 
 gamescores22 <- scores_22 %>% 
   left_join(SPs22 %>% 
@@ -450,7 +463,11 @@ gamescores22 <- scores_22 %>%
                    "officialDate" = "game_date",
                    "away_team_name" = "team")) %>% 
   rename(AwaySP_fullName = fullName,
-         AwaySP_id = id)
+         AwaySP_id = id) %>% 
+  mutate(officialDate = as.Date(officialDate)) %>% 
+  filter(!is.na(HomeSP_fullName) & !is.na(AwaySP_fullName)) %>% 
+  left_join(daily_pitchers_2022, by = c("officialDate" = "Date", "HomeSP_fullName" = "Name")) %>% 
+  left_join(daily_pitchers_2022, by = c("officialDate" = "Date", "AwaySP_fullName" = "Name"), suffix = c("_HomeSP", "_AwaySP"))
 
 
 ## Load Game Logs

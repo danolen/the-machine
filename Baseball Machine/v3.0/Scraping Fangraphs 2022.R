@@ -23,8 +23,8 @@ L7_team_batting <- url %>%
 L7_batting_file <- read.csv("Baseball Machine/Daily Files/2022/team_batting_L7_2022.csv")
 
 i <- 1
-startdate <- as.Date(max(L7_batting_file$Date))-6
-enddate <- as.Date(max(L7_batting_file$Date))
+startdate <- as.Date('2022-04-09')-7
+enddate <- as.Date('2022-04-09')-1
 urls <- list()
 while (enddate < as.Date('2022-10-05')) {
   url = paste0('https://www.fangraphs.com/leaders.aspx?pos=all&stats=bat&lg=all&qual=0&type=c,6,11,12,13,21,34,35,40,41,23,37,38,50,61,305,111,203,199,58,43,44,45,47,102,110,308,311&season=2022&month=1000&season1=2022&ind=0&team=0,ts&rost=0&age=0&filter=&players=0&startdate=',startdate,'&enddate=',enddate)
@@ -35,7 +35,7 @@ while (enddate < as.Date('2022-10-05')) {
 }
 
 tbl <- list()
-dates <- as.Date(max(L7_batting_file$Date))+1
+dates <- as.Date('2022-04-09')
 j = 1
 for (j in seq_along(urls)) {
   tbl[[j]] = urls[[j]] %>%
@@ -47,6 +47,7 @@ for (j in seq_along(urls)) {
     .[-c(1,3),] %>%
     .[,-1] %>% row_to_names(row_number = 1)
   tbl[[j]]$Date = dates
+  print(j)
   j = j+1
   dates = dates+1
 }
@@ -72,8 +73,8 @@ write.csv(team_batting_L7, "Baseball Machine/Daily Files/2022/team_batting_L7_20
 L14_batting_file <- read.csv("Baseball Machine/Daily Files/2022/team_batting_L14_2022.csv")
 
 i <- 1
-startdate <- as.Date(max(L14_batting_file$Date))-6
-enddate <- as.Date(max(L14_batting_file$Date))
+startdate <- as.Date('2022-04-09')-14
+enddate <- as.Date('2022-04-09')-1
 urls <- list()
 while (enddate < as.Date('2022-10-05')) {
   url = paste0('https://www.fangraphs.com/leaders.aspx?pos=all&stats=bat&lg=all&qual=0&type=c,6,11,12,13,21,34,35,40,41,23,37,38,50,61,305,111,203,199,58,43,44,45,47,102,110,308,311&season=2022&month=1000&season1=2022&ind=0&team=0,ts&rost=0&age=0&filter=&players=0&startdate=',startdate,'&enddate=',enddate)
@@ -84,7 +85,7 @@ while (enddate < as.Date('2022-10-05')) {
 }
 
 tbl <- list()
-dates <- as.Date(max(L14_batting_file$Date))+1
+dates <- as.Date('2022-04-09')
 j = 1
 for (j in seq_along(urls)) {
   tbl[[j]] = urls[[j]] %>%
@@ -96,6 +97,7 @@ for (j in seq_along(urls)) {
     .[-c(1,3),] %>%
     .[,-1] %>% row_to_names(row_number = 1)
   tbl[[j]]$Date = dates
+  print(j)
   j = j+1
   dates = dates+1
 }
@@ -121,8 +123,8 @@ write.csv(team_batting_L14, "Baseball Machine/Daily Files/2022/team_batting_L14_
 L30_batting_file <- read.csv("Baseball Machine/Daily Files/2022/team_batting_L30_2022.csv")
 
 i <- 1
-startdate <- as.Date(max(L30_batting_file$Date))-6
-enddate <- as.Date(max(L30_batting_file$Date))
+startdate <- as.Date('2022-04-09')-30
+enddate <- as.Date('2022-04-09')-1
 urls <- list()
 while (enddate < as.Date('2022-10-05')) {
   url = paste0('https://www.fangraphs.com/leaders.aspx?pos=all&stats=bat&lg=all&qual=0&type=c,6,11,12,13,21,34,35,40,41,23,37,38,50,61,305,111,203,199,58,43,44,45,47,102,110,308,311&season=2022&month=1000&season1=2022&ind=0&team=0,ts&rost=0&age=0&filter=&players=0&startdate=',startdate,'&enddate=',enddate)
@@ -133,7 +135,7 @@ while (enddate < as.Date('2022-10-05')) {
 }
 
 tbl <- list()
-dates <- as.Date(max(L30_batting_file$Date))+1
+dates <- as.Date('2022-04-09')
 j = 1
 for (j in seq_along(urls)) {
   tbl[[j]] = urls[[j]] %>%
@@ -145,6 +147,7 @@ for (j in seq_along(urls)) {
     .[-c(1,3),] %>%
     .[,-1] %>% row_to_names(row_number = 1)
   tbl[[j]]$Date = dates
+  print(j)
   j = j+1
   dates = dates+1
 }
@@ -170,8 +173,8 @@ write.csv(team_batting_L30, "Baseball Machine/Daily Files/2022/team_batting_L30_
 s2d_batting_file <- read.csv("Baseball Machine/Daily Files/2022/team_batting_s2d_2022.csv")
 
 i <- 1
-startdate <- as.Date(max(s2d_batting_file$Date))-6
-enddate <- as.Date(max(s2d_batting_file$Date))
+startdate <- as.Date('2022-04-09')-2
+enddate <- as.Date('2022-04-09')-1
 urls <- list()
 while (enddate < as.Date('2022-10-05')) {
   url = paste0('https://www.fangraphs.com/leaders.aspx?pos=all&stats=bat&lg=all&qual=0&type=c,6,11,12,13,21,34,35,40,41,23,37,38,50,61,305,111,203,199,58,43,44,45,47,102,110,308,311&season=2022&month=1000&season1=2022&ind=0&team=0,ts&rost=0&age=0&filter=&players=0&startdate=',startdate,'&enddate=',enddate)
@@ -181,7 +184,7 @@ while (enddate < as.Date('2022-10-05')) {
 }
 
 tbl <- list()
-dates <- as.Date(max(s2d_batting_file$Date))+1
+dates <- as.Date('2022-04-09')
 j = 1
 for (j in seq_along(urls)) {
   tbl[[j]] = urls[[j]] %>%
@@ -193,6 +196,7 @@ for (j in seq_along(urls)) {
     .[-c(1,3),] %>%
     .[,-1] %>% row_to_names(row_number = 1)
   tbl[[j]]$Date = dates
+  print(j)
   j = j+1
   dates = dates+1
 }
@@ -266,8 +270,8 @@ write.csv(pitchers_s2d, "Baseball Machine/Daily Files/2022/pitchers_s2d_2022.csv
 L7_bullpen_file <- read.csv("Baseball Machine/Daily Files/2022/team_bullpen_L7_2022.csv")
 
 i <- 1
-startdate <- as.Date(max(L7_bullpen_file$Date))-6
-enddate <- as.Date(max(L7_bullpen_file$Date))
+startdate <- as.Date('2022-04-09')-7
+enddate <- as.Date('2022-04-09')-1
 urls <- list()
 while (enddate < as.Date('2022-10-05')) {
   url = paste0('https://www.fangraphs.com/leaders.aspx?pos=all&stats=rel&lg=all&qual=0&type=c%2C7%2C13%2C120%2C121%2C40%2C43%2C44%2C48%2C47%2C49%2C51%2C322%2C42%2C6%2C45%2C62%2C122%2C59%2C105%2C112%2C113%2C111%2C325%2C328&season=2022&month=1000&season1=2022&ind=0&team=0%2Cts&rost=0&age=0&filter=&players=0&startdate=',startdate,'&enddate=',enddate)
@@ -278,7 +282,7 @@ while (enddate < as.Date('2022-10-05')) {
 }
 
 tbl <- list()
-dates <- as.Date(max(L7_bullpen_file$Date))+1
+dates <- as.Date('2022-04-09')
 j = 1
 for (j in seq_along(urls)) {
   tbl[[j]] = urls[[j]] %>%
@@ -290,6 +294,7 @@ for (j in seq_along(urls)) {
     .[-c(1,3),] %>%
     .[,-1] %>% row_to_names(row_number = 1)
   tbl[[j]]$Date = dates
+  print(j)
   j = j+1
   dates = dates+1
 }
@@ -315,8 +320,8 @@ write.csv(team_bullpen_L7, "Baseball Machine/Daily Files/2022/team_bullpen_L7_20
 L14_bullpen_file <- read.csv("Baseball Machine/Daily Files/2022/team_bullpen_L14_2022.csv")
 
 i <- 1
-startdate <- as.Date(max(L14_bullpen_file$Date))-6
-enddate <- as.Date(max(L14_bullpen_file$Date))
+startdate <- as.Date('2022-04-09')-14
+enddate <- as.Date('2022-04-09')-1
 urls <- list()
 while (enddate < as.Date('2022-10-05')) {
   url = paste0('https://www.fangraphs.com/leaders.aspx?pos=all&stats=rel&lg=all&qual=0&type=c%2C7%2C13%2C120%2C121%2C40%2C43%2C44%2C48%2C47%2C49%2C51%2C322%2C42%2C6%2C45%2C62%2C122%2C59%2C105%2C112%2C113%2C111%2C325%2C328&season=2022&month=1000&season1=2022&ind=0&team=0%2Cts&rost=0&age=0&filter=&players=0&startdate=',startdate,'&enddate=',enddate)
@@ -327,7 +332,7 @@ while (enddate < as.Date('2022-10-05')) {
 }
 
 tbl <- list()
-dates <- as.Date(max(L14_bullpen_file$Date))+1
+dates <- as.Date('2022-04-09')
 j = 1
 for (j in seq_along(urls)) {
   tbl[[j]] = urls[[j]] %>%
@@ -339,6 +344,7 @@ for (j in seq_along(urls)) {
     .[-c(1,3),] %>%
     .[,-1] %>% row_to_names(row_number = 1)
   tbl[[j]]$Date = dates
+  print(j)
   j = j+1
   dates = dates+1
 }
@@ -364,8 +370,8 @@ write.csv(team_bullpen_L14, "Baseball Machine/Daily Files/2022/team_bullpen_L14_
 L30_bullpen_file <- read.csv("Baseball Machine/Daily Files/2022/team_bullpen_L30_2022.csv")
 
 i <- 1
-startdate <- as.Date(max(L30_bullpen_file$Date))-6
-enddate <- as.Date(max(L30_bullpen_file$Date))
+startdate <- as.Date('2022-04-09')-30
+enddate <- as.Date('2022-04-09')-1
 urls <- list()
 while (enddate < as.Date('2022-10-05')) {
   url = paste0('https://www.fangraphs.com/leaders.aspx?pos=all&stats=rel&lg=all&qual=0&type=c%2C7%2C13%2C120%2C121%2C40%2C43%2C44%2C48%2C47%2C49%2C51%2C322%2C42%2C6%2C45%2C62%2C122%2C59%2C105%2C112%2C113%2C111%2C325%2C328&season=2022&month=1000&season1=2022&ind=0&team=0%2Cts&rost=0&age=0&filter=&players=0&startdate=',startdate,'&enddate=',enddate)
@@ -376,7 +382,7 @@ while (enddate < as.Date('2022-10-05')) {
 }
 
 tbl <- list()
-dates <- as.Date(max(L30_bullpen_file$Date))
+dates <- as.Date('2022-04-09')
 j = 1
 for (j in seq_along(urls)) {
   tbl[[j]] = urls[[j]] %>%
@@ -388,6 +394,7 @@ for (j in seq_along(urls)) {
     .[-c(1,3),] %>%
     .[,-1] %>% row_to_names(row_number = 1)
   tbl[[j]]$Date = dates
+  print(j)
   j = j+1
   dates = dates+1
 }
@@ -413,8 +420,8 @@ write.csv(team_bullpen_L30, "Baseball Machine/Daily Files/2022/team_bullpen_L30_
 s2d_bullpen_file <- read.csv("Baseball Machine/Daily Files/2022/team_bullpen_s2d_2022.csv")
 
 i <- 1
-startdate <- as.Date(max(s2d_bullpen_file$Date))-6
-enddate <- as.Date(max(s2d_bullpen_file$Date))
+startdate <- as.Date('2022-04-09')-2
+enddate <- as.Date('2022-04-09')-1
 urls <- list()
 while (enddate < as.Date('2022-10-05')) {
   url = paste0('https://www.fangraphs.com/leaders.aspx?pos=all&stats=rel&lg=all&qual=0&type=c%2C7%2C13%2C120%2C121%2C40%2C43%2C44%2C48%2C47%2C49%2C51%2C322%2C42%2C6%2C45%2C62%2C122%2C59%2C105%2C112%2C113%2C111%2C325%2C328&season=2022&month=1000&season1=2022&ind=0&team=0%2Cts&rost=0&age=0&filter=&players=0&startdate=',startdate,'&enddate=',enddate)
@@ -424,7 +431,7 @@ while (enddate < as.Date('2022-10-05')) {
 }
 
 tbl <- list()
-dates <- as.Date(max(s2d_bullpen_file$Date))+1
+dates <- as.Date('2022-04-09')
 j = 1
 for (j in seq_along(urls)) {
   tbl[[j]] = urls[[j]] %>%
@@ -436,6 +443,7 @@ for (j in seq_along(urls)) {
     .[-c(1,3),] %>%
     .[,-1] %>% row_to_names(row_number = 1)
   tbl[[j]]$Date = dates
+  print(j)
   j = j+1
   dates = dates+1
 }
