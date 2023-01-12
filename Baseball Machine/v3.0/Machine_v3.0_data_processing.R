@@ -21,7 +21,12 @@ team_batting_s2d_2019$Date <- as.Date(team_batting_s2d_2019$Date)
 daily_team_batting_2019 <- full_join(team_batting_L7_2019, team_batting_L14_2019, by = c("Team", "Date"), suffix = c("_L7", "_L14")) %>%
   full_join(team_batting_L30_2019, by = c("Team", "Date"))
 colnames(daily_team_batting_2019)[57:83] <- paste0(colnames(daily_team_batting_2019)[57:83],'_L30')
-daily_team_batting_2019 <- full_join(daily_team_batting_2019, team_batting_s2d_2019, by = c("Team", "Date"))
+daily_team_batting_2019 <- full_join(daily_team_batting_2019, team_batting_s2d_2019, by = c("Team", "Date")) %>% 
+  left_join(team_names %>% 
+              select(Full.Name, FG),
+            by = c("Team" = "FG")) %>% 
+  mutate(Team = Full.Name) %>% 
+  select(-Full.Name)
 
 team_bullpen_L7_2019 <- read.csv("Baseball Machine/Daily Files/2019/team_bullpen_L7_2019.csv")
 team_bullpen_L7_2019$Date <- as.Date(team_bullpen_L7_2019$Date)
@@ -35,7 +40,12 @@ team_bullpen_s2d_2019$Date <- as.Date(team_bullpen_s2d_2019$Date)
 daily_team_bullpen_2019 <- full_join(team_bullpen_L7_2019, team_bullpen_L14_2019, by = c("Team", "Date"), suffix = c("_L7", "_L14")) %>%
   full_join(team_bullpen_L30_2019, by = c("Team", "Date"))
 colnames(daily_team_bullpen_2019)[51:74] <- paste0(colnames(daily_team_bullpen_2019)[51:74],'_L30')
-daily_team_bullpen_2019 <- full_join(daily_team_bullpen_2019, team_bullpen_s2d_2019, by = c("Team", "Date"))
+daily_team_bullpen_2019 <- full_join(daily_team_bullpen_2019, team_bullpen_s2d_2019, by = c("Team", "Date")) %>% 
+  left_join(team_names %>% 
+              select(Full.Name, FG),
+            by = c("Team" = "FG")) %>% 
+  mutate(Team = Full.Name) %>% 
+  select(-Full.Name)
 
 daily_pitchers_2019 <- read.csv("Baseball Machine/Daily Files/2019/pitchers_s2d_2019.csv")
 daily_pitchers_2019$Date <- as.Date(daily_pitchers_2019$Date)
@@ -52,7 +62,9 @@ daily_pitchers_2019 <- daily_pitchers_2019 %>%
 
 ##2020
 
-team_batting_L7_2020 <- read.csv("Baseball Machine/Daily Files/2020/team_batting_L7_2020.csv")
+team_batting_L7_2020 <- read.csv("Baseball Machine/Daily Files/2020/team_batting_L7_2020.csv") %>% 
+  FindReplace(Var = "Team", replaceData = team_names, 
+              from = "BR", to = "FG")
 team_batting_L7_2020$Date <- as.Date(team_batting_L7_2020$Date)
 team_batting_L14_2020 <- read.csv("Baseball Machine/Daily Files/2020/team_batting_L14_2020.csv")
 team_batting_L14_2020$Date <- as.Date(team_batting_L14_2020$Date)
@@ -64,7 +76,12 @@ team_batting_s2d_2020$Date <- as.Date(team_batting_s2d_2020$Date)
 daily_team_batting_2020 <- full_join(team_batting_L7_2020, team_batting_L14_2020, by = c("Team", "Date"), suffix = c("_L7", "_L14")) %>%
   full_join(team_batting_L30_2020, by = c("Team", "Date"))
 colnames(daily_team_batting_2020)[57:83] <- paste0(colnames(daily_team_batting_2020)[57:83],'_L30')
-daily_team_batting_2020 <- full_join(daily_team_batting_2020, team_batting_s2d_2020, by = c("Team", "Date"))
+daily_team_batting_2020 <- full_join(daily_team_batting_2020, team_batting_s2d_2020, by = c("Team", "Date")) %>% 
+  left_join(team_names %>% 
+              select(Full.Name, FG),
+            by = c("Team" = "FG")) %>% 
+  mutate(Team = Full.Name) %>% 
+  select(-Full.Name)
 
 team_bullpen_L7_2020 <- read.csv("Baseball Machine/Daily Files/2020/team_bullpen_L7_2020.csv")
 team_bullpen_L7_2020$Date <- as.Date(team_bullpen_L7_2020$Date)
@@ -78,7 +95,12 @@ team_bullpen_s2d_2020$Date <- as.Date(team_bullpen_s2d_2020$Date)
 daily_team_bullpen_2020 <- full_join(team_bullpen_L7_2020, team_bullpen_L14_2020, by = c("Team", "Date"), suffix = c("_L7", "_L14")) %>%
   full_join(team_bullpen_L30_2020, by = c("Team", "Date"))
 colnames(daily_team_bullpen_2020)[51:74] <- paste0(colnames(daily_team_bullpen_2020)[51:74],'_L30')
-daily_team_bullpen_2020 <- full_join(daily_team_bullpen_2020, team_bullpen_s2d_2020, by = c("Team", "Date"))
+daily_team_bullpen_2020 <- full_join(daily_team_bullpen_2020, team_bullpen_s2d_2020, by = c("Team", "Date")) %>% 
+  left_join(team_names %>% 
+              select(Full.Name, FG),
+            by = c("Team" = "FG")) %>% 
+  mutate(Team = Full.Name) %>% 
+  select(-Full.Name)
 
 daily_pitchers_2020 <- read.csv("Baseball Machine/Daily Files/2020/pitchers_s2d_2020.csv")
 daily_pitchers_2020$Date <- as.Date(daily_pitchers_2020$Date)
@@ -107,7 +129,12 @@ team_batting_s2d_2021$Date <- as.Date(team_batting_s2d_2021$Date)
 daily_team_batting_2021 <- full_join(team_batting_L7_2021, team_batting_L14_2021, by = c("Team", "Date"), suffix = c("_L7", "_L14")) %>%
   full_join(team_batting_L30_2021, by = c("Team", "Date"))
 colnames(daily_team_batting_2021)[57:83] <- paste0(colnames(daily_team_batting_2021)[57:83],'_L30')
-daily_team_batting_2021 <- full_join(daily_team_batting_2021, team_batting_s2d_2021, by = c("Team", "Date"))
+daily_team_batting_2021 <- full_join(daily_team_batting_2021, team_batting_s2d_2021, by = c("Team", "Date")) %>% 
+  left_join(team_names %>% 
+              select(Full.Name, BR),
+            by = c("Team" = "BR")) %>% 
+  mutate(Team = Full.Name) %>% 
+  select(-Full.Name)
 
 team_bullpen_L7_2021 <- read.csv("Baseball Machine/Daily Files/2021/team_bullpen_L7_2021.csv")
 team_bullpen_L7_2021$Date <- as.Date(team_bullpen_L7_2021$Date)
@@ -121,7 +148,12 @@ team_bullpen_s2d_2021$Date <- as.Date(team_bullpen_s2d_2021$Date)
 daily_team_bullpen_2021 <- full_join(team_bullpen_L7_2021, team_bullpen_L14_2021, by = c("Team", "Date"), suffix = c("_L7", "_L14")) %>%
   full_join(team_bullpen_L30_2021, by = c("Team", "Date"))
 colnames(daily_team_bullpen_2021)[51:74] <- paste0(colnames(daily_team_bullpen_2021)[51:74],'_L30')
-daily_team_bullpen_2021 <- full_join(daily_team_bullpen_2021, team_bullpen_s2d_2021, by = c("Team", "Date"))
+daily_team_bullpen_2021 <- full_join(daily_team_bullpen_2021, team_bullpen_s2d_2021, by = c("Team", "Date")) %>% 
+  left_join(team_names %>% 
+              select(Full.Name, BR),
+            by = c("Team" = "BR")) %>% 
+  mutate(Team = Full.Name) %>% 
+  select(-Full.Name)
 
 daily_pitchers_2021 <- read.csv("Baseball Machine/Daily Files/2021/pitchers_s2d_2021.csv")
 daily_pitchers_2021$Date <- as.Date(daily_pitchers_2021$Date)
@@ -133,6 +165,7 @@ dupe_SPs_21 <- daily_pitchers_2021 %>%
   left_join(daily_pitchers_2021 %>% distinct(Name, Team))
 daily_pitchers_2021 <- daily_pitchers_2021 %>% 
   mutate(Name = case_when(Name == "Luis Garcia" & Team == "HOU" ~ "Luis Garcia (HOU)",
+                          Name == "Javy Guerra" & Team == "WSN" ~ "Javy Guerra (WSN)",
                           Name == "Hyun-Jin Ryu" ~ "Hyun Jin Ryu",
                           TRUE ~ Name))
 
@@ -150,7 +183,12 @@ team_batting_s2d_2022$Date <- as.Date(team_batting_s2d_2022$Date)
 daily_team_batting_2022 <- full_join(team_batting_L7_2022, team_batting_L14_2022, by = c("Team", "Date"), suffix = c("_L7", "_L14")) %>%
   full_join(team_batting_L30_2022, by = c("Team", "Date"))
 colnames(daily_team_batting_2022)[57:83] <- paste0(colnames(daily_team_batting_2022)[57:83],'_L30')
-daily_team_batting_2022 <- full_join(daily_team_batting_2022, team_batting_s2d_2022, by = c("Team", "Date"))
+daily_team_batting_2022 <- full_join(daily_team_batting_2022, team_batting_s2d_2022, by = c("Team", "Date")) %>% 
+  left_join(team_names %>% 
+              select(Full.Name22, BR),
+            by = c("Team" = "BR")) %>% 
+  mutate(Team = Full.Name22) %>% 
+  select(-Full.Name22)
 
 team_bullpen_L7_2022 <- read.csv("Baseball Machine/Daily Files/2022/team_bullpen_L7_2022.csv")
 team_bullpen_L7_2022$Date <- as.Date(team_bullpen_L7_2022$Date)
@@ -164,7 +202,12 @@ team_bullpen_s2d_2022$Date <- as.Date(team_bullpen_s2d_2022$Date)
 daily_team_bullpen_2022 <- full_join(team_bullpen_L7_2022, team_bullpen_L14_2022, by = c("Team", "Date"), suffix = c("_L7", "_L14")) %>%
   full_join(team_bullpen_L30_2022, by = c("Team", "Date"))
 colnames(daily_team_bullpen_2022)[51:74] <- paste0(colnames(daily_team_bullpen_2022)[51:74],'_L30')
-daily_team_bullpen_2022 <- full_join(daily_team_bullpen_2022, team_bullpen_s2d_2022, by = c("Team", "Date"))
+daily_team_bullpen_2022 <- full_join(daily_team_bullpen_2022, team_bullpen_s2d_2022, by = c("Team", "Date")) %>% 
+  left_join(team_names %>% 
+              select(Full.Name22, BR),
+            by = c("Team" = "BR")) %>% 
+  mutate(Team = Full.Name22) %>% 
+  select(-Full.Name22)
 
 daily_pitchers_2022 <- read.csv("Baseball Machine/Daily Files/2022/pitchers_s2d_2022.csv")
 daily_pitchers_2022$Date <- as.Date(daily_pitchers_2022$Date)
@@ -405,7 +448,11 @@ gamescores19 <- scores_19 %>%
   mutate(officialDate = as.Date(officialDate)) %>% 
   filter(!is.na(HomeSP_fullName) & !is.na(AwaySP_fullName)) %>% 
   left_join(daily_pitchers_2019, by = c("officialDate" = "Date", "HomeSP_fullName" = "Name")) %>% 
-  left_join(daily_pitchers_2019, by = c("officialDate" = "Date", "AwaySP_fullName" = "Name"), suffix = c("_HomeSP", "_AwaySP"))
+  left_join(daily_pitchers_2019, by = c("officialDate" = "Date", "AwaySP_fullName" = "Name"), suffix = c("_HomeSP", "_AwaySP")) %>% 
+  left_join(daily_team_batting_2019, by = c("officialDate" = "Date", "home_team_name" = "Team")) %>% 
+  left_join(daily_team_batting_2019, by = c("officialDate" = "Date", "away_team_name" = "Team"), suffix = c("_HomeBatters", "_AwayBatters")) %>% 
+  left_join(daily_team_bullpen_2019, by = c("officialDate" = "Date", "home_team_name" = "Team")) %>% 
+  left_join(daily_team_bullpen_2019, by = c("officialDate" = "Date", "away_team_name" = "Team"), suffix = c("_HomeBullpen", "_AwayBullpen"))
 
 gamescores20 <- scores_20 %>% 
   left_join(SPs20 %>% 
@@ -425,7 +472,11 @@ gamescores20 <- scores_20 %>%
   mutate(officialDate = as.Date(officialDate)) %>% 
   filter(!is.na(HomeSP_fullName) & !is.na(AwaySP_fullName)) %>% 
   left_join(daily_pitchers_2020, by = c("officialDate" = "Date", "HomeSP_fullName" = "Name")) %>% 
-  left_join(daily_pitchers_2020, by = c("officialDate" = "Date", "AwaySP_fullName" = "Name"), suffix = c("_HomeSP", "_AwaySP"))
+  left_join(daily_pitchers_2020, by = c("officialDate" = "Date", "AwaySP_fullName" = "Name"), suffix = c("_HomeSP", "_AwaySP")) %>% 
+  left_join(daily_team_batting_2020, by = c("officialDate" = "Date", "home_team_name" = "Team")) %>% 
+  left_join(daily_team_batting_2020, by = c("officialDate" = "Date", "away_team_name" = "Team"), suffix = c("_HomeBatters", "_AwayBatters")) %>% 
+  left_join(daily_team_bullpen_2020, by = c("officialDate" = "Date", "home_team_name" = "Team")) %>% 
+  left_join(daily_team_bullpen_2020, by = c("officialDate" = "Date", "away_team_name" = "Team"), suffix = c("_HomeBullpen", "_AwayBullpen"))
 
 
 gamescores21 <- scores_21 %>% 
@@ -446,7 +497,11 @@ gamescores21 <- scores_21 %>%
   mutate(officialDate = as.Date(officialDate)) %>% 
   filter(!is.na(HomeSP_fullName) & !is.na(AwaySP_fullName)) %>% 
   left_join(daily_pitchers_2021, by = c("officialDate" = "Date", "HomeSP_fullName" = "Name")) %>% 
-  left_join(daily_pitchers_2021, by = c("officialDate" = "Date", "AwaySP_fullName" = "Name"), suffix = c("_HomeSP", "_AwaySP"))
+  left_join(daily_pitchers_2021, by = c("officialDate" = "Date", "AwaySP_fullName" = "Name"), suffix = c("_HomeSP", "_AwaySP")) %>% 
+  left_join(daily_team_batting_2021, by = c("officialDate" = "Date", "home_team_name" = "Team")) %>% 
+  left_join(daily_team_batting_2021, by = c("officialDate" = "Date", "away_team_name" = "Team"), suffix = c("_HomeBatters", "_AwayBatters")) %>% 
+  left_join(daily_team_bullpen_2021, by = c("officialDate" = "Date", "home_team_name" = "Team")) %>% 
+  left_join(daily_team_bullpen_2021, by = c("officialDate" = "Date", "away_team_name" = "Team"), suffix = c("_HomeBullpen", "_AwayBullpen"))
 
 
 gamescores22 <- scores_22 %>% 
@@ -467,7 +522,11 @@ gamescores22 <- scores_22 %>%
   mutate(officialDate = as.Date(officialDate)) %>% 
   filter(!is.na(HomeSP_fullName) & !is.na(AwaySP_fullName)) %>% 
   left_join(daily_pitchers_2022, by = c("officialDate" = "Date", "HomeSP_fullName" = "Name")) %>% 
-  left_join(daily_pitchers_2022, by = c("officialDate" = "Date", "AwaySP_fullName" = "Name"), suffix = c("_HomeSP", "_AwaySP"))
+  left_join(daily_pitchers_2022, by = c("officialDate" = "Date", "AwaySP_fullName" = "Name"), suffix = c("_HomeSP", "_AwaySP")) %>% 
+  left_join(daily_team_batting_2022, by = c("officialDate" = "Date", "home_team_name" = "Team")) %>% 
+  left_join(daily_team_batting_2022, by = c("officialDate" = "Date", "away_team_name" = "Team"), suffix = c("_HomeBatters", "_AwayBatters")) %>% 
+  left_join(daily_team_bullpen_2022, by = c("officialDate" = "Date", "home_team_name" = "Team")) %>% 
+  left_join(daily_team_bullpen_2022, by = c("officialDate" = "Date", "away_team_name" = "Team"), suffix = c("_HomeBullpen", "_AwayBullpen"))
 
 
 ## Load Game Logs
