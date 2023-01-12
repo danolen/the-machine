@@ -1321,9 +1321,9 @@ email_table_1 <- grades %>%
                    Bets = sum(bets),
                    `Profit: 1 Unit Wagers` = sum(Units),
                    `Profit: Suggested Wagers` = sum(`Graded Profit`)) %>%
-  mutate(ROI = `Profit: 1 Unit Wagers` / Bets) %>%
-  # mutate(ROI = case_when(`Bet Grade` %in% c('C', 'D', 'F') ~ 0,
-  #                        TRUE ~ `Profit: 1 Unit Wagers` / Bets)) %>%
+  # mutate(ROI = `Profit: 1 Unit Wagers` / Bets) %>%
+  mutate(ROI = case_when(`Bet Grade` %in% c('C', 'D', 'F') ~ 0,
+                         TRUE ~ `Profit: 1 Unit Wagers` / Bets)) %>%
   mutate(`Hit Rate` = paste0(round_any(`Hit Rate`*100, 1), '%'),
          Bets = formatC(Bets, format="d", big.mark=","),
          `Profit: 1 Unit Wagers` = paste0(round_any(`Profit: 1 Unit Wagers`, 0.1), ' units'),
@@ -1335,7 +1335,8 @@ df_html_1 <- print(xtable(email_table_1), type = "html", print.results = FALSE)
 
 email_table_2 <- scores %>% 
   group_by(League) %>% 
-  summarise(`Most Recent Game Data` = as.character(max(Date)))
+  summarise(`Most Recent Game Data` = as.character(max(Date)))%>% 
+  print()
 
 df_html_2 <- print(xtable(email_table_2), type = "html", print.results = FALSE)
 
