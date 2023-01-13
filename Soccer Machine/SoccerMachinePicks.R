@@ -1985,7 +1985,7 @@ UPDATE: The Machine has updated the way that it grades bets, and will now take a
 </p><br></p>
 %s
 </p><br></p>
-These are the bets that The Machine recommends that you should make for games coming up in the next week.
+These are the bets that The Machine recommends that you should make for games coming up in the next few days.
 </p><br></p>
 %s
 </p><br></p>
