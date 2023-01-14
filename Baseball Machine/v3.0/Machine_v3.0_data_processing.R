@@ -3,7 +3,11 @@
 
 library("pacman")
 p_load("tidyverse", "readr", "DataCombine", "readxl")
-team_names <- read.csv("Baseball Machine/team_names.csv")
+team_names <- read.csv("Baseball Machine/team_names.csv") %>% 
+  left_join(baseballr::teams_lu_table %>%
+              filter(sport.name == "Major League Baseball") %>%
+              distinct(id, name),
+            by = c("Full.Name" = "name"))
 
 ## Load and join data from FanGraphs
 
@@ -383,7 +387,34 @@ scores_22 <- gms_22 %>%
                         away_hits_final = sum(away_hits),
                         away_errors_final = sum(away_errors)))
 
-## Get Starting Pitchers
+## Read in PECOTA Projections
+PECOTA_pitching_19 <- read_xlsx("Baseball Machine/PECOTA/2019/pecota_2019_03_20.xlsx", sheet = "Pitchers") %>% 
+  select(MLBCODE, NAME, IP, WARP) %>% 
+  mutate(WARP200 = (WARP/IP)*200)
+PECOTA_pitching_20 <- read_xlsx("Baseball Machine/PECOTA/2020/pecota2020_pitching_jul25.xlsx", sheet = "50") %>% 
+  select(mlbid, name, ip, warp) %>% 
+  mutate(WARP200 = (warp/ip)*200)
+PECOTA_pitching_21 <- read_xlsx("Baseball Machine/PECOTA/2021/pecota2021_pitching_apr01.xlsx", sheet = "50") %>% 
+  select(mlbid, name, ip, warp) %>% 
+  mutate(WARP200 = (as.numeric(warp)/as.numeric(ip))*200)
+PECOTA_pitching_22 <- read_xlsx("Baseball Machine/PECOTA/2022/pecota2022_pitching_apr03.xlsx", sheet = "50") %>% 
+  select(mlbid, name, ip, warp) %>% 
+  mutate(WARP200 = (warp/ip)*200)
+
+PECOTA_hitting_19 <- read_xlsx("Baseball Machine/PECOTA/2019/pecota_2019_03_20.xlsx", sheet = "Batters") %>% 
+  select(MLBCODE, NAME, PA, WARP) %>% 
+  mutate(WARP600 = (WARP/PA)*600)
+PECOTA_hitting_20 <- read_xlsx("Baseball Machine/PECOTA/2020/pecota2020_hitting_jul25.xlsx", sheet = "50") %>% 
+  select(mlbid, name, pa, warp) %>% 
+  mutate(WARP600 = (warp/pa)*600)
+PECOTA_hitting_21 <- read_xlsx("Baseball Machine/PECOTA/2021/pecota2021_hitting_apr01.xlsx", sheet = "50") %>% 
+  select(mlbid, name, pa, warp) %>% 
+  mutate(WARP600 = (as.numeric(warp)/as.numeric(pa))*600)
+PECOTA_hitting_22 <- read_xlsx("Baseball Machine/PECOTA/2022/pecota2022_hitting_apr03.xlsx", sheet = "50") %>% 
+  select(mlbid, name, pa, warp) %>% 
+  mutate(WARP600 = (as.numeric(warp)/as.numeric(pa))*600)
+
+## Get Starting Pitchers and Join WARP Projections
 
 # SPs19 <- data.frame()
 # for (i in seq_along(unique(scores_19$game_pk))) {
@@ -425,11 +456,115 @@ scores_22 <- gms_22 %>%
 # 
 # write.csv(SPs22, "Baseball Machine/Daily Files/2022/starting_pitchers_2022.csv")
 
-SPs19 <- read.csv("Baseball Machine/Daily Files/2019/starting_pitchers_2019.csv")
-SPs20 <- read.csv("Baseball Machine/Daily Files/2020/starting_pitchers_2020.csv")
-SPs21 <- read.csv("Baseball Machine/Daily Files/2021/starting_pitchers_2021.csv")
-SPs22 <- read.csv("Baseball Machine/Daily Files/2022/starting_pitchers_2022.csv")
+SPs19 <- read.csv("Baseball Machine/Daily Files/2019/starting_pitchers_2019.csv") %>% 
+  left_join(PECOTA_pitching_19 %>% 
+              select(MLBCODE, WARP200),
+            by = c("id" = "MLBCODE"))
+SPs20 <- read.csv("Baseball Machine/Daily Files/2020/starting_pitchers_2020.csv") %>% 
+  left_join(PECOTA_pitching_20 %>% 
+              select(mlbid, WARP200),
+            by = c("id" = "mlbid"))
+SPs21 <- read.csv("Baseball Machine/Daily Files/2021/starting_pitchers_2021.csv") %>% 
+  left_join(PECOTA_pitching_21 %>% 
+              select(mlbid, WARP200),
+            by = c("id" = "mlbid"))
+SPs22 <- read.csv("Baseball Machine/Daily Files/2022/starting_pitchers_2022.csv") %>% 
+  left_join(PECOTA_pitching_22 %>% 
+              select(mlbid, WARP200),
+            by = c("id" = "mlbid"))
 
+## Get Daily Rosters and Join WARP Projections
+
+# team_ids <- team_names$id
+# dates_19 <- unique(scores_19$officialDate)
+# dates_20 <- unique(scores_20$officialDate)
+# dates_21 <- unique(scores_21$officialDate)
+# dates_22 <- unique(scores_22$officialDate)
+# 
+# team_dates_19 <- merge(team_ids, dates_19)
+# team_dates_20 <- merge(team_ids, dates_20)
+# team_dates_21 <- merge(team_ids, dates_21)
+# team_dates_22 <- merge(team_ids, dates_22)
+# 
+# rosters_19 <- data.frame()
+# for (i in 1:nrow(team_dates_19)) {
+#   roster = baseballr::mlb_rosters(team_id = team_dates_19[i,1], date = team_dates_19[i,2], roster_type = 'active') %>% 
+#     select(person_id, person_full_name, position_type, position_abbreviation, team_id, date)
+#   rosters_19 = rosters_19 %>% 
+#     bind_rows(roster)
+#   print(paste0("Retrieved Rosters for record ", i,"/",nrow(team_dates_19)))
+# }
+# 
+# write.csv(rosters_19, "Baseball Machine/Daily Files/2019/daily_rosters_2019.csv")
+# 
+# rosters_20 <- data.frame()
+# for (i in 1:nrow(team_dates_20)) {
+#   roster = baseballr::mlb_rosters(team_id = team_dates_20[i,1], date = team_dates_20[i,2], roster_type = 'active') %>% 
+#     select(person_id, person_full_name, position_type, position_abbreviation, team_id, date)
+#   rosters_20 = rosters_20 %>% 
+#     bind_rows(roster)
+#   print(paste0("Retrieved Rosters for record ", i,"/",nrow(team_dates_20)))
+# }
+# 
+# write.csv(rosters_20, "Baseball Machine/Daily Files/2020/daily_rosters_2020.csv")
+# 
+# rosters_21 <- data.frame()
+# for (i in 1:nrow(team_dates_21)) {
+#   roster = baseballr::mlb_rosters(team_id = team_dates_21[i,1], date = team_dates_21[i,2], roster_type = 'active') %>% 
+#     select(person_id, person_full_name, position_type, position_abbreviation, team_id, date)
+#   rosters_21 = rosters_21 %>% 
+#     bind_rows(roster)
+#   print(paste0("Retrieved Rosters for record ", i,"/",nrow(team_dates_21)))
+# }
+# 
+# write.csv(rosters_21, "Baseball Machine/Daily Files/2021/daily_rosters_2021.csv")
+# 
+# rosters_22 <- data.frame()
+# for (i in 1:nrow(team_dates_22)) {
+#   roster = baseballr::mlb_rosters(team_id = team_dates_22[i,1], date = team_dates_22[i,2], roster_type = 'active') %>% 
+#     select(person_id, person_full_name, position_type, position_abbreviation, team_id, date)
+#   rosters_22 = rosters_22 %>% 
+#     bind_rows(roster)
+#   print(paste0("Retrieved Rosters for record ", i,"/",nrow(team_dates_22)))
+# }
+# 
+# write.csv(rosters_22, "Baseball Machine/Daily Files/2022/daily_rosters_2022.csv")
+
+rosters_19 <- read.csv("Baseball Machine/Daily Files/2019/daily_rosters_2019.csv") %>%
+  select(-X) %>% 
+  filter(position_type != "Pitcher") %>% 
+  left_join(PECOTA_hitting_19 %>% 
+              select(MLBCODE, WARP600),
+            by = c("person_id" = "MLBCODE")) %>% 
+  group_by(team_id, date) %>% 
+  summarise(WARP600 = sum(WARP600, na.rm = T))
+rosters_20 <- read.csv("Baseball Machine/Daily Files/2020/daily_rosters_2020.csv") %>%
+  select(-X) %>% 
+  filter(position_type != "Pitcher") %>% 
+  left_join(PECOTA_hitting_20 %>% 
+              select(mlbid, WARP600),
+            by = c("person_id" = "mlbid")) %>% 
+  group_by(team_id, date) %>% 
+  summarise(WARP600 = sum(WARP600, na.rm = T))
+rosters_21 <- read.csv("Baseball Machine/Daily Files/2021/daily_rosters_2021.csv") %>%
+  select(-X) %>% 
+  filter(position_type != "Pitcher") %>% 
+  left_join(PECOTA_hitting_21 %>% 
+              select(mlbid, WARP600),
+            by = c("person_id" = "mlbid")) %>% 
+  group_by(team_id, date) %>% 
+  summarise(WARP600 = sum(WARP600, na.rm = T))
+rosters_22 <- read.csv("Baseball Machine/Daily Files/2022/daily_rosters_2022.csv") %>%
+  select(-X) %>% 
+  filter(position_type != "Pitcher") %>% 
+  left_join(PECOTA_hitting_22 %>% 
+              select(mlbid, WARP600),
+            by = c("person_id" = "mlbid")) %>% 
+  group_by(team_id, date) %>% 
+  summarise(WARP600 = sum(WARP600, na.rm = T))
+
+
+## Combine all data
 gamescores19 <- scores_19 %>% 
   left_join(SPs19 %>% 
               select(-team_id, -home_plate_full_name, -home_plate_id),
@@ -437,14 +572,16 @@ gamescores19 <- scores_19 %>%
                    "officialDate" = "game_date",
                    "home_team_name" = "team")) %>% 
   rename(HomeSP_fullName = fullName,
-         HomeSP_id = id) %>% 
+         HomeSP_id = id,
+         HomeSP_WARP200 = WARP200) %>% 
   left_join(SPs19 %>% 
               select(-team_id, -home_plate_full_name, -home_plate_id),
             by = c("game_pk" = "game_pk",
                    "officialDate" = "game_date",
                    "away_team_name" = "team")) %>% 
   rename(AwaySP_fullName = fullName,
-         AwaySP_id = id) %>% 
+         AwaySP_id = id,
+         AwaySP_WARP200 = WARP200) %>% 
   mutate(officialDate = as.Date(officialDate)) %>% 
   filter(!is.na(HomeSP_fullName) & !is.na(AwaySP_fullName)) %>% 
   left_join(daily_pitchers_2019, by = c("officialDate" = "Date", "HomeSP_fullName" = "Name")) %>% 
@@ -461,14 +598,16 @@ gamescores20 <- scores_20 %>%
                    "officialDate" = "game_date",
                    "home_team_name" = "team")) %>% 
   rename(HomeSP_fullName = fullName,
-         HomeSP_id = id) %>% 
+         HomeSP_id = id,
+         HomeSP_WARP200 = WARP200) %>% 
   left_join(SPs20 %>% 
               select(-team_id, -home_plate_full_name, -home_plate_id),
             by = c("game_pk" = "game_pk",
                    "officialDate" = "game_date",
                    "away_team_name" = "team")) %>% 
   rename(AwaySP_fullName = fullName,
-         AwaySP_id = id)%>% 
+         AwaySP_id = id,
+         AwaySP_WARP200 = WARP200) %>% 
   mutate(officialDate = as.Date(officialDate)) %>% 
   filter(!is.na(HomeSP_fullName) & !is.na(AwaySP_fullName)) %>% 
   left_join(daily_pitchers_2020, by = c("officialDate" = "Date", "HomeSP_fullName" = "Name")) %>% 
@@ -486,14 +625,16 @@ gamescores21 <- scores_21 %>%
                    "officialDate" = "game_date",
                    "home_team_name" = "team")) %>% 
   rename(HomeSP_fullName = fullName,
-         HomeSP_id = id) %>% 
+         HomeSP_id = id,
+         HomeSP_WARP200 = WARP200) %>% 
   left_join(SPs21 %>% 
               select(-team_id, -home_plate_full_name, -home_plate_id),
             by = c("game_pk" = "game_pk",
                    "officialDate" = "game_date",
                    "away_team_name" = "team")) %>% 
   rename(AwaySP_fullName = fullName,
-         AwaySP_id = id )%>% 
+         AwaySP_id = id,
+         AwaySP_WARP200 = WARP200) %>% 
   mutate(officialDate = as.Date(officialDate)) %>% 
   filter(!is.na(HomeSP_fullName) & !is.na(AwaySP_fullName)) %>% 
   left_join(daily_pitchers_2021, by = c("officialDate" = "Date", "HomeSP_fullName" = "Name")) %>% 
@@ -511,14 +652,16 @@ gamescores22 <- scores_22 %>%
                    "officialDate" = "game_date",
                    "home_team_name" = "team")) %>% 
   rename(HomeSP_fullName = fullName,
-         HomeSP_id = id) %>% 
+         HomeSP_id = id,
+         HomeSP_WARP200 = WARP200) %>% 
   left_join(SPs22 %>% 
               select(-team_id, -home_plate_full_name, -home_plate_id),
             by = c("game_pk" = "game_pk",
                    "officialDate" = "game_date",
                    "away_team_name" = "team")) %>% 
   rename(AwaySP_fullName = fullName,
-         AwaySP_id = id) %>% 
+         AwaySP_id = id,
+         AwaySP_WARP200 = WARP200) %>% 
   mutate(officialDate = as.Date(officialDate)) %>% 
   filter(!is.na(HomeSP_fullName) & !is.na(AwaySP_fullName)) %>% 
   left_join(daily_pitchers_2022, by = c("officialDate" = "Date", "HomeSP_fullName" = "Name")) %>% 

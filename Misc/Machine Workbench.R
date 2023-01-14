@@ -4,6 +4,10 @@ library(tidyverse)
 
 library(baseballr)
 
+mlb_roster_types()
+mlb_rosters(109, 2019, "2019-06-01", "active")
+mlb_teams
+
 baseballr::mlb_probables(game_pk = 663178)
 
 today_pks <- get_game_pks_mlb(Sys.Date())
