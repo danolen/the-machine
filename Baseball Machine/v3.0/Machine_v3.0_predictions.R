@@ -38,8 +38,8 @@ DF_IP_Adj <- DF %>%
 ## Also add SP IP per start and per appearance
 
 DF_Rate_Adj <- DF_IP_Adj %>% 
-  mutate(WARP200_AwaySP = (WARP200_AwaySP / IP_AwaySP) * 200,
-         WARP200_HomeSP = (WARP200_HomeSP / IP_HomeSP) * 200,
+  mutate(WAR200_AwaySP = (WAR_AwaySP / IP_AwaySP) * 200,
+         WAR200_HomeSP = (WAR_HomeSP / IP_HomeSP) * 200,
     HR_L7_AwayBatters = (HR_L7_AwayBatters / PA_L7_AwayBatters) * 500,
     SB_L7_AwayBatters = (SB_L7_AwayBatters / PA_L7_AwayBatters) * 500,
     BsR_L7_AwayBatters = (BsR_L7_AwayBatters / PA_L7_AwayBatters) * 500,
@@ -99,7 +99,77 @@ DF_Rate_Adj <- DF_IP_Adj %>%
     IPperStart_AwaySP = Start.IP_AwaySP / GS_AwaySP,
     IPperG_AwaySP = IP_AwaySP / G_AwaySP,
     IPperStart_HomeSP = Start.IP_HomeSP / GS_HomeSP,
-    IPperG_HomeSP = IP_HomeSP / G_HomeSP)
+    IPperG_HomeSP = IP_HomeSP / G_HomeSP) %>% 
+  mutate(month = lubridate::month(officialDate, label = TRUE, abbr = FALSE),
+         doubleHeader = case_when(doubleHeader == 'S' ~ 'Y',
+                                  TRUE ~ doubleHeader)) %>% 
+  select(-Team_HomeSP, -Team_AwaySP)
+
+## Create separate DFs for Home/Away Runs Scores as well as 1st Inning/F5/Full Game
+
+train_full_game_home <- DF_Rate_Adj %>% 
+  ungroup() %>% 
+  select(home_runs_final, home_team_season, month, home_team_league_name, home_team_division_name,
+         doubleHeader, gameNumber, dayNight, venue.name, contains('_AwaySP'), contains('_HomeBatters'),
+         -Def_L7_HomeBatters, -Def_L14_HomeBatters, -Def_L30_HomeBatters, -Def_HomeBatters,
+         Def_L7_AwayBatters, Def_L14_AwayBatters, Def_L30_AwayBatters, Def_AwayBatters,
+         contains('_AwayBullpen')) %>%
+  rename_all(~gsub("home_","",.)) %>% 
+  rename_all(~gsub("_Home","",.)) %>% 
+  rename_all(~gsub("_Away","",.)) %>% 
+  mutate(home_or_away = 'Home')
+
+train_full_game_away <- DF_Rate_Adj %>% 
+  ungroup() %>% 
+  select(away_runs_final, home_team_season, month, away_team_league_name, away_team_division_name,
+         doubleHeader, gameNumber, dayNight, venue.name, contains('_HomeSP'), contains('_AwayBatters'),
+         Def_L7_HomeBatters, Def_L14_HomeBatters, Def_L30_HomeBatters, Def_HomeBatters,
+         -Def_L7_AwayBatters, -Def_L14_AwayBatters, -Def_L30_AwayBatters, -Def_AwayBatters,
+         contains('_HomeBullpen')) %>%
+  rename_all(~gsub("home_","",.)) %>% 
+  rename_all(~gsub("away_","",.)) %>% 
+  rename_all(~gsub("_Home","",.)) %>% 
+  rename_all(~gsub("_Away","",.)) %>% 
+  mutate(home_or_away = 'Away')
+
+train_full_game <- train_full_game_home %>% 
+  bind_rows(train_full_game_away) %>% 
+  filter(!is.na(IPSP) &
+           !is.na(PA_L7Batters) &
+           !is.na(IP_L7Bullpen) &
+           !is.na(PA_L30Batters) &
+           !is.na(IPBullpen)) %>% 
+  replace(is.na(.), 0)
+
+train_F5_game_home <- DF_Rate_Adj %>% 
+  ungroup() %>% 
+  select(home_runs_5th, home_team_season, month, home_team_league_name, home_team_division_name,
+         doubleHeader, gameNumber, dayNight, venue.name, contains('_AwaySP'), contains('_HomeBatters'),
+         -Def_L7_HomeBatters, -Def_L14_HomeBatters, -Def_L30_HomeBatters, -Def_HomeBatters,
+         Def_L7_AwayBatters, Def_L14_AwayBatters, Def_L30_AwayBatters, Def_AwayBatters) %>%
+  rename_all(~gsub("home_","",.)) %>% 
+  rename_all(~gsub("_Home","",.)) %>% 
+  rename_all(~gsub("_Away","",.)) %>% 
+  mutate(home_or_away = 'Home')
+
+train_F5_game_away <- DF_Rate_Adj %>% 
+  ungroup() %>% 
+  select(away_runs_5th, home_team_season, month, away_team_league_name, away_team_division_name,
+         doubleHeader, gameNumber, dayNight, venue.name, contains('_HomeSP'), contains('_AwayBatters'),
+         Def_L7_HomeBatters, Def_L14_HomeBatters, Def_L30_HomeBatters, Def_HomeBatters,
+         -Def_L7_AwayBatters, -Def_L14_AwayBatters, -Def_L30_AwayBatters, -Def_AwayBatters) %>%
+  rename_all(~gsub("home_","",.)) %>% 
+  rename_all(~gsub("away_","",.)) %>% 
+  rename_all(~gsub("_Home","",.)) %>% 
+  rename_all(~gsub("_Away","",.)) %>% 
+  mutate(home_or_away = 'Away')
+
+train_F5 <- train_F5_game_home %>% 
+  bind_rows(train_F5_game_away) %>% 
+  filter(!is.na(IPSP) &
+           !is.na(PA_L7Batters) &
+           !is.na(PA_L30Batters)) %>% 
+  replace(is.na(.), 0)
 
 ## Identify response (y) and predictor (x) column names for component models
 

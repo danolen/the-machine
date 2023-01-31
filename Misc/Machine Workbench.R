@@ -13,6 +13,49 @@ baseballr::mlb_probables(game_pk = 663178)
 today_pks <- get_game_pks_mlb(Sys.Date())
 tomorrow_pks <- get_game_pks_mlb(Sys.Date()+1)
 
+baseballr::get_chadwick_lu()
+
+# Get Projections 
+
+library(rvest)
+
+# URL for DepthCharts projections
+depth_url <- "https://www.fangraphs.com/projections?statgroup=fantasy&type=fangraphsdc"
+
+# URL for ATC projections
+atc_url <- "https://www.fangraphs.com/projections?statgroup=fantasy&type=atc"
+
+# URL for The BAT projections
+the_bat_url <- "https://www.fangraphs.com/projections?statgroup=fantasy&type=thebat"
+
+# URL for The BAT X projections
+the_batx_url <- "https://www.fangraphs.com/projections?statgroup=fantasy&type=thebatx"
+
+# Scrape the DepthCharts projections
+depth_html <- read_html(depth_url)
+depth_data <- depth_html %>%
+  html_node
+  html_nodes(xpath = '//table[@id="ProjectionBoard1_dg1_ctl00"]') %>%
+  html_table(fill = TRUE)
+
+# Scrape the ATC projections
+atc_html <- read_html(atc_url)
+atc_data <- atc_html %>%
+  html_nodes(xpath = '//table[@id="ProjectionBoard1_dg1_ctl00"]') %>%
+  html_table(fill = TRUE)
+
+# Scrape the The BAT projections
+the_bat_html <- read_html(the_bat_url)
+the_bat_data <- the_bat_html %>%
+  html_nodes(xpath = '//table[@id="ProjectionBoard1_dg1_ctl00"]') %>%
+  html_table(fill = TRUE)
+
+# Scrape the The BAT X projections
+the_batx_html <- read_html(the_batx_url)
+the_batx_data <- the_batx_html %>%
+  html_nodes(xpath = '//table[@id="ProjectionBoard1_dg1_ctl00"]') %>%
+  html_table(fill = TRUE)
+
 #### Odds ####
 
 library(oddsapiR)
