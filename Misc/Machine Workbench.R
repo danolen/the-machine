@@ -34,7 +34,9 @@ the_batx_url <- "https://www.fangraphs.com/projections?statgroup=fantasy&type=th
 # Scrape the DepthCharts projections
 depth_html <- read_html(depth_url)
 depth_data <- depth_html %>%
-  html_node
+  html_node("table") %>%
+  html_table(trim = TRUE) %>%
+  data.frame(stringsAsFactors = FALSE)
   html_nodes(xpath = '//table[@id="ProjectionBoard1_dg1_ctl00"]') %>%
   html_table(fill = TRUE)
 

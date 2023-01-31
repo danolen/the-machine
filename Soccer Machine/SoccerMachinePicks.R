@@ -1188,7 +1188,7 @@ history <- inner_join(history, scores, by = c("gamedate" = "Date", "HomeTeam" = 
 #history$Pick_SpreadTotal <- as.numeric(history$Pick_SpreadTotal)
 
 history2 <- history %>%
-  rowwise() %>%
+  # rowwise() %>%
   mutate(Winner = case_when(bet_type == "ML" ~ if_else(Away_Score > Home_Score,
                                                         AwayTeam,
                                                         if_else(Away_Score == Home_Score,
