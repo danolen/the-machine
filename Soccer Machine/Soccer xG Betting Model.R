@@ -267,7 +267,7 @@ train_df <- metrics %>%
                                      TRUE ~ "Under")))
 
 train <- train_df %>% 
-  filter(SplitGP > 0 & SplitGP_Opp > 0 & Date < today)%>% 
+  filter(SplitGP > 3 & SplitGP_Opp > 3 & Date < today)%>% 
   select(-ID,
          -Date,
          -Day,
@@ -340,7 +340,7 @@ saveRDS(pls_mod, "C:/Users/danie/Desktop/SportsStuff/TheMachine/Models/train_pls
 saveRDS(lm_mod, "C:/Users/danie/Desktop/SportsStuff/TheMachine/Models/train_lm.rds")
 
 train_prob <- train_df %>% 
-  filter(SplitGP > 0 & SplitGP_Opp > 0 & Date < today)%>% 
+  filter(SplitGP > 3 & SplitGP_Opp > 3 & Date < today)%>% 
   select(-ID,
          -Date,
          -Day,
