@@ -2,14 +2,26 @@
 ### Predictions
 
 library("pacman")
-p_load("tidyverse"
+p_load("tidyverse", "caret", "parallel", "doParallel"
        # , "h2o", "bit64", "zoo", "reshape"
        )
 
-DF19 <- readRDS("Baseball Machine/Daily Files/2019/full_training_data.rds")
-DF20 <- readRDS("Baseball Machine/Daily Files/2020/full_training_data.rds")
-DF21 <- readRDS("Baseball Machine/Daily Files/2021/full_training_data.rds")
-DF22 <- readRDS("Baseball Machine/Daily Files/2022/full_training_data.rds")
+DF19 <- readRDS("Baseball Machine/Daily Files/2019/full_training_data.rds") %>%
+  ungroup()
+DF20 <- readRDS("Baseball Machine/Daily Files/2020/full_training_data.rds") %>%
+  ungroup() %>% 
+  rename(WARP200_HomeSP = HomeSP_WARP200,
+         WARP200_AwaySP = AwaySP_WARP200)
+DF21 <- readRDS("Baseball Machine/Daily Files/2021/full_training_data.rds") %>%
+  ungroup() %>% 
+  rename(WARP200_HomeSP = HomeSP_WARP200,
+         WARP200_AwaySP = AwaySP_WARP200)
+DF22 <- readRDS("Baseball Machine/Daily Files/2022/full_training_data.rds") %>%
+  ungroup() %>%
+  mutate(HomeSP_WARP200 = case_when(!is.nan(HomeSP_WARP200) ~ HomeSP_WARP200),
+         AwaySP_WARP200 = case_when(!is.nan(AwaySP_WARP200) ~ AwaySP_WARP200)) %>% 
+  rename(WARP200_HomeSP = HomeSP_WARP200,
+         WARP200_AwaySP = AwaySP_WARP200)
 
 DF <- DF19 %>% 
   bind_rows(DF20, DF21, DF22)
@@ -141,7 +153,7 @@ train_full_game <- train_full_game_home %>%
            !is.na(IPBullpen)) %>% 
   replace(is.na(.), 0)
 
-train_F5_game_home <- DF_Rate_Adj %>% 
+train_F5_home <- DF_Rate_Adj %>% 
   ungroup() %>% 
   select(home_runs_5th, home_team_season, month, home_team_league_name, home_team_division_name,
          doubleHeader, gameNumber, dayNight, venue.name, contains('_AwaySP'), contains('_HomeBatters'),
@@ -152,7 +164,7 @@ train_F5_game_home <- DF_Rate_Adj %>%
   rename_all(~gsub("_Away","",.)) %>% 
   mutate(home_or_away = 'Home')
 
-train_F5_game_away <- DF_Rate_Adj %>% 
+train_F5_away <- DF_Rate_Adj %>% 
   ungroup() %>% 
   select(away_runs_5th, home_team_season, month, away_team_league_name, away_team_division_name,
          doubleHeader, gameNumber, dayNight, venue.name, contains('_HomeSP'), contains('_AwayBatters'),
@@ -164,12 +176,180 @@ train_F5_game_away <- DF_Rate_Adj %>%
   rename_all(~gsub("_Away","",.)) %>% 
   mutate(home_or_away = 'Away')
 
-train_F5 <- train_F5_game_home %>% 
-  bind_rows(train_F5_game_away) %>% 
+train_F5 <- train_F5_home %>% 
+  bind_rows(train_F5_away) %>% 
   filter(!is.na(IPSP) &
            !is.na(PA_L7Batters) &
            !is.na(PA_L30Batters)) %>% 
   replace(is.na(.), 0)
+
+train_F1_home <- DF_Rate_Adj %>% 
+  ungroup() %>% 
+  select(home_runs_1st, home_team_season, month, home_team_league_name, home_team_division_name,
+         doubleHeader, gameNumber, dayNight, venue.name, contains('_AwaySP'), contains('_HomeBatters'),
+         -Def_L7_HomeBatters, -Def_L14_HomeBatters, -Def_L30_HomeBatters, -Def_HomeBatters,
+         Def_L7_AwayBatters, Def_L14_AwayBatters, Def_L30_AwayBatters, Def_AwayBatters) %>%
+  rename_all(~gsub("home_","",.)) %>% 
+  rename_all(~gsub("_Home","",.)) %>% 
+  rename_all(~gsub("_Away","",.)) %>% 
+  mutate(home_or_away = 'Home')
+
+train_F1_away <- DF_Rate_Adj %>% 
+  ungroup() %>% 
+  select(away_runs_1st, home_team_season, month, away_team_league_name, away_team_division_name,
+         doubleHeader, gameNumber, dayNight, venue.name, contains('_HomeSP'), contains('_AwayBatters'),
+         Def_L7_HomeBatters, Def_L14_HomeBatters, Def_L30_HomeBatters, Def_HomeBatters,
+         -Def_L7_AwayBatters, -Def_L14_AwayBatters, -Def_L30_AwayBatters, -Def_AwayBatters) %>%
+  rename_all(~gsub("home_","",.)) %>% 
+  rename_all(~gsub("away_","",.)) %>% 
+  rename_all(~gsub("_Home","",.)) %>% 
+  rename_all(~gsub("_Away","",.)) %>% 
+  mutate(home_or_away = 'Away')
+
+train_F1 <- train_F1_home %>% 
+  bind_rows(train_F1_away) %>% 
+  filter(!is.na(IPSP) &
+           !is.na(PA_L7Batters) &
+           !is.na(PA_L30Batters)) %>% 
+  replace(is.na(.), 0)
+
+## Train models
+
+intervalStart <- Sys.time()
+cluster <- makeCluster(detectCores() - 1)
+registerDoParallel(cluster)
+
+fitControl <- trainControl(method = "repeatedcv",
+                           number = 10,
+                           allowParallel = TRUE)
+
+set.seed(1234)
+full_game_gbm_mod <- train(runs_final ~ .,
+                 data = train_full_game,
+                 method = "gbm",
+                 trControl = fitControl)
+set.seed(1234)
+full_game_cub_mod <- train(runs_final ~ .,
+                           data = train_full_game,
+                 method = "cubist",
+                 trControl = fitControl,
+                 tuneGrid = expand.grid(.committees=20,
+                                        .neighbors=9))
+set.seed(1234)
+full_game_rf_mod <- train(runs_final ~ .,
+                          data = train_full_game,
+                method = "ranger",
+                trControl = fitControl,
+                tuneGrid = expand.grid(.mtry = c(10,15,20),
+                                       .splitrule = c("variance", "extratrees"),
+                                       .min.node.size = c(5,10)))
+# set.seed(1234)
+# full_game_ctree_mod <- train(runs_final ~ .,
+#                              data = train_full_game,
+#                    method = "ctree",
+#                    trControl = fitControl,
+#                    tuneLength = 10)
+set.seed(1234)
+full_game_pls_mod <- train(runs_final ~ .,
+                           data = train_full_game,
+                 method = "pls",
+                 trControl = fitControl,
+                 tuneLength = 15,
+                 preProc = c("center", "scale"))
+# set.seed(1234)
+# full_game_lm_mod <- train(runs_final ~ .,
+#                           data = train_full_game,
+#                 method = "lm",
+#                 trControl = fitControl)
+
+stopCluster(cluster)
+intervalEnd <- Sys.time()
+paste("Full game runs regression model training took",intervalEnd - intervalStart,attr(intervalEnd - intervalStart,"units"))
+
+saveRDS(full_game_gbm_mod, "C:/Users/danie/Desktop/SportsStuff/TheMachine/BaseballModels/full_game_gbm.rds")
+saveRDS(full_game_cub_mod, "C:/Users/danie/Desktop/SportsStuff/TheMachine/BaseballModels/full_game_cub.rds")
+saveRDS(full_game_rf_mod, "C:/Users/danie/Desktop/SportsStuff/TheMachine/BaseballModels/full_game_rf.rds")
+# saveRDS(full_game_ctree_mod, "C:/Users/danie/Desktop/SportsStuff/TheMachine/BaseballModels/full_game_ctree.rds")
+saveRDS(full_game_pls_mod, "C:/Users/danie/Desktop/SportsStuff/TheMachine/BaseballModels/full_game_pls.rds")
+# saveRDS(full_game_lm_mod, "C:/Users/danie/Desktop/SportsStuff/TheMachine/BaseballModels/full_game_lm.rds")
+
+set.seed(1234)
+allResamples <- resamples(list("GBM" = full_game_gbm_mod,
+                               "Cubist" = full_game_cub_mod,
+                               "RF" = full_game_rf_mod,
+                               # "CI Tree" = full_game_ctree_mod,
+                               "PLS" = full_game_pls_mod#,
+                               # "LM" = full_game_lm_mod
+                               ))
+
+parallelplot(allResamples, metric = "RMSE")
+parallelplot(allResamples)
+parallelplot(allResamples, metric = "Rsquared")
+
+eval <- train_full_game
+
+eval$GBM <- predict(full_game_gbm_mod, train_full_game)
+eval$CUB <- predict(full_game_cub_mod, train_full_game)
+eval$RF <- predict(full_game_rf_mod, train_full_game)
+eval$PLS <- predict(full_game_pls_mod, train_full_game)
+
+intervalStart <- Sys.time()
+cluster <- makeCluster(detectCores() - 1)
+registerDoParallel(cluster)
+
+fitControl <- trainControl(method = "repeatedcv",
+                           number = 10,
+                           allowParallel = TRUE)
+
+set.seed(1234)
+F5_gbm_mod <- train(runs_5th ~ .,
+                           data = train_F5,
+                           method = "gbm",
+                           trControl = fitControl)
+set.seed(1234)
+F5_cub_mod <- train(runs_5th ~ .,
+                           data = train_F5,
+                           method = "cubist",
+                           trControl = fitControl,
+                           tuneGrid = expand.grid(.committees=20,
+                                                  .neighbors=9))
+set.seed(1234)
+F5_rf_mod <- train(runs_5th ~ .,
+                          data = train_F5,
+                          method = "ranger",
+                          trControl = fitControl,
+                          tuneGrid = expand.grid(.mtry = c(10,15,20),
+                                                 .splitrule = c("variance", "extratrees"),
+                                                 .min.node.size = c(5,10)))
+# set.seed(1234)
+# F5_ctree_mod <- train(runs_5th ~ .,
+#                              data = train_F5,
+#                    method = "ctree",
+#                    trControl = fitControl,
+#                    tuneLength = 10)
+set.seed(1234)
+F5_pls_mod <- train(runs_5th ~ .,
+                           data = train_F5,
+                           method = "pls",
+                           trControl = fitControl,
+                           tuneLength = 15,
+                           preProc = c("center", "scale"))
+# set.seed(1234)
+# F5_lm_mod <- train(runs_5th ~ .,
+#                           data = train_F5,
+#                 method = "lm",
+#                 trControl = fitControl)
+
+stopCluster(cluster)
+intervalEnd <- Sys.time()
+paste("F5 uns regression model training took",intervalEnd - intervalStart,attr(intervalEnd - intervalStart,"units"))
+
+saveRDS(F5_gbm_mod, "C:/Users/danie/Desktop/SportsStuff/TheMachine/BaseballModels/F5_gbm.rds")
+saveRDS(F5_cub_mod, "C:/Users/danie/Desktop/SportsStuff/TheMachine/BaseballModels/F5_cub.rds")
+saveRDS(F5_rf_mod, "C:/Users/danie/Desktop/SportsStuff/TheMachine/BaseballModels/F5_rf.rds")
+# saveRDS(F5_ctree_mod, "C:/Users/danie/Desktop/SportsStuff/TheMachine/BaseballModels/F5_ctree.rds")
+saveRDS(F5_pls_mod, "C:/Users/danie/Desktop/SportsStuff/TheMachine/BaseballModels/F5_pls.rds")
+# saveRDS(F5_lm_mod, "C:/Users/danie/Desktop/SportsStuff/TheMachine/BaseballModels/F5_lm.rds")
 
 ## Identify response (y) and predictor (x) column names for component models
 
