@@ -8,7 +8,7 @@ mlb_roster_types()
 mlb_rosters(109, 2019, "2019-06-01", "active")
 mlb_teams
 
-baseballr::mlb_probables(game_pk = 663178)
+baseballr::mlb_probables(game_pk = 719359)
 
 today_pks <- get_game_pks_mlb(Sys.Date())
 tomorrow_pks <- get_game_pks_mlb(Sys.Date()+1)
@@ -62,7 +62,8 @@ the_batx_data <- the_batx_html %>%
 
 library(oddsapiR)
 
-Sys.setenv(ODDS_API_KEY = "933d79f947f3de884dd9d79e5cae4609")
+Sys.getenv("ODDS_API_KEY")
+# Sys.setenv(ODDS_API_KEY = "933d79f947f3de884dd9d79e5cae4609")
 
 odds <- toa_sports_odds(sport_key = 'americanfootball_ncaaf', 
                           regions = 'us', 

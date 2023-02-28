@@ -115,9 +115,71 @@ DF_Rate_Adj <- DF_IP_Adj %>%
   mutate(month = lubridate::month(officialDate, label = TRUE, abbr = FALSE),
          doubleHeader = case_when(doubleHeader == 'S' ~ 'Y',
                                   TRUE ~ doubleHeader)) %>% 
-  select(-Team_HomeSP, -Team_AwaySP)
+  select(-Team_HomeSP, -Team_AwaySP) %>% 
+  mutate(Outcome_FG_ML = as.factor(case_when(home_runs_final > away_runs_final ~ 'Win',
+                                             TRUE ~ 'Lose')),
+         Outcome_FG_Minus_1.5 = as.factor(case_when(home_runs_final - 1.5 > away_runs_final ~ 'Win',
+                                                    TRUE ~ 'Lose')),
+         Outcome_FG_Minus_2.5 = as.factor(case_when(home_runs_final - 2.5 > away_runs_final ~ 'Win',
+                                                    TRUE ~ 'Lose')),
+         Outcome_FG_Plus_1.5 = as.factor(case_when(home_runs_final + 1.5 > away_runs_final ~ 'Win',
+                                                    TRUE ~ 'Lose')),
+         Outcome_FG_Plus_2.5 = as.factor(case_when(home_runs_final + 2.5 > away_runs_final ~ 'Win',
+                                                    TRUE ~ 'Lose')),
+         Outcome_FG_Total_6.5 = as.factor(case_when(home_runs_final + away_runs_final > 6.5 ~ 'Over',
+                                                    TRUE ~ 'Under')),
+         Outcome_FG_Total_7 = as.factor(case_when(home_runs_final + away_runs_final > 7 ~ 'Over',
+                                                  home_runs_final + away_runs_final == 7 ~ 'Push',
+                                                  TRUE ~ 'Under')),
+         Outcome_FG_Total_7.5 = as.factor(case_when(home_runs_final + away_runs_final > 7.5 ~ 'Over',
+                                                    TRUE ~ 'Under')),
+         Outcome_FG_Total_8 = as.factor(case_when(home_runs_final + away_runs_final > 8 ~ 'Over',
+                                                  home_runs_final + away_runs_final == 8 ~ 'Push',
+                                                  TRUE ~ 'Under')),
+         Outcome_FG_Total_8.5 = as.factor(case_when(home_runs_final + away_runs_final > 8.5 ~ 'Over',
+                                                    TRUE ~ 'Under')),
+         Outcome_FG_Total_9 = as.factor(case_when(home_runs_final + away_runs_final > 9 ~ 'Over',
+                                                  home_runs_final + away_runs_final == 9 ~ 'Push',
+                                                  TRUE ~ 'Under')),
+         Outcome_FG_Total_9.5 = as.factor(case_when(home_runs_final + away_runs_final > 9.5 ~ 'Over',
+                                                    TRUE ~ 'Under')),
+         Outcome_FG_Total_10 = as.factor(case_when(home_runs_final + away_runs_final > 10 ~ 'Over',
+                                                  home_runs_final + away_runs_final == 10 ~ 'Push',
+                                                  TRUE ~ 'Under')),
+         Outcome_FG_Total_10.5 = as.factor(case_when(home_runs_final + away_runs_final > 10.5 ~ 'Over',
+                                                    TRUE ~ 'Under')),
+         Outcome_FG_Total_11 = as.factor(case_when(home_runs_final + away_runs_final > 11 ~ 'Over',
+                                                  home_runs_final + away_runs_final == 11 ~ 'Push',
+                                                  TRUE ~ 'Under')),
+         Outcome_FG_Total_11.5 = as.factor(case_when(home_runs_final + away_runs_final > 11.5 ~ 'Over',
+                                                    TRUE ~ 'Under')),
+         Outcome_F5_ML = as.factor(case_when(home_runs_5th > away_runs_5th ~ 'Win',
+                                             home_runs_5th == away_runs_5th ~ 'Push',
+                                             TRUE ~ 'Lose')),
+         Outcome_F5_Minus_0.5 = as.factor(case_when(home_runs_5th - 0.5 > away_runs_5th ~ 'Win',
+                                                    TRUE ~ 'Lose')),
+         Outcome_F5_Minus_1.5 = as.factor(case_when(home_runs_5th - 1.5 > away_runs_5th ~ 'Win',
+                                                    TRUE ~ 'Lose')),
+         Outcome_F5_Plus_0.5 = as.factor(case_when(home_runs_5th + 0.5 > away_runs_5th ~ 'Win',
+                                                   TRUE ~ 'Lose')),
+         Outcome_F5_Plus_1.5 = as.factor(case_when(home_runs_5th + 1.5 > away_runs_5th ~ 'Win',
+                                                   TRUE ~ 'Lose')),
+         Outcome_F5_Total_3.5 = as.factor(case_when(home_runs_5th + away_runs_5th > 3.5 ~ 'Over',
+                                                    TRUE ~ 'Under')),
+         Outcome_F5_Total_4 = as.factor(case_when(home_runs_5th + away_runs_5th > 4 ~ 'Over',
+                                                  home_runs_5th + away_runs_5th == 4 ~ 'Push',
+                                                  TRUE ~ 'Under')),
+         Outcome_F5_Total_4.5 = as.factor(case_when(home_runs_5th + away_runs_5th > 4.5 ~ 'Over',
+                                                    TRUE ~ 'Under')),
+         Outcome_F5_Total_5 = as.factor(case_when(home_runs_5th + away_runs_5th > 5 ~ 'Over',
+                                                  home_runs_5th + away_runs_5th == 5 ~ 'Push',
+                                                  TRUE ~ 'Under')),
+         Outcome_F5_Total_5.5 = as.factor(case_when(home_runs_5th + away_runs_5th > 5.5 ~ 'Over',
+                                                    TRUE ~ 'Under')),
+         Outcome_F1_Total_0.5 = as.factor(case_when(home_runs_1st + away_runs_1st > 0.5 ~ 'Over',
+                                                    TRUE ~ 'Under')))
 
-## Create separate DFs for Home/Away Runs Scores as well as 1st Inning/F5/Full Game
+## Create separate DFs for Home/Away Runs Scored as well as 1st Inning/F5/Full Game
 
 train_full_game_home <- DF_Rate_Adj %>% 
   ungroup() %>% 
@@ -151,7 +213,29 @@ train_full_game <- train_full_game_home %>%
            !is.na(IP_L7Bullpen) &
            !is.na(PA_L30Batters) &
            !is.na(IPBullpen)) %>% 
-  replace(is.na(.), 0)
+  replace(is.na(.), 0) %>% 
+  mutate(Outcome_FG_TT_2.5 = as.factor(case_when(runs_final > 2.5 ~ 'Over',
+                                                 TRUE ~ 'Under')),
+         Outcome_FG_TT_3 = as.factor(case_when(runs_final > 3 ~ 'Over',
+                                               runs_final == 3 ~ 'Push',
+                                               TRUE ~ 'Under')),
+         Outcome_FG_TT_3.5 = as.factor(case_when(runs_final > 3.5 ~ 'Over',
+                                                 TRUE ~ 'Under')),
+         Outcome_FG_TT_4 = as.factor(case_when(runs_final > 4 ~ 'Over',
+                                               runs_final == 4 ~ 'Push',
+                                               TRUE ~ 'Under')),
+         Outcome_FG_TT_4.5 = as.factor(case_when(runs_final > 4.5 ~ 'Over',
+                                                 TRUE ~ 'Under')),
+         Outcome_FG_TT_5 = as.factor(case_when(runs_final > 5 ~ 'Over',
+                                               runs_final == 5 ~ 'Push',
+                                               TRUE ~ 'Under')),
+         Outcome_FG_TT_5.5 = as.factor(case_when(runs_final > 5.5 ~ 'Over',
+                                                 TRUE ~ 'Under')),
+         Outcome_FG_TT_6 = as.factor(case_when(runs_final > 6 ~ 'Over',
+                                               runs_final == 6 ~ 'Push',
+                                               TRUE ~ 'Under')),
+         Outcome_FG_TT_6.5 = as.factor(case_when(runs_final > 6.5 ~ 'Over',
+                                                 TRUE ~ 'Under')))
 
 train_F5_home <- DF_Rate_Adj %>% 
   ungroup() %>% 
@@ -181,7 +265,24 @@ train_F5 <- train_F5_home %>%
   filter(!is.na(IPSP) &
            !is.na(PA_L7Batters) &
            !is.na(PA_L30Batters)) %>% 
-  replace(is.na(.), 0)
+  replace(is.na(.), 0) %>% 
+  mutate(Outcome_F5_TT_0.5 = as.factor(case_when(runs_5th > 0.5 ~ 'Over',
+                                                 TRUE ~ 'Under')),
+         Outcome_F5_TT_1 = as.factor(case_when(runs_5th > 1 ~ 'Over',
+                                               runs_5th == 1 ~ 'Push',
+                                               TRUE ~ 'Under')),
+         Outcome_F5_TT_1.5 = as.factor(case_when(runs_5th > 1.5 ~ 'Over',
+                                                 TRUE ~ 'Under')),
+         Outcome_F5_TT_2 = as.factor(case_when(runs_5th > 2 ~ 'Over',
+                                               runs_5th == 2 ~ 'Push',
+                                               TRUE ~ 'Under')),
+         Outcome_F5_TT_2.5 = as.factor(case_when(runs_5th > 2.5 ~ 'Over',
+                                                 TRUE ~ 'Under')),
+         Outcome_F5_TT_3 = as.factor(case_when(runs_5th > 3 ~ 'Over',
+                                               runs_5th == 3 ~ 'Push',
+                                               TRUE ~ 'Under')),
+         Outcome_F5_TT_3.5 = as.factor(case_when(runs_5th > 3.5 ~ 'Over',
+                                                 TRUE ~ 'Under')))
 
 train_F1_home <- DF_Rate_Adj %>% 
   ungroup() %>% 
@@ -211,7 +312,9 @@ train_F1 <- train_F1_home %>%
   filter(!is.na(IPSP) &
            !is.na(PA_L7Batters) &
            !is.na(PA_L30Batters)) %>% 
-  replace(is.na(.), 0)
+  replace(is.na(.), 0) %>% 
+  mutate(Outcome_F1_TT_0.5 = as.factor(case_when(runs_1st > 0.5 ~ 'Over',
+                                                 TRUE ~ 'Under')))
 
 ## Train models
 
@@ -225,19 +328,19 @@ fitControl <- trainControl(method = "repeatedcv",
 
 set.seed(1234)
 full_game_gbm_mod <- train(runs_final ~ .,
-                 data = train_full_game,
+                 data = train_full_game %>% select(-contains("Outcome_")),
                  method = "gbm",
                  trControl = fitControl)
 set.seed(1234)
 full_game_cub_mod <- train(runs_final ~ .,
-                           data = train_full_game,
+                           data = train_full_game %>% select(-contains("Outcome_")),
                  method = "cubist",
                  trControl = fitControl,
                  tuneGrid = expand.grid(.committees=20,
                                         .neighbors=9))
 set.seed(1234)
 full_game_rf_mod <- train(runs_final ~ .,
-                          data = train_full_game,
+                          data = train_full_game %>% select(-contains("Outcome_")),
                 method = "ranger",
                 trControl = fitControl,
                 tuneGrid = expand.grid(.mtry = c(10,15,20),
@@ -245,20 +348,20 @@ full_game_rf_mod <- train(runs_final ~ .,
                                        .min.node.size = c(5,10)))
 # set.seed(1234)
 # full_game_ctree_mod <- train(runs_final ~ .,
-#                              data = train_full_game,
+#                              data = train_full_game %>% select(-contains("Outcome_")),
 #                    method = "ctree",
 #                    trControl = fitControl,
 #                    tuneLength = 10)
 set.seed(1234)
 full_game_pls_mod <- train(runs_final ~ .,
-                           data = train_full_game,
+                           data = train_full_game %>% select(-contains("Outcome_")),
                  method = "pls",
                  trControl = fitControl,
                  tuneLength = 15,
                  preProc = c("center", "scale"))
 # set.seed(1234)
 # full_game_lm_mod <- train(runs_final ~ .,
-#                           data = train_full_game,
+#                           data = train_full_game %>% select(-contains("Outcome_")),
 #                 method = "lm",
 #                 trControl = fitControl)
 
@@ -303,19 +406,19 @@ fitControl <- trainControl(method = "repeatedcv",
 
 set.seed(1234)
 F5_gbm_mod <- train(runs_5th ~ .,
-                           data = train_F5,
+                           data = train_F5 %>% select(-contains("Outcome_")),
                            method = "gbm",
                            trControl = fitControl)
 set.seed(1234)
 F5_cub_mod <- train(runs_5th ~ .,
-                           data = train_F5,
+                           data = train_F5 %>% select(-contains("Outcome_")),
                            method = "cubist",
                            trControl = fitControl,
                            tuneGrid = expand.grid(.committees=20,
                                                   .neighbors=9))
 set.seed(1234)
 F5_rf_mod <- train(runs_5th ~ .,
-                          data = train_F5,
+                          data = train_F5 %>% select(-contains("Outcome_")),
                           method = "ranger",
                           trControl = fitControl,
                           tuneGrid = expand.grid(.mtry = c(10,15,20),
@@ -323,26 +426,26 @@ F5_rf_mod <- train(runs_5th ~ .,
                                                  .min.node.size = c(5,10)))
 # set.seed(1234)
 # F5_ctree_mod <- train(runs_5th ~ .,
-#                              data = train_F5,
+#                              data = train_F5 %>% select(-contains("Outcome_")),
 #                    method = "ctree",
 #                    trControl = fitControl,
 #                    tuneLength = 10)
 set.seed(1234)
 F5_pls_mod <- train(runs_5th ~ .,
-                           data = train_F5,
+                           data = train_F5 %>% select(-contains("Outcome_")),
                            method = "pls",
                            trControl = fitControl,
                            tuneLength = 15,
                            preProc = c("center", "scale"))
 # set.seed(1234)
 # F5_lm_mod <- train(runs_5th ~ .,
-#                           data = train_F5,
+#                           data = train_F5 %>% select(-contains("Outcome_")),
 #                 method = "lm",
 #                 trControl = fitControl)
 
 stopCluster(cluster)
 intervalEnd <- Sys.time()
-paste("F5 uns regression model training took",intervalEnd - intervalStart,attr(intervalEnd - intervalStart,"units"))
+paste("F5 runs regression model training took",intervalEnd - intervalStart,attr(intervalEnd - intervalStart,"units"))
 
 saveRDS(F5_gbm_mod, "C:/Users/danie/Desktop/SportsStuff/TheMachine/BaseballModels/F5_gbm.rds")
 saveRDS(F5_cub_mod, "C:/Users/danie/Desktop/SportsStuff/TheMachine/BaseballModels/F5_cub.rds")
@@ -350,6 +453,84 @@ saveRDS(F5_rf_mod, "C:/Users/danie/Desktop/SportsStuff/TheMachine/BaseballModels
 # saveRDS(F5_ctree_mod, "C:/Users/danie/Desktop/SportsStuff/TheMachine/BaseballModels/F5_ctree.rds")
 saveRDS(F5_pls_mod, "C:/Users/danie/Desktop/SportsStuff/TheMachine/BaseballModels/F5_pls.rds")
 # saveRDS(F5_lm_mod, "C:/Users/danie/Desktop/SportsStuff/TheMachine/BaseballModels/F5_lm.rds")
+
+intervalStart <- Sys.time()
+cluster <- makeCluster(detectCores() - 1)
+registerDoParallel(cluster)
+
+fitControl <- trainControl(method = "repeatedcv",
+                           number = 10,
+                           allowParallel = TRUE)
+
+set.seed(1234)
+F1_gbm_mod <- train(runs_1st ~ .,
+                    data = train_F1 %>% select(-contains("Outcome_")),
+                    method = "gbm",
+                    trControl = fitControl)
+set.seed(1234)
+F1_cub_mod <- train(runs_1st ~ .,
+                    data = train_F1 %>% select(-contains("Outcome_")),
+                    method = "cubist",
+                    trControl = fitControl,
+                    tuneGrid = expand.grid(.committees=20,
+                                           .neighbors=9))
+set.seed(1234)
+F1_rf_mod <- train(runs_1st ~ .,
+                   data = train_F1 %>% select(-contains("Outcome_")),
+                   method = "ranger",
+                   trControl = fitControl,
+                   tuneGrid = expand.grid(.mtry = c(10,15,20),
+                                          .splitrule = c("variance", "extratrees"),
+                                          .min.node.size = c(5,10)))
+# set.seed(1234)
+# F1_ctree_mod <- train(runs_1st ~ .,
+#                              data = train_F1 %>% select(-contains("Outcome_")),
+#                    method = "ctree",
+#                    trControl = fitControl,
+#                    tuneLength = 10)
+set.seed(1234)
+F1_pls_mod <- train(runs_1st ~ .,
+                    data = train_F1 %>% select(-contains("Outcome_")),
+                    method = "pls",
+                    trControl = fitControl,
+                    tuneLength = 15,
+                    preProc = c("center", "scale"))
+# set.seed(1234)
+# F1_lm_mod <- train(runs_1st ~ .,
+#                           data = train_F1 %>% select(-contains("Outcome_")),
+#                 method = "lm",
+#                 trControl = fitControl)
+
+stopCluster(cluster)
+intervalEnd <- Sys.time()
+paste("F1 runs regression model training took",intervalEnd - intervalStart,attr(intervalEnd - intervalStart,"units"))
+
+saveRDS(F1_gbm_mod, "C:/Users/danie/Desktop/SportsStuff/TheMachine/BaseballModels/F1_gbm.rds")
+saveRDS(F1_cub_mod, "C:/Users/danie/Desktop/SportsStuff/TheMachine/BaseballModels/F1_cub.rds")
+saveRDS(F1_rf_mod, "C:/Users/danie/Desktop/SportsStuff/TheMachine/BaseballModels/F1_rf.rds")
+# saveRDS(F1_ctree_mod, "C:/Users/danie/Desktop/SportsStuff/TheMachine/BaseballModels/F1_ctree.rds")
+saveRDS(F1_pls_mod, "C:/Users/danie/Desktop/SportsStuff/TheMachine/BaseballModels/F1_pls.rds")
+# saveRDS(F1_lm_mod, "C:/Users/danie/Desktop/SportsStuff/TheMachine/BaseballModels/F1_lm.rds")
+
+## Create training DFs for classification models
+
+doubles <- train_full_game_home <- DF_Rate_Adj %>% 
+  ungroup() %>% 
+  select(home_team_season, month, home_team_league_name, home_team_division_name,
+         doubleHeader, gameNumber, dayNight, venue.name, contains('_AwaySP'),
+         contains('_HomeSP'), contains('_HomeBatters'), contains('_AwayBatters'),
+         contains('_AwayBullpen'), contains('_HomeBullpen'), contains('Outcome_')) %>% 
+  filter(!is.na(IP_HomeSP) &
+           !is.na(IP_AwaySP) &
+           !is.na(PA_L7_HomeBatters) &
+           !is.na(PA_L7_AwayBatters) &
+           !is.na(IP_L7_HomeBullpen) &
+           !is.na(IP_L7_AwayBullpen) &
+           !is.na(PA_L30_HomeBatters) &
+           !is.na(PA_L30_AwayBatters) &
+           !is.na(IP_HomeBullpen) &
+           !is.na(IP_AwayBullpen)) %>% 
+  replace(is.na(.), 0)
 
 ## Identify response (y) and predictor (x) column names for component models
 
