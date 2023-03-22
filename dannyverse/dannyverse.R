@@ -1,0 +1,5 @@
+## Source all files/functions in dannyverse
+source("dannyverse/simulate_game.R")
+source("dannyverse/simulate_spread.R")
+source("dannyverse/simulate_total.R")
+source("dannyverse/simulate_team_total.R")

@@ -2,9 +2,12 @@
 ### Predictions
 
 library("pacman")
-p_load("tidyverse", "caret", "parallel", "doParallel"
-       # , "h2o", "bit64", "zoo", "reshape"
-       )
+p_load(
+  "tidyverse",
+  "caret",
+  "parallel",
+  "doParallel"
+  )
 
 DF19 <- readRDS("Baseball Machine/Daily Files/2019/full_training_data.rds") %>%
   ungroup()
@@ -316,7 +319,7 @@ train_F1 <- train_F1_home %>%
   mutate(Outcome_F1_TT_0.5 = as.factor(case_when(runs_1st > 0.5 ~ 'Over',
                                                  TRUE ~ 'Under')))
 
-## Train models
+## Train regression models
 
 intervalStart <- Sys.time()
 cluster <- makeCluster(detectCores() - 1)
@@ -346,12 +349,6 @@ full_game_rf_mod <- train(runs_final ~ .,
                 tuneGrid = expand.grid(.mtry = c(10,15,20),
                                        .splitrule = c("variance", "extratrees"),
                                        .min.node.size = c(5,10)))
-# set.seed(1234)
-# full_game_ctree_mod <- train(runs_final ~ .,
-#                              data = train_full_game %>% select(-contains("Outcome_")),
-#                    method = "ctree",
-#                    trControl = fitControl,
-#                    tuneLength = 10)
 set.seed(1234)
 full_game_pls_mod <- train(runs_final ~ .,
                            data = train_full_game %>% select(-contains("Outcome_")),
@@ -359,11 +356,6 @@ full_game_pls_mod <- train(runs_final ~ .,
                  trControl = fitControl,
                  tuneLength = 15,
                  preProc = c("center", "scale"))
-# set.seed(1234)
-# full_game_lm_mod <- train(runs_final ~ .,
-#                           data = train_full_game %>% select(-contains("Outcome_")),
-#                 method = "lm",
-#                 trControl = fitControl)
 
 stopCluster(cluster)
 intervalEnd <- Sys.time()
@@ -372,17 +364,13 @@ paste("Full game runs regression model training took",intervalEnd - intervalStar
 saveRDS(full_game_gbm_mod, "C:/Users/danie/Desktop/SportsStuff/TheMachine/BaseballModels/full_game_gbm.rds")
 saveRDS(full_game_cub_mod, "C:/Users/danie/Desktop/SportsStuff/TheMachine/BaseballModels/full_game_cub.rds")
 saveRDS(full_game_rf_mod, "C:/Users/danie/Desktop/SportsStuff/TheMachine/BaseballModels/full_game_rf.rds")
-# saveRDS(full_game_ctree_mod, "C:/Users/danie/Desktop/SportsStuff/TheMachine/BaseballModels/full_game_ctree.rds")
 saveRDS(full_game_pls_mod, "C:/Users/danie/Desktop/SportsStuff/TheMachine/BaseballModels/full_game_pls.rds")
-# saveRDS(full_game_lm_mod, "C:/Users/danie/Desktop/SportsStuff/TheMachine/BaseballModels/full_game_lm.rds")
 
 set.seed(1234)
 allResamples <- resamples(list("GBM" = full_game_gbm_mod,
                                "Cubist" = full_game_cub_mod,
                                "RF" = full_game_rf_mod,
-                               # "CI Tree" = full_game_ctree_mod,
-                               "PLS" = full_game_pls_mod#,
-                               # "LM" = full_game_lm_mod
+                               "PLS" = full_game_pls_mod
                                ))
 
 parallelplot(allResamples, metric = "RMSE")
@@ -424,12 +412,6 @@ F5_rf_mod <- train(runs_5th ~ .,
                           tuneGrid = expand.grid(.mtry = c(10,15,20),
                                                  .splitrule = c("variance", "extratrees"),
                                                  .min.node.size = c(5,10)))
-# set.seed(1234)
-# F5_ctree_mod <- train(runs_5th ~ .,
-#                              data = train_F5 %>% select(-contains("Outcome_")),
-#                    method = "ctree",
-#                    trControl = fitControl,
-#                    tuneLength = 10)
 set.seed(1234)
 F5_pls_mod <- train(runs_5th ~ .,
                            data = train_F5 %>% select(-contains("Outcome_")),
@@ -437,11 +419,6 @@ F5_pls_mod <- train(runs_5th ~ .,
                            trControl = fitControl,
                            tuneLength = 15,
                            preProc = c("center", "scale"))
-# set.seed(1234)
-# F5_lm_mod <- train(runs_5th ~ .,
-#                           data = train_F5 %>% select(-contains("Outcome_")),
-#                 method = "lm",
-#                 trControl = fitControl)
 
 stopCluster(cluster)
 intervalEnd <- Sys.time()
@@ -450,9 +427,7 @@ paste("F5 runs regression model training took",intervalEnd - intervalStart,attr(
 saveRDS(F5_gbm_mod, "C:/Users/danie/Desktop/SportsStuff/TheMachine/BaseballModels/F5_gbm.rds")
 saveRDS(F5_cub_mod, "C:/Users/danie/Desktop/SportsStuff/TheMachine/BaseballModels/F5_cub.rds")
 saveRDS(F5_rf_mod, "C:/Users/danie/Desktop/SportsStuff/TheMachine/BaseballModels/F5_rf.rds")
-# saveRDS(F5_ctree_mod, "C:/Users/danie/Desktop/SportsStuff/TheMachine/BaseballModels/F5_ctree.rds")
 saveRDS(F5_pls_mod, "C:/Users/danie/Desktop/SportsStuff/TheMachine/BaseballModels/F5_pls.rds")
-# saveRDS(F5_lm_mod, "C:/Users/danie/Desktop/SportsStuff/TheMachine/BaseballModels/F5_lm.rds")
 
 intervalStart <- Sys.time()
 cluster <- makeCluster(detectCores() - 1)
@@ -482,12 +457,6 @@ F1_rf_mod <- train(runs_1st ~ .,
                    tuneGrid = expand.grid(.mtry = c(10,15,20),
                                           .splitrule = c("variance", "extratrees"),
                                           .min.node.size = c(5,10)))
-# set.seed(1234)
-# F1_ctree_mod <- train(runs_1st ~ .,
-#                              data = train_F1 %>% select(-contains("Outcome_")),
-#                    method = "ctree",
-#                    trControl = fitControl,
-#                    tuneLength = 10)
 set.seed(1234)
 F1_pls_mod <- train(runs_1st ~ .,
                     data = train_F1 %>% select(-contains("Outcome_")),
@@ -495,11 +464,6 @@ F1_pls_mod <- train(runs_1st ~ .,
                     trControl = fitControl,
                     tuneLength = 15,
                     preProc = c("center", "scale"))
-# set.seed(1234)
-# F1_lm_mod <- train(runs_1st ~ .,
-#                           data = train_F1 %>% select(-contains("Outcome_")),
-#                 method = "lm",
-#                 trControl = fitControl)
 
 stopCluster(cluster)
 intervalEnd <- Sys.time()
@@ -508,9 +472,7 @@ paste("F1 runs regression model training took",intervalEnd - intervalStart,attr(
 saveRDS(F1_gbm_mod, "C:/Users/danie/Desktop/SportsStuff/TheMachine/BaseballModels/F1_gbm.rds")
 saveRDS(F1_cub_mod, "C:/Users/danie/Desktop/SportsStuff/TheMachine/BaseballModels/F1_cub.rds")
 saveRDS(F1_rf_mod, "C:/Users/danie/Desktop/SportsStuff/TheMachine/BaseballModels/F1_rf.rds")
-# saveRDS(F1_ctree_mod, "C:/Users/danie/Desktop/SportsStuff/TheMachine/BaseballModels/F1_ctree.rds")
 saveRDS(F1_pls_mod, "C:/Users/danie/Desktop/SportsStuff/TheMachine/BaseballModels/F1_pls.rds")
-# saveRDS(F1_lm_mod, "C:/Users/danie/Desktop/SportsStuff/TheMachine/BaseballModels/F1_lm.rds")
 
 ## Create training DFs for classification models
 
@@ -531,6 +493,927 @@ doubles <- train_full_game_home <- DF_Rate_Adj %>%
            !is.na(IP_HomeBullpen) &
            !is.na(IP_AwayBullpen)) %>% 
   replace(is.na(.), 0)
+
+## Train classification models
+
+intervalStart <- Sys.time()
+cluster <- makeCluster(detectCores() - 1)
+registerDoParallel(cluster)
+
+fitControl <- trainControl(method = "repeatedcv",
+                           number = 10,
+                           allowParallel = TRUE)
+
+set.seed(1234)
+FG_ML_gbm <- train(Outcome_FG_ML ~ .,
+                     data = doubles %>% select(-contains('Outcome_'), Outcome_FG_ML),
+                     method = "gbm",
+                     trControl = fitControl)
+set.seed(1234)
+FG_ML_pls <- train(Outcome_FG_ML ~ .,
+                   data = doubles %>% select(-contains('Outcome_'), Outcome_FG_ML),
+                     method = "pls",
+                     trControl = fitControl,
+                     tuneLength = 15,
+                     preProc = c("center", "scale"))
+set.seed(1234)
+FG_ML_xgb <- train(Outcome_FG_ML ~ .,
+                   data = doubles %>% select(-contains('Outcome_'), Outcome_FG_ML),
+                     method = "xgbTree",
+                     trControl = fitControl)
+
+stopCluster(cluster)
+intervalEnd <- Sys.time()
+paste("FG ML classification model training took",intervalEnd - intervalStart,attr(intervalEnd - intervalStart,"units"))
+
+saveRDS(FG_ML_gbm, "C:/Users/danie/Desktop/SportsStuff/TheMachine/BaseballModels/FG_ML_gbm.rds")
+saveRDS(FG_ML_pls, "C:/Users/danie/Desktop/SportsStuff/TheMachine/BaseballModels/FG_ML_pls.rds")
+saveRDS(FG_ML_xgb, "C:/Users/danie/Desktop/SportsStuff/TheMachine/BaseballModels/FG_ML_xgb.rds")
+
+intervalStart <- Sys.time()
+cluster <- makeCluster(detectCores() - 1)
+registerDoParallel(cluster)
+
+fitControl <- trainControl(method = "repeatedcv",
+                           number = 10,
+                           allowParallel = TRUE)
+
+set.seed(1234)
+FG_Minus_1.5_gbm <- train(Outcome_FG_Minus_1.5 ~ .,
+                   data = doubles %>% select(-contains('Outcome_'), Outcome_FG_Minus_1.5),
+                   method = "gbm",
+                   trControl = fitControl)
+set.seed(1234)
+FG_Minus_1.5_pls <- train(Outcome_FG_Minus_1.5 ~ .,
+                   data = doubles %>% select(-contains('Outcome_'), Outcome_FG_Minus_1.5),
+                   method = "pls",
+                   trControl = fitControl,
+                   tuneLength = 15,
+                   preProc = c("center", "scale"))
+set.seed(1234)
+FG_Minus_1.5_xgb <- train(Outcome_FG_Minus_1.5 ~ .,
+                   data = doubles %>% select(-contains('Outcome_'), Outcome_FG_Minus_1.5),
+                   method = "xgbTree",
+                   trControl = fitControl)
+
+stopCluster(cluster)
+intervalEnd <- Sys.time()
+paste("FG Minus 1.5 classification model training took",intervalEnd - intervalStart,attr(intervalEnd - intervalStart,"units"))
+
+saveRDS(FG_Minus_1.5_gbm, "C:/Users/danie/Desktop/SportsStuff/TheMachine/BaseballModels/FG_Minus_1.5_gbm.rds")
+saveRDS(FG_Minus_1.5_pls, "C:/Users/danie/Desktop/SportsStuff/TheMachine/BaseballModels/FG_Minus_1.5_pls.rds")
+saveRDS(FG_Minus_1.5_xgb, "C:/Users/danie/Desktop/SportsStuff/TheMachine/BaseballModels/FG_Minus_1.5_xgb.rds")
+
+intervalStart <- Sys.time()
+cluster <- makeCluster(detectCores() - 1)
+registerDoParallel(cluster)
+
+fitControl <- trainControl(method = "repeatedcv",
+                           number = 10,
+                           allowParallel = TRUE)
+
+set.seed(1234)
+FG_Minus_2.5_gbm <- train(Outcome_FG_Minus_2.5 ~ .,
+                          data = doubles %>% select(-contains('Outcome_'), Outcome_FG_Minus_2.5),
+                          method = "gbm",
+                          trControl = fitControl)
+set.seed(1234)
+FG_Minus_2.5_pls <- train(Outcome_FG_Minus_2.5 ~ .,
+                          data = doubles %>% select(-contains('Outcome_'), Outcome_FG_Minus_2.5),
+                          method = "pls",
+                          trControl = fitControl,
+                          tuneLength = 15,
+                          preProc = c("center", "scale"))
+set.seed(1234)
+FG_Minus_2.5_xgb <- train(Outcome_FG_Minus_2.5 ~ .,
+                          data = doubles %>% select(-contains('Outcome_'), Outcome_FG_Minus_2.5),
+                          method = "xgbTree",
+                          trControl = fitControl)
+
+stopCluster(cluster)
+intervalEnd <- Sys.time()
+paste("FG Minus 2.5 classification model training took",intervalEnd - intervalStart,attr(intervalEnd - intervalStart,"units"))
+
+saveRDS(FG_Minus_2.5_gbm, "C:/Users/danie/Desktop/SportsStuff/TheMachine/BaseballModels/FG_Minus_2.5_gbm.rds")
+saveRDS(FG_Minus_2.5_pls, "C:/Users/danie/Desktop/SportsStuff/TheMachine/BaseballModels/FG_Minus_2.5_pls.rds")
+saveRDS(FG_Minus_2.5_xgb, "C:/Users/danie/Desktop/SportsStuff/TheMachine/BaseballModels/FG_Minus_2.5_xgb.rds")
+
+intervalStart <- Sys.time()
+cluster <- makeCluster(detectCores() - 1)
+registerDoParallel(cluster)
+
+fitControl <- trainControl(method = "repeatedcv",
+                           number = 10,
+                           allowParallel = TRUE)
+
+set.seed(1234)
+FG_Plus_1.5_gbm <- train(Outcome_FG_Plus_1.5 ~ .,
+                          data = doubles %>% select(-contains('Outcome_'), Outcome_FG_Plus_1.5),
+                          method = "gbm",
+                          trControl = fitControl)
+set.seed(1234)
+FG_Plus_1.5_pls <- train(Outcome_FG_Plus_1.5 ~ .,
+                          data = doubles %>% select(-contains('Outcome_'), Outcome_FG_Plus_1.5),
+                          method = "pls",
+                          trControl = fitControl,
+                          tuneLength = 15,
+                          preProc = c("center", "scale"))
+set.seed(1234)
+FG_Plus_1.5_xgb <- train(Outcome_FG_Plus_1.5 ~ .,
+                          data = doubles %>% select(-contains('Outcome_'), Outcome_FG_Plus_1.5),
+                          method = "xgbTree",
+                          trControl = fitControl)
+
+stopCluster(cluster)
+intervalEnd <- Sys.time()
+paste("FG Plus 1.5 classification model training took",intervalEnd - intervalStart,attr(intervalEnd - intervalStart,"units"))
+
+saveRDS(FG_Plus_1.5_gbm, "C:/Users/danie/Desktop/SportsStuff/TheMachine/BaseballModels/FG_Plus_1.5_gbm.rds")
+saveRDS(FG_Plus_1.5_pls, "C:/Users/danie/Desktop/SportsStuff/TheMachine/BaseballModels/FG_Plus_1.5_pls.rds")
+saveRDS(FG_Plus_1.5_xgb, "C:/Users/danie/Desktop/SportsStuff/TheMachine/BaseballModels/FG_Plus_1.5_xgb.rds")
+
+intervalStart <- Sys.time()
+cluster <- makeCluster(detectCores() - 1)
+registerDoParallel(cluster)
+
+fitControl <- trainControl(method = "repeatedcv",
+                           number = 10,
+                           allowParallel = TRUE)
+
+set.seed(1234)
+FG_Plus_2.5_gbm <- train(Outcome_FG_Plus_2.5 ~ .,
+                          data = doubles %>% select(-contains('Outcome_'), Outcome_FG_Plus_2.5),
+                          method = "gbm",
+                          trControl = fitControl)
+set.seed(1234)
+FG_Plus_2.5_pls <- train(Outcome_FG_Plus_2.5 ~ .,
+                          data = doubles %>% select(-contains('Outcome_'), Outcome_FG_Plus_2.5),
+                          method = "pls",
+                          trControl = fitControl,
+                          tuneLength = 15,
+                          preProc = c("center", "scale"))
+set.seed(1234)
+FG_Plus_2.5_xgb <- train(Outcome_FG_Plus_2.5 ~ .,
+                          data = doubles %>% select(-contains('Outcome_'), Outcome_FG_Plus_2.5),
+                          method = "xgbTree",
+                          trControl = fitControl)
+
+stopCluster(cluster)
+intervalEnd <- Sys.time()
+paste("FG Plus 2.5 classification model training took",intervalEnd - intervalStart,attr(intervalEnd - intervalStart,"units"))
+
+saveRDS(FG_Plus_2.5_gbm, "C:/Users/danie/Desktop/SportsStuff/TheMachine/BaseballModels/FG_Plus_2.5_gbm.rds")
+saveRDS(FG_Plus_2.5_pls, "C:/Users/danie/Desktop/SportsStuff/TheMachine/BaseballModels/FG_Plus_2.5_pls.rds")
+saveRDS(FG_Plus_2.5_xgb, "C:/Users/danie/Desktop/SportsStuff/TheMachine/BaseballModels/FG_Plus_2.5_xgb.rds")
+
+intervalStart <- Sys.time()
+cluster <- makeCluster(detectCores() - 1)
+registerDoParallel(cluster)
+
+fitControl <- trainControl(method = "repeatedcv",
+                           number = 10,
+                           allowParallel = TRUE)
+
+set.seed(1234)
+FG_Total_6.5_gbm <- train(Outcome_FG_Total_6.5 ~ .,
+                         data = doubles %>% select(-contains('Outcome_'), Outcome_FG_Total_6.5),
+                         method = "gbm",
+                         trControl = fitControl)
+set.seed(1234)
+FG_Total_6.5_pls <- train(Outcome_FG_Total_6.5 ~ .,
+                         data = doubles %>% select(-contains('Outcome_'), Outcome_FG_Total_6.5),
+                         method = "pls",
+                         trControl = fitControl,
+                         tuneLength = 15,
+                         preProc = c("center", "scale"))
+set.seed(1234)
+FG_Total_6.5_xgb <- train(Outcome_FG_Total_6.5 ~ .,
+                         data = doubles %>% select(-contains('Outcome_'), Outcome_FG_Total_6.5),
+                         method = "xgbTree",
+                         trControl = fitControl)
+
+stopCluster(cluster)
+intervalEnd <- Sys.time()
+paste("FG Total 6.5 classification model training took",intervalEnd - intervalStart,attr(intervalEnd - intervalStart,"units"))
+
+saveRDS(FG_Total_6.5_gbm, "C:/Users/danie/Desktop/SportsStuff/TheMachine/BaseballModels/FG_Total_6.5_gbm.rds")
+saveRDS(FG_Total_6.5_pls, "C:/Users/danie/Desktop/SportsStuff/TheMachine/BaseballModels/FG_Total_6.5_pls.rds")
+saveRDS(FG_Total_6.5_xgb, "C:/Users/danie/Desktop/SportsStuff/TheMachine/BaseballModels/FG_Total_6.5_xgb.rds")
+
+intervalStart <- Sys.time()
+cluster <- makeCluster(detectCores() - 1)
+registerDoParallel(cluster)
+
+fitControl <- trainControl(method = "repeatedcv",
+                           number = 10,
+                           allowParallel = TRUE)
+
+set.seed(1234)
+FG_Total_7_gbm <- train(Outcome_FG_Total_7 ~ .,
+                          data = doubles %>% select(-contains('Outcome_'), Outcome_FG_Total_7),
+                          method = "gbm",
+                          trControl = fitControl)
+set.seed(1234)
+FG_Total_7_pls <- train(Outcome_FG_Total_7 ~ .,
+                          data = doubles %>% select(-contains('Outcome_'), Outcome_FG_Total_7),
+                          method = "pls",
+                          trControl = fitControl,
+                          tuneLength = 15,
+                          preProc = c("center", "scale"))
+set.seed(1234)
+FG_Total_7_xgb <- train(Outcome_FG_Total_7 ~ .,
+                          data = doubles %>% select(-contains('Outcome_'), Outcome_FG_Total_7),
+                          method = "xgbTree",
+                          trControl = fitControl)
+
+stopCluster(cluster)
+intervalEnd <- Sys.time()
+paste("FG Total 7 classification model training took",intervalEnd - intervalStart,attr(intervalEnd - intervalStart,"units"))
+
+saveRDS(FG_Total_7_gbm, "C:/Users/danie/Desktop/SportsStuff/TheMachine/BaseballModels/FG_Total_7_gbm.rds")
+saveRDS(FG_Total_7_pls, "C:/Users/danie/Desktop/SportsStuff/TheMachine/BaseballModels/FG_Total_7_pls.rds")
+saveRDS(FG_Total_7_xgb, "C:/Users/danie/Desktop/SportsStuff/TheMachine/BaseballModels/FG_Total_7_xgb.rds")
+
+intervalStart <- Sys.time()
+cluster <- makeCluster(detectCores() - 1)
+registerDoParallel(cluster)
+
+fitControl <- trainControl(method = "repeatedcv",
+                           number = 10,
+                           allowParallel = TRUE)
+
+set.seed(1234)
+FG_Total_7.5_gbm <- train(Outcome_FG_Total_7.5 ~ .,
+                        data = doubles %>% select(-contains('Outcome_'), Outcome_FG_Total_7.5),
+                        method = "gbm",
+                        trControl = fitControl)
+set.seed(1234)
+FG_Total_7.5_pls <- train(Outcome_FG_Total_7.5 ~ .,
+                        data = doubles %>% select(-contains('Outcome_'), Outcome_FG_Total_7.5),
+                        method = "pls",
+                        trControl = fitControl,
+                        tuneLength = 15,
+                        preProc = c("center", "scale"))
+set.seed(1234)
+FG_Total_7.5_xgb <- train(Outcome_FG_Total_7.5 ~ .,
+                        data = doubles %>% select(-contains('Outcome_'), Outcome_FG_Total_7.5),
+                        method = "xgbTree",
+                        trControl = fitControl)
+
+stopCluster(cluster)
+intervalEnd <- Sys.time()
+paste("FG Total 7.5 classification model training took",intervalEnd - intervalStart,attr(intervalEnd - intervalStart,"units"))
+
+saveRDS(FG_Total_7.5_gbm, "C:/Users/danie/Desktop/SportsStuff/TheMachine/BaseballModels/FG_Total_7.5_gbm.rds")
+saveRDS(FG_Total_7.5_pls, "C:/Users/danie/Desktop/SportsStuff/TheMachine/BaseballModels/FG_Total_7.5_pls.rds")
+saveRDS(FG_Total_7.5_xgb, "C:/Users/danie/Desktop/SportsStuff/TheMachine/BaseballModels/FG_Total_7.5_xgb.rds")
+
+intervalStart <- Sys.time()
+cluster <- makeCluster(detectCores() - 1)
+registerDoParallel(cluster)
+
+fitControl <- trainControl(method = "repeatedcv",
+                           number = 10,
+                           allowParallel = TRUE)
+
+set.seed(1234)
+FG_Total_8_gbm <- train(Outcome_FG_Total_8 ~ .,
+                        data = doubles %>% select(-contains('Outcome_'), Outcome_FG_Total_8),
+                        method = "gbm",
+                        trControl = fitControl)
+set.seed(1234)
+FG_Total_8_pls <- train(Outcome_FG_Total_8 ~ .,
+                        data = doubles %>% select(-contains('Outcome_'), Outcome_FG_Total_8),
+                        method = "pls",
+                        trControl = fitControl,
+                        tuneLength = 15,
+                        preProc = c("center", "scale"))
+set.seed(1234)
+FG_Total_8_xgb <- train(Outcome_FG_Total_8 ~ .,
+                        data = doubles %>% select(-contains('Outcome_'), Outcome_FG_Total_8),
+                        method = "xgbTree",
+                        trControl = fitControl)
+
+stopCluster(cluster)
+intervalEnd <- Sys.time()
+paste("FG Total 8 classification model training took",intervalEnd - intervalStart,attr(intervalEnd - intervalStart,"units"))
+
+saveRDS(FG_Total_8_gbm, "C:/Users/danie/Desktop/SportsStuff/TheMachine/BaseballModels/FG_Total_8_gbm.rds")
+saveRDS(FG_Total_8_pls, "C:/Users/danie/Desktop/SportsStuff/TheMachine/BaseballModels/FG_Total_8_pls.rds")
+saveRDS(FG_Total_8_xgb, "C:/Users/danie/Desktop/SportsStuff/TheMachine/BaseballModels/FG_Total_8_xgb.rds")
+
+intervalStart <- Sys.time()
+cluster <- makeCluster(detectCores() - 1)
+registerDoParallel(cluster)
+
+fitControl <- trainControl(method = "repeatedcv",
+                           number = 10,
+                           allowParallel = TRUE)
+
+set.seed(1234)
+FG_Total_8.5_gbm <- train(Outcome_FG_Total_8.5 ~ .,
+                          data = doubles %>% select(-contains('Outcome_'), Outcome_FG_Total_8.5),
+                          method = "gbm",
+                          trControl = fitControl)
+set.seed(1234)
+FG_Total_8.5_pls <- train(Outcome_FG_Total_8.5 ~ .,
+                          data = doubles %>% select(-contains('Outcome_'), Outcome_FG_Total_8.5),
+                          method = "pls",
+                          trControl = fitControl,
+                          tuneLength = 15,
+                          preProc = c("center", "scale"))
+set.seed(1234)
+FG_Total_8.5_xgb <- train(Outcome_FG_Total_8.5 ~ .,
+                          data = doubles %>% select(-contains('Outcome_'), Outcome_FG_Total_8.5),
+                          method = "xgbTree",
+                          trControl = fitControl)
+
+stopCluster(cluster)
+intervalEnd <- Sys.time()
+paste("FG Total 8.5 classification model training took",intervalEnd - intervalStart,attr(intervalEnd - intervalStart,"units"))
+
+saveRDS(FG_Total_8.5_gbm, "C:/Users/danie/Desktop/SportsStuff/TheMachine/BaseballModels/FG_Total_8.5_gbm.rds")
+saveRDS(FG_Total_8.5_pls, "C:/Users/danie/Desktop/SportsStuff/TheMachine/BaseballModels/FG_Total_8.5_pls.rds")
+saveRDS(FG_Total_8.5_xgb, "C:/Users/danie/Desktop/SportsStuff/TheMachine/BaseballModels/FG_Total_8.5_xgb.rds")
+
+intervalStart <- Sys.time()
+cluster <- makeCluster(detectCores() - 1)
+registerDoParallel(cluster)
+
+fitControl <- trainControl(method = "repeatedcv",
+                           number = 10,
+                           allowParallel = TRUE)
+
+set.seed(1234)
+FG_Total_9_gbm <- train(Outcome_FG_Total_9 ~ .,
+                        data = doubles %>% select(-contains('Outcome_'), Outcome_FG_Total_9),
+                        method = "gbm",
+                        trControl = fitControl)
+set.seed(1234)
+FG_Total_9_pls <- train(Outcome_FG_Total_9 ~ .,
+                        data = doubles %>% select(-contains('Outcome_'), Outcome_FG_Total_9),
+                        method = "pls",
+                        trControl = fitControl,
+                        tuneLength = 15,
+                        preProc = c("center", "scale"))
+set.seed(1234)
+FG_Total_9_xgb <- train(Outcome_FG_Total_9 ~ .,
+                        data = doubles %>% select(-contains('Outcome_'), Outcome_FG_Total_9),
+                        method = "xgbTree",
+                        trControl = fitControl)
+
+stopCluster(cluster)
+intervalEnd <- Sys.time()
+paste("FG Total 9 classification model training took",intervalEnd - intervalStart,attr(intervalEnd - intervalStart,"units"))
+
+saveRDS(FG_Total_9_gbm, "C:/Users/danie/Desktop/SportsStuff/TheMachine/BaseballModels/FG_Total_9_gbm.rds")
+saveRDS(FG_Total_9_pls, "C:/Users/danie/Desktop/SportsStuff/TheMachine/BaseballModels/FG_Total_9_pls.rds")
+saveRDS(FG_Total_9_xgb, "C:/Users/danie/Desktop/SportsStuff/TheMachine/BaseballModels/FG_Total_9_xgb.rds")
+
+intervalStart <- Sys.time()
+cluster <- makeCluster(detectCores() - 1)
+registerDoParallel(cluster)
+
+fitControl <- trainControl(method = "repeatedcv",
+                           number = 10,
+                           allowParallel = TRUE)
+
+set.seed(1234)
+FG_Total_9.5_gbm <- train(Outcome_FG_Total_9.5 ~ .,
+                          data = doubles %>% select(-contains('Outcome_'), Outcome_FG_Total_9.5),
+                          method = "gbm",
+                          trControl = fitControl)
+set.seed(1234)
+FG_Total_9.5_pls <- train(Outcome_FG_Total_9.5 ~ .,
+                          data = doubles %>% select(-contains('Outcome_'), Outcome_FG_Total_9.5),
+                          method = "pls",
+                          trControl = fitControl,
+                          tuneLength = 15,
+                          preProc = c("center", "scale"))
+set.seed(1234)
+FG_Total_9.5_xgb <- train(Outcome_FG_Total_9.5 ~ .,
+                          data = doubles %>% select(-contains('Outcome_'), Outcome_FG_Total_9.5),
+                          method = "xgbTree",
+                          trControl = fitControl)
+
+stopCluster(cluster)
+intervalEnd <- Sys.time()
+paste("FG Total 9.5 classification model training took",intervalEnd - intervalStart,attr(intervalEnd - intervalStart,"units"))
+
+saveRDS(FG_Total_9.5_gbm, "C:/Users/danie/Desktop/SportsStuff/TheMachine/BaseballModels/FG_Total_9.5_gbm.rds")
+saveRDS(FG_Total_9.5_pls, "C:/Users/danie/Desktop/SportsStuff/TheMachine/BaseballModels/FG_Total_9.5_pls.rds")
+saveRDS(FG_Total_9.5_xgb, "C:/Users/danie/Desktop/SportsStuff/TheMachine/BaseballModels/FG_Total_9.5_xgb.rds")
+
+intervalStart <- Sys.time()
+cluster <- makeCluster(detectCores() - 1)
+registerDoParallel(cluster)
+
+fitControl <- trainControl(method = "repeatedcv",
+                           number = 10,
+                           allowParallel = TRUE)
+
+set.seed(1234)
+FG_Total_10_gbm <- train(Outcome_FG_Total_10 ~ .,
+                        data = doubles %>% select(-contains('Outcome_'), Outcome_FG_Total_10),
+                        method = "gbm",
+                        trControl = fitControl)
+set.seed(1234)
+FG_Total_10_pls <- train(Outcome_FG_Total_10 ~ .,
+                        data = doubles %>% select(-contains('Outcome_'), Outcome_FG_Total_10),
+                        method = "pls",
+                        trControl = fitControl,
+                        tuneLength = 15,
+                        preProc = c("center", "scale"))
+set.seed(1234)
+FG_Total_10_xgb <- train(Outcome_FG_Total_10 ~ .,
+                        data = doubles %>% select(-contains('Outcome_'), Outcome_FG_Total_10),
+                        method = "xgbTree",
+                        trControl = fitControl)
+
+stopCluster(cluster)
+intervalEnd <- Sys.time()
+paste("FG Total 10 classification model training took",intervalEnd - intervalStart,attr(intervalEnd - intervalStart,"units"))
+
+saveRDS(FG_Total_10_gbm, "C:/Users/danie/Desktop/SportsStuff/TheMachine/BaseballModels/FG_Total_10_gbm.rds")
+saveRDS(FG_Total_10_pls, "C:/Users/danie/Desktop/SportsStuff/TheMachine/BaseballModels/FG_Total_10_pls.rds")
+saveRDS(FG_Total_10_xgb, "C:/Users/danie/Desktop/SportsStuff/TheMachine/BaseballModels/FG_Total_10_xgb.rds")
+
+intervalStart <- Sys.time()
+cluster <- makeCluster(detectCores() - 1)
+registerDoParallel(cluster)
+
+fitControl <- trainControl(method = "repeatedcv",
+                           number = 10,
+                           allowParallel = TRUE)
+
+set.seed(1234)
+FG_Total_10.5_gbm <- train(Outcome_FG_Total_10.5 ~ .,
+                          data = doubles %>% select(-contains('Outcome_'), Outcome_FG_Total_10.5),
+                          method = "gbm",
+                          trControl = fitControl)
+set.seed(1234)
+FG_Total_10.5_pls <- train(Outcome_FG_Total_10.5 ~ .,
+                          data = doubles %>% select(-contains('Outcome_'), Outcome_FG_Total_10.5),
+                          method = "pls",
+                          trControl = fitControl,
+                          tuneLength = 15,
+                          preProc = c("center", "scale"))
+set.seed(1234)
+FG_Total_10.5_xgb <- train(Outcome_FG_Total_10.5 ~ .,
+                          data = doubles %>% select(-contains('Outcome_'), Outcome_FG_Total_10.5),
+                          method = "xgbTree",
+                          trControl = fitControl)
+
+stopCluster(cluster)
+intervalEnd <- Sys.time()
+paste("FG Total 10.5 classification model training took",intervalEnd - intervalStart,attr(intervalEnd - intervalStart,"units"))
+
+saveRDS(FG_Total_10.5_gbm, "C:/Users/danie/Desktop/SportsStuff/TheMachine/BaseballModels/FG_Total_10.5_gbm.rds")
+saveRDS(FG_Total_10.5_pls, "C:/Users/danie/Desktop/SportsStuff/TheMachine/BaseballModels/FG_Total_10.5_pls.rds")
+saveRDS(FG_Total_10.5_xgb, "C:/Users/danie/Desktop/SportsStuff/TheMachine/BaseballModels/FG_Total_10.5_xgb.rds")
+
+intervalStart <- Sys.time()
+cluster <- makeCluster(detectCores() - 1)
+registerDoParallel(cluster)
+
+fitControl <- trainControl(method = "repeatedcv",
+                           number = 10,
+                           allowParallel = TRUE)
+
+set.seed(1234)
+FG_Total_11_gbm <- train(Outcome_FG_Total_11 ~ .,
+                        data = doubles %>% select(-contains('Outcome_'), Outcome_FG_Total_11),
+                        method = "gbm",
+                        trControl = fitControl)
+set.seed(1234)
+FG_Total_11_pls <- train(Outcome_FG_Total_11 ~ .,
+                        data = doubles %>% select(-contains('Outcome_'), Outcome_FG_Total_11),
+                        method = "pls",
+                        trControl = fitControl,
+                        tuneLength = 15,
+                        preProc = c("center", "scale"))
+set.seed(1234)
+FG_Total_11_xgb <- train(Outcome_FG_Total_11 ~ .,
+                        data = doubles %>% select(-contains('Outcome_'), Outcome_FG_Total_11),
+                        method = "xgbTree",
+                        trControl = fitControl)
+
+stopCluster(cluster)
+intervalEnd <- Sys.time()
+paste("FG Total 11 classification model training took",intervalEnd - intervalStart,attr(intervalEnd - intervalStart,"units"))
+
+saveRDS(FG_Total_11_gbm, "C:/Users/danie/Desktop/SportsStuff/TheMachine/BaseballModels/FG_Total_11_gbm.rds")
+saveRDS(FG_Total_11_pls, "C:/Users/danie/Desktop/SportsStuff/TheMachine/BaseballModels/FG_Total_11_pls.rds")
+saveRDS(FG_Total_11_xgb, "C:/Users/danie/Desktop/SportsStuff/TheMachine/BaseballModels/FG_Total_11_xgb.rds")
+
+intervalStart <- Sys.time()
+cluster <- makeCluster(detectCores() - 1)
+registerDoParallel(cluster)
+
+fitControl <- trainControl(method = "repeatedcv",
+                           number = 10,
+                           allowParallel = TRUE)
+
+set.seed(1234)
+FG_Total_11.5_gbm <- train(Outcome_FG_Total_11.5 ~ .,
+                          data = doubles %>% select(-contains('Outcome_'), Outcome_FG_Total_11.5),
+                          method = "gbm",
+                          trControl = fitControl)
+set.seed(1234)
+FG_Total_11.5_pls <- train(Outcome_FG_Total_11.5 ~ .,
+                          data = doubles %>% select(-contains('Outcome_'), Outcome_FG_Total_11.5),
+                          method = "pls",
+                          trControl = fitControl,
+                          tuneLength = 15,
+                          preProc = c("center", "scale"))
+set.seed(1234)
+FG_Total_11.5_xgb <- train(Outcome_FG_Total_11.5 ~ .,
+                          data = doubles %>% select(-contains('Outcome_'), Outcome_FG_Total_11.5),
+                          method = "xgbTree",
+                          trControl = fitControl)
+
+stopCluster(cluster)
+intervalEnd <- Sys.time()
+paste("FG Total 11.5 classification model training took",intervalEnd - intervalStart,attr(intervalEnd - intervalStart,"units"))
+
+saveRDS(FG_Total_11.5_gbm, "C:/Users/danie/Desktop/SportsStuff/TheMachine/BaseballModels/FG_Total_11.5_gbm.rds")
+saveRDS(FG_Total_11.5_pls, "C:/Users/danie/Desktop/SportsStuff/TheMachine/BaseballModels/FG_Total_11.5_pls.rds")
+saveRDS(FG_Total_11.5_xgb, "C:/Users/danie/Desktop/SportsStuff/TheMachine/BaseballModels/FG_Total_11.5_xgb.rds")
+
+intervalStart <- Sys.time()
+cluster <- makeCluster(detectCores() - 1)
+registerDoParallel(cluster)
+
+fitControl <- trainControl(method = "repeatedcv",
+                           number = 10,
+                           allowParallel = TRUE)
+
+set.seed(1234)
+F5_ML_gbm <- train(Outcome_F5_ML ~ .,
+                   data = doubles %>% select(-contains('Outcome_'), -contains('Bullpen'), Outcome_F5_ML),
+                   method = "gbm",
+                   trControl = fitControl)
+set.seed(1234)
+F5_ML_pls <- train(Outcome_F5_ML ~ .,
+                   data = doubles %>% select(-contains('Outcome_'), -contains('Bullpen'), Outcome_F5_ML),
+                   method = "pls",
+                   trControl = fitControl,
+                   tuneLength = 15,
+                   preProc = c("center", "scale"))
+set.seed(1234)
+F5_ML_xgb <- train(Outcome_F5_ML ~ .,
+                   data = doubles %>% select(-contains('Outcome_'), -contains('Bullpen'), Outcome_F5_ML),
+                   method = "xgbTree",
+                   trControl = fitControl)
+
+stopCluster(cluster)
+intervalEnd <- Sys.time()
+paste("F5 ML classification model training took",intervalEnd - intervalStart,attr(intervalEnd - intervalStart,"units"))
+
+saveRDS(F5_ML_gbm, "C:/Users/danie/Desktop/SportsStuff/TheMachine/BaseballModels/F5_ML_gbm.rds")
+saveRDS(F5_ML_pls, "C:/Users/danie/Desktop/SportsStuff/TheMachine/BaseballModels/F5_ML_pls.rds")
+saveRDS(F5_ML_xgb, "C:/Users/danie/Desktop/SportsStuff/TheMachine/BaseballModels/F5_ML_xgb.rds")
+
+intervalStart <- Sys.time()
+cluster <- makeCluster(detectCores() - 1)
+registerDoParallel(cluster)
+
+fitControl <- trainControl(method = "repeatedcv",
+                           number = 10,
+                           allowParallel = TRUE)
+
+set.seed(1234)
+F5_Minus_0.5_gbm <- train(Outcome_F5_Minus_0.5 ~ .,
+                          data = doubles %>% select(-contains('Outcome_'), -contains('Bullpen'), Outcome_F5_Minus_0.5),
+                          method = "gbm",
+                          trControl = fitControl)
+set.seed(1234)
+F5_Minus_0.5_pls <- train(Outcome_F5_Minus_0.5 ~ .,
+                          data = doubles %>% select(-contains('Outcome_'), -contains('Bullpen'), Outcome_F5_Minus_0.5),
+                          method = "pls",
+                          trControl = fitControl,
+                          tuneLength = 15,
+                          preProc = c("center", "scale"))
+set.seed(1234)
+F5_Minus_0.5_xgb <- train(Outcome_F5_Minus_0.5 ~ .,
+                          data = doubles %>% select(-contains('Outcome_'), -contains('Bullpen'), Outcome_F5_Minus_0.5),
+                          method = "xgbTree",
+                          trControl = fitControl)
+
+stopCluster(cluster)
+intervalEnd <- Sys.time()
+paste("F5 Minus 0.5 classification model training took",intervalEnd - intervalStart,attr(intervalEnd - intervalStart,"units"))
+
+saveRDS(F5_Minus_0.5_gbm, "C:/Users/danie/Desktop/SportsStuff/TheMachine/BaseballModels/F5_Minus_0.5_gbm.rds")
+saveRDS(F5_Minus_0.5_pls, "C:/Users/danie/Desktop/SportsStuff/TheMachine/BaseballModels/F5_Minus_0.5_pls.rds")
+saveRDS(F5_Minus_0.5_xgb, "C:/Users/danie/Desktop/SportsStuff/TheMachine/BaseballModels/F5_Minus_0.5_xgb.rds")
+
+intervalStart <- Sys.time()
+cluster <- makeCluster(detectCores() - 1)
+registerDoParallel(cluster)
+
+fitControl <- trainControl(method = "repeatedcv",
+                           number = 10,
+                           allowParallel = TRUE)
+
+set.seed(1234)
+F5_Minus_1.5_gbm <- train(Outcome_F5_Minus_1.5 ~ .,
+                          data = doubles %>% select(-contains('Outcome_'), -contains('Bullpen'), Outcome_F5_Minus_1.5),
+                          method = "gbm",
+                          trControl = fitControl)
+set.seed(1234)
+F5_Minus_1.5_pls <- train(Outcome_F5_Minus_1.5 ~ .,
+                          data = doubles %>% select(-contains('Outcome_'), -contains('Bullpen'), Outcome_F5_Minus_1.5),
+                          method = "pls",
+                          trControl = fitControl,
+                          tuneLength = 15,
+                          preProc = c("center", "scale"))
+set.seed(1234)
+F5_Minus_1.5_xgb <- train(Outcome_F5_Minus_1.5 ~ .,
+                          data = doubles %>% select(-contains('Outcome_'), -contains('Bullpen'), Outcome_F5_Minus_1.5),
+                          method = "xgbTree",
+                          trControl = fitControl)
+
+stopCluster(cluster)
+intervalEnd <- Sys.time()
+paste("F5 Minus 1.5 classification model training took",intervalEnd - intervalStart,attr(intervalEnd - intervalStart,"units"))
+
+saveRDS(F5_Minus_1.5_gbm, "C:/Users/danie/Desktop/SportsStuff/TheMachine/BaseballModels/F5_Minus_1.5_gbm.rds")
+saveRDS(F5_Minus_1.5_pls, "C:/Users/danie/Desktop/SportsStuff/TheMachine/BaseballModels/F5_Minus_1.5_pls.rds")
+saveRDS(F5_Minus_1.5_xgb, "C:/Users/danie/Desktop/SportsStuff/TheMachine/BaseballModels/F5_Minus_1.5_xgb.rds")
+
+intervalStart <- Sys.time()
+cluster <- makeCluster(detectCores() - 1)
+registerDoParallel(cluster)
+
+fitControl <- trainControl(method = "repeatedcv",
+                           number = 10,
+                           allowParallel = TRUE)
+
+set.seed(1234)
+F5_Plus_0.5_gbm <- train(Outcome_F5_Plus_0.5 ~ .,
+                         data = doubles %>% select(-contains('Outcome_'), -contains('Bullpen'), Outcome_F5_Plus_0.5),
+                         method = "gbm",
+                         trControl = fitControl)
+set.seed(1234)
+F5_Plus_0.5_pls <- train(Outcome_F5_Plus_0.5 ~ .,
+                         data = doubles %>% select(-contains('Outcome_'), -contains('Bullpen'), Outcome_F5_Plus_0.5),
+                         method = "pls",
+                         trControl = fitControl,
+                         tuneLength = 15,
+                         preProc = c("center", "scale"))
+set.seed(1234)
+F5_Plus_0.5_xgb <- train(Outcome_F5_Plus_0.5 ~ .,
+                         data = doubles %>% select(-contains('Outcome_'), -contains('Bullpen'), Outcome_F5_Plus_0.5),
+                         method = "xgbTree",
+                         trControl = fitControl)
+
+stopCluster(cluster)
+intervalEnd <- Sys.time()
+paste("F5 Plus 0.5 classification model training took",intervalEnd - intervalStart,attr(intervalEnd - intervalStart,"units"))
+
+saveRDS(F5_Plus_0.5_gbm, "C:/Users/danie/Desktop/SportsStuff/TheMachine/BaseballModels/F5_Plus_0.5_gbm.rds")
+saveRDS(F5_Plus_0.5_pls, "C:/Users/danie/Desktop/SportsStuff/TheMachine/BaseballModels/F5_Plus_0.5_pls.rds")
+saveRDS(F5_Plus_0.5_xgb, "C:/Users/danie/Desktop/SportsStuff/TheMachine/BaseballModels/F5_Plus_0.5_xgb.rds")
+
+intervalStart <- Sys.time()
+cluster <- makeCluster(detectCores() - 1)
+registerDoParallel(cluster)
+
+fitControl <- trainControl(method = "repeatedcv",
+                           number = 10,
+                           allowParallel = TRUE)
+
+set.seed(1234)
+F5_Plus_1.5_gbm <- train(Outcome_F5_Plus_1.5 ~ .,
+                         data = doubles %>% select(-contains('Outcome_'), -contains('Bullpen'), Outcome_F5_Plus_1.5),
+                         method = "gbm",
+                         trControl = fitControl)
+set.seed(1234)
+F5_Plus_1.5_pls <- train(Outcome_F5_Plus_1.5 ~ .,
+                         data = doubles %>% select(-contains('Outcome_'), -contains('Bullpen'), Outcome_F5_Plus_1.5),
+                         method = "pls",
+                         trControl = fitControl,
+                         tuneLength = 15,
+                         preProc = c("center", "scale"))
+set.seed(1234)
+F5_Plus_1.5_xgb <- train(Outcome_F5_Plus_1.5 ~ .,
+                         data = doubles %>% select(-contains('Outcome_'), -contains('Bullpen'), Outcome_F5_Plus_1.5),
+                         method = "xgbTree",
+                         trControl = fitControl)
+
+stopCluster(cluster)
+intervalEnd <- Sys.time()
+paste("F5 Plus 1.5 classification model training took",intervalEnd - intervalStart,attr(intervalEnd - intervalStart,"units"))
+
+saveRDS(F5_Plus_1.5_gbm, "C:/Users/danie/Desktop/SportsStuff/TheMachine/BaseballModels/F5_Plus_1.5_gbm.rds")
+saveRDS(F5_Plus_1.5_pls, "C:/Users/danie/Desktop/SportsStuff/TheMachine/BaseballModels/F5_Plus_1.5_pls.rds")
+saveRDS(F5_Plus_1.5_xgb, "C:/Users/danie/Desktop/SportsStuff/TheMachine/BaseballModels/F5_Plus_1.5_xgb.rds")
+
+intervalStart <- Sys.time()
+cluster <- makeCluster(detectCores() - 1)
+registerDoParallel(cluster)
+
+fitControl <- trainControl(method = "repeatedcv",
+                           number = 10,
+                           allowParallel = TRUE)
+
+set.seed(1234)
+F5_Total_3.5_gbm <- train(Outcome_F5_Total_3.5 ~ .,
+                          data = doubles %>% select(-contains('Outcome_'), Outcome_F5_Total_3.5),
+                          method = "gbm",
+                          trControl = fitControl)
+set.seed(1234)
+F5_Total_3.5_pls <- train(Outcome_F5_Total_3.5 ~ .,
+                          data = doubles %>% select(-contains('Outcome_'), Outcome_F5_Total_3.5),
+                          method = "pls",
+                          trControl = fitControl,
+                          tuneLength = 15,
+                          preProc = c("center", "scale"))
+set.seed(1234)
+F5_Total_3.5_xgb <- train(Outcome_F5_Total_3.5 ~ .,
+                          data = doubles %>% select(-contains('Outcome_'), Outcome_F5_Total_3.5),
+                          method = "xgbTree",
+                          trControl = fitControl)
+
+stopCluster(cluster)
+intervalEnd <- Sys.time()
+paste("F5 Total 3.5 classification model training took",intervalEnd - intervalStart,attr(intervalEnd - intervalStart,"units"))
+
+saveRDS(F5_Total_3.5_gbm, "C:/Users/danie/Desktop/SportsStuff/TheMachine/BaseballModels/F5_Total_3.5_gbm.rds")
+saveRDS(F5_Total_3.5_pls, "C:/Users/danie/Desktop/SportsStuff/TheMachine/BaseballModels/F5_Total_3.5_pls.rds")
+saveRDS(F5_Total_3.5_xgb, "C:/Users/danie/Desktop/SportsStuff/TheMachine/BaseballModels/F5_Total_3.5_xgb.rds")
+
+intervalStart <- Sys.time()
+cluster <- makeCluster(detectCores() - 1)
+registerDoParallel(cluster)
+
+fitControl <- trainControl(method = "repeatedcv",
+                           number = 10,
+                           allowParallel = TRUE)
+
+set.seed(1234)
+F5_Total_4_gbm <- train(Outcome_F5_Total_4 ~ .,
+                        data = doubles %>% select(-contains('Outcome_'), Outcome_F5_Total_4),
+                        method = "gbm",
+                        trControl = fitControl)
+set.seed(1234)
+F5_Total_4_pls <- train(Outcome_F5_Total_4 ~ .,
+                        data = doubles %>% select(-contains('Outcome_'), Outcome_F5_Total_4),
+                        method = "pls",
+                        trControl = fitControl,
+                        tuneLength = 15,
+                        preProc = c("center", "scale"))
+set.seed(1234)
+F5_Total_4_xgb <- train(Outcome_F5_Total_4 ~ .,
+                        data = doubles %>% select(-contains('Outcome_'), Outcome_F5_Total_4),
+                        method = "xgbTree",
+                        trControl = fitControl)
+
+stopCluster(cluster)
+intervalEnd <- Sys.time()
+paste("F5 Total 4 classification model training took",intervalEnd - intervalStart,attr(intervalEnd - intervalStart,"units"))
+
+saveRDS(F5_Total_4_gbm, "C:/Users/danie/Desktop/SportsStuff/TheMachine/BaseballModels/F5_Total_4_gbm.rds")
+saveRDS(F5_Total_4_pls, "C:/Users/danie/Desktop/SportsStuff/TheMachine/BaseballModels/F5_Total_4_pls.rds")
+saveRDS(F5_Total_4_xgb, "C:/Users/danie/Desktop/SportsStuff/TheMachine/BaseballModels/F5_Total_4_xgb.rds")
+
+intervalStart <- Sys.time()
+cluster <- makeCluster(detectCores() - 1)
+registerDoParallel(cluster)
+
+fitControl <- trainControl(method = "repeatedcv",
+                           number = 10,
+                           allowParallel = TRUE)
+
+set.seed(1234)
+F5_Total_4.5_gbm <- train(Outcome_F5_Total_4.5 ~ .,
+                          data = doubles %>% select(-contains('Outcome_'), Outcome_F5_Total_4.5),
+                          method = "gbm",
+                          trControl = fitControl)
+set.seed(1234)
+F5_Total_4.5_pls <- train(Outcome_F5_Total_4.5 ~ .,
+                          data = doubles %>% select(-contains('Outcome_'), Outcome_F5_Total_4.5),
+                          method = "pls",
+                          trControl = fitControl,
+                          tuneLength = 15,
+                          preProc = c("center", "scale"))
+set.seed(1234)
+F5_Total_4.5_xgb <- train(Outcome_F5_Total_4.5 ~ .,
+                          data = doubles %>% select(-contains('Outcome_'), Outcome_F5_Total_4.5),
+                          method = "xgbTree",
+                          trControl = fitControl)
+
+stopCluster(cluster)
+intervalEnd <- Sys.time()
+paste("F5 Total 4.5 classification model training took",intervalEnd - intervalStart,attr(intervalEnd - intervalStart,"units"))
+
+saveRDS(F5_Total_4.5_gbm, "C:/Users/danie/Desktop/SportsStuff/TheMachine/BaseballModels/F5_Total_4.5_gbm.rds")
+saveRDS(F5_Total_4.5_pls, "C:/Users/danie/Desktop/SportsStuff/TheMachine/BaseballModels/F5_Total_4.5_pls.rds")
+saveRDS(F5_Total_4.5_xgb, "C:/Users/danie/Desktop/SportsStuff/TheMachine/BaseballModels/F5_Total_4.5_xgb.rds")
+
+intervalStart <- Sys.time()
+cluster <- makeCluster(detectCores() - 1)
+registerDoParallel(cluster)
+
+fitControl <- trainControl(method = "repeatedcv",
+                           number = 10,
+                           allowParallel = TRUE)
+
+set.seed(1234)
+F5_Total_5_gbm <- train(Outcome_F5_Total_5 ~ .,
+                        data = doubles %>% select(-contains('Outcome_'), Outcome_F5_Total_5),
+                        method = "gbm",
+                        trControl = fitControl)
+set.seed(1234)
+F5_Total_5_pls <- train(Outcome_F5_Total_5 ~ .,
+                        data = doubles %>% select(-contains('Outcome_'), Outcome_F5_Total_5),
+                        method = "pls",
+                        trControl = fitControl,
+                        tuneLength = 15,
+                        preProc = c("center", "scale"))
+set.seed(1234)
+F5_Total_5_xgb <- train(Outcome_F5_Total_5 ~ .,
+                        data = doubles %>% select(-contains('Outcome_'), Outcome_F5_Total_5),
+                        method = "xgbTree",
+                        trControl = fitControl)
+
+stopCluster(cluster)
+intervalEnd <- Sys.time()
+paste("F5 Total 5 classification model training took",intervalEnd - intervalStart,attr(intervalEnd - intervalStart,"units"))
+
+saveRDS(F5_Total_5_gbm, "C:/Users/danie/Desktop/SportsStuff/TheMachine/BaseballModels/F5_Total_5_gbm.rds")
+saveRDS(F5_Total_5_pls, "C:/Users/danie/Desktop/SportsStuff/TheMachine/BaseballModels/F5_Total_5_pls.rds")
+saveRDS(F5_Total_5_xgb, "C:/Users/danie/Desktop/SportsStuff/TheMachine/BaseballModels/F5_Total_5_xgb.rds")
+
+intervalStart <- Sys.time()
+cluster <- makeCluster(detectCores() - 1)
+registerDoParallel(cluster)
+
+fitControl <- trainControl(method = "repeatedcv",
+                           number = 10,
+                           allowParallel = TRUE)
+
+set.seed(1234)
+F5_Total_5.5_gbm <- train(Outcome_F5_Total_5.5 ~ .,
+                          data = doubles %>% select(-contains('Outcome_'), Outcome_F5_Total_5.5),
+                          method = "gbm",
+                          trControl = fitControl)
+set.seed(1234)
+F5_Total_5.5_pls <- train(Outcome_F5_Total_5.5 ~ .,
+                          data = doubles %>% select(-contains('Outcome_'), Outcome_F5_Total_5.5),
+                          method = "pls",
+                          trControl = fitControl,
+                          tuneLength = 15,
+                          preProc = c("center", "scale"))
+set.seed(1234)
+F5_Total_5.5_xgb <- train(Outcome_F5_Total_5.5 ~ .,
+                          data = doubles %>% select(-contains('Outcome_'), Outcome_F5_Total_5.5),
+                          method = "xgbTree",
+                          trControl = fitControl)
+
+stopCluster(cluster)
+intervalEnd <- Sys.time()
+paste("F5 Total 5.5 classification model training took",intervalEnd - intervalStart,attr(intervalEnd - intervalStart,"units"))
+
+saveRDS(F5_Total_5.5_gbm, "C:/Users/danie/Desktop/SportsStuff/TheMachine/BaseballModels/F5_Total_5.5_gbm.rds")
+saveRDS(F5_Total_5.5_pls, "C:/Users/danie/Desktop/SportsStuff/TheMachine/BaseballModels/F5_Total_5.5_pls.rds")
+saveRDS(F5_Total_5.5_xgb, "C:/Users/danie/Desktop/SportsStuff/TheMachine/BaseballModels/F5_Total_5.5_xgb.rds")
+
+intervalStart <- Sys.time()
+cluster <- makeCluster(detectCores() - 1)
+registerDoParallel(cluster)
+
+fitControl <- trainControl(method = "repeatedcv",
+                           number = 10,
+                           allowParallel = TRUE)
+
+set.seed(1234)
+F1_Total_0.5_gbm <- train(Outcome_F1_Total_0.5 ~ .,
+                        data = doubles %>% select(-contains('Outcome_'), Outcome_F1_Total_0.5),
+                        method = "gbm",
+                        trControl = fitControl)
+set.seed(1234)
+F1_Total_0.5_pls <- train(Outcome_F1_Total_0.5 ~ .,
+                        data = doubles %>% select(-contains('Outcome_'), Outcome_F1_Total_0.5),
+                        method = "pls",
+                        trControl = fitControl,
+                        tuneLength = 15,
+                        preProc = c("center", "scale"))
+set.seed(1234)
+F1_Total_0.5_xgb <- train(Outcome_F1_Total_0.5 ~ .,
+                        data = doubles %>% select(-contains('Outcome_'), Outcome_F1_Total_0.5),
+                        method = "xgbTree",
+                        trControl = fitControl)
+
+stopCluster(cluster)
+intervalEnd <- Sys.time()
+paste("F1 Total 0.5 classification model training took",intervalEnd - intervalStart,attr(intervalEnd - intervalStart,"units"))
+
+saveRDS(F1_Total_0.5_gbm, "C:/Users/danie/Desktop/SportsStuff/TheMachine/BaseballModels/F1_Total_0.5_gbm.rds")
+saveRDS(F1_Total_0.5_pls, "C:/Users/danie/Desktop/SportsStuff/TheMachine/BaseballModels/F1_Total_0.5_pls.rds")
+saveRDS(F1_Total_0.5_xgb, "C:/Users/danie/Desktop/SportsStuff/TheMachine/BaseballModels/F1_Total_0.5_xgb.rds")
+
 
 ## Identify response (y) and predictor (x) column names for component models
 
