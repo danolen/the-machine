@@ -1,5 +1,5 @@
 ## Get MLB game scores for a given season
-get_mlb_scores <- function(season, file_type = c("pks", "scores")) {
+get_mlb_season_scores <- function(season, file_type = c("pks", "scores")) {
   library(tidyverse)
   library(baseballr)
   season_info = baseballr::mlb_seasons_all()
@@ -25,26 +25,27 @@ get_mlb_scores <- function(season, file_type = c("pks", "scores")) {
     j = j+1
   }
   
-  game_pks <- tbl %>% 
-    filter(status.detailedState != 'Postponed' &
-             seriesDescription == 'Regular Season' &
-             !is.na(game_pk)) %>% 
-    distinct(game_pk, officialDate, gameNumber, doubleHeader, dayNight, scheduledInnings)
-  
-  game_tbl <- data.frame()
-  k <- 1
-  for (k in 1:nrow(game_pks)) {
-    gm = mlb_game_linescore(game_pks$game_pk[k])
-    game_tbl = game_tbl %>% 
-      bind_rows(gm)
-    k = k+1
-  }
   
   if (file_type == "pks") {
     return(tbl)
   }
 
   if (file_type == "scores") {
+    game_pks <- tbl %>% 
+      filter(status.detailedState != 'Postponed' &
+               seriesDescription == 'Regular Season' &
+               !is.na(game_pk)) %>% 
+      distinct(game_pk, officialDate, gameNumber, doubleHeader, dayNight, scheduledInnings)
+    
+    game_tbl <- data.frame()
+    k <- 1
+    for (k in 1:nrow(game_pks)) {
+      gm = mlb_game_linescore(game_pks$game_pk[k])
+      game_tbl = game_tbl %>% 
+        bind_rows(gm)
+      k = k+1
+    }
+    
     return(game_tbl)
   }
   
