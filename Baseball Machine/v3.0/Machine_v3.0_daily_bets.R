@@ -1,3 +1,330 @@
+### The Machine v3.0
+### Daily Bets
+library(tidyverse)
+source("dannyverse/dannyverse.R")
+
+#### Setup ####
+
+## Season start and end date
+season = 2023
+season_info = baseballr::mlb_seasons_all()
+startDate = as.Date(season_info[season_info$season_id==as.character(season),"regular_season_start_date"]$regular_season_start_date)
+endDate = as.Date(season_info[season_info$season_id==as.character(season),"regular_season_end_date"]$regular_season_end_date)
+
+## Info for today's games
+todays_games <- get_mlb_daily_scores(Sys.Date(), Sys.Date(), file_type = "scores") %>% 
+  distinct(game_pk, home_team_name, away_team_name, home_team_season, home_team_league_name,
+           home_team_division_name, away_team_league_name, away_team_division_name) %>% 
+  inner_join(get_mlb_daily_scores(Sys.Date(), Sys.Date(), file_type = "pks") %>% 
+               filter(seriesDescription == 'Regular Season' &
+                        scheduledInnings == 9) %>% 
+               select(game_pk, officialDate, doubleHeader, gameNumber, dayNight, venue.name)) %>% 
+  select(-game_pk) %>% 
+  mutate(officialDate = as.Date(officialDate))
+
+## Team names
+team_names <- read.csv("Baseball Machine/team_names.csv") %>% 
+  left_join(baseballr::teams_lu_table %>%
+              filter(sport.name == "Major League Baseball") %>%
+              distinct(id, name),
+            by = c("Full.Name" = "name"))
+
+## Daily stats
+pitchers_s2d <- read.csv(paste0("Baseball Machine/Daily Files/",season,"/pitchers_s2d_",season,".csv"))
+team_batting_L7 <- read.csv(paste0("Baseball Machine/Daily Files/",season,"/team_batting_L7_",season,".csv"))
+team_batting_L14 <- read.csv(paste0("Baseball Machine/Daily Files/",season,"/team_batting_L14_",season,".csv"))
+team_batting_L30 <- read.csv(paste0("Baseball Machine/Daily Files/",season,"/team_batting_L30_",season,".csv"))
+team_batting_s2d <- read.csv(paste0("Baseball Machine/Daily Files/",season,"/team_batting_s2d_",season,".csv"))
+team_bullpen_L7 <- read.csv(paste0("Baseball Machine/Daily Files/",season,"/team_bullpen_L7_",season,".csv"))
+team_bullpen_L14 <- read.csv(paste0("Baseball Machine/Daily Files/",season,"/team_bullpen_L14_",season,".csv"))
+team_bullpen_L30 <- read.csv(paste0("Baseball Machine/Daily Files/",season,"/team_bullpen_L30_",season,".csv"))
+team_bullpen_s2d <- read.csv(paste0("Baseball Machine/Daily Files/",season,"/team_bullpen_s2d_",season,".csv"))
+pitchers_s2d_startDate <- max(as.Date(pitchers_s2d$Date)) + 1
+team_batting_L7_startDate <- max(as.Date(team_batting_L7$Date)) + 1
+team_batting_L14_startDate <- max(as.Date(team_batting_L14$Date)) + 1
+team_batting_L30_startDate <- max(as.Date(team_batting_L30$Date)) + 1
+team_batting_s2d_startDate <- max(as.Date(team_batting_s2d$Date)) + 1
+team_bullpen_L7_startDate <- max(as.Date(team_bullpen_L7$Date)) + 1
+team_bullpen_L14_startDate <- max(as.Date(team_bullpen_L14$Date)) + 1
+team_bullpen_L30_startDate <- max(as.Date(team_bullpen_L30$Date)) + 1
+team_bullpen_s2d_startDate <- max(as.Date(team_bullpen_s2d$Date)) + 1
+pitchers_s2d_today <- scrape_fangraphs(position = "starting pitchers",
+                                       season = season,
+                                       start_date = pitchers_s2d_startDate,
+                                       end_date = Sys.Date(),
+                                       time_frame = "s2d")
+team_batting_L7_today <- scrape_fangraphs(position = "team batting",
+                                          season = season,
+                                          start_date = team_batting_L7_startDate,
+                                          end_date = Sys.Date(),
+                                          time_frame = "L7")
+team_batting_L14_today <- scrape_fangraphs(position = "team batting",
+                                           season = season,
+                                           start_date = team_batting_L14_startDate,
+                                           end_date = Sys.Date(),
+                                           time_frame = "L14")
+team_batting_L30_today <- scrape_fangraphs(position = "team batting",
+                                           season = season,
+                                           start_date = team_batting_L30_startDate,
+                                           end_date = Sys.Date(),
+                                           time_frame = "L30")
+team_batting_s2d_today <- scrape_fangraphs(position = "team batting",
+                                           season = season,
+                                           start_date = team_batting_s2d_startDate,
+                                           end_date = Sys.Date(),
+                                           time_frame = "s2d")
+team_bullpen_L7_today <- scrape_fangraphs(position = "team bullpen",
+                                          season = season,
+                                          start_date = team_bullpen_L7_startDate,
+                                          end_date = Sys.Date(),
+                                          time_frame = "L7")
+team_bullpen_L14_today <- scrape_fangraphs(position = "team bullpen",
+                                           season = season,
+                                           start_date = team_bullpen_L14_startDate,
+                                           end_date = Sys.Date(),
+                                           time_frame = "L14")
+team_bullpen_L30_today <- scrape_fangraphs(position = "team bullpen",
+                                           season = season,
+                                           start_date = team_bullpen_L30_startDate,
+                                           end_date = Sys.Date(),
+                                           time_frame = "L30")
+team_bullpen_s2d_today <- scrape_fangraphs(position = "team bullpen",
+                                           season = season,
+                                           start_date = team_bullpen_s2d_startDate,
+                                           end_date = Sys.Date(),
+                                           time_frame = "s2d")
+
+## Scores
+game_pks <- read.csv(paste0("Baseball Machine/Daily Files/",season,"/game_pks_",season,".csv"))
+game_pks_max_date <- max(as.Date(game_pks$officialDate))
+pks <- get_mlb_daily_scores(start_date = game_pks_max_date + 1,
+                            end_date = Sys.Date()-1,
+                            file_type = "pks")
+game_scores <- read.csv(paste0("Baseball Machine/Daily Files/",season,"/game_scores_",season,".csv"))
+game_scores_max_date <- max(as.Date(game_scores$officialDate))
+scores <- get_mlb_daily_scores(start_date = game_scores_max_date + 1,
+                            end_date = Sys.Date()-1,
+                            file_type = "scores")
+
+## Starting pitchers and rosters for today
+starting_pitchers <- read.csv(paste0("Baseball Machine/Daily Files/",season,"/starting_pitchers_",season,".csv"))
+starting_pitchers_max_date <- max(as.Date(starting_pitchers$game_date))
+probables <- get_probable_pitchers(starting_pitchers_max_date+1, Sys.Date())
+daily_rosters <- read.csv(paste0("Baseball Machine/Daily Files/",season,"/daily_rosters_",season,".csv"))
+daily_rosters_max_date <- max(as.Date(daily_rosters$date))
+rosters <- get_daily_rosters(daily_rosters_max_date+1, Sys.Date())
+
+## Bovada Odds
+bovada_odds <- get_bovada_odds("baseball", "mlb")
+
+## Overwrite files with updates
+pitchers_s2d_update <- pitchers_s2d %>% 
+  union(pitchers_s2d_today)
+team_batting_L7_update <- team_batting_L7 %>% 
+  union(team_batting_L7_today)
+team_batting_L14_update <- team_batting_L14 %>% 
+  union(team_batting_L14_today)
+team_batting_L30_update <- team_batting_L30 %>% 
+  union(team_batting_L30_today)
+team_batting_s2d_update <- team_batting_s2d %>% 
+  union(team_batting_s2d_today)
+team_bullpen_L7_update <- team_bullpen_L7 %>% 
+  union(team_bullpen_L7_today)
+team_bullpen_L14_update <- team_bullpen_L14 %>% 
+  union(team_bullpen_L14_today)
+team_bullpen_L30_update <- team_bullpen_L30 %>% 
+  union(team_bullpen_L30_today)
+team_bullpen_s2d_update <- team_bullpen_s2d %>% 
+  union(team_bullpen_s2d_today)
+write.csv(pitchers_s2d_update, paste0("Baseball Machine/Daily Files/",season,"/pitchers_s2d_",season,".csv"), row.names = FALSE)
+write.csv(team_batting_L7_update, paste0("Baseball Machine/Daily Files/",season,"/team_batting_L7_",season,".csv"), row.names = FALSE)
+write.csv(team_batting_L14_update, paste0("Baseball Machine/Daily Files/",season,"/team_batting_L14_",season,".csv"), row.names = FALSE)
+write.csv(team_batting_L30_update, paste0("Baseball Machine/Daily Files/",season,"/team_batting_L30_",season,".csv"), row.names = FALSE)
+write.csv(team_batting_s2d_update, paste0("Baseball Machine/Daily Files/",season,"/team_batting_s2d_",season,".csv"), row.names = FALSE)
+write.csv(team_bullpen_L7_update, paste0("Baseball Machine/Daily Files/",season,"/team_bullpen_L7_",season,".csv"), row.names = FALSE)
+write.csv(team_bullpen_L14_update, paste0("Baseball Machine/Daily Files/",season,"/team_bullpen_L14_",season,".csv"), row.names = FALSE)
+write.csv(team_bullpen_L30_update, paste0("Baseball Machine/Daily Files/",season,"/team_bullpen_L30_",season,".csv"), row.names = FALSE)
+write.csv(team_bullpen_s2d_update, paste0("Baseball Machine/Daily Files/",season,"/team_bullpen_s2d_",season,".csv"), row.names = FALSE)
+
+pks_update <- game_pks %>% 
+  union(pks)
+scores_update <- game_scores %>% 
+  union(scores)
+write.csv(pks_update, paste0("Baseball Machine/Daily Files/",season,"/game_pks_",season,".csv"), row.names = FALSE)
+write.csv(scores_update, paste0("Baseball Machine/Daily Files/",season,"/game_scores_",season,".csv"), row.names = FALSE)
+
+probables_update <- starting_pitchers %>% 
+  union(probables)
+rosters_update <- daily_rosters %>% 
+  union(rosters)
+write.csv(probables_update, paste0("Baseball Machine/Daily Files/",season,"/starting_pitchers_",season,".csv"), row.names = FALSE)
+write.csv(rosters_update, paste0("Baseball Machine/Daily Files/",season,"/daily_rosters_",season,".csv"), row.names = FALSE)
+
+
+#### Data Prep ####
+results <- scores_update %>% 
+  distinct(game_pk, home_team_name, away_team_name, num, ordinal_num, home_runs, home_hits,
+           home_errors, away_runs, away_hits, away_errors, home_team_season, home_team_league_name,
+           home_team_division_name, away_team_league_name, away_team_division_name) %>%
+  inner_join(pks_update %>% 
+               filter(status.detailedState %in% c('Final', 'Completed Early') &
+                        # is.na(resumeDate) &
+                        # is.na(resumedFrom) &
+                        seriesDescription == 'Regular Season' &
+                        scheduledInnings == 9) %>% 
+               select(game_pk, officialDate, doubleHeader, gameNumber, dayNight, scheduledInnings, venue.name)) %>% 
+  filter(!is.na(num)) %>% 
+  replace(is.na(.),0) %>% 
+  group_by(game_pk) %>% 
+  mutate(home_runs = cumsum(home_runs),
+         home_hits = cumsum(home_hits),
+         home_errors = cumsum(home_errors),
+         away_runs = cumsum(away_runs),
+         away_hits = cumsum(away_hits),
+         away_errors = cumsum(away_errors)) %>% 
+  filter(num <= 9) %>%
+  select(-num) %>%  
+  pivot_wider(names_from = ordinal_num, values_from = c(home_runs, home_hits, home_errors, away_runs, away_hits, away_errors)) %>% 
+  left_join(scores_update %>% 
+              distinct(game_pk, home_team_name, away_team_name, num, ordinal_num, home_runs, home_hits,
+                       home_errors, away_runs, away_hits, away_errors, home_team_season, home_team_league_name,
+                       home_team_division_name, away_team_league_name, away_team_division_name) %>%
+              filter(!is.na(num)) %>% 
+              replace(is.na(.),0) %>% 
+              group_by(game_pk) %>% 
+              dplyr::summarise(home_runs_final = sum(home_runs),
+                        home_hits_final = sum(home_hits),
+                        home_errors_final = sum(home_errors),
+                        away_runs_final = sum(away_runs),
+                        away_hits_final = sum(away_hits),
+                        away_errors_final = sum(away_errors)))
+
+team_batting_L7_today$Date <- as.Date(team_batting_L7_today$Date)
+team_batting_L14_today$Date <- as.Date(team_batting_L14_today$Date)
+team_batting_L30_today$Date <- as.Date(team_batting_L30_today$Date)
+team_batting_s2d_today$Date <- as.Date(team_batting_s2d_today$Date)
+
+daily_team_batting <- team_batting_L7_today %>% 
+  select(-contains('url')) %>% 
+  full_join(team_batting_L14_today %>% 
+              select(-contains('url')), by = c("Team", "Date"), suffix = c("_L7", "_L14")) %>%
+  full_join(team_batting_L30_today %>% 
+              select(-contains('url')), by = c("Team", "Date"))
+colnames(daily_team_batting)[57:83] <- paste0(colnames(daily_team_batting)[57:83],'_L30')
+daily_team_batting <- daily_team_batting %>% 
+  full_join(team_batting_s2d_today %>% 
+              select(-contains('url')), by = c("Team", "Date")) %>% 
+  left_join(team_names %>% 
+              select(Full.Name22, BR),
+            by = c("Team" = "BR")) %>% 
+  mutate(Team = Full.Name22) %>% 
+  select(-Full.Name22)
+
+team_bullpen_L7_today$Date <- as.Date(team_bullpen_L7_today$Date)
+team_bullpen_L14_today$Date <- as.Date(team_bullpen_L14_today$Date)
+team_bullpen_L30_today$Date <- as.Date(team_bullpen_L30_today$Date)
+team_bullpen_s2d_today$Date <- as.Date(team_bullpen_s2d_today$Date)
+
+daily_team_bullpen <- team_bullpen_L7_today %>% 
+  select(-contains('url')) %>% 
+  full_join(team_bullpen_L14_today %>% 
+              select(-contains('url')), by = c("Team", "Date"), suffix = c("_L7", "_L14")) %>%
+  full_join(team_bullpen_L30_today %>% 
+              select(-contains('url')), by = c("Team", "Date"))
+colnames(daily_team_bullpen)[51:74] <- paste0(colnames(daily_team_bullpen)[51:74],'_L30')
+daily_team_bullpen <- daily_team_bullpen %>% 
+  full_join(team_bullpen_s2d_today %>% 
+              select(-contains('url')), by = c("Team", "Date")) %>% 
+  left_join(team_names %>% 
+              select(Full.Name22, BR),
+            by = c("Team" = "BR")) %>% 
+  mutate(Team = Full.Name22) %>% 
+  select(-Full.Name22)
+
+pitchers_s2d_today$Date <- as.Date(pitchers_s2d_today$Date)
+dupe_SPs_today <- pitchers_s2d_today %>% 
+  filter(Date == max(pitchers_s2d_today$Date)) %>% 
+  group_by(Name) %>% 
+  dplyr::summarise(records = n()) %>% 
+  filter(records > 1) %>% 
+  left_join(pitchers_s2d_today %>% distinct(Name, Team))
+daily_pitchers <- pitchers_s2d_today # %>% 
+  # mutate(Name = case_when(Name == "Luis Garcia" & Team == "HOU" ~ "Luis Garcia (HOU)",
+  #                         Name == "Luis Castillo" & Team == "DET" ~ "Luis Castillo (DET)",
+  #                         Name == "Luis Ortiz" & Team == "SFG" ~ "Luis Ortiz (SFG)",
+  #                         Name == "Hyun-Jin Ryu" ~ "Hyun Jin Ryu",
+  #                         TRUE ~ Name))
+
+PECOTA_pitching_23 <- readxl::read_xlsx(paste0("Baseball Machine/PECOTA/",season,"/pecota2023_pitching_mar29.xlsx"), sheet = "50") %>% 
+  select(mlbid, name, ip, warp) %>% 
+  mutate(WARP200 = (warp/ip)*200)
+PECOTA_hitting_23 <- readxl::read_xlsx(paste0("Baseball Machine/PECOTA/",season,"/pecota2023_hitting_mar29.xlsx"), sheet = "50") %>% 
+  select(mlbid, name, pa, warp) %>% 
+  mutate(WARP600 = (as.numeric(warp)/as.numeric(pa))*600)
+
+upcoming_games <- bovada_odds %>% 
+  left_join(todays_games,
+            by = c("AwayTeam" = "away_team_name",
+                   "HomeTeam" = "home_team_name",
+                   "gamedate" = "officialDate")) %>% 
+  left_join(probables %>% 
+              select(game_date, fullName, id, team) %>% 
+              mutate(game_date = as.Date(game_date)),
+            by = c("AwayTeam" = "team", "gamedate" = "game_date")) %>% 
+  left_join(probables %>% 
+            select(game_date, fullName, id, team) %>% 
+            mutate(game_date = as.Date(game_date)),
+          by = c("HomeTeam" = "team", "gamedate" = "game_date"),
+          suffix = c("_AwaySP", "_HomeSP")) %>% 
+  left_join(PECOTA_pitching_23 %>% 
+              select(mlbid, WARP200),
+            by = c("id_AwaySP" = "mlbid")) %>% 
+  left_join(PECOTA_pitching_23 %>% 
+            select(mlbid, WARP200),
+          by = c("id_HomeSP" = "mlbid"),
+          suffix = c("_AwaySP", "_HomeSP")) %>% 
+  left_join(rosters_update %>% 
+              filter(position_type != "Pitcher") %>% 
+              left_join(PECOTA_hitting_23 %>% 
+                          select(mlbid, WARP600),
+                        by = c("person_id" = "mlbid")) %>% 
+              group_by(team_id, date) %>% 
+              dplyr::summarise(WARP600 = sum(WARP600, na.rm = T)) %>% 
+              left_join(team_names %>% 
+                          select(Full.Name22, id),
+                        by = c("team_id" = "id")) %>% 
+              ungroup() %>% 
+              select(-team_id) %>% 
+              mutate(date = as.Date(date)),
+            by = c("gamedate" = "date",
+                   "HomeTeam" = "Full.Name22")) %>% 
+  left_join(rosters_update %>% 
+              filter(position_type != "Pitcher") %>% 
+              left_join(PECOTA_hitting_23 %>% 
+                          select(mlbid, WARP600),
+                        by = c("person_id" = "mlbid")) %>% 
+              group_by(team_id, date) %>% 
+              dplyr::summarise(WARP600 = sum(WARP600, na.rm = T)) %>% 
+              left_join(team_names %>% 
+                          select(Full.Name22, id),
+                        by = c("team_id" = "id")) %>% 
+              ungroup() %>% 
+              select(-team_id) %>% 
+              mutate(date = as.Date(date)),
+            by = c("gamedate" = "date",
+                   "AwayTeam" = "Full.Name22"),
+            suffix = c("_HomeBatters", "_AwayBatters")) %>% 
+  filter(!is.na(fullName_HomeSP) & !is.na(fullName_AwaySP)) %>% 
+  left_join(daily_pitchers, by = c("gamedate" = "Date", "fullName_HomeSP" = "Name")) %>% 
+  left_join(daily_pitchers, by = c("gamedate" = "Date", "fullName_AwaySP" = "Name"), suffix = c("_HomeSP", "_AwaySP")) %>% 
+  left_join(daily_team_batting, by = c("gamedate" = "Date", "HomeTeam" = "Team")) %>% 
+  left_join(daily_team_batting, by = c("gamedate" = "Date", "AwayTeam" = "Team"), suffix = c("_HomeBatters", "_AwayBatters")) %>% 
+  left_join(daily_team_bullpen, by = c("gamedate" = "Date", "HomeTeam" = "Team")) %>% 
+  left_join(daily_team_bullpen, by = c("gamedate" = "Date", "AwayTeam" = "Team"), suffix = c("_HomeBullpen", "_AwayBullpen")) %>% 
+  rename("AwaySP_fullName" = "fullName_AwaySP",
+         "HomeSP_fullName" = "fullName_HomeSP")
+  
+
 ### The Machine v2.0
 ### Daily Bets
 
