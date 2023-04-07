@@ -1407,7 +1407,7 @@ bets_table <- #read.csv("Soccer Machine/upcoming_bets.csv") %>%
          Rank = (KC_Rank + EV_Rank) / 2) %>% 
   arrange(gamedate, ID, Rank) %>% 
   mutate(Final_Rank = row_number()) %>% 
-  filter(Final_Rank == 1 & `Bet Grade` %in% c('A+', 'A', 'B')) %>%
+  filter(Final_Rank == 1 & `Bet Grade` %in% c('A+', 'A')) %>%
   arrange(gamedate, desc(Kelly_Criteria)) %>% 
   ungroup() %>% 
   mutate(Pick = case_when(is.na(Pick_SpreadTotal) | Pick_SpreadTotal == 0 ~ paste0(Pick),
@@ -1457,13 +1457,9 @@ Email[["subject"]] = paste0("Soccer Machine Picks: ", Sys.Date())
 Email[["HTMLbody"]] = sprintf("
 The Machine's picks for upcoming soccer matches are in! The Machine currently offers picks for the Big 5 European Leagues plus MLS, the EFL Championship, and Liga MX. The attached documents contains all of the pertinent betting information for the upcoming matches, as well as a glossary. Good luck!
 </p><br></p>
-UPDATE: Now included in the table below are the average odds for each bet grade and the associated implied odds. These numbers will help inform us how each bet grade is performing. As of January 17th, the A+, A, and B bets are all hitting at a higher rate than their implied odds. The A+ bets are hitting 59%% of the time, with an edge of 7%% over the implied 52%% odds. The B, C, and D are all hitting within a percent or two of the implied odds. This is actually an encouraging sign when you consider that each bet will have some vig associated with it. The Machine is basically losing the C and D bets by the vig, while the B bets are in danger of the same. Hopefully this will inspire some confidence in The Machine. This also shows why it is important to get the best odds. I have two suggestions for finding the best odds:
+UPDATE: The Machine will no longer include B bets in the suggested bets. I apologize for the poor performance lately - I should have removed these earlier but I have been more focused on preparing for baseball season lately. Hopefully you have just been tailing the A+ and A bets.
 </p><br></p>
-<blockquote>
-    1. Place bets further in advance of the game. Odds are often worse the day of a game rather than several days in advance. We hope this is the case, because that means The Machine is suggesting bets that other smart people are also betting on, causing the odds to move. If you can place these bets before the odds move, your results will improve. This will not always be true though...
-    </p><br></p>
-    2. If you are in a state with legal sports betting, I highly encourage you to create accounts with more than one sportsbook and see which book offers the best odds for each bet. I've noticed some huge discrepancies between books at times. This is probably the best thing you can do to ensure you are betting the best odds possible.
-</blockquote>
+Speaking of baseball...I am working on the baseball version of The Machine. I hope to have this up and running in the next month or so. If you have any interest in the baseball version, feel free to let me know!
 </p><br></p>
 %s
 </p><br></p>
