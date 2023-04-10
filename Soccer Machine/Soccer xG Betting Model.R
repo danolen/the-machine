@@ -18,7 +18,7 @@ intervalStart <- Sys.time()
 
 mls <- fb_match_results(country = "USA",
                           gender = "M",
-                          season_end_year = c(2018, 2019, 2020, 2021, 2022), tier = "1st") %>% 
+                          season_end_year = c(2018, 2019, 2020, 2021, 2022, 2023), tier = "1st") %>% 
   select(Day, Date, Time, Home, Home_xG, HomeGoals, AwayGoals, Away_xG, Away,
          Competition_Name, Season_End_Year) %>% 
   rename(xG = Home_xG,
@@ -267,7 +267,7 @@ train_df <- metrics %>%
                                      TRUE ~ "Under")))
 
 train <- train_df %>% 
-  filter(SplitGP > 3 & SplitGP_Opp > 3 & Date < today)%>% 
+  filter(SplitGP > 1 & SplitGP_Opp > 1 & Date < today)%>% 
   select(-ID,
          -Date,
          -Day,
@@ -340,7 +340,7 @@ saveRDS(pls_mod, "C:/Users/danie/Desktop/SportsStuff/TheMachine/SoccerModels/tra
 saveRDS(lm_mod, "C:/Users/danie/Desktop/SportsStuff/TheMachine/SoccerModels/train_lm.rds")
 
 train_prob <- train_df %>% 
-  filter(SplitGP > 3 & SplitGP_Opp > 3 & Date < today)%>% 
+  filter(SplitGP > 1 & SplitGP_Opp > 1 & Date < today)%>% 
   select(-ID,
          -Date,
          -Day,
