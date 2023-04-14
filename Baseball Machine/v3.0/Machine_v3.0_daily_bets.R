@@ -21,6 +21,15 @@ todays_games <- get_mlb_daily_scores(Sys.Date(), Sys.Date(), file_type = "scores
                select(game_pk, officialDate, doubleHeader, gameNumber, dayNight, venue.name)) %>% 
   select(-game_pk) %>% 
   mutate(officialDate = as.Date(officialDate))
+tmrw_games <- get_mlb_daily_scores(Sys.Date()+1, Sys.Date()+1, file_type = "scores") %>% 
+  distinct(game_pk, home_team_name, away_team_name, home_team_season, home_team_league_name,
+           home_team_division_name, away_team_league_name, away_team_division_name) %>% 
+  inner_join(get_mlb_daily_scores(Sys.Date()+1, Sys.Date()+1, file_type = "pks") %>% 
+               filter(seriesDescription == 'Regular Season' &
+                        scheduledInnings == 9) %>% 
+               select(game_pk, officialDate, doubleHeader, gameNumber, dayNight, venue.name)) %>% 
+  select(-game_pk) %>% 
+  mutate(officialDate = as.Date(officialDate))
 
 ## Team names
 team_names <- read.csv("Baseball Machine/team_names.csv") %>% 
@@ -28,6 +37,147 @@ team_names <- read.csv("Baseball Machine/team_names.csv") %>%
               filter(sport.name == "Major League Baseball") %>%
               distinct(id, name),
             by = c("Full.Name" = "name"))
+
+## Load model objects
+models_dir <- "C:/Users/danie/Desktop/SportsStuff/TheMachine/BaseballModels/"
+full_game_pls <- readRDS(paste0(models_dir,"full_game_pls.rds"))
+full_game_rf <- readRDS(paste0(models_dir,"full_game_rf.rds"))
+full_game_cub <- readRDS(paste0(models_dir,"full_game_cub.rds"))
+full_game_gbm <- readRDS(paste0(models_dir,"full_game_gbm.rds"))
+F5_pls <- readRDS(paste0(models_dir,"F5_pls.rds"))
+F5_rf <- readRDS(paste0(models_dir,"F5_rf.rds"))
+F5_cub <- readRDS(paste0(models_dir,"F5_cub.rds"))
+F5_gbm <- readRDS(paste0(models_dir,"F5_gbm.rds"))
+F1_pls <- readRDS(paste0(models_dir,"F1_pls.rds"))
+F1_rf <- readRDS(paste0(models_dir,"F1_rf.rds"))
+F1_cub <- readRDS(paste0(models_dir,"F1_cub.rds"))
+F1_gbm <- readRDS(paste0(models_dir,"F1_gbm.rds"))
+FG_ML_gbm <- readRDS(paste0(models_dir,"FG_ML_gbm.rds"))
+FG_ML_pls <- readRDS(paste0(models_dir,"FG_ML_pls.rds"))
+FG_ML_xgb <- readRDS(paste0(models_dir,"FG_ML_xgb.rds"))
+FG_Minus_1.5_gbm <- readRDS(paste0(models_dir,"FG_Minus_1.5_gbm.rds"))
+FG_Minus_1.5_pls <- readRDS(paste0(models_dir,"FG_Minus_1.5_pls.rds"))
+FG_Minus_1.5_xgb <- readRDS(paste0(models_dir,"FG_Minus_1.5_xgb.rds"))
+FG_Minus_2.5_gbm <- readRDS(paste0(models_dir,"FG_Minus_2.5_gbm.rds"))
+FG_Minus_2.5_pls <- readRDS(paste0(models_dir,"FG_Minus_2.5_pls.rds"))
+FG_Minus_2.5_xgb <- readRDS(paste0(models_dir,"FG_Minus_2.5_xgb.rds"))
+FG_Plus_1.5_gbm <- readRDS(paste0(models_dir,"FG_Plus_1.5_gbm.rds"))
+FG_Plus_1.5_pls <- readRDS(paste0(models_dir,"FG_Plus_1.5_pls.rds"))
+FG_Plus_1.5_xgb <- readRDS(paste0(models_dir,"FG_Plus_1.5_xgb.rds"))
+FG_Plus_2.5_gbm <- readRDS(paste0(models_dir,"FG_Plus_2.5_gbm.rds"))
+FG_Plus_2.5_pls <- readRDS(paste0(models_dir,"FG_Plus_2.5_pls.rds"))
+FG_Plus_2.5_xgb <- readRDS(paste0(models_dir,"FG_Plus_2.5_xgb.rds"))
+FG_Total_6.5_gbm <- readRDS(paste0(models_dir,"FG_Total_6.5_gbm.rds"))
+FG_Total_6.5_pls <- readRDS(paste0(models_dir,"FG_Total_6.5_pls.rds"))
+FG_Total_6.5_xgb <- readRDS(paste0(models_dir,"FG_Total_6.5_xgb.rds"))
+FG_Total_7_gbm <- readRDS(paste0(models_dir,"FG_Total_7_gbm.rds"))
+FG_Total_7_pls <- readRDS(paste0(models_dir,"FG_Total_7_pls.rds"))
+FG_Total_7_xgb <- readRDS(paste0(models_dir,"FG_Total_7_xgb.rds"))
+FG_Total_7.5_gbm <- readRDS(paste0(models_dir,"FG_Total_7.5_gbm.rds"))
+FG_Total_7.5_pls <- readRDS(paste0(models_dir,"FG_Total_7.5_pls.rds"))
+FG_Total_7.5_xgb <- readRDS(paste0(models_dir,"FG_Total_7.5_xgb.rds"))
+FG_Total_8_gbm <- readRDS(paste0(models_dir,"FG_Total_8_gbm.rds"))
+FG_Total_8_pls <- readRDS(paste0(models_dir,"FG_Total_8_pls.rds"))
+FG_Total_8_xgb <- readRDS(paste0(models_dir,"FG_Total_8_xgb.rds"))
+FG_Total_8.5_gbm <- readRDS(paste0(models_dir,"FG_Total_8.5_gbm.rds"))
+FG_Total_8.5_pls <- readRDS(paste0(models_dir,"FG_Total_8.5_pls.rds"))
+FG_Total_8.5_xgb <- readRDS(paste0(models_dir,"FG_Total_8.5_xgb.rds"))
+FG_Total_9_gbm <- readRDS(paste0(models_dir,"FG_Total_9_gbm.rds"))
+FG_Total_9_pls <- readRDS(paste0(models_dir,"FG_Total_9_pls.rds"))
+FG_Total_9_xgb <- readRDS(paste0(models_dir,"FG_Total_9_xgb.rds"))
+FG_Total_9.5_gbm <- readRDS(paste0(models_dir,"FG_Total_9.5_gbm.rds"))
+FG_Total_9.5_pls <- readRDS(paste0(models_dir,"FG_Total_9.5_pls.rds"))
+FG_Total_9.5_xgb <- readRDS(paste0(models_dir,"FG_Total_9.5_xgb.rds"))
+FG_Total_10_gbm <- readRDS(paste0(models_dir,"FG_Total_10_gbm.rds"))
+FG_Total_10_pls <- readRDS(paste0(models_dir,"FG_Total_10_pls.rds"))
+FG_Total_10_xgb <- readRDS(paste0(models_dir,"FG_Total_10_xgb.rds"))
+FG_Total_10.5_gbm <- readRDS(paste0(models_dir,"FG_Total_10.5_gbm.rds"))
+FG_Total_10.5_pls <- readRDS(paste0(models_dir,"FG_Total_10.5_pls.rds"))
+FG_Total_10.5_xgb <- readRDS(paste0(models_dir,"FG_Total_10.5_xgb.rds"))
+FG_Total_11_gbm <- readRDS(paste0(models_dir,"FG_Total_11_gbm.rds"))
+FG_Total_11_pls <- readRDS(paste0(models_dir,"FG_Total_11_pls.rds"))
+FG_Total_11_xgb <- readRDS(paste0(models_dir,"FG_Total_11_xgb.rds"))
+FG_Total_11.5_gbm <- readRDS(paste0(models_dir,"FG_Total_11.5_gbm.rds"))
+FG_Total_11.5_pls <- readRDS(paste0(models_dir,"FG_Total_11.5_pls.rds"))
+FG_Total_11.5_xgb <- readRDS(paste0(models_dir,"FG_Total_11.5_xgb.rds"))
+FG_TT_2.5_gbm <- readRDS(paste0(models_dir,"FG_TT_2.5_gbm.rds"))
+FG_TT_2.5_pls <- readRDS(paste0(models_dir,"FG_TT_2.5_pls.rds"))
+FG_TT_2.5_xgb <- readRDS(paste0(models_dir,"FG_TT_2.5_xgb.rds"))
+FG_TT_3_gbm <- readRDS(paste0(models_dir,"FG_TT_3_gbm.rds"))
+FG_TT_3_pls <- readRDS(paste0(models_dir,"FG_TT_3_pls.rds"))
+FG_TT_3_xgb <- readRDS(paste0(models_dir,"FG_TT_3_xgb.rds"))
+FG_TT_3.5_gbm <- readRDS(paste0(models_dir,"FG_TT_3.5_gbm.rds"))
+FG_TT_3.5_pls <- readRDS(paste0(models_dir,"FG_TT_3.5_pls.rds"))
+FG_TT_3.5_xgb <- readRDS(paste0(models_dir,"FG_TT_3.5_xgb.rds"))
+FG_TT_4_gbm <- readRDS(paste0(models_dir,"FG_TT_4_gbm.rds"))
+FG_TT_4_pls <- readRDS(paste0(models_dir,"FG_TT_4_pls.rds"))
+FG_TT_4_xgb <- readRDS(paste0(models_dir,"FG_TT_4_xgb.rds"))
+FG_TT_4.5_gbm <- readRDS(paste0(models_dir,"FG_TT_4.5_gbm.rds"))
+FG_TT_4.5_pls <- readRDS(paste0(models_dir,"FG_TT_4.5_pls.rds"))
+FG_TT_4.5_xgb <- readRDS(paste0(models_dir,"FG_TT_4.5_xgb.rds"))
+FG_TT_5_gbm <- readRDS(paste0(models_dir,"FG_TT_5_gbm.rds"))
+FG_TT_5_pls <- readRDS(paste0(models_dir,"FG_TT_5_pls.rds"))
+FG_TT_5_xgb <- readRDS(paste0(models_dir,"FG_TT_5_xgb.rds"))
+FG_TT_5.5_gbm <- readRDS(paste0(models_dir,"FG_TT_5.5_gbm.rds"))
+FG_TT_5.5_pls <- readRDS(paste0(models_dir,"FG_TT_5.5_pls.rds"))
+FG_TT_5.5_xgb <- readRDS(paste0(models_dir,"FG_TT_5.5_xgb.rds"))
+F5_ML_gbm <- readRDS(paste0(models_dir,"F5_ML_gbm.rds"))
+F5_ML_pls <- readRDS(paste0(models_dir,"F5_ML_pls.rds"))
+F5_ML_xgb <- readRDS(paste0(models_dir,"F5_ML_xgb.rds"))
+F5_Minus_1.5_gbm <- readRDS(paste0(models_dir,"F5_Minus_1.5_gbm.rds"))
+F5_Minus_1.5_pls <- readRDS(paste0(models_dir,"F5_Minus_1.5_pls.rds"))
+F5_Minus_1.5_xgb <- readRDS(paste0(models_dir,"F5_Minus_1.5_xgb.rds"))
+F5_Minus_0.5_gbm <- readRDS(paste0(models_dir,"F5_Minus_0.5_gbm.rds"))
+F5_Minus_0.5_pls <- readRDS(paste0(models_dir,"F5_Minus_0.5_pls.rds"))
+F5_Minus_0.5_xgb <- readRDS(paste0(models_dir,"F5_Minus_0.5_xgb.rds"))
+F5_Plus_1.5_gbm <- readRDS(paste0(models_dir,"F5_Plus_1.5_gbm.rds"))
+F5_Plus_1.5_pls <- readRDS(paste0(models_dir,"F5_Plus_1.5_pls.rds"))
+F5_Plus_1.5_xgb <- readRDS(paste0(models_dir,"F5_Plus_1.5_xgb.rds"))
+F5_Plus_0.5_gbm <- readRDS(paste0(models_dir,"F5_Plus_0.5_gbm.rds"))
+F5_Plus_0.5_pls <- readRDS(paste0(models_dir,"F5_Plus_0.5_pls.rds"))
+F5_Plus_0.5_xgb <- readRDS(paste0(models_dir,"F5_Plus_0.5_xgb.rds"))
+F5_Total_3.5_gbm <- readRDS(paste0(models_dir,"F5_Total_3.5_gbm.rds"))
+F5_Total_3.5_pls <- readRDS(paste0(models_dir,"F5_Total_3.5_pls.rds"))
+F5_Total_3.5_xgb <- readRDS(paste0(models_dir,"F5_Total_3.5_xgb.rds"))
+F5_Total_4_gbm <- readRDS(paste0(models_dir,"F5_Total_4_gbm.rds"))
+F5_Total_4_pls <- readRDS(paste0(models_dir,"F5_Total_4_pls.rds"))
+F5_Total_4_xgb <- readRDS(paste0(models_dir,"F5_Total_4_xgb.rds"))
+F5_Total_4.5_gbm <- readRDS(paste0(models_dir,"F5_Total_4.5_gbm.rds"))
+F5_Total_4.5_pls <- readRDS(paste0(models_dir,"F5_Total_4.5_pls.rds"))
+F5_Total_4.5_xgb <- readRDS(paste0(models_dir,"F5_Total_4.5_xgb.rds"))
+F5_Total_5_gbm <- readRDS(paste0(models_dir,"F5_Total_5_gbm.rds"))
+F5_Total_5_pls <- readRDS(paste0(models_dir,"F5_Total_5_pls.rds"))
+F5_Total_5_xgb <- readRDS(paste0(models_dir,"F5_Total_5_xgb.rds"))
+F5_Total_5.5_gbm <- readRDS(paste0(models_dir,"F5_Total_5.5_gbm.rds"))
+F5_Total_5.5_pls <- readRDS(paste0(models_dir,"F5_Total_5.5_pls.rds"))
+F5_Total_5.5_xgb <- readRDS(paste0(models_dir,"F5_Total_5.5_xgb.rds"))
+F5_TT_0.5_gbm <- readRDS(paste0(models_dir,"F5_TT_0.5_gbm.rds"))
+F5_TT_0.5_pls <- readRDS(paste0(models_dir,"F5_TT_0.5_pls.rds"))
+F5_TT_0.5_xgb <- readRDS(paste0(models_dir,"F5_TT_0.5_xgb.rds"))
+F5_TT_1_gbm <- readRDS(paste0(models_dir,"F5_TT_1_gbm.rds"))
+F5_TT_1_pls <- readRDS(paste0(models_dir,"F5_TT_1_pls.rds"))
+F5_TT_1_xgb <- readRDS(paste0(models_dir,"F5_TT_1_xgb.rds"))
+F5_TT_1.5_gbm <- readRDS(paste0(models_dir,"F5_TT_1.5_gbm.rds"))
+F5_TT_1.5_pls <- readRDS(paste0(models_dir,"F5_TT_1.5_pls.rds"))
+F5_TT_1.5_xgb <- readRDS(paste0(models_dir,"F5_TT_1.5_xgb.rds"))
+F5_TT_2_gbm <- readRDS(paste0(models_dir,"F5_TT_2_gbm.rds"))
+F5_TT_2_pls <- readRDS(paste0(models_dir,"F5_TT_2_pls.rds"))
+F5_TT_2_xgb <- readRDS(paste0(models_dir,"F5_TT_2_xgb.rds"))
+F5_TT_2.5_gbm <- readRDS(paste0(models_dir,"F5_TT_2.5_gbm.rds"))
+F5_TT_2.5_pls <- readRDS(paste0(models_dir,"F5_TT_2.5_pls.rds"))
+F5_TT_2.5_xgb <- readRDS(paste0(models_dir,"F5_TT_2.5_xgb.rds"))
+F5_TT_3_gbm <- readRDS(paste0(models_dir,"F5_TT_3_gbm.rds"))
+F5_TT_3_pls <- readRDS(paste0(models_dir,"F5_TT_3_pls.rds"))
+F5_TT_3_xgb <- readRDS(paste0(models_dir,"F5_TT_3_xgb.rds"))
+F5_TT_3.5_gbm <- readRDS(paste0(models_dir,"F5_TT_3.5_gbm.rds"))
+F5_TT_3.5_pls <- readRDS(paste0(models_dir,"F5_TT_3.5_pls.rds"))
+F5_TT_3.5_xgb <- readRDS(paste0(models_dir,"F5_TT_3.5_xgb.rds"))
+F1_Total_0.5_gbm <- readRDS(paste0(models_dir,"F1_Total_0.5_gbm.rds"))
+F1_Total_0.5_pls <- readRDS(paste0(models_dir,"F1_Total_0.5_pls.rds"))
+F1_Total_0.5_xgb <- readRDS(paste0(models_dir,"F1_Total_0.5_xgb.rds"))
+F1_TT_0.5_gbm <- readRDS(paste0(models_dir,"F1_TT_0.5_gbm.rds"))
+F1_TT_0.5_pls <- readRDS(paste0(models_dir,"F1_TT_0.5_pls.rds"))
+F1_TT_0.5_xgb <- readRDS(paste0(models_dir,"F1_TT_0.5_xgb.rds"))
 
 ## Daily stats
 pitchers_s2d <- read.csv(paste0("Baseball Machine/Daily Files/",season,"/pitchers_s2d_",season,".csv"))
@@ -101,8 +251,8 @@ pks <- get_mlb_daily_scores(start_date = game_pks_max_date + 1,
                             end_date = Sys.Date()-1,
                             file_type = "pks")
 game_scores <- read.csv(paste0("Baseball Machine/Daily Files/",season,"/game_scores_",season,".csv"))
-game_scores_max_date <- max(as.Date(game_scores$officialDate))
-scores <- get_mlb_daily_scores(start_date = game_scores_max_date + 1,
+game_scores_max_date <- max(as.Date(game_pks$officialDate))
+scores <- get_mlb_daily_scores(start_date = game_pks_max_date + 1,
                             end_date = Sys.Date()-1,
                             file_type = "scores")
 
@@ -110,31 +260,46 @@ scores <- get_mlb_daily_scores(start_date = game_scores_max_date + 1,
 starting_pitchers <- read.csv(paste0("Baseball Machine/Daily Files/",season,"/starting_pitchers_",season,".csv"))
 starting_pitchers_max_date <- max(as.Date(starting_pitchers$game_date))
 probables <- get_probable_pitchers(starting_pitchers_max_date+1, Sys.Date())
+tmrw_probables <- get_probable_pitchers(Sys.Date()+1, Sys.Date()+1)
 daily_rosters <- read.csv(paste0("Baseball Machine/Daily Files/",season,"/daily_rosters_",season,".csv"))
 daily_rosters_max_date <- max(as.Date(daily_rosters$date))
 rosters <- get_daily_rosters(daily_rosters_max_date+1, Sys.Date())
+tmrw_rosters <- get_daily_rosters(Sys.Date()+1, Sys.Date()+1)
 
 ## Bovada Odds
-bovada_odds <- get_bovada_odds("baseball", "mlb")
+bovada_odds <- get_bovada_odds("baseball", "mlb") %>% 
+  mutate(AwayStartingPitcher = case_when(str_detect(AwayStartingPitcher, "Shohei Ohtani") ~ "Shohei Ohtani",
+                                         TRUE ~ AwayStartingPitcher),
+         HomeStartingPitcher = case_when(str_detect(HomeStartingPitcher, "Shohei Ohtani") ~ "Shohei Ohtani",
+                                         TRUE ~ HomeStartingPitcher))
 
 ## Overwrite files with updates
 pitchers_s2d_update <- pitchers_s2d %>% 
+  mutate(Date = as.Date(Date)) %>% 
   union(pitchers_s2d_today)
-team_batting_L7_update <- team_batting_L7 %>% 
+team_batting_L7_update <- team_batting_L7 %>%  
+  mutate(Date = as.Date(Date)) %>% 
   union(team_batting_L7_today)
-team_batting_L14_update <- team_batting_L14 %>% 
+team_batting_L14_update <- team_batting_L14 %>%  
+  mutate(Date = as.Date(Date)) %>% 
   union(team_batting_L14_today)
-team_batting_L30_update <- team_batting_L30 %>% 
+team_batting_L30_update <- team_batting_L30 %>%  
+  mutate(Date = as.Date(Date)) %>% 
   union(team_batting_L30_today)
-team_batting_s2d_update <- team_batting_s2d %>% 
+team_batting_s2d_update <- team_batting_s2d %>%  
+  mutate(Date = as.Date(Date)) %>% 
   union(team_batting_s2d_today)
-team_bullpen_L7_update <- team_bullpen_L7 %>% 
+team_bullpen_L7_update <- team_bullpen_L7 %>%  
+  mutate(Date = as.Date(Date)) %>% 
   union(team_bullpen_L7_today)
-team_bullpen_L14_update <- team_bullpen_L14 %>% 
+team_bullpen_L14_update <- team_bullpen_L14 %>%  
+  mutate(Date = as.Date(Date)) %>% 
   union(team_bullpen_L14_today)
-team_bullpen_L30_update <- team_bullpen_L30 %>% 
+team_bullpen_L30_update <- team_bullpen_L30 %>%  
+  mutate(Date = as.Date(Date)) %>% 
   union(team_bullpen_L30_today)
-team_bullpen_s2d_update <- team_bullpen_s2d %>% 
+team_bullpen_s2d_update <- team_bullpen_s2d %>%  
+  mutate(Date = as.Date(Date)) %>% 
   union(team_bullpen_s2d_today)
 write.csv(pitchers_s2d_update, paste0("Baseball Machine/Daily Files/",season,"/pitchers_s2d_",season,".csv"), row.names = FALSE)
 write.csv(team_batting_L7_update, paste0("Baseball Machine/Daily Files/",season,"/team_batting_L7_",season,".csv"), row.names = FALSE)
@@ -147,9 +312,50 @@ write.csv(team_bullpen_L30_update, paste0("Baseball Machine/Daily Files/",season
 write.csv(team_bullpen_s2d_update, paste0("Baseball Machine/Daily Files/",season,"/team_bullpen_s2d_",season,".csv"), row.names = FALSE)
 
 pks_update <- game_pks %>% 
-  union(pks)
+  mutate(season = as.character(season),
+         seasonDisplay = as.character(seasonDisplay),
+         status.codedGameState = as.character(status.codedGameState),
+         status.statusCode = as.character(status.statusCode),
+         status.abstractGameCode = as.character(status.abstractGameCode),
+         teams.away.leagueRecord.pct = as.character(teams.away.leagueRecord.pct),
+         teams.home.leagueRecord.pct = as.character(teams.home.leagueRecord.pct)) %>% 
+  bind_rows(pks)
 scores_update <- game_scores %>% 
-  union(scores)
+  mutate(home_team_id = as.character(home_team_id),
+         away_team_id = as.character(away_team_id),
+         home_team_season = as.character(home_team_season),
+         home_team_venue_id = as.character(home_team_venue_id),
+         home_team_first_year_of_play = as.character(home_team_first_year_of_play),
+         home_team_league_id = as.character(home_team_league_id),
+         home_team_division_id = as.character(home_team_division_id),
+         home_team_sport_id = as.character(home_team_sport_id),
+         home_team_record_games_played = as.character(home_team_record_games_played),
+         home_team_record_league_record_wins = as.character(home_team_record_league_record_wins),
+         home_team_record_league_record_losses = as.character(home_team_record_league_record_losses),
+         home_team_record_league_record_ties = as.character(home_team_record_league_record_ties),
+         home_team_record_league_record_pct = as.character(home_team_record_league_record_pct),
+         home_team_record_division_leader = as.character(home_team_record_division_leader),
+         home_team_record_wins = as.character(home_team_record_wins),
+         home_team_record_losses = as.character(home_team_record_losses),
+         home_team_record_winning_percentage = as.character(home_team_record_winning_percentage),
+         home_team_active = as.character(home_team_active),
+         away_team_season = as.character(away_team_season),
+         away_team_venue_id = as.character(away_team_venue_id),
+         away_team_first_year_of_play = as.character(away_team_first_year_of_play),
+         away_team_league_id = as.character(away_team_league_id),
+         away_team_division_id = as.character(away_team_division_id),
+         away_team_sport_id = as.character(away_team_sport_id),
+         away_team_record_games_played = as.character(away_team_record_games_played),
+         away_team_record_league_record_wins = as.character(away_team_record_league_record_wins),
+         away_team_record_league_record_losses = as.character(away_team_record_league_record_losses),
+         away_team_record_league_record_ties = as.character(away_team_record_league_record_ties),
+         away_team_record_league_record_pct = as.character(away_team_record_league_record_pct),
+         away_team_record_division_leader = as.character(away_team_record_division_leader),
+         away_team_record_wins = as.character(away_team_record_wins),
+         away_team_record_losses = as.character(away_team_record_losses),
+         away_team_record_winning_percentage = as.character(away_team_record_winning_percentage),
+         away_team_active = as.character(away_team_active)) %>% 
+  bind_rows(scores)
 write.csv(pks_update, paste0("Baseball Machine/Daily Files/",season,"/game_pks_",season,".csv"), row.names = FALSE)
 write.csv(scores_update, paste0("Baseball Machine/Daily Files/",season,"/game_scores_",season,".csv"), row.names = FALSE)
 
@@ -248,12 +454,14 @@ dupe_SPs_today <- pitchers_s2d_today %>%
   dplyr::summarise(records = n()) %>% 
   filter(records > 1) %>% 
   left_join(pitchers_s2d_today %>% distinct(Name, Team))
-daily_pitchers <- pitchers_s2d_today # %>% 
-  # mutate(Name = case_when(Name == "Luis Garcia" & Team == "HOU" ~ "Luis Garcia (HOU)",
-  #                         Name == "Luis Castillo" & Team == "DET" ~ "Luis Castillo (DET)",
-  #                         Name == "Luis Ortiz" & Team == "SFG" ~ "Luis Ortiz (SFG)",
-  #                         Name == "Hyun-Jin Ryu" ~ "Hyun Jin Ryu",
-  #                         TRUE ~ Name))
+dupe_SPs_today$Name
+daily_pitchers <- pitchers_s2d_today %>% 
+  select(-contains('url')) %>% 
+  mutate(Name = case_when(Name == "Luis Garcia" & Team == "HOU" ~ "Luis Garcia (HOU)",
+                          # Name == "Luis Castillo" & Team == "DET" ~ "Luis Castillo (DET)",
+                          # Name == "Luis Ortiz" & Team == "SFG" ~ "Luis Ortiz (SFG)",
+                          # Name == "Hyun-Jin Ryu" ~ "Hyun Jin Ryu",
+                          TRUE ~ Name))
 
 PECOTA_pitching_23 <- readxl::read_xlsx(paste0("Baseball Machine/PECOTA/",season,"/pecota2023_pitching_mar29.xlsx"), sheet = "50") %>% 
   select(mlbid, name, ip, warp) %>% 
@@ -262,18 +470,22 @@ PECOTA_hitting_23 <- readxl::read_xlsx(paste0("Baseball Machine/PECOTA/",season,
   select(mlbid, name, pa, warp) %>% 
   mutate(WARP600 = (as.numeric(warp)/as.numeric(pa))*600)
 
-upcoming_games <- bovada_odds %>% 
-  left_join(todays_games,
+upcoming_games_today <- bovada_odds %>% 
+  filter(gamedate == Sys.Date()) %>% 
+  left_join(todays_games %>% 
+              bind_rows(tmrw_games),
             by = c("AwayTeam" = "away_team_name",
                    "HomeTeam" = "home_team_name",
                    "gamedate" = "officialDate")) %>% 
   left_join(probables %>% 
+              bind_rows(tmrw_probables) %>% 
               select(game_date, fullName, id, team) %>% 
               mutate(game_date = as.Date(game_date)),
             by = c("AwayTeam" = "team", "gamedate" = "game_date")) %>% 
   left_join(probables %>% 
-            select(game_date, fullName, id, team) %>% 
-            mutate(game_date = as.Date(game_date)),
+              bind_rows(tmrw_probables) %>% 
+              select(game_date, fullName, id, team) %>%
+              mutate(game_date = as.Date(game_date)),
           by = c("HomeTeam" = "team", "gamedate" = "game_date"),
           suffix = c("_AwaySP", "_HomeSP")) %>% 
   left_join(PECOTA_pitching_23 %>% 
@@ -284,6 +496,7 @@ upcoming_games <- bovada_odds %>%
           by = c("id_HomeSP" = "mlbid"),
           suffix = c("_AwaySP", "_HomeSP")) %>% 
   left_join(rosters_update %>% 
+              bind_rows(tmrw_rosters) %>% 
               filter(position_type != "Pitcher") %>% 
               left_join(PECOTA_hitting_23 %>% 
                           select(mlbid, WARP600),
@@ -299,6 +512,7 @@ upcoming_games <- bovada_odds %>%
             by = c("gamedate" = "date",
                    "HomeTeam" = "Full.Name22")) %>% 
   left_join(rosters_update %>% 
+              bind_rows(tmrw_rosters) %>% 
               filter(position_type != "Pitcher") %>% 
               left_join(PECOTA_hitting_23 %>% 
                           select(mlbid, WARP600),
@@ -321,9 +535,553 @@ upcoming_games <- bovada_odds %>%
   left_join(daily_team_batting, by = c("gamedate" = "Date", "AwayTeam" = "Team"), suffix = c("_HomeBatters", "_AwayBatters")) %>% 
   left_join(daily_team_bullpen, by = c("gamedate" = "Date", "HomeTeam" = "Team")) %>% 
   left_join(daily_team_bullpen, by = c("gamedate" = "Date", "AwayTeam" = "Team"), suffix = c("_HomeBullpen", "_AwayBullpen")) %>% 
-  rename("AwaySP_fullName" = "fullName_AwaySP",
-         "HomeSP_fullName" = "fullName_HomeSP")
+  dplyr::rename(AwaySP_fullName = fullName_AwaySP,
+                HomeSP_fullName = fullName_HomeSP) %>% 
+  mutate(WARP200_HomeSP = case_when(!is.nan(WARP200_HomeSP) ~ WARP200_HomeSP),
+         WARP200_AwaySP = case_when(!is.nan(WARP200_AwaySP) ~ WARP200_AwaySP)) %>% 
+  mutate(IP_AwaySP = as.integer(IP_AwaySP) + (IP_AwaySP %% 1 * 3.33),
+         Start.IP_AwaySP = as.integer(Start.IP_AwaySP) + (Start.IP_AwaySP %% 1 * 3.33),
+         Relief.IP_AwaySP = as.integer(Relief.IP_AwaySP) + (Relief.IP_AwaySP %% 1 * 3.33),
+         IP_HomeSP = as.integer(IP_HomeSP) + (IP_HomeSP %% 1 * 3.33),
+         Start.IP_HomeSP = as.integer(Start.IP_HomeSP) + (Start.IP_HomeSP %% 1 * 3.33),
+         Relief.IP_HomeSP = as.integer(Relief.IP_HomeSP) + (Relief.IP_HomeSP %% 1 * 3.33),
+         IP_L7_AwayBullpen = as.integer(IP_L7_AwayBullpen) + (IP_L7_AwayBullpen %% 1 * 3.33),
+         IP_L14_AwayBullpen = as.integer(IP_L14_AwayBullpen) + (IP_L14_AwayBullpen %% 1 * 3.33),
+         IP_L30_AwayBullpen = as.integer(IP_L30_AwayBullpen) + (IP_L30_AwayBullpen %% 1 * 3.33),
+         IP_AwayBullpen = as.integer(IP_AwayBullpen) + (IP_AwayBullpen %% 1 * 3.33),
+         IP_L7_HomeBullpen = as.integer(IP_L7_HomeBullpen) + (IP_L7_HomeBullpen %% 1 * 3.33),
+         IP_L14_HomeBullpen = as.integer(IP_L14_HomeBullpen) + (IP_L14_HomeBullpen %% 1 * 3.33),
+         IP_L30_HomeBullpen = as.integer(IP_L30_HomeBullpen) + (IP_L30_HomeBullpen %% 1 * 3.33),
+         IP_HomeBullpen = as.integer(IP_HomeBullpen) + (IP_HomeBullpen %% 1 * 3.33)) %>% 
+  mutate(WAR200_AwaySP = (WAR_AwaySP / IP_AwaySP) * 200,
+         WAR200_HomeSP = (WAR_HomeSP / IP_HomeSP) * 200,
+         HR_L7_AwayBatters = (HR_L7_AwayBatters / PA_L7_AwayBatters) * 500,
+         SB_L7_AwayBatters = (SB_L7_AwayBatters / PA_L7_AwayBatters) * 500,
+         BsR_L7_AwayBatters = (BsR_L7_AwayBatters / PA_L7_AwayBatters) * 500,
+         Off_L7_AwayBatters = (Off_L7_AwayBatters / PA_L7_AwayBatters) * 500,
+         Def_L7_AwayBatters = (Def_L7_AwayBatters / PA_L7_AwayBatters) * 500,
+         WAR_L7_AwayBatters = (WAR_L7_AwayBatters / PA_L7_AwayBatters) * 500,
+         HR_L14_AwayBatters = (HR_L14_AwayBatters / PA_L14_AwayBatters) * 500,
+         SB_L14_AwayBatters = (SB_L14_AwayBatters / PA_L14_AwayBatters) * 500,
+         BsR_L14_AwayBatters = (BsR_L14_AwayBatters / PA_L14_AwayBatters) * 500,
+         Off_L14_AwayBatters = (Off_L14_AwayBatters / PA_L14_AwayBatters) * 500,
+         Def_L14_AwayBatters = (Def_L14_AwayBatters / PA_L14_AwayBatters) * 500,
+         WAR_L14_AwayBatters = (WAR_L14_AwayBatters / PA_L14_AwayBatters) * 500,
+         HR_L30_AwayBatters = (HR_L30_AwayBatters / PA_L30_AwayBatters) * 500,
+         SB_L30_AwayBatters = (SB_L30_AwayBatters / PA_L30_AwayBatters) * 500,
+         BsR_L30_AwayBatters = (BsR_L30_AwayBatters / PA_L30_AwayBatters) * 500,
+         Off_L30_AwayBatters = (Off_L30_AwayBatters / PA_L30_AwayBatters) * 500,
+         Def_L30_AwayBatters = (Def_L30_AwayBatters / PA_L30_AwayBatters) * 500,
+         WAR_L30_AwayBatters = (WAR_L30_AwayBatters / PA_L30_AwayBatters) * 500,
+         HR_AwayBatters = (HR_AwayBatters / PA_AwayBatters) * 500,
+         SB_AwayBatters = (SB_AwayBatters / PA_AwayBatters) * 500,
+         BsR_AwayBatters = (BsR_AwayBatters / PA_AwayBatters) * 500,
+         Off_AwayBatters = (Off_AwayBatters / PA_AwayBatters) * 500,
+         Def_AwayBatters = (Def_AwayBatters / PA_AwayBatters) * 500,
+         WAR_AwayBatters = (WAR_AwayBatters / PA_AwayBatters) * 500,
+         HR_L7_HomeBatters = (HR_L7_HomeBatters / PA_L7_HomeBatters) * 500,
+         SB_L7_HomeBatters = (SB_L7_HomeBatters / PA_L7_HomeBatters) * 500,
+         BsR_L7_HomeBatters = (BsR_L7_HomeBatters / PA_L7_HomeBatters) * 500,
+         Off_L7_HomeBatters = (Off_L7_HomeBatters / PA_L7_HomeBatters) * 500,
+         Def_L7_HomeBatters = (Def_L7_HomeBatters / PA_L7_HomeBatters) * 500,
+         WAR_L7_HomeBatters = (WAR_L7_HomeBatters / PA_L7_HomeBatters) * 500,
+         HR_L14_HomeBatters = (HR_L14_HomeBatters / PA_L14_HomeBatters) * 500,
+         SB_L14_HomeBatters = (SB_L14_HomeBatters / PA_L14_HomeBatters) * 500,
+         BsR_L14_HomeBatters = (BsR_L14_HomeBatters / PA_L14_HomeBatters) * 500,
+         Off_L14_HomeBatters = (Off_L14_HomeBatters / PA_L14_HomeBatters) * 500,
+         Def_L14_HomeBatters = (Def_L14_HomeBatters / PA_L14_HomeBatters) * 500,
+         WAR_L14_HomeBatters = (WAR_L14_HomeBatters / PA_L14_HomeBatters) * 500,
+         HR_L30_HomeBatters = (HR_L30_HomeBatters / PA_L30_HomeBatters) * 500,
+         SB_L30_HomeBatters = (SB_L30_HomeBatters / PA_L30_HomeBatters) * 500,
+         BsR_L30_HomeBatters = (BsR_L30_HomeBatters / PA_L30_HomeBatters) * 500,
+         Off_L30_HomeBatters = (Off_L30_HomeBatters / PA_L30_HomeBatters) * 500,
+         Def_L30_HomeBatters = (Def_L30_HomeBatters / PA_L30_HomeBatters) * 500,
+         WAR_L30_HomeBatters = (WAR_L30_HomeBatters / PA_L30_HomeBatters) * 500,
+         HR_HomeBatters = (HR_HomeBatters / PA_HomeBatters) * 500,
+         SB_HomeBatters = (SB_HomeBatters / PA_HomeBatters) * 500,
+         BsR_HomeBatters = (BsR_HomeBatters / PA_HomeBatters) * 500,
+         Off_HomeBatters = (Off_HomeBatters/ PA_HomeBatters) * 500,
+         Def_HomeBatters = (Def_HomeBatters / PA_HomeBatters) * 500,
+         WAR_HomeBatters = (WAR_HomeBatters / PA_HomeBatters) * 500,
+         WAR_L7_AwayBullpen = (WAR_L7_AwayBullpen / IP_L7_AwayBullpen) * 200,
+         WAR_L14_AwayBullpen = (WAR_L14_AwayBullpen / IP_L14_AwayBullpen) * 200,
+         WAR_L30_AwayBullpen = (WAR_L30_AwayBullpen / IP_L30_AwayBullpen) * 200,
+         WAR_AwayBullpen = (WAR_AwayBullpen / IP_AwayBullpen) * 200,
+         WAR_L7_HomeBullpen = (WAR_L7_HomeBullpen / IP_L7_HomeBullpen) * 200,
+         WAR_L14_HomeBullpen = (WAR_L14_HomeBullpen / IP_L14_HomeBullpen) * 200,
+         WAR_L30_HomeBullpen = (WAR_L30_HomeBullpen / IP_L30_HomeBullpen) * 200,
+         WAR_HomeBullpen = (WAR_HomeBullpen / IP_HomeBullpen) * 200,
+         IPperStart_AwaySP = Start.IP_AwaySP / GS_AwaySP,
+         IPperG_AwaySP = IP_AwaySP / G_AwaySP,
+         IPperStart_HomeSP = Start.IP_HomeSP / GS_HomeSP,
+         IPperG_HomeSP = IP_HomeSP / G_HomeSP) %>% 
+  mutate(month = lubridate::month(gamedate, label = TRUE, abbr = FALSE),
+         doubleHeader = case_when(doubleHeader == 'S' ~ 'Y',
+                                  TRUE ~ doubleHeader)) %>% 
+  mutate(home_team_season = as.numeric(home_team_season))
+
+upcoming_games_tomorrow <- bovada_odds %>% 
+  filter(gamedate == Sys.Date()+1) %>% 
+  mutate(yesterday_date = gamedate - 1) %>% 
+  left_join(todays_games %>% 
+              bind_rows(tmrw_games),
+            by = c("AwayTeam" = "away_team_name",
+                   "HomeTeam" = "home_team_name",
+                   "gamedate" = "officialDate")) %>% 
+  left_join(probables %>% 
+              bind_rows(tmrw_probables) %>% 
+              select(game_date, fullName, id, team) %>% 
+              mutate(game_date = as.Date(game_date)),
+            by = c("AwayTeam" = "team", "gamedate" = "game_date")) %>% 
+  left_join(probables %>% 
+              bind_rows(tmrw_probables) %>% 
+              select(game_date, fullName, id, team) %>%
+              mutate(game_date = as.Date(game_date)),
+            by = c("HomeTeam" = "team", "gamedate" = "game_date"),
+            suffix = c("_AwaySP", "_HomeSP")) %>% 
+  left_join(PECOTA_pitching_23 %>% 
+              select(mlbid, WARP200),
+            by = c("id_AwaySP" = "mlbid")) %>% 
+  left_join(PECOTA_pitching_23 %>% 
+              select(mlbid, WARP200),
+            by = c("id_HomeSP" = "mlbid"),
+            suffix = c("_AwaySP", "_HomeSP")) %>% 
+  left_join(rosters_update %>% 
+              bind_rows(tmrw_rosters) %>% 
+              filter(position_type != "Pitcher") %>% 
+              left_join(PECOTA_hitting_23 %>% 
+                          select(mlbid, WARP600),
+                        by = c("person_id" = "mlbid")) %>% 
+              group_by(team_id, date) %>% 
+              dplyr::summarise(WARP600 = sum(WARP600, na.rm = T)) %>% 
+              left_join(team_names %>% 
+                          select(Full.Name22, id),
+                        by = c("team_id" = "id")) %>% 
+              ungroup() %>% 
+              select(-team_id) %>% 
+              mutate(date = as.Date(date)),
+            by = c("gamedate" = "date",
+                   "HomeTeam" = "Full.Name22")) %>% 
+  left_join(rosters_update %>% 
+              bind_rows(tmrw_rosters) %>% 
+              filter(position_type != "Pitcher") %>% 
+              left_join(PECOTA_hitting_23 %>% 
+                          select(mlbid, WARP600),
+                        by = c("person_id" = "mlbid")) %>% 
+              group_by(team_id, date) %>% 
+              dplyr::summarise(WARP600 = sum(WARP600, na.rm = T)) %>% 
+              left_join(team_names %>% 
+                          select(Full.Name22, id),
+                        by = c("team_id" = "id")) %>% 
+              ungroup() %>% 
+              select(-team_id) %>% 
+              mutate(date = as.Date(date)),
+            by = c("gamedate" = "date",
+                   "AwayTeam" = "Full.Name22"),
+            suffix = c("_HomeBatters", "_AwayBatters")) %>% 
+  filter(!is.na(fullName_HomeSP) & !is.na(fullName_AwaySP)) %>% 
+  left_join(daily_pitchers, by = c("yesterday_date" = "Date", "fullName_HomeSP" = "Name")) %>% 
+  left_join(daily_pitchers, by = c("yesterday_date" = "Date", "fullName_AwaySP" = "Name"), suffix = c("_HomeSP", "_AwaySP")) %>% 
+  left_join(daily_team_batting, by = c("yesterday_date" = "Date", "HomeTeam" = "Team")) %>% 
+  left_join(daily_team_batting, by = c("yesterday_date" = "Date", "AwayTeam" = "Team"), suffix = c("_HomeBatters", "_AwayBatters")) %>% 
+  left_join(daily_team_bullpen, by = c("yesterday_date" = "Date", "HomeTeam" = "Team")) %>% 
+  left_join(daily_team_bullpen, by = c("yesterday_date" = "Date", "AwayTeam" = "Team"), suffix = c("_HomeBullpen", "_AwayBullpen")) %>% 
+  dplyr::rename(AwaySP_fullName = fullName_AwaySP,
+                HomeSP_fullName = fullName_HomeSP) %>% 
+  mutate(WARP200_HomeSP = case_when(!is.nan(WARP200_HomeSP) ~ WARP200_HomeSP),
+         WARP200_AwaySP = case_when(!is.nan(WARP200_AwaySP) ~ WARP200_AwaySP)) %>% 
+  mutate(IP_AwaySP = as.integer(IP_AwaySP) + (IP_AwaySP %% 1 * 3.33),
+         Start.IP_AwaySP = as.integer(Start.IP_AwaySP) + (Start.IP_AwaySP %% 1 * 3.33),
+         Relief.IP_AwaySP = as.integer(Relief.IP_AwaySP) + (Relief.IP_AwaySP %% 1 * 3.33),
+         IP_HomeSP = as.integer(IP_HomeSP) + (IP_HomeSP %% 1 * 3.33),
+         Start.IP_HomeSP = as.integer(Start.IP_HomeSP) + (Start.IP_HomeSP %% 1 * 3.33),
+         Relief.IP_HomeSP = as.integer(Relief.IP_HomeSP) + (Relief.IP_HomeSP %% 1 * 3.33),
+         IP_L7_AwayBullpen = as.integer(IP_L7_AwayBullpen) + (IP_L7_AwayBullpen %% 1 * 3.33),
+         IP_L14_AwayBullpen = as.integer(IP_L14_AwayBullpen) + (IP_L14_AwayBullpen %% 1 * 3.33),
+         IP_L30_AwayBullpen = as.integer(IP_L30_AwayBullpen) + (IP_L30_AwayBullpen %% 1 * 3.33),
+         IP_AwayBullpen = as.integer(IP_AwayBullpen) + (IP_AwayBullpen %% 1 * 3.33),
+         IP_L7_HomeBullpen = as.integer(IP_L7_HomeBullpen) + (IP_L7_HomeBullpen %% 1 * 3.33),
+         IP_L14_HomeBullpen = as.integer(IP_L14_HomeBullpen) + (IP_L14_HomeBullpen %% 1 * 3.33),
+         IP_L30_HomeBullpen = as.integer(IP_L30_HomeBullpen) + (IP_L30_HomeBullpen %% 1 * 3.33),
+         IP_HomeBullpen = as.integer(IP_HomeBullpen) + (IP_HomeBullpen %% 1 * 3.33)) %>% 
+  mutate(WAR200_AwaySP = (WAR_AwaySP / IP_AwaySP) * 200,
+         WAR200_HomeSP = (WAR_HomeSP / IP_HomeSP) * 200,
+         HR_L7_AwayBatters = (HR_L7_AwayBatters / PA_L7_AwayBatters) * 500,
+         SB_L7_AwayBatters = (SB_L7_AwayBatters / PA_L7_AwayBatters) * 500,
+         BsR_L7_AwayBatters = (BsR_L7_AwayBatters / PA_L7_AwayBatters) * 500,
+         Off_L7_AwayBatters = (Off_L7_AwayBatters / PA_L7_AwayBatters) * 500,
+         Def_L7_AwayBatters = (Def_L7_AwayBatters / PA_L7_AwayBatters) * 500,
+         WAR_L7_AwayBatters = (WAR_L7_AwayBatters / PA_L7_AwayBatters) * 500,
+         HR_L14_AwayBatters = (HR_L14_AwayBatters / PA_L14_AwayBatters) * 500,
+         SB_L14_AwayBatters = (SB_L14_AwayBatters / PA_L14_AwayBatters) * 500,
+         BsR_L14_AwayBatters = (BsR_L14_AwayBatters / PA_L14_AwayBatters) * 500,
+         Off_L14_AwayBatters = (Off_L14_AwayBatters / PA_L14_AwayBatters) * 500,
+         Def_L14_AwayBatters = (Def_L14_AwayBatters / PA_L14_AwayBatters) * 500,
+         WAR_L14_AwayBatters = (WAR_L14_AwayBatters / PA_L14_AwayBatters) * 500,
+         HR_L30_AwayBatters = (HR_L30_AwayBatters / PA_L30_AwayBatters) * 500,
+         SB_L30_AwayBatters = (SB_L30_AwayBatters / PA_L30_AwayBatters) * 500,
+         BsR_L30_AwayBatters = (BsR_L30_AwayBatters / PA_L30_AwayBatters) * 500,
+         Off_L30_AwayBatters = (Off_L30_AwayBatters / PA_L30_AwayBatters) * 500,
+         Def_L30_AwayBatters = (Def_L30_AwayBatters / PA_L30_AwayBatters) * 500,
+         WAR_L30_AwayBatters = (WAR_L30_AwayBatters / PA_L30_AwayBatters) * 500,
+         HR_AwayBatters = (HR_AwayBatters / PA_AwayBatters) * 500,
+         SB_AwayBatters = (SB_AwayBatters / PA_AwayBatters) * 500,
+         BsR_AwayBatters = (BsR_AwayBatters / PA_AwayBatters) * 500,
+         Off_AwayBatters = (Off_AwayBatters / PA_AwayBatters) * 500,
+         Def_AwayBatters = (Def_AwayBatters / PA_AwayBatters) * 500,
+         WAR_AwayBatters = (WAR_AwayBatters / PA_AwayBatters) * 500,
+         HR_L7_HomeBatters = (HR_L7_HomeBatters / PA_L7_HomeBatters) * 500,
+         SB_L7_HomeBatters = (SB_L7_HomeBatters / PA_L7_HomeBatters) * 500,
+         BsR_L7_HomeBatters = (BsR_L7_HomeBatters / PA_L7_HomeBatters) * 500,
+         Off_L7_HomeBatters = (Off_L7_HomeBatters / PA_L7_HomeBatters) * 500,
+         Def_L7_HomeBatters = (Def_L7_HomeBatters / PA_L7_HomeBatters) * 500,
+         WAR_L7_HomeBatters = (WAR_L7_HomeBatters / PA_L7_HomeBatters) * 500,
+         HR_L14_HomeBatters = (HR_L14_HomeBatters / PA_L14_HomeBatters) * 500,
+         SB_L14_HomeBatters = (SB_L14_HomeBatters / PA_L14_HomeBatters) * 500,
+         BsR_L14_HomeBatters = (BsR_L14_HomeBatters / PA_L14_HomeBatters) * 500,
+         Off_L14_HomeBatters = (Off_L14_HomeBatters / PA_L14_HomeBatters) * 500,
+         Def_L14_HomeBatters = (Def_L14_HomeBatters / PA_L14_HomeBatters) * 500,
+         WAR_L14_HomeBatters = (WAR_L14_HomeBatters / PA_L14_HomeBatters) * 500,
+         HR_L30_HomeBatters = (HR_L30_HomeBatters / PA_L30_HomeBatters) * 500,
+         SB_L30_HomeBatters = (SB_L30_HomeBatters / PA_L30_HomeBatters) * 500,
+         BsR_L30_HomeBatters = (BsR_L30_HomeBatters / PA_L30_HomeBatters) * 500,
+         Off_L30_HomeBatters = (Off_L30_HomeBatters / PA_L30_HomeBatters) * 500,
+         Def_L30_HomeBatters = (Def_L30_HomeBatters / PA_L30_HomeBatters) * 500,
+         WAR_L30_HomeBatters = (WAR_L30_HomeBatters / PA_L30_HomeBatters) * 500,
+         HR_HomeBatters = (HR_HomeBatters / PA_HomeBatters) * 500,
+         SB_HomeBatters = (SB_HomeBatters / PA_HomeBatters) * 500,
+         BsR_HomeBatters = (BsR_HomeBatters / PA_HomeBatters) * 500,
+         Off_HomeBatters = (Off_HomeBatters/ PA_HomeBatters) * 500,
+         Def_HomeBatters = (Def_HomeBatters / PA_HomeBatters) * 500,
+         WAR_HomeBatters = (WAR_HomeBatters / PA_HomeBatters) * 500,
+         WAR_L7_AwayBullpen = (WAR_L7_AwayBullpen / IP_L7_AwayBullpen) * 200,
+         WAR_L14_AwayBullpen = (WAR_L14_AwayBullpen / IP_L14_AwayBullpen) * 200,
+         WAR_L30_AwayBullpen = (WAR_L30_AwayBullpen / IP_L30_AwayBullpen) * 200,
+         WAR_AwayBullpen = (WAR_AwayBullpen / IP_AwayBullpen) * 200,
+         WAR_L7_HomeBullpen = (WAR_L7_HomeBullpen / IP_L7_HomeBullpen) * 200,
+         WAR_L14_HomeBullpen = (WAR_L14_HomeBullpen / IP_L14_HomeBullpen) * 200,
+         WAR_L30_HomeBullpen = (WAR_L30_HomeBullpen / IP_L30_HomeBullpen) * 200,
+         WAR_HomeBullpen = (WAR_HomeBullpen / IP_HomeBullpen) * 200,
+         IPperStart_AwaySP = Start.IP_AwaySP / GS_AwaySP,
+         IPperG_AwaySP = IP_AwaySP / G_AwaySP,
+         IPperStart_HomeSP = Start.IP_HomeSP / GS_HomeSP,
+         IPperG_HomeSP = IP_HomeSP / G_HomeSP) %>% 
+  mutate(month = lubridate::month(gamedate, label = TRUE, abbr = FALSE),
+         doubleHeader = case_when(doubleHeader == 'S' ~ 'Y',
+                                  TRUE ~ doubleHeader)) %>% 
+  mutate(home_team_season = as.numeric(home_team_season))
+
+upcoming_games <- upcoming_games_today %>% 
+  bind_rows(upcoming_games_tomorrow)
+
+pred_data_home <- upcoming_games %>% 
+  ungroup() %>% 
+  select(gamedate, AwayTeam, HomeTeam, AwayStartingPitcher, HomeStartingPitcher, AwaySP_fullName, HomeSP_fullName,
+         home_team_season, month, home_team_league_name, home_team_division_name,
+         doubleHeader, gameNumber, dayNight, venue.name, contains('_AwaySP'), contains('_HomeBatters'),
+         -Def_L7_HomeBatters, -Def_L14_HomeBatters, -Def_L30_HomeBatters, -Def_HomeBatters,
+         Def_L7_AwayBatters, Def_L14_AwayBatters, Def_L30_AwayBatters, Def_AwayBatters,
+         contains('_AwayBullpen')) %>%
+  rename_all(~gsub("home_","",.)) %>% 
+  rename_all(~gsub("_Home","",.)) %>% 
+  rename_all(~gsub("_Away","",.)) %>% 
+  mutate(home_or_away = 'Home')
+
+pred_data_away <- upcoming_games %>% 
+  ungroup() %>% 
+  select(gamedate, AwayTeam, HomeTeam, AwayStartingPitcher, HomeStartingPitcher, AwaySP_fullName, HomeSP_fullName,
+         home_team_season, month, away_team_league_name, away_team_division_name,
+         doubleHeader, gameNumber, dayNight, venue.name, contains('_HomeSP'), contains('_AwayBatters'),
+         Def_L7_HomeBatters, Def_L14_HomeBatters, Def_L30_HomeBatters, Def_HomeBatters,
+         -Def_L7_AwayBatters, -Def_L14_AwayBatters, -Def_L30_AwayBatters, -Def_AwayBatters,
+         contains('_HomeBullpen')) %>%
+  rename_all(~gsub("home_","",.)) %>% 
+  rename_all(~gsub("away_","",.)) %>% 
+  rename_all(~gsub("_Home","",.)) %>% 
+  rename_all(~gsub("_Away","",.)) %>% 
+  mutate(home_or_away = 'Away')
   
+pred_data <- pred_data_home %>% 
+  bind_rows(pred_data_away) %>% 
+  filter(!is.na(IPSP) &
+           !is.na(PA_L7Batters) &
+           !is.na(IP_L7Bullpen) &
+           !is.na(PA_L30Batters) &
+           !is.na(IPBullpen)) %>% 
+  replace(is.na(.), 0) %>% 
+  distinct() %>% 
+  mutate(Team = case_when(home_or_away == "Home" ~ HomeTeam,
+                          TRUE ~ AwayTeam),
+         Opponent = case_when(home_or_away == "Away" ~ HomeTeam,
+                              TRUE ~ AwayTeam))
+
+singles <- pred_data
+singles$pR_FG_pls <- predict(full_game_pls, pred_data)
+singles$pR_FG_rf <- predict(full_game_rf, pred_data)
+singles$pR_FG_cub <- predict(full_game_cub, pred_data)
+singles$pR_FG_gbm <- predict(full_game_gbm, pred_data)
+singles$pR_F5_pls <- predict(F5_pls, pred_data)
+singles$pR_F5_rf <- predict(F5_rf, pred_data)
+singles$pR_F5_cub <- predict(F5_cub, pred_data)
+singles$pR_F5_gbm <- predict(F5_gbm, pred_data)
+singles$pR_F1_pls <- predict(F1_pls, pred_data)
+singles$pR_F1_rf <- predict(F1_rf, pred_data)
+singles$pR_F1_cub <- predict(F1_cub, pred_data)
+singles$pR_F1_gbm <- predict(F1_gbm, pred_data)
+singles$pFG_TT_2.5_gbm <- predict(FG_TT_2.5_gbm, pred_data, type = "prob")
+singles$pFG_TT_2.5_pls <- predict(FG_TT_2.5_pls, pred_data, type = "prob")
+singles$pFG_TT_2.5_xgb <- predict(FG_TT_2.5_xgb, pred_data, type = "prob")
+singles$pFG_TT_3_gbm <- predict(FG_TT_3_gbm, pred_data, type = "prob")
+singles$pFG_TT_3_pls <- predict(FG_TT_3_pls, pred_data, type = "prob")
+singles$pFG_TT_3_xgb <- predict(FG_TT_3_xgb, pred_data, type = "prob")
+singles$pFG_TT_3.5_gbm <- predict(FG_TT_3.5_gbm, pred_data, type = "prob")
+singles$pFG_TT_3.5_pls <- predict(FG_TT_3.5_pls, pred_data, type = "prob")
+singles$pFG_TT_3.5_xgb <- predict(FG_TT_3.5_xgb, pred_data, type = "prob")
+singles$pFG_TT_4_gbm <- predict(FG_TT_4_gbm, pred_data, type = "prob")
+singles$pFG_TT_4_pls <- predict(FG_TT_4_pls, pred_data, type = "prob")
+singles$pFG_TT_4_xgb <- predict(FG_TT_4_xgb, pred_data, type = "prob")
+singles$pFG_TT_4.5_gbm <- predict(FG_TT_4.5_gbm, pred_data, type = "prob")
+singles$pFG_TT_4.5_pls <- predict(FG_TT_4.5_pls, pred_data, type = "prob")
+singles$pFG_TT_4.5_xgb <- predict(FG_TT_4.5_xgb, pred_data, type = "prob")
+singles$pFG_TT_5_gbm <- predict(FG_TT_5_gbm, pred_data, type = "prob")
+singles$pFG_TT_5_pls <- predict(FG_TT_5_pls, pred_data, type = "prob")
+singles$pFG_TT_5_xgb <- predict(FG_TT_5_xgb, pred_data, type = "prob")
+singles$pFG_TT_5.5_gbm <- predict(FG_TT_5.5_gbm, pred_data, type = "prob")
+singles$pFG_TT_5.5_pls <- predict(FG_TT_5.5_pls, pred_data, type = "prob")
+singles$pFG_TT_5.5_xgb <- predict(FG_TT_5.5_xgb, pred_data, type = "prob")
+singles$pF5_TT_0.5_gbm <- predict(F5_TT_0.5_gbm, pred_data, type = "prob")
+singles$pF5_TT_0.5_pls <- predict(F5_TT_0.5_pls, pred_data, type = "prob")
+singles$pF5_TT_0.5_xgb <- predict(F5_TT_0.5_xgb, pred_data, type = "prob")
+singles$pF5_TT_1_gbm <- predict(F5_TT_1_gbm, pred_data, type = "prob")
+singles$pF5_TT_1_pls <- predict(F5_TT_1_pls, pred_data, type = "prob")
+singles$pF5_TT_1_xgb <- predict(F5_TT_1_xgb, pred_data, type = "prob")
+singles$pF5_TT_1.5_gbm <- predict(F5_TT_1.5_gbm, pred_data, type = "prob")
+singles$pF5_TT_1.5_pls <- predict(F5_TT_1.5_pls, pred_data, type = "prob")
+singles$pF5_TT_1.5_xgb <- predict(F5_TT_1.5_xgb, pred_data, type = "prob")
+singles$pF5_TT_2_gbm <- predict(F5_TT_2_gbm, pred_data, type = "prob")
+singles$pF5_TT_2_pls <- predict(F5_TT_2_pls, pred_data, type = "prob")
+singles$pF5_TT_2_xgb <- predict(F5_TT_2_xgb, pred_data, type = "prob")
+singles$pF5_TT_2.5_gbm <- predict(F5_TT_2.5_gbm, pred_data, type = "prob")
+singles$pF5_TT_2.5_pls <- predict(F5_TT_2.5_pls, pred_data, type = "prob")
+singles$pF5_TT_2.5_xgb <- predict(F5_TT_2.5_xgb, pred_data, type = "prob")
+singles$pF5_TT_3_gbm <- predict(F5_TT_3_gbm, pred_data, type = "prob")
+singles$pF5_TT_3_pls <- predict(F5_TT_3_pls, pred_data, type = "prob")
+singles$pF5_TT_3_xgb <- predict(F5_TT_3_xgb, pred_data, type = "prob")
+singles$pF5_TT_3.5_gbm <- predict(F5_TT_3.5_gbm, pred_data, type = "prob")
+singles$pF5_TT_3.5_pls <- predict(F5_TT_3.5_pls, pred_data, type = "prob")
+singles$pF5_TT_3.5_xgb <- predict(F5_TT_3.5_xgb, pred_data, type = "prob")
+singles$pF1_TT_0.5_gbm <- predict(F1_TT_0.5_gbm, pred_data, type = "prob")
+singles$pF1_TT_0.5_pls <- predict(F1_TT_0.5_pls, pred_data, type = "prob")
+singles$pF1_TT_0.5_xgb <- predict(F1_TT_0.5_xgb, pred_data, type = "prob")
+singles <- singles %>% 
+  mutate(pR_FG = (pR_FG_gbm + pR_FG_cub + pR_FG_rf + pR_FG_pls) / 4,
+         pR_F5 = (pR_F5_gbm + pR_F5_cub + pR_F5_rf + pR_F5_pls) / 4,
+         pR_F1 = (pR_F1_gbm + pR_F1_cub + pR_F1_rf + pR_F1_pls) / 4,
+         pFG_TT_2.5 = (pFG_TT_2.5_gbm + pFG_TT_2.5_pls + pFG_TT_2.5_xgb) / 3,
+         pFG_TT_3 = (pFG_TT_3_gbm + pFG_TT_3_pls + pFG_TT_3_xgb) / 3,
+         pFG_TT_3.5 = (pFG_TT_3.5_gbm + pFG_TT_3.5_pls + pFG_TT_3.5_xgb) / 3,
+         pFG_TT_4 = (pFG_TT_4_gbm + pFG_TT_4_pls + pFG_TT_4_xgb) / 3,
+         pFG_TT_4.5 = (pFG_TT_4.5_gbm + pFG_TT_4.5_pls + pFG_TT_4.5_xgb) / 3,
+         pFG_TT_5 = (pFG_TT_5_gbm + pFG_TT_5_pls + pFG_TT_5_xgb) / 3,
+         pFG_TT_5.5 = (pFG_TT_5.5_gbm + pFG_TT_5.5_pls + pFG_TT_5.5_xgb) / 3,
+         pF5_TT_0.5 = (pF5_TT_0.5_gbm + pF5_TT_0.5_pls + pF5_TT_0.5_xgb) / 3,
+         pF5_TT_1 = (pF5_TT_1_gbm + pF5_TT_1_pls + pF5_TT_1_xgb) / 3,
+         pF5_TT_1.5 = (pF5_TT_1.5_gbm + pF5_TT_1.5_pls + pF5_TT_1.5_xgb) / 3,
+         pF5_TT_2 = (pF5_TT_2_gbm + pF5_TT_2_pls + pF5_TT_2_xgb) / 3,
+         pF5_TT_2.5 = (pF5_TT_2.5_gbm + pF5_TT_2.5_pls + pF5_TT_2.5_xgb) / 3,
+         pF5_TT_3 = (pF5_TT_3_gbm + pF5_TT_3_pls + pF5_TT_3_xgb) / 3,
+         pF5_TT_3.5 = (pF5_TT_3.5_gbm + pF5_TT_3.5_pls + pF5_TT_3.5_xgb) / 3,
+         pF1_TT_0.5 = (pF1_TT_0.5_gbm + pF1_TT_0.5_pls + pF1_TT_0.5_xgb) / 3)
+
+singles2 <- singles %>% 
+  select(gamedate:HomeSP_fullName, Team, Opponent, home_or_away, pR_FG:pF1_TT_0.5) %>%
+  left_join(singles %>% 
+              select(gamedate:HomeSP_fullName, Team, Opponent, home_or_away, pR_FG:pF1_TT_0.5),
+            by = c("gamedate", "Team" = "Opponent", "Opponent" = "Team", "AwaySP_fullName", 
+                   "HomeSP_fullName", "AwayStartingPitcher", "HomeStartingPitcher"),
+            suffix = c("_Home", "_Away")) %>% 
+  select(gamedate:HomeSP_fullName, home_or_away_Home, pR_FG_Home:pF1_TT_0.5_Home, pR_FG_Away:pF1_TT_0.5_Away, -home_or_away_Away) %>% 
+  # rename(Home = Team,
+  #        Away = Opponent) %>% 
+  filter(home_or_away_Home == "Home") %>% 
+  select(-home_or_away_Home)
+
+metrics_df <- upcoming_games %>% 
+  select(-yesterday_date, -(bet_type:HUN.SpreadTotal)) %>% 
+  ungroup() %>% 
+  filter(!is.na(IP_HomeSP) &
+           !is.na(IP_AwaySP) &
+           !is.na(PA_L7_HomeBatters) &
+           !is.na(PA_L7_AwayBatters) &
+           !is.na(IP_L7_HomeBullpen) &
+           !is.na(IP_L7_AwayBullpen) &
+           !is.na(PA_L30_HomeBatters) &
+           !is.na(PA_L30_AwayBatters) &
+           !is.na(IP_HomeBullpen) &
+           !is.na(IP_AwayBullpen)) %>% 
+  replace(is.na(.), 0) %>% 
+  distinct()
+  
+doubles <- metrics_df
+doubles$pFG_ML_gbm <- predict(FG_ML_gbm, metrics_df, type = "prob")
+doubles$pFG_ML_pls <- predict(FG_ML_pls, metrics_df, type = "prob")
+doubles$pFG_ML_xgb <- predict(FG_ML_xgb, metrics_df, type = "prob")
+doubles$pFG_Minus_1.5_gbm <- predict(FG_Minus_1.5_gbm, metrics_df, type = "prob")
+doubles$pFG_Minus_1.5_pls <- predict(FG_Minus_1.5_pls, metrics_df, type = "prob")
+doubles$pFG_Minus_1.5_xgb <- predict(FG_Minus_1.5_xgb, metrics_df, type = "prob")
+doubles$pFG_Minus_2.5_gbm <- predict(FG_Minus_2.5_gbm, metrics_df, type = "prob")
+doubles$pFG_Minus_2.5_pls <- predict(FG_Minus_2.5_pls, metrics_df, type = "prob")
+doubles$pFG_Minus_2.5_xgb <- predict(FG_Minus_2.5_xgb, metrics_df, type = "prob")
+doubles$pFG_Plus_1.5_gbm <- predict(FG_Plus_1.5_gbm, metrics_df, type = "prob")
+doubles$pFG_Plus_1.5_pls <- predict(FG_Plus_1.5_pls, metrics_df, type = "prob")
+doubles$pFG_Plus_1.5_xgb <- predict(FG_Plus_1.5_xgb, metrics_df, type = "prob")
+doubles$pFG_Plus_2.5_gbm <- predict(FG_Plus_2.5_gbm, metrics_df, type = "prob")
+doubles$pFG_Plus_2.5_pls <- predict(FG_Plus_2.5_pls, metrics_df, type = "prob")
+doubles$pFG_Plus_2.5_xgb <- predict(FG_Plus_2.5_xgb, metrics_df, type = "prob")
+doubles$pFG_Total_6.5_gbm <- predict(FG_Total_6.5_gbm, metrics_df, type = "prob")
+doubles$pFG_Total_6.5_pls <- predict(FG_Total_6.5_pls, metrics_df, type = "prob")
+doubles$pFG_Total_6.5_xgb <- predict(FG_Total_6.5_xgb, metrics_df, type = "prob")
+doubles$pFG_Total_7_gbm <- predict(FG_Total_7_gbm, metrics_df, type = "prob")
+doubles$pFG_Total_7_pls <- predict(FG_Total_7_pls, metrics_df, type = "prob")
+doubles$pFG_Total_7_xgb <- predict(FG_Total_7_xgb, metrics_df, type = "prob")
+doubles$pFG_Total_7.5_gbm <- predict(FG_Total_7.5_gbm, metrics_df, type = "prob")
+doubles$pFG_Total_7.5_pls <- predict(FG_Total_7.5_pls, metrics_df, type = "prob")
+doubles$pFG_Total_7.5_xgb <- predict(FG_Total_7.5_xgb, metrics_df, type = "prob")
+doubles$pFG_Total_8_gbm <- predict(FG_Total_8_gbm, metrics_df, type = "prob")
+doubles$pFG_Total_8_pls <- predict(FG_Total_8_pls, metrics_df, type = "prob")
+doubles$pFG_Total_8_xgb <- predict(FG_Total_8_xgb, metrics_df, type = "prob")
+doubles$pFG_Total_8.5_gbm <- predict(FG_Total_8.5_gbm, metrics_df, type = "prob")
+doubles$pFG_Total_8.5_pls <- predict(FG_Total_8.5_pls, metrics_df, type = "prob")
+doubles$pFG_Total_8.5_xgb <- predict(FG_Total_8.5_xgb, metrics_df, type = "prob")
+doubles$pFG_Total_9_gbm <- predict(FG_Total_9_gbm, metrics_df, type = "prob")
+doubles$pFG_Total_9_pls <- predict(FG_Total_9_pls, metrics_df, type = "prob")
+doubles$pFG_Total_9_xgb <- predict(FG_Total_9_xgb, metrics_df, type = "prob")
+doubles$pFG_Total_9.5_gbm <- predict(FG_Total_9.5_gbm, metrics_df, type = "prob")
+doubles$pFG_Total_9.5_pls <- predict(FG_Total_9.5_pls, metrics_df, type = "prob")
+doubles$pFG_Total_9.5_xgb <- predict(FG_Total_9.5_xgb, metrics_df, type = "prob")
+doubles$pFG_Total_10_gbm <- predict(FG_Total_10_gbm, metrics_df, type = "prob")
+doubles$pFG_Total_10_pls <- predict(FG_Total_10_pls, metrics_df, type = "prob")
+doubles$pFG_Total_10_xgb <- predict(FG_Total_10_xgb, metrics_df, type = "prob")
+doubles$pFG_Total_10.5_gbm <- predict(FG_Total_10.5_gbm, metrics_df, type = "prob")
+doubles$pFG_Total_10.5_pls <- predict(FG_Total_10.5_pls, metrics_df, type = "prob")
+doubles$pFG_Total_10.5_xgb <- predict(FG_Total_10.5_xgb, metrics_df, type = "prob")
+doubles$pFG_Total_11_gbm <- predict(FG_Total_11_gbm, metrics_df, type = "prob")
+doubles$pFG_Total_11_pls <- predict(FG_Total_11_pls, metrics_df, type = "prob")
+doubles$pFG_Total_11_xgb <- predict(FG_Total_11_xgb, metrics_df, type = "prob")
+doubles$pFG_Total_11.5_gbm <- predict(FG_Total_11.5_gbm, metrics_df, type = "prob")
+doubles$pFG_Total_11.5_pls <- predict(FG_Total_11.5_pls, metrics_df, type = "prob")
+doubles$pFG_Total_11.5_xgb <- predict(FG_Total_11.5_xgb, metrics_df, type = "prob")
+doubles$pF5_ML_gbm <- predict(F5_ML_gbm, metrics_df, type = "prob")
+doubles$pF5_ML_pls <- predict(F5_ML_pls, metrics_df, type = "prob")
+doubles$pF5_ML_xgb <- predict(F5_ML_xgb, metrics_df, type = "prob")
+doubles$pF5_Minus_0.5_gbm <- predict(F5_Minus_0.5_gbm, metrics_df, type = "prob")
+doubles$pF5_Minus_0.5_pls <- predict(F5_Minus_0.5_pls, metrics_df, type = "prob")
+doubles$pF5_Minus_0.5_xgb <- predict(F5_Minus_0.5_xgb, metrics_df, type = "prob")
+doubles$pF5_Minus_1.5_gbm <- predict(F5_Minus_1.5_gbm, metrics_df, type = "prob")
+doubles$pF5_Minus_1.5_pls <- predict(F5_Minus_1.5_pls, metrics_df, type = "prob")
+doubles$pF5_Minus_1.5_xgb <- predict(F5_Minus_1.5_xgb, metrics_df, type = "prob")
+doubles$pF5_Plus_0.5_gbm <- predict(F5_Plus_0.5_gbm, metrics_df, type = "prob")
+doubles$pF5_Plus_0.5_pls <- predict(F5_Plus_0.5_pls, metrics_df, type = "prob")
+doubles$pF5_Plus_0.5_xgb <- predict(F5_Plus_0.5_xgb, metrics_df, type = "prob")
+doubles$pF5_Plus_1.5_gbm <- predict(F5_Plus_1.5_gbm, metrics_df, type = "prob")
+doubles$pF5_Plus_1.5_pls <- predict(F5_Plus_1.5_pls, metrics_df, type = "prob")
+doubles$pF5_Plus_1.5_xgb <- predict(F5_Plus_1.5_xgb, metrics_df, type = "prob")
+doubles$pF5_Total_3.5_gbm <- predict(F5_Total_3.5_gbm, metrics_df, type = "prob")
+doubles$pF5_Total_3.5_pls <- predict(F5_Total_3.5_pls, metrics_df, type = "prob")
+doubles$pF5_Total_3.5_xgb <- predict(F5_Total_3.5_xgb, metrics_df, type = "prob")
+doubles$pF5_Total_4_gbm <- predict(F5_Total_4_gbm, metrics_df, type = "prob")
+doubles$pF5_Total_4_pls <- predict(F5_Total_4_pls, metrics_df, type = "prob")
+doubles$pF5_Total_4_xgb <- predict(F5_Total_4_xgb, metrics_df, type = "prob")
+doubles$pF5_Total_4.5_gbm <- predict(F5_Total_4.5_gbm, metrics_df, type = "prob")
+doubles$pF5_Total_4.5_pls <- predict(F5_Total_4.5_pls, metrics_df, type = "prob")
+doubles$pF5_Total_4.5_xgb <- predict(F5_Total_4.5_xgb, metrics_df, type = "prob")
+doubles$pF5_Total_5_gbm <- predict(F5_Total_5_gbm, metrics_df, type = "prob")
+doubles$pF5_Total_5_pls <- predict(F5_Total_5_pls, metrics_df, type = "prob")
+doubles$pF5_Total_5_xgb <- predict(F5_Total_5_xgb, metrics_df, type = "prob")
+doubles$pF5_Total_5.5_gbm <- predict(F5_Total_5.5_gbm, metrics_df, type = "prob")
+doubles$pF5_Total_5.5_pls <- predict(F5_Total_5.5_pls, metrics_df, type = "prob")
+doubles$pF5_Total_5.5_xgb <- predict(F5_Total_5.5_xgb, metrics_df, type = "prob")
+doubles$pF1_Total_0.5_gbm <- predict(F1_Total_0.5_gbm, metrics_df, type = "prob")
+doubles$pF1_Total_0.5_pls <- predict(F1_Total_0.5_pls, metrics_df, type = "prob")
+doubles$pF1_Total_0.5_xgb <- predict(F1_Total_0.5_xgb, metrics_df, type = "prob")
+doubles <- doubles %>% 
+  mutate(pFG_ML = (pFG_ML_gbm + pFG_ML_pls + pFG_ML_xgb) / 3,
+         pFG_Minus_1.5 = (pFG_Minus_1.5_gbm + pFG_Minus_1.5_pls + pFG_Minus_1.5_xgb) / 3,
+         pFG_Minus_2.5 = (pFG_Minus_2.5_gbm + pFG_Minus_2.5_pls + pFG_Minus_2.5_xgb) / 3,
+         pFG_Plus_1.5 = (pFG_Plus_1.5_gbm + pFG_Plus_1.5_pls + pFG_Plus_1.5_xgb) / 3,
+         pFG_Plus_2.5 = (pFG_Plus_2.5_gbm + pFG_Plus_2.5_pls + pFG_Plus_2.5_xgb) / 3,
+         pFG_Total_6.5 = (pFG_Total_6.5_gbm + pFG_Total_6.5_pls + pFG_Total_6.5_xgb) / 3,
+         pFG_Total_7 = (pFG_Total_7_gbm + pFG_Total_7_pls + pFG_Total_7_xgb) / 3,
+         pFG_Total_7.5 = (pFG_Total_7.5_gbm + pFG_Total_7.5_pls + pFG_Total_7.5_xgb) / 3,
+         pFG_Total_8 = (pFG_Total_8_gbm + pFG_Total_8_pls + pFG_Total_8_xgb) / 3,
+         pFG_Total_8.5 = (pFG_Total_8.5_gbm + pFG_Total_8.5_pls + pFG_Total_8.5_xgb) / 3,
+         pFG_Total_9 = (pFG_Total_9_gbm + pFG_Total_9_pls + pFG_Total_9_xgb) / 3,
+         pFG_Total_9.5 = (pFG_Total_9.5_gbm + pFG_Total_9.5_pls + pFG_Total_9.5_xgb) / 3,
+         pFG_Total_10 = (pFG_Total_10_gbm + pFG_Total_10_pls + pFG_Total_10_xgb) / 3,
+         pFG_Total_10.5 = (pFG_Total_10.5_gbm + pFG_Total_10.5_pls + pFG_Total_10.5_xgb) / 3,
+         pFG_Total_11 = (pFG_Total_11_gbm + pFG_Total_11_pls + pFG_Total_11_xgb) / 3,
+         pFG_Total_11.5 = (pFG_Total_11.5_gbm + pFG_Total_11.5_pls + pFG_Total_11.5_xgb) / 3,
+         pF5_ML = (pF5_ML_gbm + pF5_ML_pls + pF5_ML_xgb) / 3,
+         pF5_Minus_0.5 = (pF5_Minus_0.5_gbm + pF5_Minus_0.5_pls + pF5_Minus_0.5_xgb) / 3,
+         pF5_Minus_1.5 = (pF5_Minus_1.5_gbm + pF5_Minus_1.5_pls + pF5_Minus_1.5_xgb) / 3,
+         pF5_Plus_0.5 = (pF5_Plus_0.5_gbm + pF5_Plus_0.5_pls + pF5_Plus_0.5_xgb) / 3,
+         pF5_Plus_1.5 = (pF5_Plus_1.5_gbm + pF5_Plus_1.5_pls + pF5_Plus_1.5_xgb) / 3,
+         pF5_Total_3.5 = (pF5_Total_3.5_gbm + pF5_Total_3.5_pls + pF5_Total_3.5_xgb) / 3,
+         pF5_Total_4 = (pF5_Total_4_gbm + pF5_Total_4_pls + pF5_Total_4_xgb) / 3,
+         pF5_Total_4.5 = (pF5_Total_4.5_gbm + pF5_Total_4.5_pls + pF5_Total_4.5_xgb) / 3,
+         pF5_Total_5 = (pF5_Total_5_gbm + pF5_Total_5_pls + pF5_Total_5_xgb) / 3,
+         pF5_Total_5.5 = (pF5_Total_5.5_gbm + pF5_Total_5.5_pls + pF5_Total_5.5_xgb) / 3,
+         pF1_Total_0.5 = (pF1_Total_0.5_gbm + pF1_Total_0.5_pls + pF1_Total_0.5_xgb) / 3)
+
+doubles2 <- doubles %>% 
+  select(gamedate:HomeStartingPitcher, pFG_ML:pF1_Total_0.5)
+
+FinalPreds <- doubles2 %>% 
+  left_join(singles2,
+            by = c("gamedate", "AwayTeam" = "AwayTeam_Home", 
+                   "HomeTeam" = "HomeTeam_Home", 
+                   "AwayStartingPitcher", "HomeStartingPitcher"))
+
+upcoming_df <- upcoming_games %>% 
+  select(gamedate:HomeStartingPitcher, AwaySP_fullName, HomeSP_fullName, bet_type:HUN.SpreadTotal) %>% 
+  left_join(FinalPreds)
+
+bets <- upcoming_df %>% 
+  mutate(AOY_ImpliedOdds = if_else(AOY.Odds > 0, 100 / (AOY.Odds + 100), abs(AOY.Odds) / (abs(AOY.Odds) + 100)),
+         HUN_ImpliedOdds = if_else(HUN.Odds > 0, 100 / (HUN.Odds + 100), abs(HUN.Odds) / (abs(HUN.Odds) + 100))) %>% 
+  dplyr::rename(Home_pred_FG = pR_FG_Home,
+         Away_pred_FG = pR_FG_Away,
+         Home_pred_F5 = pR_F5_Home,
+         Away_pred_F5 = pR_F5_Away,
+         Home_pred_F1 = pR_F1_Home,
+         Away_pred_F1 = pR_F1_Away) %>% 
+  mutate(bet_type_full = bet_type,
+         bet_type = case_when(bet_type == "Moneyline - Game" ~ "FG ML",
+                              bet_type == "Moneyline - 5 Inning Line" ~ "F5 ML",
+                              bet_type == "Runline - Game" ~ "FG RL",
+                              bet_type == "Runline - 5 Inning Line" ~ "F5 RL",
+                              bet_type == "Total - Game" ~ "FG Total",
+                              bet_type == "Total - 5 Inning Line" ~ "F5 Total",
+                              bet_type == "Will there be a run scored in the 1st inning - Game" ~ "RFI",
+                              bet_type == "Alternate Runline - Game - 1.5" ~ "FG Alt RL",
+                              bet_type == "Alternate Runline - Game - 2.5" ~ "FG Alt RL",
+                              bet_type == "Alternate Runline - 5 Inning Line - 0.5" ~ "FG Alt RL",
+                              bet_type == "Alternate Runline - 5 Inning Line - 1.5" ~ "FG Alt RL",
+                              str_detect(bet_type, )
+                              
+                              bet_type == "Goal Spread" ~ "Spread",
+                              grepl("Alternate Spread", bet_type) ~ "Alt Spread",
+                              bet_type == "Total" ~ "Total",
+                              grepl("Alternate Total", bet_type) ~ "Alt Total",
+                              bet_type == "Both Teams To Score" ~ "BTTS",
+                              grepl("Total Goals O/U", bet_type) & (Pick_Odds > -250) & (Pick_Odds < 210) ~ "TT",
+                              grepl("Total Goals O/U", bet_type) & ((Pick_Odds <= -250) | (Pick_Odds >= 210)) ~ "Alt TT",
+                              bet_type == "Draw No Bet" ~ "Draw No Bet",
+                              TRUE ~ "Other"))
+
+bets2 <- bets %>% 
+  mutate(bet_type_full)
+
 
 ### The Machine v2.0
 ### Daily Bets

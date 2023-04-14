@@ -1,4 +1,34 @@
 "game_pk","game_date","fullName","id","team","team_id","home_plate_full_name","home_plate_id"
+718780,"2023-03-30","Max Fried",608331,"Atlanta Braves",144,"Dan Bellino",483564
+718780,"2023-03-30","Patrick Corbin",571578,"Washington Nationals",120,"Dan Bellino",483564
+718781,"2023-03-30","Logan Webb",657277,"San Francisco Giants",137,"Laz Diaz",427113
+718781,"2023-03-30","Gerrit Cole",543037,"New York Yankees",147,"Laz Diaz",427113
+718782,"2023-03-30","Kyle Gibson",502043,"Baltimore Orioles",110,"Lance Barksdale",427013
+718782,"2023-03-30","Corey Kluber",446372,"Boston Red Sox",111,"Lance Barksdale",427013
+718777,"2023-03-30","Corbin Burnes",669203,"Milwaukee Brewers",158,"Ron Kulpa",427292
+718777,"2023-03-30","Marcus Stroman",573186,"Chicago Cubs",112,"Ron Kulpa",427292
+718776,"2023-03-30","Eduardo Rodriguez",593958,"Detroit Tigers",116,"Jerry Layne",427299
+718776,"2023-03-30","Shane McClanahan",663556,"Tampa Bay Rays",139,"Jerry Layne",427299
+718779,"2023-03-30","Aaron Nola",605400,"Philadelphia Phillies",143,"Jeff Nelson",427362
+718779,"2023-03-30","Jacob deGrom",594798,"Texas Rangers",140,"Jeff Nelson",427362
+718773,"2023-03-30","Mitch Keller",656605,"Pittsburgh Pirates",134,"Mark Wegner",427533
+718773,"2023-03-30","Hunter Greene",668881,"Cincinnati Reds",113,"Mark Wegner",427533
+718772,"2023-03-30","Alek Manoah",666201,"Toronto Blue Jays",141,"Dan Iassogna",427248
+718772,"2023-03-30","Miles Mikolas",571945,"St. Louis Cardinals",138,"Dan Iassogna",427248
+718775,"2023-03-30","Pablo Lopez",641154,"Minnesota Twins",142,"Todd Tichenor",429805
+718775,"2023-03-30","Zack Greinke",425844,"Kansas City Royals",118,"Todd Tichenor",429805
+718774,"2023-03-30","Max Scherzer",453286,"New York Mets",121,"Larry Vanover",427520
+718774,"2023-03-30","Sandy Alcantara",645261,"Miami Marlins",146,"Larry Vanover",427520
+718768,"2023-03-30","Dylan Cease",656302,"Chicago White Sox",145,"Bill Miller",427344
+718768,"2023-03-30","Framber Valdez",664285,"Houston Astros",117,"Bill Miller",427344
+718778,"2023-03-30","German Marquez",608566,"Colorado Rockies",115,"Chris Conroy",482620
+718778,"2023-03-30","Blake Snell",605483,"San Diego Padres",135,"Chris Conroy",482620
+718769,"2023-03-30","Shohei Ohtani",660271,"Los Angeles Angels",108,"Adrian Johnson",482641
+718769,"2023-03-30","Kyle Muller",666205,"Oakland Athletics",133,"Adrian Johnson",482641
+718770,"2023-03-30","Zac Gallen",668678,"Arizona Diamondbacks",109,"Marvin Hudson",427243
+718770,"2023-03-30","Julio Urias",628711,"Los Angeles Dodgers",119,"Marvin Hudson",427243
+718767,"2023-03-30","Shane Bieber",669456,"Cleveland Guardians",114,"Mark Carlson",427053
+718767,"2023-03-30","Luis Castillo",622491,"Seattle Mariners",136,"Mark Carlson",427053
 718771,"2023-03-31","David Peterson",656849,"New York Mets",121,"Chris Guccione",427197
 718771,"2023-03-31","Jesus Luzardo",666200,"Miami Marlins",146,"Chris Guccione",427197
 718764,"2023-03-31","Lance Lynn",458681,"Chicago White Sox",145,"Rob Drake",427128
@@ -9,3 +39,347 @@
 718765,"2023-03-31","Dustin May",669160,"Los Angeles Dodgers",119,"Hunter Wendelstedt",427537
 718763,"2023-03-31","Hunter Gaddis",683769,"Cleveland Guardians",114,"Jordan Baker",490319
 718763,"2023-03-31","Robbie Ray",592662,"Seattle Mariners",136,"Jordan Baker",490319
+718760,"2023-04-01","Lucas Giolito",608337,"Chicago White Sox",145,"Chad Whitson",489985
+718760,"2023-04-01","Jose Urquidy",664353,"Houston Astros",117,"Chad Whitson",489985
+718759,"2023-04-01","Kevin Gausman",592332,"Toronto Blue Jays",141,"Scott Barry",482608
+718759,"2023-04-01","Jack Flaherty",656427,"St. Louis Cardinals",138,"Scott Barry",482608
+718758,"2023-04-01","Brandon Woodruff",605540,"Milwaukee Brewers",158,"Cory Blaser",484183
+718758,"2023-04-01","Justin Steele",657006,"Chicago Cubs",112,"Cory Blaser",484183
+718752,"2023-04-01","Zack Wheeler",554430,"Philadelphia Phillies",143,"CB Bucknor",427044
+718752,"2023-04-01","Nathan Eovaldi",543135,"Texas Rangers",140,"CB Bucknor",427044
+718753,"2023-04-01","Spencer Strider",675911,"Atlanta Braves",144,"Phil Cuzzi",427093
+718753,"2023-04-01","Josiah Gray",680686,"Washington Nationals",120,"Phil Cuzzi",427093
+718762,"2023-04-01","Alex Cobb",502171,"San Francisco Giants",137,"Andy Fletcher",427164
+718762,"2023-04-01","Clarke Schmidt",657376,"New York Yankees",147,"Andy Fletcher",427164
+718757,"2023-04-01","Patrick Sandoval",663776,"Los Angeles Angels",108,"Manny Gonzalez",484499
+718757,"2023-04-01","Shintaro Fujinami",660261,"Oakland Athletics",133,"Manny Gonzalez",484499
+718761,"2023-04-01","Dean Kremer",665152,"Baltimore Orioles",110,"Will Little",504381
+718761,"2023-04-01","Chris Sale",519242,"Boston Red Sox",111,"Will Little",504381
+718756,"2023-04-01","Rich Hill",448179,"Pittsburgh Pirates",134,"Bruce Dreckman",427129
+718756,"2023-04-01","Nick Lodolo",666157,"Cincinnati Reds",113,"Bruce Dreckman",427129
+718754,"2023-04-01","Spencer Turnbull",605513,"Detroit Tigers",116,"Vic Carapazza",483569
+718754,"2023-04-01","Zach Eflin",621107,"Tampa Bay Rays",139,"Vic Carapazza",483569
+718751,"2023-04-01","Sonny Gray",543243,"Minnesota Twins",142,"Brian Knight",427286
+718751,"2023-04-01","Jordan Lyles",543475,"Kansas City Royals",118,"Brian Knight",427286
+718755,"2023-04-01","Tylor Megill",656731,"New York Mets",121,"David Rackley",482663
+718755,"2023-04-01","Edward Cabrera",665795,"Miami Marlins",146,"David Rackley",482663
+718750,"2023-04-01","Jose Urena",570632,"Colorado Rockies",115,"Pat Hoberg",573596
+718750,"2023-04-01","Michael Wacha",608379,"San Diego Padres",135,"Pat Hoberg",573596
+718749,"2023-04-01","Madison Bumgarner",518516,"Arizona Diamondbacks",109,"John Tumpane",483630
+718749,"2023-04-01","Clayton Kershaw",477132,"Los Angeles Dodgers",119,"John Tumpane",483630
+718746,"2023-04-01","Aaron Civale",650644,"Cleveland Guardians",114,"Tripp Gibson",503586
+718746,"2023-04-01","Logan Gilbert",669302,"Seattle Mariners",136,"Tripp Gibson",503586
+718742,"2023-04-02","Joey Wentz",666214,"Detroit Tigers",116,"Nick Mahrley",521051
+718742,"2023-04-02","Jeffrey Springs",605488,"Tampa Bay Rays",139,"Nick Mahrley",521051
+718748,"2023-04-02","Cole Irvin",608344,"Baltimore Orioles",110,"Ryan Additon",596809
+718748,"2023-04-02","Tanner Houck",656557,"Boston Red Sox",111,"Ryan Additon",596809
+718743,"2023-04-02","Jared Shuster",694363,"Atlanta Braves",144,"Mark Ripperger",483919
+718743,"2023-04-02","MacKenzie Gore",669022,"Washington Nationals",120,"Mark Ripperger",483919
+718747,"2023-04-02","Ross Stripling",548389,"San Francisco Giants",137,"Erich Bacchus",623938
+718747,"2023-04-02","Jhony Brito",666745,"New York Yankees",147,"Erich Bacchus",623938
+718744,"2023-04-02","Vince Velasquez",592826,"Pittsburgh Pirates",134,"Stu Scheurwater",521889
+718744,"2023-04-02","Graham Ashcraft",668933,"Cincinnati Reds",113,"Stu Scheurwater",521889
+718741,"2023-04-02","Kodai Senga",673540,"New York Mets",121,"Edwin Moscoso",554242
+718741,"2023-04-02","Trevor Rogers",669432,"Miami Marlins",146,"Edwin Moscoso",554242
+718745,"2023-04-02","Joe Ryan",657746,"Minnesota Twins",142,"Alex Tosi",605673
+718745,"2023-04-02","Brad Keller",641745,"Kansas City Royals",118,"Alex Tosi",605673
+718740,"2023-04-02","Mike Clevinger",605182,"Chicago White Sox",145,"Roberto Ortiz",577468
+718740,"2023-04-02","Luis Garcia",677651,"Houston Astros",117,"Roberto Ortiz",577468
+718737,"2023-04-02","Chris Bassitt",605135,"Toronto Blue Jays",141,"Gabe Morales",573597
+718737,"2023-04-02","Jordan Montgomery",656756,"St. Louis Cardinals",138,"Gabe Morales",573597
+718738,"2023-04-02","Eric Lauer",641778,"Milwaukee Brewers",158,"Carlos Torres",547380
+718738,"2023-04-02","Jameson Taillon",592791,"Chicago Cubs",112,"Carlos Torres",547380
+718734,"2023-04-02","Tyler Anderson",542881,"Los Angeles Angels",108,"Quinn Wolcott",511890
+718734,"2023-04-02","Ken Waldichuk",686610,"Oakland Athletics",133,"Quinn Wolcott",511890
+718736,"2023-04-02","Zach Davies",605200,"Arizona Diamondbacks",109,"Ryan Blakney",503502
+718736,"2023-04-02","Noah Syndergaard",592789,"Los Angeles Dodgers",119,"Ryan Blakney",503502
+718733,"2023-04-02","Austin Gomber",596295,"Colorado Rockies",115,"Nestor Ceja",598411
+718733,"2023-04-02","Seth Lugo",607625,"San Diego Padres",135,"Nestor Ceja",598411
+718735,"2023-04-02","Cal Quantrill",615698,"Cleveland Guardians",114,"Brennan Miller",639723
+718735,"2023-04-02","Marco Gonzales",594835,"Seattle Mariners",136,"Brennan Miller",639723
+718739,"2023-04-02","Bailey Falter",663559,"Philadelphia Phillies",143,"Chris Segal",503490
+718739,"2023-04-02","Martin Perez",527048,"Texas Rangers",140,"Chris Segal",503490
+718731,"2023-04-03","Carlos Carrasco",471911,"New York Mets",121,"Alan Porter",484198
+718731,"2023-04-03","Freddy Peralta",642547,"Milwaukee Brewers",158,"Alan Porter",484198
+718730,"2023-04-03","Anthony DeSclafani",543101,"San Francisco Giants",137,"James Hoye",428442
+718730,"2023-04-03","Michael Kopech",656629,"Chicago White Sox",145,"James Hoye",428442
+718728,"2023-04-03","Drew Smyly",592767,"Chicago Cubs",112,"Bill Miller",427344
+718728,"2023-04-03","Connor Overton",656818,"Cincinnati Reds",113,"Bill Miller",427344
+718729,"2023-04-03","Tyler Mahle",641816,"Minnesota Twins",142,"Mike Estabrook",482631
+718729,"2023-04-03","Johnny Cueto",456501,"Miami Marlins",146,"Mike Estabrook",482631
+718732,"2023-04-03","Drew Rasmussen",656876,"Tampa Bay Rays",139,"Larry Vanover",427520
+718732,"2023-04-03","Trevor Williams",592866,"Washington Nationals",120,"Larry Vanover",427520
+718725,"2023-04-03","Taijuan Walker",592836,"Philadelphia Phillies",143,"Paul Emmel",427144
+718725,"2023-04-03","Nestor Cortes",641482,"New York Yankees",147,"Paul Emmel",427144
+718724,"2023-04-03","Johan Oviedo",670912,"Pittsburgh Pirates",134,"Adam Beck",644760
+718724,"2023-04-03","Kutter Crawford",676710,"Boston Red Sox",111,"Adam Beck",644760
+718719,"2023-04-03","Jose Berrios",621244,"Toronto Blue Jays",141,"Adam Hamari",503077
+718719,"2023-04-03","Brady Singer",663903,"Kansas City Royals",118,"Adam Hamari",503077
+718727,"2023-04-03","Charlie Morton",450203,"Atlanta Braves",144,"Tony Randazzo",427413
+718727,"2023-04-03","Jake Woodford",663765,"St. Louis Cardinals",138,"Tony Randazzo",427413
+718726,"2023-04-03","Kyle Bradish",680694,"Baltimore Orioles",110,"Marvin Hudson",427243
+718726,"2023-04-03","Jon Gray",592351,"Texas Rangers",140,"Marvin Hudson",427243
+718723,"2023-04-03","Matthew Boyd",571510,"Detroit Tigers",116,"Ben May",521251
+718723,"2023-04-03","Hunter Brown",686613,"Houston Astros",117,"Ben May",521251
+718721,"2023-04-03","Zach Plesac",668676,"Cleveland Guardians",114,"Alfonso Marquez",427315
+718721,"2023-04-03","James Kaprielian",621076,"Oakland Athletics",133,"Alfonso Marquez",427315
+718722,"2023-04-03","Ryne Nelson",669194,"Arizona Diamondbacks",109,"Jansen Visconti",596740
+718722,"2023-04-03","Ryan Weathers",677960,"San Diego Padres",135,"Jansen Visconti",596740
+718720,"2023-04-03","Reid Detmers",672282,"Los Angeles Angels",108,"Charlie Ramos",605671
+718720,"2023-04-03","George Kirby",669923,"Seattle Mariners",136,"Charlie Ramos",605671
+718718,"2023-04-03","Ryan Feltner",663372,"Colorado Rockies",115,"Mark Carlson",427053
+718718,"2023-04-03","Michael Grove",675627,"Los Angeles Dodgers",119,"Mark Carlson",427053
+718717,"2023-04-04","Zac Gallen",668678,"Arizona Diamondbacks",109,"Ron Kulpa",427292
+718717,"2023-04-04","Yu Darvish",506433,"San Diego Padres",135,"Ron Kulpa",427292
+718716,"2023-04-04","Hayden Wesneski",669713,"Chicago Cubs",112,"Rob Drake",427128
+718716,"2023-04-04","Luis Cessa",570666,"Cincinnati Reds",113,"Rob Drake",427128
+718714,"2023-04-04","Kenta Maeda",628317,"Minnesota Twins",142,"Laz Diaz",427113
+718714,"2023-04-04","Sandy Alcantara",645261,"Miami Marlins",146,"Laz Diaz",427113
+718715,"2023-04-04","Josh Fleming",676596,"Tampa Bay Rays",139,"Chris Guccione",427197
+718715,"2023-04-04","Chad Kuhl",641771,"Washington Nationals",120,"Chris Guccione",427197
+718710,"2023-04-04","Matt Strahm",621381,"Philadelphia Phillies",143,"Chad Fairchild",431232
+718710,"2023-04-04","Domingo German",593334,"New York Yankees",147,"Chad Fairchild",431232
+718713,"2023-04-04","Roansy Contreras",672710,"Pittsburgh Pirates",134,"Dan Iassogna",427248
+718713,"2023-04-04","Nick Pivetta",601713,"Boston Red Sox",111,"Dan Iassogna",427248
+718708,"2023-04-04","Yusei Kikuchi",579328,"Toronto Blue Jays",141,"Jerry Layne",427299
+718708,"2023-04-04","Kris Bubic",663460,"Kansas City Royals",118,"Jerry Layne",427299
+718712,"2023-04-04","Max Scherzer",453286,"New York Mets",121,"Jim Wolf",427554
+718712,"2023-04-04","Wade Miley",489119,"Milwaukee Brewers",158,"Jim Wolf",427554
+718711,"2023-04-04","Dylan Dodd",689266,"Atlanta Braves",144,"Junior Valentine",608093
+718711,"2023-04-04","Steven Matz",571927,"St. Louis Cardinals",138,"Junior Valentine",608093
+718709,"2023-04-04","Kyle Gibson",502043,"Baltimore Orioles",110,"Hunter Wendelstedt",427537
+718709,"2023-04-04","Andrew Heaney",571760,"Texas Rangers",140,"Hunter Wendelstedt",427537
+718705,"2023-04-04","Matt Manning",666159,"Detroit Tigers",116,"Jeff Nelson",427362
+718705,"2023-04-04","Framber Valdez",664285,"Houston Astros",117,"Jeff Nelson",427362
+718707,"2023-04-04","Shane Bieber",669456,"Cleveland Guardians",114,"Doug Eddings",427139
+718707,"2023-04-04","JP Sears",676664,"Oakland Athletics",133,"Doug Eddings",427139
+718706,"2023-04-04","Jose Suarez",660761,"Los Angeles Angels",108,"Brian O'Nora",427366
+718706,"2023-04-04","Luis Castillo",622491,"Seattle Mariners",136,"Brian O'Nora",427366
+718703,"2023-04-04","German Marquez",608566,"Colorado Rockies",115,"Jordan Baker",490319
+718703,"2023-04-04","Julio Urias",628711,"Los Angeles Dodgers",119,"Jordan Baker",490319
+718704,"2023-04-05","Shane McClanahan",663556,"Tampa Bay Rays",139,"Dan Merzel",605670
+718704,"2023-04-05","Patrick Corbin",571578,"Washington Nationals",120,"Dan Merzel",605670
+718699,"2023-04-05","Aaron Nola",605400,"Philadelphia Phillies",143,"Nic Lentz",544728
+718699,"2023-04-05","Gerrit Cole",543037,"New York Yankees",147,"Nic Lentz",544728
+718701,"2023-04-05","Pablo Lopez",641154,"Minnesota Twins",142,"Andy Fletcher",427164
+718701,"2023-04-05","Jesus Luzardo",666200,"Miami Marlins",146,"Andy Fletcher",427164
+718697,"2023-04-05","Bryce Elder",693821,"Atlanta Braves",144,"Todd Tichenor",429805
+718697,"2023-04-05","Miles Mikolas",571945,"St. Louis Cardinals",138,"Todd Tichenor",429805
+718702,"2023-04-05","Mitch Keller",656605,"Pittsburgh Pirates",134,"Scott Barry",482608
+718702,"2023-04-05","Corey Kluber",446372,"Boston Red Sox",111,"Scott Barry",482608
+718698,"2023-04-05","David Peterson",656849,"New York Mets",121,"Mike Muchlinski",483912
+718698,"2023-04-05","Corbin Burnes",669203,"Milwaukee Brewers",158,"Mike Muchlinski",483912
+718694,"2023-04-05","Grayson Rodriguez",680570,"Baltimore Orioles",110,"John Tumpane",483630
+718694,"2023-04-05","Jacob deGrom",594798,"Texas Rangers",140,"John Tumpane",483630
+718696,"2023-04-05","Eduardo Rodriguez",593958,"Detroit Tigers",116,"CB Bucknor",427044
+718696,"2023-04-05","Cristian Javier",664299,"Houston Astros",117,"CB Bucknor",427044
+718695,"2023-04-05","Logan Webb",657277,"San Francisco Giants",137,"D.J. Reyburn",482666
+718695,"2023-04-05","Dylan Cease",656302,"Chicago White Sox",145,"D.J. Reyburn",482666
+718689,"2023-04-05","Hunter Gaddis",683769,"Cleveland Guardians",114,"Lance Barrett",483561
+718689,"2023-04-05","Kyle Muller",666205,"Oakland Athletics",133,"Lance Barrett",483561
+718691,"2023-04-05","Shohei Ohtani",660271,"Los Angeles Angels",108,"Pat Hoberg",573596
+718691,"2023-04-05","Chris Flexen",623167,"Seattle Mariners",136,"Pat Hoberg",573596
+718692,"2023-04-05","Alek Manoah",666201,"Toronto Blue Jays",141,"Vic Carapazza",483569
+718692,"2023-04-05","Zack Greinke",425844,"Kansas City Royals",118,"Vic Carapazza",483569
+718690,"2023-04-06","Chris Sale",519242,"Boston Red Sox",111,"Edwin Moscoso",554242
+718690,"2023-04-06","Spencer Turnbull",605513,"Detroit Tigers",116,"Edwin Moscoso",554242
+718686,"2023-04-06","Kevin Gausman",592332,"Toronto Blue Jays",141,"Manny Gonzalez",484499
+718686,"2023-04-06","Jordan Lyles",543475,"Kansas City Royals",118,"Manny Gonzalez",484499
+718687,"2023-04-06","Alex Wood",622072,"San Francisco Giants",137,"John Libka",596805
+718687,"2023-04-06","Lance Lynn",458681,"Chicago White Sox",145,"John Libka",596805
+718682,"2023-04-06","Josiah Gray",680686,"Washington Nationals",120,"Cory Blaser",484183
+718682,"2023-04-06","Kyle Freeland",607536,"Colorado Rockies",115,"Cory Blaser",484183
+718681,"2023-04-06","Blake Snell",605483,"San Diego Padres",135,"Jeremie Rehak",605672
+718681,"2023-04-06","Spencer Strider",675911,"Atlanta Braves",144,"Jeremie Rehak",605672
+718683,"2023-04-06","Dustin May",669160,"Los Angeles Dodgers",119,"Ramon De Jesus",594151
+718683,"2023-04-06","Merrill Kelly",518876,"Arizona Diamondbacks",109,"Ramon De Jesus",594151
+718693,"2023-04-07","Edward Cabrera",665795,"Miami Marlins",146,"Chris Segal",503490
+718693,"2023-04-07","Tylor Megill",656731,"New York Mets",121,"Chris Segal",503490
+718685,"2023-04-07","Hunter Greene",668881,"Cincinnati Reds",113,"Sean Barber",503493
+718685,"2023-04-07","Zack Wheeler",554430,"Philadelphia Phillies",143,"Sean Barber",503493
+718688,"2023-04-07","Clarke Schmidt",657376,"New York Yankees",147,"Chad Whitson",489985
+718688,"2023-04-07","Dean Kremer",665152,"Baltimore Orioles",110,"Chad Whitson",489985
+718684,"2023-04-07","Jose Urquidy",664353,"Houston Astros",117,"Tripp Gibson",503586
+718684,"2023-04-07","Sonny Gray",543243,"Minnesota Twins",142,"Tripp Gibson",503586
+718675,"2023-04-07","Nathan Eovaldi",543135,"Texas Rangers",140,"Nestor Ceja",598411
+718675,"2023-04-07","Marcus Stroman",573186,"Chicago Cubs",112,"Nestor Ceja",598411
+718677,"2023-04-07","Logan Gilbert",669302,"Seattle Mariners",136,"Nate Tomlinson",608158
+718677,"2023-04-07","Aaron Civale",650644,"Cleveland Guardians",114,"Nate Tomlinson",608158
+718679,"2023-04-07","Lucas Giolito",608337,"Chicago White Sox",145,"Ryan Wills",605674
+718679,"2023-04-07","Rich Hill",448179,"Pittsburgh Pirates",134,"Ryan Wills",605674
+718680,"2023-04-07","Brad Keller",641745,"Kansas City Royals",118,"Clint Vondrak",623949
+718680,"2023-04-07","Alex Cobb",502171,"San Francisco Giants",137,"Clint Vondrak",623949
+718678,"2023-04-07","Ken Waldichuk",686610,"Oakland Athletics",133,"Ryan Blakney",503502
+718678,"2023-04-07","Zach Eflin",621107,"Tampa Bay Rays",139,"Ryan Blakney",503502
+718676,"2023-04-07","Nick Martinez",607259,"San Diego Padres",135,"Paul Emmel",427144
+718676,"2023-04-07","Jared Shuster",694363,"Atlanta Braves",144,"Paul Emmel",427144
+718674,"2023-04-07","Jack Flaherty",656427,"St. Louis Cardinals",138,"Adam Hamari",503077
+718674,"2023-04-07","Brandon Woodruff",605540,"Milwaukee Brewers",158,"Adam Hamari",503077
+718673,"2023-04-07","MacKenzie Gore",669022,"Washington Nationals",120,"Carlos Torres",547380
+718673,"2023-04-07","Jose Urena",570632,"Colorado Rockies",115,"Carlos Torres",547380
+718670,"2023-04-07","Chris Bassitt",605135,"Toronto Blue Jays",141,"Brian Knight",427286
+718670,"2023-04-07","Patrick Sandoval",663776,"Los Angeles Angels",108,"Brian Knight",427286
+718671,"2023-04-07","Clayton Kershaw",477132,"Los Angeles Dodgers",119,"Alfonso Marquez",427315
+718671,"2023-04-07","Madison Bumgarner",518516,"Arizona Diamondbacks",109,"Alfonso Marquez",427315
+718666,"2023-04-08","Luis Garcia",677651,"Houston Astros",117,"Brennan Miller",639723
+718666,"2023-04-08","Joe Ryan",657746,"Minnesota Twins",142,"Brennan Miller",639723
+718672,"2023-04-08","Brady Singer",663903,"Kansas City Royals",118,"Adam Beck",644760
+718672,"2023-04-08","Sean Manaea",640455,"San Francisco Giants",137,"Adam Beck",644760
+718669,"2023-04-08","Martin Perez",527048,"Texas Rangers",140,"Charlie Ramos",605671
+718669,"2023-04-08","Justin Steele",657006,"Chicago Cubs",112,"Charlie Ramos",605671
+718668,"2023-04-08","Nick Lodolo",666157,"Cincinnati Reds",113,"Alan Porter",484198
+718668,"2023-04-08","Bailey Falter",663559,"Philadelphia Phillies",143,"Alan Porter",484198
+718667,"2023-04-08","Tanner Houck",656557,"Boston Red Sox",111,"Chris Guccione",427197
+718667,"2023-04-08","Joey Wentz",666214,"Detroit Tigers",116,"Chris Guccione",427197
+718665,"2023-04-08","Shintaro Fujinami",660261,"Oakland Athletics",133,"Marvin Hudson",427243
+718665,"2023-04-08","Jeffrey Springs",605488,"Tampa Bay Rays",139,"Marvin Hudson",427243
+718661,"2023-04-08","Trevor Rogers",669432,"Miami Marlins",146,"Ben May",521251
+718661,"2023-04-08","Kodai Senga",673540,"New York Mets",121,"Ben May",521251
+718663,"2023-04-08","Marco Gonzales",594835,"Seattle Mariners",136,"James Hoye",428442
+718663,"2023-04-08","Cal Quantrill",615698,"Cleveland Guardians",114,"James Hoye",428442
+718662,"2023-04-08","Mike Clevinger",605182,"Chicago White Sox",145,"Mike Estabrook",482631
+718662,"2023-04-08","Vince Velasquez",592826,"Pittsburgh Pirates",134,"Mike Estabrook",482631
+718664,"2023-04-08","Jhony Brito",666745,"New York Yankees",147,"Roberto Ortiz",577468
+718664,"2023-04-08","Cole Irvin",608344,"Baltimore Orioles",110,"Roberto Ortiz",577468
+718660,"2023-04-08","Jordan Montgomery",656756,"St. Louis Cardinals",138,"Jerry Layne",427299
+718660,"2023-04-08","Eric Lauer",641778,"Milwaukee Brewers",158,"Jerry Layne",427299
+718659,"2023-04-08","Michael Wacha",608379,"San Diego Padres",135,"Chad Fairchild",431232
+718659,"2023-04-08","Charlie Morton",450203,"Atlanta Braves",144,"Chad Fairchild",431232
+718656,"2023-04-08","Noah Syndergaard",592789,"Los Angeles Dodgers",119,"Doug Eddings",427139
+718656,"2023-04-08","Zach Davies",605200,"Arizona Diamondbacks",109,"Doug Eddings",427139
+718658,"2023-04-08","Trevor Williams",592866,"Washington Nationals",120,"Jansen Visconti",596740
+718658,"2023-04-08","Austin Gomber",596295,"Colorado Rockies",115,"Jansen Visconti",596740
+718657,"2023-04-08","Jose Berrios",621244,"Toronto Blue Jays",141,"Tony Randazzo",427413
+718657,"2023-04-08","Tyler Anderson",542881,"Los Angeles Angels",108,"Tony Randazzo",427413
+718652,"2023-04-09","Connor Overton",656818,"Cincinnati Reds",113,"Jim Wolf",427554
+718652,"2023-04-09","Taijuan Walker",592836,"Philadelphia Phillies",143,"Jim Wolf",427554
+718654,"2023-04-09","Kutter Crawford",676710,"Boston Red Sox",111,"David Rackley",482663
+718654,"2023-04-09","Matthew Boyd",571510,"Detroit Tigers",116,"David Rackley",482663
+718655,"2023-04-09","James Kaprielian",621076,"Oakland Athletics",133,"Hunter Wendelstedt",427537
+718655,"2023-04-09","Drew Rasmussen",656876,"Tampa Bay Rays",139,"Hunter Wendelstedt",427537
+718653,"2023-04-09","Michael Kopech",656629,"Chicago White Sox",145,"Laz Diaz",427113
+718653,"2023-04-09","Johan Oviedo",670912,"Pittsburgh Pirates",134,"Laz Diaz",427113
+718651,"2023-04-09","Nestor Cortes",641482,"New York Yankees",147,"Bill Miller",427344
+718651,"2023-04-09","Tyler Wells",669330,"Baltimore Orioles",110,"Bill Miller",427344
+718646,"2023-04-09","George Kirby",669923,"Seattle Mariners",136,"D.J. Reyburn",482666
+718646,"2023-04-09","Zach Plesac",668676,"Cleveland Guardians",114,"D.J. Reyburn",482666
+718647,"2023-04-09","Braxton Garrett",666129,"Miami Marlins",146,"Jeff Nelson",427362
+718647,"2023-04-09","Carlos Carrasco",471911,"New York Mets",121,"Jeff Nelson",427362
+718649,"2023-04-09","Hunter Brown",686613,"Houston Astros",117,"Mark Carlson",427053
+718649,"2023-04-09","Tyler Mahle",641816,"Minnesota Twins",142,"Mark Carlson",427053
+718650,"2023-04-09","Jake Woodford",663765,"St. Louis Cardinals",138,"Vic Carapazza",483569
+718650,"2023-04-09","Freddy Peralta",642547,"Milwaukee Brewers",158,"Vic Carapazza",483569
+718642,"2023-04-09","Jon Gray",592351,"Texas Rangers",140,"Brian O'Nora",427366
+718642,"2023-04-09","Jameson Taillon",592791,"Chicago Cubs",112,"Brian O'Nora",427366
+718645,"2023-04-09","Chad Kuhl",641771,"Washington Nationals",120,"Ron Kulpa",427292
+718645,"2023-04-09","Ryan Feltner",663372,"Colorado Rockies",115,"Ron Kulpa",427292
+718643,"2023-04-09","Kris Bubic",663460,"Kansas City Royals",118,"Dan Iassogna",427248
+718643,"2023-04-09","Anthony DeSclafani",543101,"San Francisco Giants",137,"Dan Iassogna",427248
+718644,"2023-04-09","Yusei Kikuchi",579328,"Toronto Blue Jays",141,"Alex MacKay",623945
+718644,"2023-04-09","Reid Detmers",672282,"Los Angeles Angels",108,"Alex MacKay",623945
+718639,"2023-04-09","Michael Grove",675627,"Los Angeles Dodgers",119,"Lance Barrett",483561
+718639,"2023-04-09","Ryne Nelson",669194,"Arizona Diamondbacks",109,"Lance Barrett",483561
+718648,"2023-04-09","Seth Lugo",607625,"San Diego Padres",135,"Nic Lentz",544728
+718648,"2023-04-09","Dylan Dodd",689266,"Atlanta Braves",144,"Nic Lentz",544728
+718640,"2023-04-10","Dylan Cease",656302,"Chicago White Sox",145,"Mike Muchlinski",483912
+718640,"2023-04-10","Kenta Maeda",628317,"Minnesota Twins",142,"Mike Muchlinski",483912
+718637,"2023-04-10","Domingo German",593334,"New York Yankees",147,"Larry Vanover",427520
+718637,"2023-04-10","Shane Bieber",669456,"Cleveland Guardians",114,"Larry Vanover",427520
+718635,"2023-04-10","JP Sears",676664,"Oakland Athletics",133,"Malachi Moore",623946
+718635,"2023-04-10","Kyle Gibson",502043,"Baltimore Orioles",110,"Malachi Moore",623946
+718632,"2023-04-10","Framber Valdez",664285,"Houston Astros",117,"Nick Mahrley",521051
+718632,"2023-04-10","Roansy Contreras",672710,"Pittsburgh Pirates",134,"Nick Mahrley",521051
+718638,"2023-04-10","Nick Pivetta",601713,"Boston Red Sox",111,"Jeremie Rehak",605672
+718638,"2023-04-10","Jalen Beeks",656222,"Tampa Bay Rays",139,"Jeremie Rehak",605672
+718633,"2023-04-10","Sandy Alcantara",645261,"Miami Marlins",146,"John Libka",596805
+718633,"2023-04-10","Matt Strahm",621381,"Philadelphia Phillies",143,"John Libka",596805
+718634,"2023-04-10","Yu Darvish",506433,"San Diego Padres",135,"Lance Barksdale",427013
+718634,"2023-04-10","Max Scherzer",453286,"New York Mets",121,"Lance Barksdale",427013
+718636,"2023-04-10","Graham Ashcraft",668933,"Cincinnati Reds",113,"John Tumpane",483630
+718636,"2023-04-10","Bryce Elder",693821,"Atlanta Braves",144,"John Tumpane",483630
+718628,"2023-04-10","Luis Castillo",622491,"Seattle Mariners",136,"Junior Valentine",608093
+718628,"2023-04-10","Drew Smyly",592767,"Chicago Cubs",112,"Junior Valentine",608093
+718630,"2023-04-10","Zack Greinke",425844,"Kansas City Royals",118,"Cory Blaser",484183
+718630,"2023-04-10","Andrew Heaney",571760,"Texas Rangers",140,"Cory Blaser",484183
+718629,"2023-04-10","Steven Matz",571927,"St. Louis Cardinals",138,"Shane Livensparger",575629
+718629,"2023-04-10","German Marquez",608566,"Colorado Rockies",115,"Shane Livensparger",575629
+718631,"2023-04-10","Patrick Corbin",571578,"Washington Nationals",120,"Ramon De Jesus",594151
+718631,"2023-04-10","Jose Suarez",660761,"Los Angeles Angels",108,"Ramon De Jesus",594151
+718627,"2023-04-10","Wade Miley",489119,"Milwaukee Brewers",158,"Scott Barry",482608
+718627,"2023-04-10","Zac Gallen",668678,"Arizona Diamondbacks",109,"Scott Barry",482608
+718641,"2023-04-10","Julio Urias",628711,"Los Angeles Dodgers",119,"Todd Tichenor",429805
+718641,"2023-04-10","Logan Webb",657277,"San Francisco Giants",137,"Todd Tichenor",429805
+718626,"2023-04-11","Gerrit Cole",543037,"New York Yankees",147,"Edwin Moscoso",554242
+718626,"2023-04-11","Hunter Gaddis",683769,"Cleveland Guardians",114,"Edwin Moscoso",554242
+718618,"2023-04-11","Kyle Muller",666205,"Oakland Athletics",133,"Mark Wegner",427533
+718618,"2023-04-11","Grayson Rodriguez",680570,"Baltimore Orioles",110,"Mark Wegner",427533
+718623,"2023-04-11","Cristian Javier",664299,"Houston Astros",117,"Adam Hamari",503077
+718623,"2023-04-11","Mitch Keller",656605,"Pittsburgh Pirates",134,"Adam Hamari",503077
+718625,"2023-04-11","Garrett Whitlock",676477,"Boston Red Sox",111,"Paul Emmel",427144
+718625,"2023-04-11","Shane McClanahan",663556,"Tampa Bay Rays",139,"Paul Emmel",427144
+718619,"2023-04-11","Jesus Luzardo",666200,"Miami Marlins",146,"Nate Tomlinson",608158
+718619,"2023-04-11","Aaron Nola",605400,"Philadelphia Phillies",143,"Nate Tomlinson",608158
+718622,"2023-04-11","Matt Manning",666159,"Detroit Tigers",116,"Erich Bacchus",623938
+718622,"2023-04-11","Alek Manoah",666201,"Toronto Blue Jays",141,"Erich Bacchus",623938
+718621,"2023-04-11","Ryan Weathers",677960,"San Diego Padres",135,"Will Little",504381
+718621,"2023-04-11","David Peterson",656849,"New York Mets",121,"Will Little",504381
+718620,"2023-04-11","Luis Cessa",570666,"Cincinnati Reds",113,"Ryan Blakney",503502
+718620,"2023-04-11","Kyle Wright",657140,"Atlanta Braves",144,"Ryan Blakney",503502
+718617,"2023-04-11","Chris Flexen",623167,"Seattle Mariners",136,"Adrian Johnson",482641
+718617,"2023-04-11","Hayden Wesneski",669713,"Chicago Cubs",112,"Adrian Johnson",482641
+718616,"2023-04-11","Lance Lynn",458681,"Chicago White Sox",145,"Sean Barber",503493
+718616,"2023-04-11","Pablo Lopez",641154,"Minnesota Twins",142,"Sean Barber",503493
+718615,"2023-04-11","Jordan Lyles",543475,"Kansas City Royals",118,"Carlos Torres",547380
+718615,"2023-04-11","Jacob deGrom",594798,"Texas Rangers",140,"Carlos Torres",547380
+718613,"2023-04-11","Miles Mikolas",571945,"St. Louis Cardinals",138,"Dan Bellino",483564
+718613,"2023-04-11","Kyle Freeland",607536,"Colorado Rockies",115,"Dan Bellino",483564
+718614,"2023-04-11","Josiah Gray",680686,"Washington Nationals",120,"Alfonso Marquez",427315
+718614,"2023-04-11","Shohei Ohtani",660271,"Los Angeles Angels",108,"Alfonso Marquez",427315
+718611,"2023-04-11","Corbin Burnes",669203,"Milwaukee Brewers",158,"Clint Vondrak",623949
+718611,"2023-04-11","Merrill Kelly",518876,"Arizona Diamondbacks",109,"Clint Vondrak",623949
+718624,"2023-04-11","Dustin May",669160,"Los Angeles Dodgers",119,"Brian Knight",427286
+718624,"2023-04-11","Alex Wood",622072,"San Francisco Giants",137,"Brian Knight",427286
+718608,"2023-04-12","Jose Urquidy",664353,"Houston Astros",117,"Jerry Layne",427299
+718608,"2023-04-12","Rich Hill",448179,"Pittsburgh Pirates",134,"Jerry Layne",427299
+718610,"2023-04-12","Blake Snell",605483,"San Diego Padres",135,"Ryan Additon",596809
+718610,"2023-04-12","Tylor Megill",656731,"New York Mets",121,"Ryan Additon",596809
+718605,"2023-04-12","Lucas Giolito",608337,"Chicago White Sox",145,"Alan Porter",484198
+718605,"2023-04-12","Sonny Gray",543243,"Minnesota Twins",142,"Alan Porter",484198
+718604,"2023-04-12","Clarke Schmidt",657376,"New York Yankees",147,"Chris Guccione",427197
+718604,"2023-04-12","Peyton Battenfield",685410,"Cleveland Guardians",114,"Chris Guccione",427197
+718606,"2023-04-12","Logan Gilbert",669302,"Seattle Mariners",136,"Manny Gonzalez",484499
+718606,"2023-04-12","Marcus Stroman",573186,"Chicago Cubs",112,"Manny Gonzalez",484499
+718607,"2023-04-12","Jack Flaherty",656427,"St. Louis Cardinals",138,"Phil Cuzzi",427093
+718607,"2023-04-12","Jose Urena",570632,"Colorado Rockies",115,"Phil Cuzzi",427093
+718598,"2023-04-12","Janson Junk",676083,"Milwaukee Brewers",158,"Gabe Morales",573597
+718598,"2023-04-12","Drey Jameson",686753,"Arizona Diamondbacks",109,"Gabe Morales",573597
+718609,"2023-04-12","Edward Cabrera",665795,"Miami Marlins",146,"James Hoye",428442
+718609,"2023-04-12","Zack Wheeler",554430,"Philadelphia Phillies",143,"James Hoye",428442
+718602,"2023-04-12","MacKenzie Gore",669022,"Washington Nationals",120,"Doug Eddings",427139
+718602,"2023-04-12","Griffin Canning",656288,"Los Angeles Angels",108,"Doug Eddings",427139
+718599,"2023-04-12","Ken Waldichuk",686610,"Oakland Athletics",133,"Bruce Dreckman",427129
+718599,"2023-04-12","Dean Kremer",665152,"Baltimore Orioles",110,"Bruce Dreckman",427129
+718600,"2023-04-12","Chris Sale",519242,"Boston Red Sox",111,"Chad Fairchild",431232
+718600,"2023-04-12","Taj Bradley",671737,"Tampa Bay Rays",139,"Chad Fairchild",431232
+718603,"2023-04-12","Eduardo Rodriguez",593958,"Detroit Tigers",116,"Ryan Wills",605674
+718603,"2023-04-12","Kevin Gausman",592332,"Toronto Blue Jays",141,"Ryan Wills",605674
+718601,"2023-04-12","Hunter Greene",668881,"Cincinnati Reds",113,"Marvin Hudson",427243
+718601,"2023-04-12","Spencer Strider",675911,"Atlanta Braves",144,"Marvin Hudson",427243
+718595,"2023-04-12","Brad Keller",641745,"Kansas City Royals",118,"Jansen Visconti",596740
+718595,"2023-04-12","Nathan Eovaldi",543135,"Texas Rangers",140,"Jansen Visconti",596740
+718612,"2023-04-12","Clayton Kershaw",477132,"Los Angeles Dodgers",119,"Alex Tosi",605673
+718612,"2023-04-12","Alex Cobb",502171,"San Francisco Giants",137,"Alex Tosi",605673
+718596,"2023-04-13","Adam Oller",670124,"Oakland Athletics",133,"Stu Scheurwater",521889
+718596,"2023-04-13","Cole Irvin",608344,"Baltimore Orioles",110,"Stu Scheurwater",521889
+718594,"2023-04-13","Corey Kluber",446372,"Boston Red Sox",111,"Nic Lentz",544728
+718594,"2023-04-13","Jeffrey Springs",605488,"Tampa Bay Rays",139,"Nic Lentz",544728
+718597,"2023-04-13","Bailey Falter",663559,"Philadelphia Phillies",143,"David Rackley",482663
+718597,"2023-04-13","Nick Lodolo",666157,"Cincinnati Reds",113,"David Rackley",482663
+718590,"2023-04-13","Joe Ryan",657746,"Minnesota Twins",142,"D.J. Reyburn",482666
+718590,"2023-04-13","Jhony Brito",666745,"New York Yankees",147,"D.J. Reyburn",482666
+718593,"2023-04-13","Spencer Turnbull",605513,"Detroit Tigers",116,"Mike Estabrook",482631
+718593,"2023-04-13","Chris Bassitt",605135,"Toronto Blue Jays",141,"Mike Estabrook",482631
+718591,"2023-04-13","Vince Velasquez",592826,"Pittsburgh Pirates",134,"Dan Merzel",605670
+718591,"2023-04-13","Jordan Montgomery",656756,"St. Louis Cardinals",138,"Dan Merzel",605670
+718589,"2023-04-13","Colin Rea",607067,"Milwaukee Brewers",158,"Mark Ripperger",483919
+718589,"2023-04-13","Nick Martinez",607259,"San Diego Padres",135,"Mark Ripperger",483919

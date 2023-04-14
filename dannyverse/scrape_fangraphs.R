@@ -1,12 +1,12 @@
 ## Scrape fangraphs.com for hitting or pitching stats for a given date range
 scrape_fangraphs <- function(position = c("team batting", "starting pitchers", "team bullpen"), season, start_date, end_date, time_frame = c("L7", "L14", "L30", "s2d")) {
+  library("plyr")
   library("tidyverse")
   library("rvest")
   library("xml2")
   library("readr")
   library("janitor")
   library("lubridate")
-  library("plyr")
   library("baseballr")
   season_info = baseballr::mlb_seasons_all()
   

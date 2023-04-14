@@ -26,7 +26,10 @@ get_mlb_daily_scores <- function(start_date, end_date, file_type = c("pks", "sco
   
   
   if (file_type == "pks") {
-    return(tbl)
+    return(tbl %>% 
+             filter(status.detailedState != 'Postponed' &
+                      seriesDescription == 'Regular Season' &
+                      !is.na(game_pk)))
   }
   
   if (file_type == "scores") {
