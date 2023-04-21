@@ -257,7 +257,8 @@ scores <- get_mlb_daily_scores(start_date = game_pks_max_date + 1,
                             file_type = "scores")
 
 ## Starting pitchers and rosters for today
-starting_pitchers <- read.csv(paste0("Baseball Machine/Daily Files/",season,"/starting_pitchers_",season,".csv"))
+starting_pitchers <- read.csv(paste0("Baseball Machine/Daily Files/",season,"/starting_pitchers_",season,".csv")) %>% 
+  filter(game_date < Sys.Date())
 starting_pitchers_max_date <- max(as.Date(starting_pitchers$game_date))
 probables <- get_probable_pitchers(starting_pitchers_max_date+1, Sys.Date())
 tmrw_probables <- get_probable_pitchers(Sys.Date()+1, Sys.Date()+1)
@@ -1055,32 +1056,564 @@ bets <- upcoming_df %>%
          Away_pred_F5 = pR_F5_Away,
          Home_pred_F1 = pR_F1_Home,
          Away_pred_F1 = pR_F1_Away) %>% 
-  mutate(bet_type_full = bet_type,
-         bet_type = case_when(bet_type == "Moneyline - Game" ~ "FG ML",
-                              bet_type == "Moneyline - 5 Inning Line" ~ "F5 ML",
-                              bet_type == "Runline - Game" ~ "FG RL",
-                              bet_type == "Runline - 5 Inning Line" ~ "F5 RL",
-                              bet_type == "Total - Game" ~ "FG Total",
-                              bet_type == "Total - 5 Inning Line" ~ "F5 Total",
-                              bet_type == "Will there be a run scored in the 1st inning - Game" ~ "RFI",
-                              bet_type == "Alternate Runline - Game - 1.5" ~ "FG Alt RL",
-                              bet_type == "Alternate Runline - Game - 2.5" ~ "FG Alt RL",
-                              bet_type == "Alternate Runline - 5 Inning Line - 0.5" ~ "FG Alt RL",
-                              bet_type == "Alternate Runline - 5 Inning Line - 1.5" ~ "FG Alt RL",
-                              str_detect(bet_type, )
-                              
-                              bet_type == "Goal Spread" ~ "Spread",
-                              grepl("Alternate Spread", bet_type) ~ "Alt Spread",
-                              bet_type == "Total" ~ "Total",
-                              grepl("Alternate Total", bet_type) ~ "Alt Total",
-                              bet_type == "Both Teams To Score" ~ "BTTS",
-                              grepl("Total Goals O/U", bet_type) & (Pick_Odds > -250) & (Pick_Odds < 210) ~ "TT",
-                              grepl("Total Goals O/U", bet_type) & ((Pick_Odds <= -250) | (Pick_Odds >= 210)) ~ "Alt TT",
-                              bet_type == "Draw No Bet" ~ "Draw No Bet",
+  dplyr::mutate(bet_type_full = bet_type,
+         bet_type = case_when(bet_type_full == "Moneyline - Game" ~ "FG ML",
+                              bet_type_full == "Moneyline - 5 Inning Line" ~ "F5 ML",
+                              bet_type_full == "Runline - Game" ~ "FG RL",
+                              bet_type_full == "Runline - 5 Inning Line" ~ "F5 RL",
+                              bet_type_full == "Total - Game" ~ "FG Total",
+                              bet_type_full == "Total - 5 Inning Line" ~ "F5 Total",
+                              bet_type_full == "Will there be a run scored in the 1st inning - Game" ~ "RFI",
+                              bet_type_full == "Alternate Runline - Game - 1.5" ~ "FG Alt RL",
+                              bet_type_full == "Alternate Runline - Game - 2.5" ~ "FG Alt RL",
+                              bet_type_full == "Alternate Runline - 5 Inning Line - 0.5" ~ "F5 Alt RL",
+                              bet_type_full == "Alternate Runline - 5 Inning Line - 1.5" ~ "F5 Alt RL",
+                              str_detect(bet_type_full, "Alternate Total - Game") ~ "FG Alt Total",
+                              str_detect(bet_type_full, "Alternate Total - 5 Inning Line") ~ "F5 Alt Total",
+                              str_detect(bet_type_full, "To Score - 1st Inning") ~ "Team RFI",
+                              str_detect(bet_type_full, "Team Total") & 
+                                str_detect(bet_type_full, "5 Inning Line") & 
+                                (AOY.Odds <= -160 | HUN.Odds <= -160) ~ "F5 Alt TT",
+                              str_detect(bet_type_full, "Team Total") & 
+                                str_detect(bet_type_full, "Game") &
+                                (AOY.Odds <= -160 | HUN.Odds <= -160) ~ "FG Alt TT",
+                              str_detect(bet_type_full, "Team Total") & 
+                                str_detect(bet_type_full, "5 Inning Line") ~ "F5 TT",
+                              str_detect(bet_type_full, "Team Total") & 
+                                str_detect(bet_type_full, "Game") ~ "FG TT",
                               TRUE ~ "Other"))
 
 bets2 <- bets %>% 
-  mutate(bet_type_full)
+  rowwise() %>% 
+  dplyr::mutate(AOY_ProjOdds1 = case_when(bet_type == "FG ML" ~ simulate_game(homeScorePred = Home_pred_FG,
+                                                                              awayScorePred = Away_pred_FG,
+                                                                              homeORaway = "away",
+                                                                              max_score = 20,
+                                                                              drawAllowed = FALSE),
+                                          bet_type == "F5 ML" ~ simulate_game(homeScorePred = Home_pred_F5,
+                                                                              awayScorePred = Away_pred_F5,
+                                                                              homeORaway = "away",
+                                                                              max_score = 20,
+                                                                              drawAllowed = FALSE),
+                                          bet_type == "FG RL" |
+                                            bet_type == "FG Alt RL" ~ simulate_spread(homeScorePred = Home_pred_FG,
+                                                                              awayScorePred = Away_pred_FG,
+                                                                              homeORaway = "away",
+                                                                              max_score = 20,
+                                                                              spread = AOY.SpreadTotal),
+                                          bet_type == "F5 RL" |
+                                            bet_type == "F5 Alt RL" ~ simulate_spread(homeScorePred = Home_pred_F5,
+                                                                              awayScorePred = Away_pred_F5,
+                                                                              homeORaway = "away",
+                                                                              max_score = 20,
+                                                                              spread = AOY.SpreadTotal),
+                                          bet_type == "FG Total" |
+                                            bet_type == "FG Alt Total" ~ simulate_total(homeScorePred = Home_pred_FG,
+                                                                              awayScorePred = Away_pred_FG,
+                                                                              overORunder = "over",
+                                                                              max_score = 20,
+                                                                              total = AOY.SpreadTotal),
+                                          bet_type == "F5 Total" |
+                                            bet_type == "F5 Alt Total" ~ simulate_total(homeScorePred = Home_pred_F5,
+                                                                              awayScorePred = Away_pred_F5,
+                                                                              overORunder = "over",
+                                                                              max_score = 20,
+                                                                              total = AOY.SpreadTotal),
+                                          bet_type == "RFI" ~ simulate_total(homeScorePred = Home_pred_F1,
+                                                                             awayScorePred = Away_pred_F1,
+                                                                             overORunder = "over",
+                                                                             max_score = 20,
+                                                                             total = 0.5),
+                                          bet_type == "Team RFI" &
+                                            str_detect(bet_type_full, AwayTeam) ~ simulate_team_total(ScorePred = Away_pred_F1,
+                                                                                                      overORunder = "over",
+                                                                                                      team_total = 0.5,
+                                                                                                      max_score = 20),
+                                          bet_type == "Team RFI" &
+                                            str_detect(bet_type_full, HomeTeam) ~ simulate_team_total(ScorePred = Home_pred_F1,
+                                                                                                      overORunder = "over",
+                                                                                                      team_total = 0.5,
+                                                                                                      max_score = 20),
+                                          (bet_type == "F5 TT" |
+                                            bet_type == "F5 Alt TT") &
+                                            str_detect(bet_type_full, AwayTeam) ~ simulate_team_total(ScorePred = Away_pred_F5,
+                                                                                                      overORunder = "over",
+                                                                                                      team_total = AOY.SpreadTotal,
+                                                                                                      max_score = 20),
+                                          (bet_type == "F5 TT" |
+                                            bet_type == "F5 Alt TT") &
+                                            str_detect(bet_type_full, HomeTeam) ~ simulate_team_total(ScorePred = Home_pred_F5,
+                                                                                                      overORunder = "over",
+                                                                                                      team_total = AOY.SpreadTotal,
+                                                                                                      max_score = 20),
+                                          (bet_type == "FG TT" |
+                                            bet_type == "FG Alt TT") &
+                                            str_detect(bet_type_full, AwayTeam) ~ simulate_team_total(ScorePred = Away_pred_FG,
+                                                                                                      overORunder = "over",
+                                                                                                      team_total = AOY.SpreadTotal,
+                                                                                                      max_score = 20),
+                                          (bet_type == "FG TT" |
+                                            bet_type == "FG Alt TT") &
+                                            str_detect(bet_type_full, HomeTeam) ~ simulate_team_total(ScorePred = Home_pred_FG,
+                                                                                                      overORunder = "over",
+                                                                                                      team_total = AOY.SpreadTotal,
+                                                                                                      max_score = 20)),
+                HUN_ProjOdds1 = case_when(bet_type == "FG ML" ~ simulate_game(homeScorePred = Home_pred_FG,
+                                                                              awayScorePred = Away_pred_FG,
+                                                                              homeORaway = "home",
+                                                                              max_score = 20,
+                                                                              drawAllowed = FALSE),
+                                          bet_type == "F5 ML" ~ simulate_game(homeScorePred = Home_pred_F5,
+                                                                              awayScorePred = Away_pred_F5,
+                                                                              homeORaway = "home",
+                                                                              max_score = 20,
+                                                                              drawAllowed = FALSE),
+                                          bet_type == "FG RL" |
+                                            bet_type == "FG Alt RL" ~ simulate_spread(homeScorePred = Home_pred_FG,
+                                                                                      awayScorePred = Away_pred_FG,
+                                                                                      homeORaway = "home",
+                                                                                      max_score = 20,
+                                                                                      spread = HUN.SpreadTotal),
+                                          bet_type == "F5 RL" |
+                                            bet_type == "F5 Alt RL" ~ simulate_spread(homeScorePred = Home_pred_F5,
+                                                                                      awayScorePred = Away_pred_F5,
+                                                                                      homeORaway = "home",
+                                                                                      max_score = 20,
+                                                                                      spread = HUN.SpreadTotal),
+                                          bet_type == "FG Total" |
+                                            bet_type == "FG Alt Total" ~ simulate_total(homeScorePred = Home_pred_FG,
+                                                                                        awayScorePred = Away_pred_FG,
+                                                                                        overORunder = "under",
+                                                                                        max_score = 20,
+                                                                                        total = HUN.SpreadTotal),
+                                          bet_type == "F5 Total" |
+                                            bet_type == "F5 Alt Total" ~ simulate_total(homeScorePred = Home_pred_F5,
+                                                                                        awayScorePred = Away_pred_F5,
+                                                                                        overORunder = "under",
+                                                                                        max_score = 20,
+                                                                                        total = HUN.SpreadTotal),
+                                          bet_type == "RFI" ~ simulate_total(homeScorePred = Home_pred_F1,
+                                                                             awayScorePred = Away_pred_F1,
+                                                                             overORunder = "under",
+                                                                             max_score = 20,
+                                                                             total = 0.5),
+                                          bet_type == "Team RFI" &
+                                            str_detect(bet_type_full, AwayTeam) ~ simulate_team_total(ScorePred = Away_pred_F1,
+                                                                                                      overORunder = "under",
+                                                                                                      team_total = 0.5,
+                                                                                                      max_score = 20),
+                                          bet_type == "Team RFI" &
+                                            str_detect(bet_type_full, HomeTeam) ~ simulate_team_total(ScorePred = Home_pred_F1,
+                                                                                                      overORunder = "under",
+                                                                                                      team_total = 0.5,
+                                                                                                      max_score = 20),
+                                          (bet_type == "F5 TT" |
+                                             bet_type == "F5 Alt TT") &
+                                            str_detect(bet_type_full, AwayTeam) ~ simulate_team_total(ScorePred = Away_pred_F5,
+                                                                                                      overORunder = "under",
+                                                                                                      team_total = HUN.SpreadTotal,
+                                                                                                      max_score = 20),
+                                          (bet_type == "F5 TT" |
+                                             bet_type == "F5 Alt TT") &
+                                            str_detect(bet_type_full, HomeTeam) ~ simulate_team_total(ScorePred = Home_pred_F5,
+                                                                                                      overORunder = "under",
+                                                                                                      team_total = HUN.SpreadTotal,
+                                                                                                      max_score = 20),
+                                          (bet_type == "FG TT" |
+                                             bet_type == "FG Alt TT") &
+                                            str_detect(bet_type_full, AwayTeam) ~ simulate_team_total(ScorePred = Away_pred_FG,
+                                                                                                      overORunder = "under",
+                                                                                                      team_total = HUN.SpreadTotal,
+                                                                                                      max_score = 20),
+                                          (bet_type == "FG TT" |
+                                             bet_type == "FG Alt TT") &
+                                            str_detect(bet_type_full, HomeTeam) ~ simulate_team_total(ScorePred = Home_pred_FG,
+                                                                                                      overORunder = "under",
+                                                                                                      team_total = HUN.SpreadTotal,
+                                                                                                      max_score = 20)),
+                AOY_ProjOdds2 = case_when(bet_type == "FG ML" ~ pFG_ML$Lose,
+                                          bet_type == "F5 ML" ~ pF5_ML$Lose,
+                                          (bet_type == "FG RL" |
+                                            bet_type == "FG Alt RL") &
+                                            AOY.SpreadTotal == -1.5 ~ pFG_Minus_1.5$Lose,
+                                          (bet_type == "FG RL" |
+                                             bet_type == "FG Alt RL") &
+                                            AOY.SpreadTotal == 1.5 ~ pFG_Plus_1.5$Lose,
+                                          (bet_type == "FG RL" |
+                                             bet_type == "FG Alt RL") &
+                                            AOY.SpreadTotal == -2.5 ~ pFG_Minus_2.5$Lose,
+                                          (bet_type == "FG RL" |
+                                             bet_type == "FG Alt RL") &
+                                            AOY.SpreadTotal == 2.5 ~ pFG_Plus_2.5$Lose,
+                                          (bet_type == "F5 RL" |
+                                             bet_type == "F5 Alt RL") &
+                                            AOY.SpreadTotal == -1.5 ~ pF5_Minus_1.5$Lose,
+                                          (bet_type == "F5 RL" |
+                                             bet_type == "F5 Alt RL") &
+                                            AOY.SpreadTotal == 1.5 ~ pF5_Plus_1.5$Lose,
+                                          (bet_type == "F5 RL" |
+                                             bet_type == "F5 Alt RL") &
+                                            AOY.SpreadTotal == -0.5 ~ pF5_Minus_0.5$Lose,
+                                          (bet_type == "F5 RL" |
+                                             bet_type == "F5 Alt RL") &
+                                            AOY.SpreadTotal == 0.5 ~ pF5_Plus_0.5$Lose,
+                                          (bet_type == "FG Total" |
+                                             bet_type == "FG Alt Total") &
+                                            AOY.SpreadTotal == 6.5 ~ pFG_Total_6.5$Over,
+                                          (bet_type == "FG Total" |
+                                             bet_type == "FG Alt Total") &
+                                            AOY.SpreadTotal == 7 ~ pFG_Total_7$Over,
+                                          (bet_type == "FG Total" |
+                                             bet_type == "FG Alt Total") &
+                                            AOY.SpreadTotal == 7.5 ~ pFG_Total_7.5$Over,
+                                          (bet_type == "FG Total" |
+                                             bet_type == "FG Alt Total") &
+                                            AOY.SpreadTotal == 8 ~ pFG_Total_8$Over,
+                                          (bet_type == "FG Total" |
+                                             bet_type == "FG Alt Total") &
+                                            AOY.SpreadTotal == 8.5 ~ pFG_Total_8.5$Over,
+                                          (bet_type == "FG Total" |
+                                             bet_type == "FG Alt Total") &
+                                            AOY.SpreadTotal == 9 ~ pFG_Total_9$Over,
+                                          (bet_type == "FG Total" |
+                                             bet_type == "FG Alt Total") &
+                                            AOY.SpreadTotal == 9.5 ~ pFG_Total_9.5$Over,
+                                          (bet_type == "FG Total" |
+                                             bet_type == "FG Alt Total") &
+                                            AOY.SpreadTotal == 10 ~ pFG_Total_10$Over,
+                                          (bet_type == "FG Total" |
+                                             bet_type == "FG Alt Total") &
+                                            AOY.SpreadTotal == 10.5 ~ pFG_Total_10.5$Over,
+                                          (bet_type == "FG Total" |
+                                             bet_type == "FG Alt Total") &
+                                            AOY.SpreadTotal == 11 ~ pFG_Total_11$Over,
+                                          (bet_type == "FG Total" |
+                                             bet_type == "FG Alt Total") &
+                                            AOY.SpreadTotal == 11.5 ~ pFG_Total_11.5$Over,
+                                          (bet_type == "F5 Total" |
+                                             bet_type == "F5 Alt Total") &
+                                            AOY.SpreadTotal == 3.5 ~ pF5_Total_3.5$Over,
+                                          (bet_type == "F5 Total" |
+                                             bet_type == "F5 Alt Total") &
+                                            AOY.SpreadTotal == 4 ~ pF5_Total_4$Over,
+                                          (bet_type == "F5 Total" |
+                                             bet_type == "F5 Alt Total") &
+                                            AOY.SpreadTotal == 4.5 ~ pF5_Total_4.5$Over,
+                                          (bet_type == "F5 Total" |
+                                             bet_type == "F5 Alt Total") &
+                                            AOY.SpreadTotal == 5 ~ pF5_Total_5$Over,
+                                          (bet_type == "F5 Total" |
+                                             bet_type == "F5 Alt Total") &
+                                            AOY.SpreadTotal == 5.5 ~ pF5_Total_5.5$Over,
+                                          bet_type == "RFI" ~ pF1_Total_0.5$Over,
+                                          bet_type == "Team RFI" &
+                                            str_detect(bet_type_full, AwayTeam) ~ pF1_TT_0.5_Away$Over,
+                                          bet_type == "Team RFI" &
+                                            str_detect(bet_type_full, HomeTeam) ~ pF1_TT_0.5_Home$Over,
+                                          (bet_type == "FG TT" |
+                                             bet_type == "FG Alt TT") &
+                                            str_detect(bet_type_full, AwayTeam) &
+                                            AOY.SpreadTotal == 2.5 ~ pFG_TT_2.5_Away$Over,
+                                          (bet_type == "FG TT" |
+                                             bet_type == "FG Alt TT") &
+                                            str_detect(bet_type_full, HomeTeam) &
+                                            AOY.SpreadTotal == 2.5 ~ pFG_TT_2.5_Home$Over,
+                                          (bet_type == "FG TT" |
+                                             bet_type == "FG Alt TT") &
+                                            str_detect(bet_type_full, AwayTeam) &
+                                            AOY.SpreadTotal == 3 ~ pFG_TT_3_Away$Over,
+                                          (bet_type == "FG TT" |
+                                             bet_type == "FG Alt TT") &
+                                            str_detect(bet_type_full, HomeTeam) &
+                                            AOY.SpreadTotal == 3 ~ pFG_TT_3_Home$Over,
+                                          (bet_type == "FG TT" |
+                                             bet_type == "FG Alt TT") &
+                                            str_detect(bet_type_full, AwayTeam) &
+                                            AOY.SpreadTotal == 3.5 ~ pFG_TT_3.5_Away$Over,
+                                          (bet_type == "FG TT" |
+                                             bet_type == "FG Alt TT") &
+                                            str_detect(bet_type_full, HomeTeam) &
+                                            AOY.SpreadTotal == 3.5 ~ pFG_TT_3.5_Home$Over,
+                                          (bet_type == "FG TT" |
+                                             bet_type == "FG Alt TT") &
+                                            str_detect(bet_type_full, AwayTeam) &
+                                            AOY.SpreadTotal == 4 ~ pFG_TT_4_Away$Over,
+                                          (bet_type == "FG TT" |
+                                             bet_type == "FG Alt TT") &
+                                            str_detect(bet_type_full, HomeTeam) &
+                                            AOY.SpreadTotal == 4 ~ pFG_TT_4_Home$Over,
+                                          (bet_type == "FG TT" |
+                                             bet_type == "FG Alt TT") &
+                                            str_detect(bet_type_full, AwayTeam) &
+                                            AOY.SpreadTotal == 4.5 ~ pFG_TT_4.5_Away$Over,
+                                          (bet_type == "FG TT" |
+                                             bet_type == "FG Alt TT") &
+                                            str_detect(bet_type_full, HomeTeam) &
+                                            AOY.SpreadTotal == 4.5 ~ pFG_TT_4.5_Home$Over,
+                                          (bet_type == "FG TT" |
+                                             bet_type == "FG Alt TT") &
+                                            str_detect(bet_type_full, AwayTeam) &
+                                            AOY.SpreadTotal == 5 ~ pFG_TT_5_Away$Over,
+                                          (bet_type == "FG TT" |
+                                             bet_type == "FG Alt TT") &
+                                            str_detect(bet_type_full, HomeTeam) &
+                                            AOY.SpreadTotal == 5 ~ pFG_TT_5_Home$Over,
+                                          (bet_type == "FG TT" |
+                                             bet_type == "FG Alt TT") &
+                                            str_detect(bet_type_full, AwayTeam) &
+                                            AOY.SpreadTotal == 5.5 ~ pFG_TT_5.5_Away$Over,
+                                          (bet_type == "FG TT" |
+                                             bet_type == "FG Alt TT") &
+                                            str_detect(bet_type_full, HomeTeam) &
+                                            AOY.SpreadTotal == 5.5 ~ pFG_TT_5.5_Home$Over,
+                                          (bet_type == "F5 TT" |
+                                             bet_type == "F5 Alt TT") &
+                                            str_detect(bet_type_full, AwayTeam) &
+                                            AOY.SpreadTotal == 0.5 ~ pF5_TT_0.5_Away$Over,
+                                          (bet_type == "F5 TT" |
+                                             bet_type == "F5 Alt TT") &
+                                            str_detect(bet_type_full, HomeTeam) &
+                                            AOY.SpreadTotal == 0.5 ~ pF5_TT_0.5_Home$Over,
+                                          (bet_type == "F5 TT" |
+                                             bet_type == "F5 Alt TT") &
+                                            str_detect(bet_type_full, AwayTeam) &
+                                            AOY.SpreadTotal == 1 ~ pF5_TT_1_Away$Over,
+                                          (bet_type == "F5 TT" |
+                                             bet_type == "F5 Alt TT") &
+                                            str_detect(bet_type_full, HomeTeam) &
+                                            AOY.SpreadTotal == 1 ~ pF5_TT_1_Home$Over,
+                                          (bet_type == "F5 TT" |
+                                             bet_type == "F5 Alt TT") &
+                                            str_detect(bet_type_full, AwayTeam) &
+                                            AOY.SpreadTotal == 1.5 ~ pF5_TT_1.5_Away$Over,
+                                          (bet_type == "F5 TT" |
+                                             bet_type == "F5 Alt TT") &
+                                            str_detect(bet_type_full, HomeTeam) &
+                                            AOY.SpreadTotal == 1.5 ~ pF5_TT_1.5_Home$Over,
+                                          (bet_type == "F5 TT" |
+                                             bet_type == "F5 Alt TT") &
+                                            str_detect(bet_type_full, AwayTeam) &
+                                            AOY.SpreadTotal == 2 ~ pF5_TT_2_Away$Over,
+                                          (bet_type == "F5 TT" |
+                                             bet_type == "F5 Alt TT") &
+                                            str_detect(bet_type_full, HomeTeam) &
+                                            AOY.SpreadTotal == 2 ~ pF5_TT_2_Home$Over,
+                                          (bet_type == "F5 TT" |
+                                             bet_type == "F5 Alt TT") &
+                                            str_detect(bet_type_full, AwayTeam) &
+                                            AOY.SpreadTotal == 2.5 ~ pF5_TT_2.5_Away$Over,
+                                          (bet_type == "F5 TT" |
+                                             bet_type == "F5 Alt TT") &
+                                            str_detect(bet_type_full, HomeTeam) &
+                                            AOY.SpreadTotal == 2.5 ~ pF5_TT_2.5_Home$Over,
+                                          (bet_type == "F5 TT" |
+                                             bet_type == "F5 Alt TT") &
+                                            str_detect(bet_type_full, AwayTeam) &
+                                            AOY.SpreadTotal == 3 ~ pF5_TT_3_Away$Over,
+                                          (bet_type == "F5 TT" |
+                                             bet_type == "F5 Alt TT") &
+                                            str_detect(bet_type_full, HomeTeam) &
+                                            AOY.SpreadTotal == 3 ~ pF5_TT_3_Home$Over,
+                                          (bet_type == "F5 TT" |
+                                             bet_type == "F5 Alt TT") &
+                                            str_detect(bet_type_full, AwayTeam) &
+                                            AOY.SpreadTotal == 3.5 ~ pF5_TT_3.5_Away$Over,
+                                          (bet_type == "F5 TT" |
+                                             bet_type == "F5 Alt TT") &
+                                            str_detect(bet_type_full, HomeTeam) &
+                                            AOY.SpreadTotal == 3.5 ~ pF5_TT_3.5_Home$Over),
+                HUN_ProjOdds2 = case_when(bet_type == "FG ML" ~ pFG_ML$Win,
+                                          bet_type == "F5 ML" ~ pF5_ML$Win,
+                                          (bet_type == "FG RL" |
+                                             bet_type == "FG Alt RL") &
+                                            AOY.SpreadTotal == -1.5 ~ pFG_Minus_1.5$Win,
+                                          (bet_type == "FG RL" |
+                                             bet_type == "FG Alt RL") &
+                                            AOY.SpreadTotal == 1.5 ~ pFG_Plus_1.5$Win,
+                                          (bet_type == "FG RL" |
+                                             bet_type == "FG Alt RL") &
+                                            AOY.SpreadTotal == -2.5 ~ pFG_Minus_2.5$Win,
+                                          (bet_type == "FG RL" |
+                                             bet_type == "FG Alt RL") &
+                                            AOY.SpreadTotal == 2.5 ~ pFG_Plus_2.5$Win,
+                                          (bet_type == "F5 RL" |
+                                             bet_type == "F5 Alt RL") &
+                                            AOY.SpreadTotal == -1.5 ~ pF5_Minus_1.5$Win,
+                                          (bet_type == "F5 RL" |
+                                             bet_type == "F5 Alt RL") &
+                                            AOY.SpreadTotal == 1.5 ~ pF5_Plus_1.5$Win,
+                                          (bet_type == "F5 RL" |
+                                             bet_type == "F5 Alt RL") &
+                                            AOY.SpreadTotal == -0.5 ~ pF5_Minus_0.5$Win,
+                                          (bet_type == "F5 RL" |
+                                             bet_type == "F5 Alt RL") &
+                                            AOY.SpreadTotal == 0.5 ~ pF5_Plus_0.5$Win,
+                                          (bet_type == "FG Total" |
+                                             bet_type == "FG Alt Total") &
+                                            AOY.SpreadTotal == 6.5 ~ pFG_Total_6.5$Under,
+                                          (bet_type == "FG Total" |
+                                             bet_type == "FG Alt Total") &
+                                            AOY.SpreadTotal == 7 ~ pFG_Total_7$Under,
+                                          (bet_type == "FG Total" |
+                                             bet_type == "FG Alt Total") &
+                                            AOY.SpreadTotal == 7.5 ~ pFG_Total_7.5$Under,
+                                          (bet_type == "FG Total" |
+                                             bet_type == "FG Alt Total") &
+                                            AOY.SpreadTotal == 8 ~ pFG_Total_8$Under,
+                                          (bet_type == "FG Total" |
+                                             bet_type == "FG Alt Total") &
+                                            AOY.SpreadTotal == 8.5 ~ pFG_Total_8.5$Under,
+                                          (bet_type == "FG Total" |
+                                             bet_type == "FG Alt Total") &
+                                            AOY.SpreadTotal == 9 ~ pFG_Total_9$Under,
+                                          (bet_type == "FG Total" |
+                                             bet_type == "FG Alt Total") &
+                                            AOY.SpreadTotal == 9.5 ~ pFG_Total_9.5$Under,
+                                          (bet_type == "FG Total" |
+                                             bet_type == "FG Alt Total") &
+                                            AOY.SpreadTotal == 10 ~ pFG_Total_10$Under,
+                                          (bet_type == "FG Total" |
+                                             bet_type == "FG Alt Total") &
+                                            AOY.SpreadTotal == 10.5 ~ pFG_Total_10.5$Under,
+                                          (bet_type == "FG Total" |
+                                             bet_type == "FG Alt Total") &
+                                            AOY.SpreadTotal == 11 ~ pFG_Total_11$Under,
+                                          (bet_type == "FG Total" |
+                                             bet_type == "FG Alt Total") &
+                                            AOY.SpreadTotal == 11.5 ~ pFG_Total_11.5$Under,
+                                          (bet_type == "F5 Total" |
+                                             bet_type == "F5 Alt Total") &
+                                            AOY.SpreadTotal == 3.5 ~ pF5_Total_3.5$Under,
+                                          (bet_type == "F5 Total" |
+                                             bet_type == "F5 Alt Total") &
+                                            AOY.SpreadTotal == 4 ~ pF5_Total_4$Under,
+                                          (bet_type == "F5 Total" |
+                                             bet_type == "F5 Alt Total") &
+                                            AOY.SpreadTotal == 4.5 ~ pF5_Total_4.5$Under,
+                                          (bet_type == "F5 Total" |
+                                             bet_type == "F5 Alt Total") &
+                                            AOY.SpreadTotal == 5 ~ pF5_Total_5$Under,
+                                          (bet_type == "F5 Total" |
+                                             bet_type == "F5 Alt Total") &
+                                            AOY.SpreadTotal == 5.5 ~ pF5_Total_5.5$Under,
+                                          bet_type == "RFI" ~ pF1_Total_0.5$Under,
+                                          bet_type == "Team RFI" &
+                                            str_detect(bet_type_full, AwayTeam) ~ pF1_TT_0.5_Away$Under,
+                                          bet_type == "Team RFI" &
+                                            str_detect(bet_type_full, HomeTeam) ~ pF1_TT_0.5_Home$Under,
+                                          (bet_type == "FG TT" |
+                                             bet_type == "FG Alt TT") &
+                                            str_detect(bet_type_full, AwayTeam) &
+                                            AOY.SpreadTotal == 2.5 ~ pFG_TT_2.5_Away$Under,
+                                          (bet_type == "FG TT" |
+                                             bet_type == "FG Alt TT") &
+                                            str_detect(bet_type_full, HomeTeam) &
+                                            AOY.SpreadTotal == 2.5 ~ pFG_TT_2.5_Home$Under,
+                                          (bet_type == "FG TT" |
+                                             bet_type == "FG Alt TT") &
+                                            str_detect(bet_type_full, AwayTeam) &
+                                            AOY.SpreadTotal == 3 ~ pFG_TT_3_Away$Under,
+                                          (bet_type == "FG TT" |
+                                             bet_type == "FG Alt TT") &
+                                            str_detect(bet_type_full, HomeTeam) &
+                                            AOY.SpreadTotal == 3 ~ pFG_TT_3_Home$Under,
+                                          (bet_type == "FG TT" |
+                                             bet_type == "FG Alt TT") &
+                                            str_detect(bet_type_full, AwayTeam) &
+                                            AOY.SpreadTotal == 3.5 ~ pFG_TT_3.5_Away$Under,
+                                          (bet_type == "FG TT" |
+                                             bet_type == "FG Alt TT") &
+                                            str_detect(bet_type_full, HomeTeam) &
+                                            AOY.SpreadTotal == 3.5 ~ pFG_TT_3.5_Home$Under,
+                                          (bet_type == "FG TT" |
+                                             bet_type == "FG Alt TT") &
+                                            str_detect(bet_type_full, AwayTeam) &
+                                            AOY.SpreadTotal == 4 ~ pFG_TT_4_Away$Under,
+                                          (bet_type == "FG TT" |
+                                             bet_type == "FG Alt TT") &
+                                            str_detect(bet_type_full, HomeTeam) &
+                                            AOY.SpreadTotal == 4 ~ pFG_TT_4_Home$Under,
+                                          (bet_type == "FG TT" |
+                                             bet_type == "FG Alt TT") &
+                                            str_detect(bet_type_full, AwayTeam) &
+                                            AOY.SpreadTotal == 4.5 ~ pFG_TT_4.5_Away$Under,
+                                          (bet_type == "FG TT" |
+                                             bet_type == "FG Alt TT") &
+                                            str_detect(bet_type_full, HomeTeam) &
+                                            AOY.SpreadTotal == 4.5 ~ pFG_TT_4.5_Home$Under,
+                                          (bet_type == "FG TT" |
+                                             bet_type == "FG Alt TT") &
+                                            str_detect(bet_type_full, AwayTeam) &
+                                            AOY.SpreadTotal == 5 ~ pFG_TT_5_Away$Under,
+                                          (bet_type == "FG TT" |
+                                             bet_type == "FG Alt TT") &
+                                            str_detect(bet_type_full, HomeTeam) &
+                                            AOY.SpreadTotal == 5 ~ pFG_TT_5_Home$Under,
+                                          (bet_type == "FG TT" |
+                                             bet_type == "FG Alt TT") &
+                                            str_detect(bet_type_full, AwayTeam) &
+                                            AOY.SpreadTotal == 5.5 ~ pFG_TT_5.5_Away$Under,
+                                          (bet_type == "FG TT" |
+                                             bet_type == "FG Alt TT") &
+                                            str_detect(bet_type_full, HomeTeam) &
+                                            AOY.SpreadTotal == 5.5 ~ pFG_TT_5.5_Home$Under,
+                                          (bet_type == "F5 TT" |
+                                             bet_type == "F5 Alt TT") &
+                                            str_detect(bet_type_full, AwayTeam) &
+                                            AOY.SpreadTotal == 0.5 ~ pF5_TT_0.5_Away$Under,
+                                          (bet_type == "F5 TT" |
+                                             bet_type == "F5 Alt TT") &
+                                            str_detect(bet_type_full, HomeTeam) &
+                                            AOY.SpreadTotal == 0.5 ~ pF5_TT_0.5_Home$Under,
+                                          (bet_type == "F5 TT" |
+                                             bet_type == "F5 Alt TT") &
+                                            str_detect(bet_type_full, AwayTeam) &
+                                            AOY.SpreadTotal == 1 ~ pF5_TT_1_Away$Under,
+                                          (bet_type == "F5 TT" |
+                                             bet_type == "F5 Alt TT") &
+                                            str_detect(bet_type_full, HomeTeam) &
+                                            AOY.SpreadTotal == 1 ~ pF5_TT_1_Home$Under,
+                                          (bet_type == "F5 TT" |
+                                             bet_type == "F5 Alt TT") &
+                                            str_detect(bet_type_full, AwayTeam) &
+                                            AOY.SpreadTotal == 1.5 ~ pF5_TT_1.5_Away$Under,
+                                          (bet_type == "F5 TT" |
+                                             bet_type == "F5 Alt TT") &
+                                            str_detect(bet_type_full, HomeTeam) &
+                                            AOY.SpreadTotal == 1.5 ~ pF5_TT_1.5_Home$Under,
+                                          (bet_type == "F5 TT" |
+                                             bet_type == "F5 Alt TT") &
+                                            str_detect(bet_type_full, AwayTeam) &
+                                            AOY.SpreadTotal == 2 ~ pF5_TT_2_Away$Under,
+                                          (bet_type == "F5 TT" |
+                                             bet_type == "F5 Alt TT") &
+                                            str_detect(bet_type_full, HomeTeam) &
+                                            AOY.SpreadTotal == 2 ~ pF5_TT_2_Home$Under,
+                                          (bet_type == "F5 TT" |
+                                             bet_type == "F5 Alt TT") &
+                                            str_detect(bet_type_full, AwayTeam) &
+                                            AOY.SpreadTotal == 2.5 ~ pF5_TT_2.5_Away$Under,
+                                          (bet_type == "F5 TT" |
+                                             bet_type == "F5 Alt TT") &
+                                            str_detect(bet_type_full, HomeTeam) &
+                                            AOY.SpreadTotal == 2.5 ~ pF5_TT_2.5_Home$Under,
+                                          (bet_type == "F5 TT" |
+                                             bet_type == "F5 Alt TT") &
+                                            str_detect(bet_type_full, AwayTeam) &
+                                            AOY.SpreadTotal == 3 ~ pF5_TT_3_Away$Under,
+                                          (bet_type == "F5 TT" |
+                                             bet_type == "F5 Alt TT") &
+                                            str_detect(bet_type_full, HomeTeam) &
+                                            AOY.SpreadTotal == 3 ~ pF5_TT_3_Home$Under,
+                                          (bet_type == "F5 TT" |
+                                             bet_type == "F5 Alt TT") &
+                                            str_detect(bet_type_full, AwayTeam) &
+                                            AOY.SpreadTotal == 3.5 ~ pF5_TT_3.5_Away$Under,
+                                          (bet_type == "F5 TT" |
+                                             bet_type == "F5 Alt TT") &
+                                            str_detect(bet_type_full, HomeTeam) &
+                                            AOY.SpreadTotal == 3.5 ~ pF5_TT_3.5_Home$Under),
+                check = AOY_ProjOdds2 + HUN_ProjOdds2)
 
 
 ### The Machine v2.0
