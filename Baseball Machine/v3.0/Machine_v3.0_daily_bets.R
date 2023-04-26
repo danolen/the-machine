@@ -1817,7 +1817,14 @@ email_table_1 <- grades %>%
                    Bets = sum(bets),
                    `Profit: 1 Unit Wagers` = sum(Units),
                    `Profit: Suggested Wagers` = sum(Kelly_Profit)) %>% 
-  dplyr::mutate(ROI = `Profit: 1 Unit Wagers` / Bets) %>% 
+  dplyr::mutate(ROI = `Profit: 1 Unit Wagers` / Bets) %>%
+  dplyr::mutate(`Hit Rate` = paste0(round_any(`Hit Rate`*100, 1), '%'),
+         `Average Odds` = as.integer(round_any(`Average Odds`,1)),
+         `Average Implied Odds` = paste0(round_any(`Average Implied Odds`*100, 1), '%'),
+         Bets = formatC(Bets, format="d", big.mark=","),
+         `Profit: 1 Unit Wagers` = paste0(round_any(`Profit: 1 Unit Wagers`, 0.1), ' units'),
+         `Profit: Suggested Wagers` = paste0(round_any(`Profit: Suggested Wagers`, 0.1), ' units'),
+         ROI = paste0(round_any(ROI*100, 0.01), '%'))%>% 
   print()
 
 df_html_1 <- print(xtable(email_table_1), type = "html", print.results = FALSE)
@@ -1832,7 +1839,14 @@ email_table_2 <- grades %>%
                    Bets = sum(bets),
                    `Profit: 1 Unit Wagers` = sum(Units),
                    `Profit: Suggested Wagers` = sum(Kelly_Profit)) %>% 
-  dplyr::mutate(ROI = `Profit: 1 Unit Wagers` / Bets) %>% 
+  dplyr::mutate(ROI = `Profit: 1 Unit Wagers` / Bets) %>%
+  dplyr::mutate(`Hit Rate` = paste0(round_any(`Hit Rate`*100, 1), '%'),
+         `Average Odds` = as.integer(round_any(`Average Odds`,1)),
+         `Average Implied Odds` = paste0(round_any(`Average Implied Odds`*100, 1), '%'),
+         Bets = formatC(Bets, format="d", big.mark=","),
+         `Profit: 1 Unit Wagers` = paste0(round_any(`Profit: 1 Unit Wagers`, 0.1), ' units'),
+         `Profit: Suggested Wagers` = paste0(round_any(`Profit: Suggested Wagers`, 0.1), ' units'),
+         ROI = paste0(round_any(ROI*100, 0.01), '%')) %>% 
   print()
 
 df_html_2 <- print(xtable(email_table_2), type = "html", print.results = FALSE)
