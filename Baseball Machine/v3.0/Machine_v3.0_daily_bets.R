@@ -23,7 +23,7 @@ todays_games <- get_mlb_daily_scores(Sys.Date(), Sys.Date(), file_type = "scores
                         scheduledInnings == 9) %>% 
                select(game_pk, officialDate, doubleHeader, gameNumber, dayNight, venue.name)) %>% 
   select(-game_pk) %>% 
-  mutate(officialDate = as.Date(officialDate))
+  dplyr::mutate(officialDate = as.Date(officialDate))
 tmrw_games <- get_mlb_daily_scores(Sys.Date()+1, Sys.Date()+1, file_type = "scores") %>% 
   distinct(game_pk, home_team_name, away_team_name, home_team_season, home_team_league_name,
            home_team_division_name, away_team_league_name, away_team_division_name) %>% 
@@ -32,7 +32,7 @@ tmrw_games <- get_mlb_daily_scores(Sys.Date()+1, Sys.Date()+1, file_type = "scor
                         scheduledInnings == 9) %>% 
                select(game_pk, officialDate, doubleHeader, gameNumber, dayNight, venue.name)) %>% 
   select(-game_pk) %>% 
-  mutate(officialDate = as.Date(officialDate))
+  dplyr::mutate(officialDate = as.Date(officialDate))
 
 ## Team names
 team_names <- read.csv("Baseball Machine/team_names.csv") %>% 
@@ -272,7 +272,7 @@ tmrw_rosters <- get_daily_rosters(Sys.Date()+1, Sys.Date()+1)
 
 ## Bovada Odds
 bovada_odds <- get_bovada_odds("baseball", "mlb") %>% 
-  mutate(AwayStartingPitcher = case_when(str_detect(AwayStartingPitcher, "Shohei Ohtani") ~ "Shohei Ohtani",
+  dplyr::mutate(AwayStartingPitcher = case_when(str_detect(AwayStartingPitcher, "Shohei Ohtani") ~ "Shohei Ohtani",
                                          str_detect(AwayStartingPitcher, "Nestor Cortes") ~ "Nestor Cortes",
                                          TRUE ~ AwayStartingPitcher),
          HomeStartingPitcher = case_when(str_detect(HomeStartingPitcher, "Shohei Ohtani") ~ "Shohei Ohtani",
@@ -281,31 +281,31 @@ bovada_odds <- get_bovada_odds("baseball", "mlb") %>%
 
 ## Overwrite files with updates
 pitchers_s2d_update <- pitchers_s2d %>% 
-  mutate(Date = as.Date(Date)) %>% 
+  dplyr::mutate(Date = as.Date(Date)) %>% 
   union(pitchers_s2d_today)
 team_batting_L7_update <- team_batting_L7 %>%  
-  mutate(Date = as.Date(Date)) %>% 
+  dplyr::mutate(Date = as.Date(Date)) %>% 
   union(team_batting_L7_today)
 team_batting_L14_update <- team_batting_L14 %>%  
-  mutate(Date = as.Date(Date)) %>% 
+  dplyr::mutate(Date = as.Date(Date)) %>% 
   union(team_batting_L14_today)
 team_batting_L30_update <- team_batting_L30 %>%  
-  mutate(Date = as.Date(Date)) %>% 
+  dplyr::mutate(Date = as.Date(Date)) %>% 
   union(team_batting_L30_today)
 team_batting_s2d_update <- team_batting_s2d %>%  
-  mutate(Date = as.Date(Date)) %>% 
+  dplyr::mutate(Date = as.Date(Date)) %>% 
   union(team_batting_s2d_today)
 team_bullpen_L7_update <- team_bullpen_L7 %>%  
-  mutate(Date = as.Date(Date)) %>% 
+  dplyr::mutate(Date = as.Date(Date)) %>% 
   union(team_bullpen_L7_today)
 team_bullpen_L14_update <- team_bullpen_L14 %>%  
-  mutate(Date = as.Date(Date)) %>% 
+  dplyr::mutate(Date = as.Date(Date)) %>% 
   union(team_bullpen_L14_today)
 team_bullpen_L30_update <- team_bullpen_L30 %>%  
-  mutate(Date = as.Date(Date)) %>% 
+  dplyr::mutate(Date = as.Date(Date)) %>% 
   union(team_bullpen_L30_today)
 team_bullpen_s2d_update <- team_bullpen_s2d %>%  
-  mutate(Date = as.Date(Date)) %>% 
+  dplyr::mutate(Date = as.Date(Date)) %>% 
   union(team_bullpen_s2d_today)
 write.csv(pitchers_s2d_update, paste0("Baseball Machine/Daily Files/",season,"/pitchers_s2d_",season,".csv"), row.names = FALSE)
 write.csv(team_batting_L7_update, paste0("Baseball Machine/Daily Files/",season,"/team_batting_L7_",season,".csv"), row.names = FALSE)
@@ -318,7 +318,7 @@ write.csv(team_bullpen_L30_update, paste0("Baseball Machine/Daily Files/",season
 write.csv(team_bullpen_s2d_update, paste0("Baseball Machine/Daily Files/",season,"/team_bullpen_s2d_",season,".csv"), row.names = FALSE)
 
 pks_update <- game_pks %>% 
-  mutate(season = as.character(season),
+  dplyr::mutate(season = as.character(season),
          seasonDisplay = as.character(seasonDisplay),
          status.codedGameState = as.character(status.codedGameState),
          status.statusCode = as.character(status.statusCode),
@@ -327,7 +327,7 @@ pks_update <- game_pks %>%
          teams.home.leagueRecord.pct = as.character(teams.home.leagueRecord.pct)) %>% 
   bind_rows(pks)
 scores_update <- game_scores %>% 
-  mutate(home_team_id = as.character(home_team_id),
+  dplyr::mutate(home_team_id = as.character(home_team_id),
          away_team_id = as.character(away_team_id),
          home_team_season = as.character(home_team_season),
          home_team_venue_id = as.character(home_team_venue_id),
@@ -388,7 +388,7 @@ results <- scores_update %>%
   filter(!is.na(num)) %>% 
   replace(is.na(.),0) %>% 
   group_by(game_pk) %>% 
-  mutate(home_runs = cumsum(home_runs),
+  dplyr::mutate(home_runs = cumsum(home_runs),
          home_hits = cumsum(home_hits),
          home_errors = cumsum(home_errors),
          away_runs = cumsum(away_runs),
@@ -429,7 +429,7 @@ daily_team_batting <- daily_team_batting %>%
   left_join(team_names %>% 
               select(Full.Name22, BR),
             by = c("Team" = "BR")) %>% 
-  mutate(Team = Full.Name22) %>% 
+  dplyr::mutate(Team = Full.Name22) %>% 
   select(-Full.Name22)
 
 team_bullpen_L7_today$Date <- as.Date(team_bullpen_L7_today$Date)
@@ -450,7 +450,7 @@ daily_team_bullpen <- daily_team_bullpen %>%
   left_join(team_names %>% 
               select(Full.Name22, BR),
             by = c("Team" = "BR")) %>% 
-  mutate(Team = Full.Name22) %>% 
+  dplyr::mutate(Team = Full.Name22) %>% 
   select(-Full.Name22)
 
 pitchers_s2d_today$Date <- as.Date(pitchers_s2d_today$Date)
@@ -463,7 +463,7 @@ dupe_SPs_today <- pitchers_s2d_today %>%
 dupe_SPs_today$Name
 daily_pitchers <- pitchers_s2d_today %>% 
   select(-contains('url')) %>% 
-  mutate(Name = case_when(Name == "Luis Garcia" & Team == "HOU" ~ "Luis Garcia (HOU)",
+  dplyr::mutate(Name = case_when(Name == "Luis Garcia" & Team == "HOU" ~ "Luis Garcia (HOU)",
                           # Name == "Luis Castillo" & Team == "DET" ~ "Luis Castillo (DET)",
                           # Name == "Luis Ortiz" & Team == "SFG" ~ "Luis Ortiz (SFG)",
                           # Name == "Hyun-Jin Ryu" ~ "Hyun Jin Ryu",
@@ -471,10 +471,10 @@ daily_pitchers <- pitchers_s2d_today %>%
 
 PECOTA_pitching_23 <- readxl::read_xlsx(paste0("Baseball Machine/PECOTA/",season,"/pecota2023_pitching_mar29.xlsx"), sheet = "50") %>% 
   select(mlbid, name, ip, warp) %>% 
-  mutate(WARP200 = (warp/ip)*200)
+  dplyr::mutate(WARP200 = (warp/ip)*200)
 PECOTA_hitting_23 <- readxl::read_xlsx(paste0("Baseball Machine/PECOTA/",season,"/pecota2023_hitting_mar29.xlsx"), sheet = "50") %>% 
   select(mlbid, name, pa, warp) %>% 
-  mutate(WARP600 = (as.numeric(warp)/as.numeric(pa))*600)
+  dplyr::mutate(WARP600 = (as.numeric(warp)/as.numeric(pa))*600)
 
 upcoming_games_today <- bovada_odds %>% 
   filter(gamedate == Sys.Date()) %>% 
@@ -486,12 +486,12 @@ upcoming_games_today <- bovada_odds %>%
   left_join(probables %>% 
               bind_rows(tmrw_probables) %>% 
               select(game_date, fullName, id, team) %>% 
-              mutate(game_date = as.Date(game_date)),
+              dplyr::mutate(game_date = as.Date(game_date)),
             by = c("AwayTeam" = "team", "gamedate" = "game_date")) %>% 
   left_join(probables %>% 
               bind_rows(tmrw_probables) %>% 
               select(game_date, fullName, id, team) %>%
-              mutate(game_date = as.Date(game_date)),
+              dplyr::mutate(game_date = as.Date(game_date)),
           by = c("HomeTeam" = "team", "gamedate" = "game_date"),
           suffix = c("_AwaySP", "_HomeSP")) %>% 
   left_join(PECOTA_pitching_23 %>% 
@@ -514,7 +514,7 @@ upcoming_games_today <- bovada_odds %>%
                         by = c("team_id" = "id")) %>% 
               ungroup() %>% 
               select(-team_id) %>% 
-              mutate(date = as.Date(date)),
+              dplyr::mutate(date = as.Date(date)),
             by = c("gamedate" = "date",
                    "HomeTeam" = "Full.Name22")) %>% 
   left_join(rosters_update %>% 
@@ -530,7 +530,7 @@ upcoming_games_today <- bovada_odds %>%
                         by = c("team_id" = "id")) %>% 
               ungroup() %>% 
               select(-team_id) %>% 
-              mutate(date = as.Date(date)),
+              dplyr::mutate(date = as.Date(date)),
             by = c("gamedate" = "date",
                    "AwayTeam" = "Full.Name22"),
             suffix = c("_HomeBatters", "_AwayBatters")) %>% 
@@ -543,9 +543,9 @@ upcoming_games_today <- bovada_odds %>%
   left_join(daily_team_bullpen, by = c("gamedate" = "Date", "AwayTeam" = "Team"), suffix = c("_HomeBullpen", "_AwayBullpen")) %>% 
   dplyr::rename(AwaySP_fullName = fullName_AwaySP,
                 HomeSP_fullName = fullName_HomeSP) %>% 
-  mutate(WARP200_HomeSP = case_when(!is.nan(WARP200_HomeSP) ~ WARP200_HomeSP),
+  dplyr::mutate(WARP200_HomeSP = case_when(!is.nan(WARP200_HomeSP) ~ WARP200_HomeSP),
          WARP200_AwaySP = case_when(!is.nan(WARP200_AwaySP) ~ WARP200_AwaySP)) %>% 
-  mutate(IP_AwaySP = as.integer(IP_AwaySP) + (IP_AwaySP %% 1 * 3.33),
+  dplyr::mutate(IP_AwaySP = as.integer(IP_AwaySP) + (IP_AwaySP %% 1 * 3.33),
          Start.IP_AwaySP = as.integer(Start.IP_AwaySP) + (Start.IP_AwaySP %% 1 * 3.33),
          Relief.IP_AwaySP = as.integer(Relief.IP_AwaySP) + (Relief.IP_AwaySP %% 1 * 3.33),
          IP_HomeSP = as.integer(IP_HomeSP) + (IP_HomeSP %% 1 * 3.33),
@@ -559,7 +559,7 @@ upcoming_games_today <- bovada_odds %>%
          IP_L14_HomeBullpen = as.integer(IP_L14_HomeBullpen) + (IP_L14_HomeBullpen %% 1 * 3.33),
          IP_L30_HomeBullpen = as.integer(IP_L30_HomeBullpen) + (IP_L30_HomeBullpen %% 1 * 3.33),
          IP_HomeBullpen = as.integer(IP_HomeBullpen) + (IP_HomeBullpen %% 1 * 3.33)) %>% 
-  mutate(WAR200_AwaySP = (WAR_AwaySP / IP_AwaySP) * 200,
+  dplyr::mutate(WAR200_AwaySP = (WAR_AwaySP / IP_AwaySP) * 200,
          WAR200_HomeSP = (WAR_HomeSP / IP_HomeSP) * 200,
          HR_L7_AwayBatters = (HR_L7_AwayBatters / PA_L7_AwayBatters) * 500,
          SB_L7_AwayBatters = (SB_L7_AwayBatters / PA_L7_AwayBatters) * 500,
@@ -621,14 +621,14 @@ upcoming_games_today <- bovada_odds %>%
          IPperG_AwaySP = IP_AwaySP / G_AwaySP,
          IPperStart_HomeSP = Start.IP_HomeSP / GS_HomeSP,
          IPperG_HomeSP = IP_HomeSP / G_HomeSP) %>% 
-  mutate(month = lubridate::month(gamedate, label = TRUE, abbr = FALSE),
+  dplyr::mutate(month = lubridate::month(gamedate, label = TRUE, abbr = FALSE),
          doubleHeader = case_when(doubleHeader == 'S' ~ 'Y',
                                   TRUE ~ doubleHeader)) %>% 
-  mutate(home_team_season = as.numeric(home_team_season))
+  dplyr::mutate(home_team_season = as.numeric(home_team_season))
 
 upcoming_games_tomorrow <- bovada_odds %>% 
   filter(gamedate == Sys.Date()+1) %>% 
-  mutate(yesterday_date = gamedate - 1) %>% 
+  dplyr::mutate(yesterday_date = gamedate - 1) %>% 
   left_join(todays_games %>% 
               bind_rows(tmrw_games),
             by = c("AwayTeam" = "away_team_name",
@@ -637,12 +637,12 @@ upcoming_games_tomorrow <- bovada_odds %>%
   left_join(probables %>% 
               bind_rows(tmrw_probables) %>% 
               select(game_date, fullName, id, team) %>% 
-              mutate(game_date = as.Date(game_date)),
+              dplyr::mutate(game_date = as.Date(game_date)),
             by = c("AwayTeam" = "team", "gamedate" = "game_date")) %>% 
   left_join(probables %>% 
               bind_rows(tmrw_probables) %>% 
               select(game_date, fullName, id, team) %>%
-              mutate(game_date = as.Date(game_date)),
+              dplyr::mutate(game_date = as.Date(game_date)),
             by = c("HomeTeam" = "team", "gamedate" = "game_date"),
             suffix = c("_AwaySP", "_HomeSP")) %>% 
   left_join(PECOTA_pitching_23 %>% 
@@ -665,7 +665,7 @@ upcoming_games_tomorrow <- bovada_odds %>%
                         by = c("team_id" = "id")) %>% 
               ungroup() %>% 
               select(-team_id) %>% 
-              mutate(date = as.Date(date)),
+              dplyr::mutate(date = as.Date(date)),
             by = c("gamedate" = "date",
                    "HomeTeam" = "Full.Name22")) %>% 
   left_join(rosters_update %>% 
@@ -681,7 +681,7 @@ upcoming_games_tomorrow <- bovada_odds %>%
                         by = c("team_id" = "id")) %>% 
               ungroup() %>% 
               select(-team_id) %>% 
-              mutate(date = as.Date(date)),
+              dplyr::mutate(date = as.Date(date)),
             by = c("gamedate" = "date",
                    "AwayTeam" = "Full.Name22"),
             suffix = c("_HomeBatters", "_AwayBatters")) %>% 
@@ -694,9 +694,9 @@ upcoming_games_tomorrow <- bovada_odds %>%
   left_join(daily_team_bullpen, by = c("yesterday_date" = "Date", "AwayTeam" = "Team"), suffix = c("_HomeBullpen", "_AwayBullpen")) %>% 
   dplyr::rename(AwaySP_fullName = fullName_AwaySP,
                 HomeSP_fullName = fullName_HomeSP) %>% 
-  mutate(WARP200_HomeSP = case_when(!is.nan(WARP200_HomeSP) ~ WARP200_HomeSP),
+  dplyr::mutate(WARP200_HomeSP = case_when(!is.nan(WARP200_HomeSP) ~ WARP200_HomeSP),
          WARP200_AwaySP = case_when(!is.nan(WARP200_AwaySP) ~ WARP200_AwaySP)) %>% 
-  mutate(IP_AwaySP = as.integer(IP_AwaySP) + (IP_AwaySP %% 1 * 3.33),
+  dplyr::mutate(IP_AwaySP = as.integer(IP_AwaySP) + (IP_AwaySP %% 1 * 3.33),
          Start.IP_AwaySP = as.integer(Start.IP_AwaySP) + (Start.IP_AwaySP %% 1 * 3.33),
          Relief.IP_AwaySP = as.integer(Relief.IP_AwaySP) + (Relief.IP_AwaySP %% 1 * 3.33),
          IP_HomeSP = as.integer(IP_HomeSP) + (IP_HomeSP %% 1 * 3.33),
@@ -710,7 +710,7 @@ upcoming_games_tomorrow <- bovada_odds %>%
          IP_L14_HomeBullpen = as.integer(IP_L14_HomeBullpen) + (IP_L14_HomeBullpen %% 1 * 3.33),
          IP_L30_HomeBullpen = as.integer(IP_L30_HomeBullpen) + (IP_L30_HomeBullpen %% 1 * 3.33),
          IP_HomeBullpen = as.integer(IP_HomeBullpen) + (IP_HomeBullpen %% 1 * 3.33)) %>% 
-  mutate(WAR200_AwaySP = (WAR_AwaySP / IP_AwaySP) * 200,
+  dplyr::mutate(WAR200_AwaySP = (WAR_AwaySP / IP_AwaySP) * 200,
          WAR200_HomeSP = (WAR_HomeSP / IP_HomeSP) * 200,
          HR_L7_AwayBatters = (HR_L7_AwayBatters / PA_L7_AwayBatters) * 500,
          SB_L7_AwayBatters = (SB_L7_AwayBatters / PA_L7_AwayBatters) * 500,
@@ -772,10 +772,10 @@ upcoming_games_tomorrow <- bovada_odds %>%
          IPperG_AwaySP = IP_AwaySP / G_AwaySP,
          IPperStart_HomeSP = Start.IP_HomeSP / GS_HomeSP,
          IPperG_HomeSP = IP_HomeSP / G_HomeSP) %>% 
-  mutate(month = lubridate::month(gamedate, label = TRUE, abbr = FALSE),
+  dplyr::mutate(month = lubridate::month(gamedate, label = TRUE, abbr = FALSE),
          doubleHeader = case_when(doubleHeader == 'S' ~ 'Y',
                                   TRUE ~ doubleHeader)) %>% 
-  mutate(home_team_season = as.numeric(home_team_season))
+  dplyr::mutate(home_team_season = as.numeric(home_team_season))
 
 upcoming_games <- upcoming_games_today %>% 
   bind_rows(upcoming_games_tomorrow)
@@ -791,7 +791,7 @@ pred_data_home <- upcoming_games %>%
   rename_all(~gsub("home_","",.)) %>% 
   rename_all(~gsub("_Home","",.)) %>% 
   rename_all(~gsub("_Away","",.)) %>% 
-  mutate(home_or_away = 'Home')
+  dplyr::mutate(home_or_away = 'Home')
 
 pred_data_away <- upcoming_games %>% 
   ungroup() %>% 
@@ -805,7 +805,7 @@ pred_data_away <- upcoming_games %>%
   rename_all(~gsub("away_","",.)) %>% 
   rename_all(~gsub("_Home","",.)) %>% 
   rename_all(~gsub("_Away","",.)) %>% 
-  mutate(home_or_away = 'Away')
+  dplyr::mutate(home_or_away = 'Away')
   
 pred_data <- pred_data_home %>% 
   bind_rows(pred_data_away) %>% 
@@ -816,7 +816,7 @@ pred_data <- pred_data_home %>%
            !is.na(IPBullpen)) %>% 
   replace(is.na(.), 0) %>% 
   distinct() %>% 
-  mutate(Team = case_when(home_or_away == "Home" ~ HomeTeam,
+  dplyr::mutate(Team = case_when(home_or_away == "Home" ~ HomeTeam,
                           TRUE ~ AwayTeam),
          Opponent = case_when(home_or_away == "Away" ~ HomeTeam,
                               TRUE ~ AwayTeam))
@@ -880,7 +880,7 @@ singles$pF1_TT_0.5_gbm <- predict(F1_TT_0.5_gbm, pred_data, type = "prob")
 singles$pF1_TT_0.5_pls <- predict(F1_TT_0.5_pls, pred_data, type = "prob")
 singles$pF1_TT_0.5_xgb <- predict(F1_TT_0.5_xgb, pred_data, type = "prob")
 singles <- singles %>% 
-  mutate(pR_FG = (pR_FG_gbm + pR_FG_cub + pR_FG_rf + pR_FG_pls) / 4,
+  dplyr::mutate(pR_FG = (pR_FG_gbm + pR_FG_cub + pR_FG_rf + pR_FG_pls) / 4,
          pR_F5 = (pR_F5_gbm + pR_F5_cub + pR_F5_rf + pR_F5_pls) / 4,
          pR_F1 = (pR_F1_gbm + pR_F1_cub + pR_F1_rf + pR_F1_pls) / 4,
          pFG_TT_2.5 = (pFG_TT_2.5_gbm + pFG_TT_2.5_pls + pFG_TT_2.5_xgb) / 3,
@@ -1011,7 +1011,7 @@ doubles$pF1_Total_0.5_gbm <- predict(F1_Total_0.5_gbm, metrics_df, type = "prob"
 doubles$pF1_Total_0.5_pls <- predict(F1_Total_0.5_pls, metrics_df, type = "prob")
 doubles$pF1_Total_0.5_xgb <- predict(F1_Total_0.5_xgb, metrics_df, type = "prob")
 doubles <- doubles %>% 
-  mutate(pFG_ML = (pFG_ML_gbm + pFG_ML_pls + pFG_ML_xgb) / 3,
+  dplyr::mutate(pFG_ML = (pFG_ML_gbm + pFG_ML_pls + pFG_ML_xgb) / 3,
          pFG_Minus_1.5 = (pFG_Minus_1.5_gbm + pFG_Minus_1.5_pls + pFG_Minus_1.5_xgb) / 3,
          pFG_Minus_2.5 = (pFG_Minus_2.5_gbm + pFG_Minus_2.5_pls + pFG_Minus_2.5_xgb) / 3,
          pFG_Plus_1.5 = (pFG_Plus_1.5_gbm + pFG_Plus_1.5_pls + pFG_Plus_1.5_xgb) / 3,
@@ -1048,12 +1048,14 @@ FinalPreds <- doubles2 %>%
                    "HomeTeam" = "HomeTeam_Home", 
                    "AwayStartingPitcher", "HomeStartingPitcher"))
 
+#### Predictions ####
+
 upcoming_df <- upcoming_games %>% 
   select(gamedate:HomeStartingPitcher, AwaySP_fullName, HomeSP_fullName, bet_type:HUN.SpreadTotal) %>% 
   left_join(FinalPreds)
 
 bets <- upcoming_df %>% 
-  mutate(AOY_ImpliedOdds = if_else(AOY.Odds > 0, 100 / (AOY.Odds + 100), abs(AOY.Odds) / (abs(AOY.Odds) + 100)),
+  dplyr::mutate(AOY_ImpliedOdds = if_else(AOY.Odds > 0, 100 / (AOY.Odds + 100), abs(AOY.Odds) / (abs(AOY.Odds) + 100)),
          HUN_ImpliedOdds = if_else(HUN.Odds > 0, 100 / (HUN.Odds + 100), abs(HUN.Odds) / (abs(HUN.Odds) + 100))) %>% 
   dplyr::rename(Home_pred_FG = pR_FG_Home,
          Away_pred_FG = pR_FG_Away,
@@ -1688,7 +1690,7 @@ bets3 <- bets2 %>%
 
 write.csv(bets3, "Baseball Machine/v3.0/upcoming_bets.csv", row.names = FALSE, na = "")
 
-## Analyze performance
+#### Analyze Performance ####
 
 history <- readRDS("Baseball Machine/v3.0/PicksHistory.rds") %>% 
   bind_rows(bets3) %>% 
@@ -1696,9 +1698,171 @@ history <- readRDS("Baseball Machine/v3.0/PicksHistory.rds") %>%
 
 saveRDS(history, "Baseball Machine/v3.0/PicksHistory.rds")
 
+history2 <- history %>% 
+  inner_join(results %>% 
+               filter(doubleHeader == 'N') %>% 
+               mutate(officialDate = as.Date(officialDate)),
+             by = c("gamedate" = "officialDate",
+                    "AwayTeam" = "away_team_name",
+                    "HomeTeam" = "home_team_name")) %>% 
+  dplyr::mutate(Winner = case_when(bet_type == 'FG ML' ~ 
+                              case_when(away_runs_final > home_runs_final ~ AwayTeam,
+                                        TRUE ~ HomeTeam),
+                            bet_type == 'F5 ML' ~
+                              case_when(away_runs_5th > home_runs_5th ~ AwayTeam,
+                                        away_runs_5th == home_runs_5th ~ "Push",
+                                        TRUE ~ HomeTeam),
+                            bet_type %in% c('FG RL', 'FG Alt RL') ~ 
+                              case_when(Pick == AwayTeam ~ 
+                                          case_when(away_runs_final + Pick_SpreadTotal > home_runs_final ~ AwayTeam,
+                                                    away_runs_final + Pick_SpreadTotal == home_runs_final ~ "Push",
+                                                    TRUE ~ HomeTeam),
+                                        Pick == HomeTeam ~ 
+                                          case_when(home_runs_final + Pick_SpreadTotal > away_runs_final ~ HomeTeam,
+                                                    home_runs_final + Pick_SpreadTotal == away_runs_final ~ "Push",
+                                                    TRUE ~ AwayTeam)),
+                            bet_type %in% c('F5 RL', 'F5 Alt RL') ~ 
+                              case_when(Pick == AwayTeam ~ 
+                                          case_when(away_runs_5th + Pick_SpreadTotal > home_runs_5th ~ AwayTeam,
+                                                    away_runs_5th + Pick_SpreadTotal == home_runs_5th ~ "Push",
+                                                    TRUE ~ HomeTeam),
+                                        Pick == HomeTeam ~ 
+                                          case_when(home_runs_5th + Pick_SpreadTotal > away_runs_5th ~ HomeTeam,
+                                                    home_runs_5th + Pick_SpreadTotal == away_runs_5th ~ "Push",
+                                                    TRUE ~ AwayTeam)),
+                            bet_type %in% c('FG Total', 'FG Alt Total') ~
+                              case_when(away_runs_final + home_runs_final > Pick_SpreadTotal ~ "Over",
+                                        away_runs_final + home_runs_final == Pick_SpreadTotal ~ "Push",
+                                        TRUE ~ "Under"),
+                            bet_type %in% c('F5 Total', 'F5 Alt Total') ~
+                              case_when(away_runs_5th + home_runs_5th > Pick_SpreadTotal ~ "Over",
+                                        away_runs_5th + home_runs_5th == Pick_SpreadTotal ~ "Push",
+                                        TRUE ~ "Under"),
+                            bet_type %in% c('FG TT', 'FG Alt TT') ~
+                              case_when(str_detect(bet_type_full, AwayTeam) ~ 
+                                          case_when(away_runs_final > Pick_SpreadTotal ~ "Over",
+                                                    away_runs_final == Pick_SpreadTotal ~ "Push",
+                                                    TRUE ~ "Under"),
+                                        str_detect(bet_type_full, HomeTeam) ~ 
+                                          case_when(home_runs_final > Pick_SpreadTotal ~ "Over",
+                                                    home_runs_final == Pick_SpreadTotal ~ "Push",
+                                                    TRUE ~ "Under")),
+                            bet_type %in% c('F5 TT', 'F5 Alt TT') ~
+                              case_when(str_detect(bet_type_full, AwayTeam) ~ 
+                                          case_when(away_runs_5th > Pick_SpreadTotal ~ "Over",
+                                                    away_runs_5th == Pick_SpreadTotal ~ "Push",
+                                                    TRUE ~ "Under"),
+                                        str_detect(bet_type_full, HomeTeam) ~ 
+                                          case_when(home_runs_5th > Pick_SpreadTotal ~ "Over",
+                                                    home_runs_5th == Pick_SpreadTotal ~ "Push",
+                                                    TRUE ~ "Under")),
+                            bet_type == 'RFI' ~
+                              case_when(away_runs_1st + home_runs_1st > 0 ~ "Yes",
+                                        TRUE ~ "No"),
+                            bet_type == 'Team RFI' ~
+                              case_when(str_detect(bet_type_full, AwayTeam) ~
+                                          case_when(away_runs_1st > 0 ~ "Yes",
+                                                    TRUE ~ "No"),
+                                        str_detect(bet_type_full, HomeTeam) ~
+                                          case_when(home_runs_1st > 0 ~ "Yes",
+                                                    TRUE ~ "No"))),
+                Pick_Correct = if_else(Winner == Pick, 1, 0),
+                Units = if_else(Pick_Correct == 1, Fract_Odds, -1),
+                Kelly_Bet = Kelly_Criteria * 100,
+                Kelly_Profit = Units * Kelly_Bet) %>%
+  arrange(desc(run_timestamp)) %>%
+  group_by(gamedate, AwayTeam, HomeTeam, bet_type_full, OddsType) %>%
+  dplyr::mutate(partition = row_number()) %>% 
+  select(-(game_pk:away_errors_final))
+
+saveRDS(history2, "Baseball Machine/v3.0/PicksHistory_Outcomes.rds")
+
+types <- history2 %>%
+  ungroup() %>% 
+  filter(Winner != "Push" &
+           Kelly_Criteria > 0 &
+           Pick_Odds >= -200 &
+           Pick_WinProb >= 0.3 &
+           partition == 1 &
+           OddsType == 'Day Of') %>% 
+  select(gamedate, AwayTeam, HomeTeam, bet_type, Pick_Odds, Pick_WinProb, Pick_LoseProb, Fract_Odds,
+         Kelly_Criteria, EV, KC_tier, Pick_Correct, Units, Kelly_Bet, Kelly_Profit, run_timestamp) %>% 
+  dplyr::mutate(WinProb_tier = round_any(Pick_WinProb, 0.05, floor),
+                Odds_tier = round_any(Pick_Odds, 10, floor),
+                EV_tier = round_any(EV, 1, floor),
+                bets = as.integer(1))
+
+grades <- types %>%
+  arrange(gamedate, AwayTeam, HomeTeam, desc(Kelly_Criteria)) %>% 
+  group_by(gamedate, AwayTeam, HomeTeam) %>% 
+  dplyr::mutate(KC_Rank = row_number()) %>% 
+  arrange(gamedate, AwayTeam, HomeTeam, desc(EV)) %>% 
+  group_by(gamedate, AwayTeam, HomeTeam) %>% 
+  dplyr::mutate(EV_Rank = row_number(),
+                Rank = (KC_Rank + EV_Rank) / 2) %>% 
+  arrange(gamedate, gamedate, AwayTeam, HomeTeam, Rank) %>% 
+  dplyr::mutate(Final_Rank = row_number()) %>% 
+  filter(Final_Rank == 1) %>% 
+  ungroup()
+
+#### Final Email Tables ####
+
+email_table_1 <- grades %>% 
+  group_by(KC_tier = as.numeric(as.character(KC_tier))) %>%
+  dplyr::summarise(`Hit Rate` = mean(Pick_Correct),
+                   `Average Implied Odds` = mean(if_else(Pick_Odds > 0, 100 / (Pick_Odds + 100), abs(Pick_Odds) / (abs(Pick_Odds) + 100))),
+                   `Average Odds` = if_else(`Average Implied Odds` < 0.5,
+                                            (100 / `Average Implied Odds`) - 100,
+                                            -1 * (100 * `Average Implied Odds`) / (1 - `Average Implied Odds`)),
+                   Bets = sum(bets),
+                   `Profit: 1 Unit Wagers` = sum(Units),
+                   `Profit: Suggested Wagers` = sum(Kelly_Profit)) %>% 
+  dplyr::mutate(ROI = `Profit: 1 Unit Wagers` / Bets) %>% 
+  print()
+
+df_html_1 <- print(xtable(email_table_1), type = "html", print.results = FALSE)
+
+email_table_2 <- grades %>% 
+  group_by(EV_tier = as.numeric(as.character(EV_tier))) %>%
+  dplyr::summarise(`Hit Rate` = mean(Pick_Correct),
+                   `Average Implied Odds` = mean(if_else(Pick_Odds > 0, 100 / (Pick_Odds + 100), abs(Pick_Odds) / (abs(Pick_Odds) + 100))),
+                   `Average Odds` = if_else(`Average Implied Odds` < 0.5,
+                                            (100 / `Average Implied Odds`) - 100,
+                                            -1 * (100 * `Average Implied Odds`) / (1 - `Average Implied Odds`)),
+                   Bets = sum(bets),
+                   `Profit: 1 Unit Wagers` = sum(Units),
+                   `Profit: Suggested Wagers` = sum(Kelly_Profit)) %>% 
+  dplyr::mutate(ROI = `Profit: 1 Unit Wagers` / Bets) %>% 
+  print()
+
+df_html_2 <- print(xtable(email_table_2), type = "html", print.results = FALSE)
+
+plot_data <- grades %>% 
+  select(gamedate, Units, Kelly_Profit) %>% 
+  dplyr::rename(`Profit: 1 Unit Wagers` = Units,
+         `Profit: Suggested Wagers` = Kelly_Profit) %>% 
+  melt("gamedate", c("Profit: 1 Unit Wagers", "Profit: Suggested Wagers")) %>% 
+  group_by(gamedate, variable) %>% 
+  dplyr::summarise(value = sum(value)) %>% 
+  group_by(variable) %>% 
+  dplyr::mutate(cumulative_value = cumsum(value))
+
+plot <- ggplot(plot_data1) +
+  aes(x = gamedate, y = cumulative_value, colour = variable) +
+  geom_line() +
+  theme_minimal() +
+  labs(
+    x = "Game Date",
+    y = "Cumulative Profit (Units)",
+    color = ""
+  ) +
+  theme(legend.position = "bottom")
+
+plot_html <- blastula::add_ggplot(plot_object = plot)
+
 bets_table <- bets3 %>% 
   filter(Kelly_Criteria > 0 &
-           Pick_Odds > -200 &
+           Pick_Odds >= -200 &
            Pick_WinProb > 0.3 &
            gamedate == Sys.Date()) %>% 
   arrange(gamedate, AwayTeam, HomeTeam, AwayStartingPitcher, HomeStartingPitcher, desc(Kelly_Criteria)) %>% 
@@ -1719,7 +1883,7 @@ bets_table <- bets3 %>%
                           str_detect(bet_type_full, AwayTeam) ~ paste0(AwayTeam, " ", Pick, " ", Pick_SpreadTotal),
                           TRUE ~ paste0(Pick, " ", Pick_SpreadTotal))) %>% 
   select(gamedate, AwayTeam, HomeTeam, bet_type_full, Pick, Pick_Odds, Machine_Odds, KC_tier, EV_tier) %>% 
-  mutate(gamedate = as.character(gamedate)) %>% 
+  dplyr::mutate(gamedate = as.character(gamedate)) %>% 
   dplyr::rename(`Game Date` = gamedate,
          `Home Team` = HomeTeam,
          `Away Team` = AwayTeam,
@@ -1728,7 +1892,7 @@ bets_table <- bets3 %>%
          `Odds Should Be` = Machine_Odds,
          KC = KC_tier,
          EV = EV_tier) %>% 
-  mutate(`Current Pick Odds` = as.integer(`Current Pick Odds`),
+  dplyr::mutate(`Current Pick Odds` = as.integer(`Current Pick Odds`),
          `Odds Should Be` = as.integer(`Odds Should Be`),
          EV = as.integer(EV))
 
@@ -1756,13 +1920,25 @@ Email = Outlook$CreateItem(0)
 Email[["to"]] = "dnolen@smu.edu"
 Email[["subject"]] = paste0("Baseball Machine Picks: ", Sys.Date())
 Email[["HTMLbody"]] = sprintf("
-The Basebal Machine is now up and running! Below are the top picks for each game today, along with the predicted team totals for each team. Good luck!
+The Basebal Machine is now up and running! The Machine will suggest one bet per game to start off the season. We will refine our approach as we see how The Machine performs. Here are the results so far grouped by Kelly Criteria tier:
+</p><br></p>
+%s
+</p><br></p>
+And again by Expected Value tier:
+</p><br></p>
+%s
+</p><br></p>
+Below are the top picks for each game today, along with the predicted team totals for each team. Good luck!
 </p><br></p>
 %s
 </p><br></p>
 %s
 </p><br></p>
-", df_html_bets, itts_html)
+Below are the historical results for both a flat betting strategy (1 unit wagers), and the suggested wager sizes (Kelly Criteria):
+</p><br></p>
+%s
+</p><br></p>
+", df_html_1, df_html_2, df_html_bets, itts_html, plot_html)
 Email[["attachments"]]$Add("C:/Users/danie/Desktop/SportsStuff/TheMachine/the-machine/Baseball Machine/v3.0/upcoming_bets.csv")
 
 Email$Send()
