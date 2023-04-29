@@ -307,15 +307,6 @@ team_bullpen_L30_update <- team_bullpen_L30 %>%
 team_bullpen_s2d_update <- team_bullpen_s2d %>%  
   dplyr::mutate(Date = as.Date(Date)) %>% 
   union(team_bullpen_s2d_today)
-write.csv(pitchers_s2d_update, paste0("Baseball Machine/Daily Files/",season,"/pitchers_s2d_",season,".csv"), row.names = FALSE)
-write.csv(team_batting_L7_update, paste0("Baseball Machine/Daily Files/",season,"/team_batting_L7_",season,".csv"), row.names = FALSE)
-write.csv(team_batting_L14_update, paste0("Baseball Machine/Daily Files/",season,"/team_batting_L14_",season,".csv"), row.names = FALSE)
-write.csv(team_batting_L30_update, paste0("Baseball Machine/Daily Files/",season,"/team_batting_L30_",season,".csv"), row.names = FALSE)
-write.csv(team_batting_s2d_update, paste0("Baseball Machine/Daily Files/",season,"/team_batting_s2d_",season,".csv"), row.names = FALSE)
-write.csv(team_bullpen_L7_update, paste0("Baseball Machine/Daily Files/",season,"/team_bullpen_L7_",season,".csv"), row.names = FALSE)
-write.csv(team_bullpen_L14_update, paste0("Baseball Machine/Daily Files/",season,"/team_bullpen_L14_",season,".csv"), row.names = FALSE)
-write.csv(team_bullpen_L30_update, paste0("Baseball Machine/Daily Files/",season,"/team_bullpen_L30_",season,".csv"), row.names = FALSE)
-write.csv(team_bullpen_s2d_update, paste0("Baseball Machine/Daily Files/",season,"/team_bullpen_s2d_",season,".csv"), row.names = FALSE)
 
 pks_update <- game_pks %>% 
   dplyr::mutate(season = as.character(season),
@@ -362,16 +353,11 @@ scores_update <- game_scores %>%
          away_team_record_winning_percentage = as.character(away_team_record_winning_percentage),
          away_team_active = as.character(away_team_active)) %>% 
   bind_rows(scores)
-write.csv(pks_update, paste0("Baseball Machine/Daily Files/",season,"/game_pks_",season,".csv"), row.names = FALSE)
-write.csv(scores_update, paste0("Baseball Machine/Daily Files/",season,"/game_scores_",season,".csv"), row.names = FALSE)
 
 probables_update <- starting_pitchers %>% 
   union(probables)
 rosters_update <- daily_rosters %>% 
   union(rosters)
-write.csv(probables_update, paste0("Baseball Machine/Daily Files/",season,"/starting_pitchers_",season,".csv"), row.names = FALSE)
-write.csv(rosters_update, paste0("Baseball Machine/Daily Files/",season,"/daily_rosters_",season,".csv"), row.names = FALSE)
-
 
 #### Data Prep ####
 results <- scores_update %>% 
@@ -778,7 +764,9 @@ upcoming_games_tomorrow <- bovada_odds %>%
   dplyr::mutate(home_team_season = as.numeric(home_team_season))
 
 upcoming_games <- upcoming_games_today %>% 
-  bind_rows(upcoming_games_tomorrow)
+  bind_rows(upcoming_games_tomorrow) %>% 
+  filter(venue.name != 'Estadio Alfredo Harp Helu' &
+           doubleHeader == 'N')
 
 pred_data_home <- upcoming_games %>% 
   ungroup() %>% 
@@ -1054,7 +1042,13 @@ upcoming_df <- upcoming_games %>%
   select(gamedate:HomeStartingPitcher, AwaySP_fullName, HomeSP_fullName, bet_type:HUN.SpreadTotal) %>% 
   left_join(FinalPreds)
 
+mismatched_pitchers <- upcoming_df %>% 
+  filter(trimws(tolower(AwayStartingPitcher)) != trimws(tolower(AwaySP_fullName)) |
+           trimws(tolower(HomeStartingPitcher)) != trimws(tolower(HomeSP_fullName)))
+
 bets <- upcoming_df %>% 
+  filter(trimws(tolower(AwayStartingPitcher)) == trimws(tolower(AwaySP_fullName)) &
+           trimws(tolower(HomeStartingPitcher)) == trimws(tolower(HomeSP_fullName))) %>%
   dplyr::mutate(AOY_ImpliedOdds = if_else(AOY.Odds > 0, 100 / (AOY.Odds + 100), abs(AOY.Odds) / (abs(AOY.Odds) + 100)),
          HUN_ImpliedOdds = if_else(HUN.Odds > 0, 100 / (HUN.Odds + 100), abs(HUN.Odds) / (abs(HUN.Odds) + 100))) %>% 
   dplyr::rename(Home_pred_FG = pR_FG_Home,
@@ -1065,27 +1059,27 @@ bets <- upcoming_df %>%
          Away_pred_F1 = pR_F1_Away) %>% 
   dplyr::mutate(bet_type_full = bet_type,
          bet_type = case_when(bet_type_full == "Moneyline - Game" ~ "FG ML",
-                              bet_type_full == "Moneyline - 5 Inning Line" ~ "F5 ML",
+                              bet_type_full == "Moneyline - First 5 Innings" ~ "F5 ML",
                               bet_type_full == "Runline - Game" ~ "FG RL",
-                              bet_type_full == "Runline - 5 Inning Line" ~ "F5 RL",
+                              bet_type_full == "Runline - First 5 Innings" ~ "F5 RL",
                               bet_type_full == "Total - Game" ~ "FG Total",
-                              bet_type_full == "Total - 5 Inning Line" ~ "F5 Total",
+                              bet_type_full == "Total - First 5 Innings" ~ "F5 Total",
                               bet_type_full == "Will there be a run scored in the 1st inning - Game" ~ "RFI",
                               bet_type_full == "Alternate Runline - Game - 1.5" ~ "FG Alt RL",
                               bet_type_full == "Alternate Runline - Game - 2.5" ~ "FG Alt RL",
-                              bet_type_full == "Alternate Runline - 5 Inning Line - 0.5" ~ "F5 Alt RL",
-                              bet_type_full == "Alternate Runline - 5 Inning Line - 1.5" ~ "F5 Alt RL",
+                              bet_type_full == "Alternate Runline - First 5 Innings - 0.5" ~ "F5 Alt RL",
+                              bet_type_full == "Alternate Runline - First 5 Innings - 1.5" ~ "F5 Alt RL",
                               str_detect(bet_type_full, "Alternate Total - Game") ~ "FG Alt Total",
-                              str_detect(bet_type_full, "Alternate Total - 5 Inning Line") ~ "F5 Alt Total",
+                              str_detect(bet_type_full, "Alternate Total - First 5 Innings") ~ "F5 Alt Total",
                               str_detect(bet_type_full, "To Score - 1st Inning") ~ "Team RFI",
                               str_detect(bet_type_full, "Team Total") & 
-                                str_detect(bet_type_full, "5 Inning Line") & 
+                                str_detect(bet_type_full, "First 5 Innings") & 
                                 (AOY.Odds <= -160 | HUN.Odds <= -160) ~ "F5 Alt TT",
                               str_detect(bet_type_full, "Team Total") & 
                                 str_detect(bet_type_full, "Game") &
                                 (AOY.Odds <= -160 | HUN.Odds <= -160) ~ "FG Alt TT",
                               str_detect(bet_type_full, "Team Total") & 
-                                str_detect(bet_type_full, "5 Inning Line") ~ "F5 TT",
+                                str_detect(bet_type_full, "First 5 Innings") ~ "F5 TT",
                               str_detect(bet_type_full, "Team Total") & 
                                 str_detect(bet_type_full, "Game") ~ "FG TT",
                               TRUE ~ "Other"))
@@ -1629,14 +1623,8 @@ bets2 <- bets %>%
                                             str_detect(bet_type_full, HomeTeam) &
                                             HUN.SpreadTotal == 3.5 ~ pF5_TT_3.5_Home$Under))
 
-mismatched_pitchers <- bets2 %>% 
-  filter(trimws(tolower(AwayStartingPitcher)) != trimws(tolower(AwaySP_fullName)) |
-           trimws(tolower(HomeStartingPitcher)) != trimws(tolower(HomeSP_fullName)))
-
 bets3 <- bets2 %>% 
-  filter(AwayStartingPitcher == AwaySP_fullName &
-           HomeStartingPitcher == HomeSP_fullName &
-           !is.na(AOY_ProjOdds2) &
+  filter(!is.na(AOY_ProjOdds2) &
            !is.na(HUN_ProjOdds2)) %>% 
   dplyr::mutate(AOY_ProjOdds = (AOY_ProjOdds1 + AOY_ProjOdds2) / 2,
          HUN_ProjOdds = (HUN_ProjOdds1 + HUN_ProjOdds2) / 2,
@@ -1861,7 +1849,7 @@ plot_data <- grades %>%
   group_by(variable) %>% 
   dplyr::mutate(cumulative_value = cumsum(value))
 
-plot <- ggplot(plot_data1) +
+plot <- ggplot(plot_data) +
   aes(x = gamedate, y = cumulative_value, colour = variable) +
   geom_line() +
   theme_minimal() +
@@ -1957,4 +1945,17 @@ Email[["attachments"]]$Add("C:/Users/danie/Desktop/SportsStuff/TheMachine/the-ma
 
 Email$Send()
 
+write.csv(pitchers_s2d_update, paste0("Baseball Machine/Daily Files/",season,"/pitchers_s2d_",season,".csv"), row.names = FALSE)
+write.csv(team_batting_L7_update, paste0("Baseball Machine/Daily Files/",season,"/team_batting_L7_",season,".csv"), row.names = FALSE)
+write.csv(team_batting_L14_update, paste0("Baseball Machine/Daily Files/",season,"/team_batting_L14_",season,".csv"), row.names = FALSE)
+write.csv(team_batting_L30_update, paste0("Baseball Machine/Daily Files/",season,"/team_batting_L30_",season,".csv"), row.names = FALSE)
+write.csv(team_batting_s2d_update, paste0("Baseball Machine/Daily Files/",season,"/team_batting_s2d_",season,".csv"), row.names = FALSE)
+write.csv(team_bullpen_L7_update, paste0("Baseball Machine/Daily Files/",season,"/team_bullpen_L7_",season,".csv"), row.names = FALSE)
+write.csv(team_bullpen_L14_update, paste0("Baseball Machine/Daily Files/",season,"/team_bullpen_L14_",season,".csv"), row.names = FALSE)
+write.csv(team_bullpen_L30_update, paste0("Baseball Machine/Daily Files/",season,"/team_bullpen_L30_",season,".csv"), row.names = FALSE)
+write.csv(team_bullpen_s2d_update, paste0("Baseball Machine/Daily Files/",season,"/team_bullpen_s2d_",season,".csv"), row.names = FALSE)
+write.csv(pks_update, paste0("Baseball Machine/Daily Files/",season,"/game_pks_",season,".csv"), row.names = FALSE)
+write.csv(scores_update, paste0("Baseball Machine/Daily Files/",season,"/game_scores_",season,".csv"), row.names = FALSE)
+write.csv(probables_update, paste0("Baseball Machine/Daily Files/",season,"/starting_pitchers_",season,".csv"), row.names = FALSE)
+write.csv(rosters_update, paste0("Baseball Machine/Daily Files/",season,"/daily_rosters_",season,".csv"), row.names = FALSE)
 
