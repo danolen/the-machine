@@ -1896,15 +1896,15 @@ bets_table <- bets3 %>%
          EV = EV_tier) %>% 
   dplyr::mutate(`Current Pick Odds` = as.integer(`Current Pick Odds`),
          `Odds Should Be` = as.integer(`Odds Should Be`),
-         EV = as.integer(EV))
+         EV = as.integer(as.character(EV)))
 
 df_html_bets <- if_else(nrow(bets_table)==0,
                         "<b>At the odds currently available, no bets are recommended</b>",
                         print(xtable(bets_table), type = "html", print.results = FALSE))
 
 ITTs <- bets2 %>% 
-  filter(AwayStartingPitcher == AwaySP_fullName &
-           HomeStartingPitcher == HomeSP_fullName &
+  filter(trimws(tolower(AwayStartingPitcher)) == trimws(tolower(AwaySP_fullName)) &
+           trimws(tolower(HomeStartingPitcher)) == trimws(tolower(HomeSP_fullName)) &
            !is.na(AOY_ProjOdds2) &
            !is.na(HUN_ProjOdds2) &
            gamedate == Sys.Date()) %>% 
