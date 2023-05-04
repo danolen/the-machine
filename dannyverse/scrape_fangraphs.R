@@ -36,7 +36,7 @@ scrape_fangraphs <- function(position = c("team batting", "starting pitchers", "
       tbl[[j]] = urls[[j]] %>%
         read_html() %>%
         html_nodes("table") %>%
-        .[13] %>%
+        .[7] %>%
         html_table(fill = TRUE) %>%
         data.frame(stringsAsFactors = FALSE) %>%
         .[-c(1,3),] %>%
@@ -81,7 +81,7 @@ scrape_fangraphs <- function(position = c("team batting", "starting pitchers", "
       tbl[[j]] = urls[[j]] %>%
         read_html() %>%
         html_nodes("table") %>%
-        .[13] %>%
+        .[7] %>%
         html_table(fill = TRUE) %>%
         data.frame(stringsAsFactors = FALSE) %>%
         .[-c(1,3),] %>%
@@ -125,7 +125,7 @@ scrape_fangraphs <- function(position = c("team batting", "starting pitchers", "
       tbl[[j]] = urls[[j]] %>%
         read_html() %>%
         html_nodes("table") %>%
-        .[13] %>%
+        .[7] %>%
         html_table(fill = TRUE) %>%
         data.frame(stringsAsFactors = FALSE) %>%
         .[-c(1,3),] %>%
