@@ -1769,10 +1769,15 @@ types <- history2 %>%
   ungroup() %>% 
   filter(Winner != "Push" &
            Kelly_Criteria > 0 &
-           Pick_Odds >= -200 &
+           Pick_Odds >= -180 &
            Pick_WinProb >= 0.3 &
            partition == 1 &
-           OddsType == 'Day Of') %>% 
+           OddsType == 'Day Of' &
+           !str_detect(bet_type, "RFI") &
+           bet_type != "F5 Alt TT") %>% 
+  mutate(Units = if_else(Pick_Correct == 1,
+                         if_else(Pick_Odds > 0, Pick_Odds / 100, 1),
+                         if_else(Pick_Odds > 0, -1, Pick_Odds / 100))) %>% 
   select(gamedate, AwayTeam, HomeTeam, bet_type, Pick_Odds, Pick_WinProb, Pick_LoseProb, Fract_Odds,
          Kelly_Criteria, EV, KC_tier, Pick_Correct, Units, Kelly_Bet, Kelly_Profit, run_timestamp) %>% 
   dplyr::mutate(WinProb_tier = round_any(Pick_WinProb, 0.05, floor),
@@ -1781,22 +1786,40 @@ types <- history2 %>%
                 bets = as.integer(1))
 
 grades <- types %>%
-  arrange(gamedate, AwayTeam, HomeTeam, desc(Kelly_Criteria)) %>% 
-  group_by(gamedate, AwayTeam, HomeTeam) %>% 
-  dplyr::mutate(KC_Rank = row_number()) %>% 
   arrange(gamedate, AwayTeam, HomeTeam, desc(EV)) %>% 
   group_by(gamedate, AwayTeam, HomeTeam) %>% 
-  dplyr::mutate(EV_Rank = row_number(),
+  dplyr::mutate(EV_Rank = row_number()) %>% 
+  arrange(gamedate, AwayTeam, HomeTeam, desc(Kelly_Criteria)) %>% 
+  group_by(gamedate, AwayTeam, HomeTeam) %>% 
+  dplyr::mutate(KC_Rank = row_number(),
                 Rank = (KC_Rank + EV_Rank) / 2) %>% 
   arrange(gamedate, gamedate, AwayTeam, HomeTeam, Rank) %>% 
   dplyr::mutate(Final_Rank = row_number()) %>% 
   filter(Final_Rank == 1) %>% 
-  ungroup()
+  ungroup() %>% 
+  dplyr::mutate(`Bet Grade` = case_when(as.numeric(as.character(KC_tier)) < 0.1 &
+                                          as.numeric(as.character(EV_tier)) < 1 ~ "C",
+                                        as.numeric(as.character(KC_tier)) < 0.2 |
+                                          as.numeric(as.character(EV_tier)) < 2 ~ "B",
+                                        as.numeric(as.character(KC_tier)) < 0.35 ~ "A",
+                                        as.numeric(as.character(KC_tier)) >= 0.35 ~ "A+",
+                                        TRUE ~ "No Grade"),
+                `Graded Risk` = case_when(`Bet Grade` == 'A+' ~ 2,
+                                          `Bet Grade` == 'A' ~ 1.5,
+                                          `Bet Grade` == 'B' ~ 1,
+                                          # `Bet Grade` == 'C' ~ 0.5,
+                                          TRUE ~ 0),
+                `Graded Profit` = Units*`Graded Risk`,
+                `Bet Grade` = factor(`Bet Grade`, levels = c('A+', 'A', 'B', 'C')))
 
 #### Final Email Tables ####
 
-email_table_1 <- grades %>% 
-  group_by(KC_tier = as.numeric(as.character(KC_tier))) %>%
+email_table_1 <- grades %>%
+  group_by(`Bet Grade`,
+           `Suggested Wager` = case_when(`Bet Grade` == 'A+' ~ '2 units',
+                                         `Bet Grade` == 'A' ~ '1.5 unit',
+                                         `Bet Grade` == 'B' ~ '1 unit',
+                                         TRUE ~ 'No bet')) %>%
   dplyr::summarise(`Hit Rate` = mean(Pick_Correct),
                    `Average Implied Odds` = mean(if_else(Pick_Odds > 0, 100 / (Pick_Odds + 100), abs(Pick_Odds) / (abs(Pick_Odds) + 100))),
                    `Average Odds` = if_else(`Average Implied Odds` < 0.5,
@@ -1804,40 +1827,18 @@ email_table_1 <- grades %>%
                                             -1 * (100 * `Average Implied Odds`) / (1 - `Average Implied Odds`)),
                    Bets = sum(bets),
                    `Profit: 1 Unit Wagers` = sum(Units),
-                   `Profit: Suggested Wagers` = sum(Kelly_Profit)) %>% 
+                   `Profit: Suggested Wagers` = sum(`Graded Profit`)) %>% 
   dplyr::mutate(ROI = `Profit: 1 Unit Wagers` / Bets) %>%
   dplyr::mutate(`Hit Rate` = paste0(round_any(`Hit Rate`*100, 1), '%'),
-         `Average Odds` = as.integer(round_any(`Average Odds`,1)),
-         `Average Implied Odds` = paste0(round_any(`Average Implied Odds`*100, 1), '%'),
-         Bets = formatC(Bets, format="d", big.mark=","),
-         `Profit: 1 Unit Wagers` = paste0(round_any(`Profit: 1 Unit Wagers`, 0.1), ' units'),
-         `Profit: Suggested Wagers` = paste0(round_any(`Profit: Suggested Wagers`, 0.1), ' units'),
-         ROI = paste0(round_any(ROI*100, 0.01), '%'))%>% 
+                `Average Odds` = as.integer(round_any(`Average Odds`,1)),
+                `Average Implied Odds` = paste0(round_any(`Average Implied Odds`*100, 1), '%'),
+                Bets = formatC(Bets, format="d", big.mark=","),
+                `Profit: 1 Unit Wagers` = paste0(round_any(`Profit: 1 Unit Wagers`, 0.1), ' units'),
+                `Profit: Suggested Wagers` = paste0(round_any(`Profit: Suggested Wagers`, 0.1), ' units'),
+                ROI = paste0(round_any(ROI*100, 0.01), '%')) %>%
   print()
 
 df_html_1 <- print(xtable(email_table_1), type = "html", print.results = FALSE)
-
-email_table_2 <- grades %>% 
-  group_by(EV_tier = as.numeric(as.character(EV_tier))) %>%
-  dplyr::summarise(`Hit Rate` = mean(Pick_Correct),
-                   `Average Implied Odds` = mean(if_else(Pick_Odds > 0, 100 / (Pick_Odds + 100), abs(Pick_Odds) / (abs(Pick_Odds) + 100))),
-                   `Average Odds` = if_else(`Average Implied Odds` < 0.5,
-                                            (100 / `Average Implied Odds`) - 100,
-                                            -1 * (100 * `Average Implied Odds`) / (1 - `Average Implied Odds`)),
-                   Bets = sum(bets),
-                   `Profit: 1 Unit Wagers` = sum(Units),
-                   `Profit: Suggested Wagers` = sum(Kelly_Profit)) %>% 
-  dplyr::mutate(ROI = `Profit: 1 Unit Wagers` / Bets) %>%
-  dplyr::mutate(`Hit Rate` = paste0(round_any(`Hit Rate`*100, 1), '%'),
-         `Average Odds` = as.integer(round_any(`Average Odds`,1)),
-         `Average Implied Odds` = paste0(round_any(`Average Implied Odds`*100, 1), '%'),
-         Bets = formatC(Bets, format="d", big.mark=","),
-         `Profit: 1 Unit Wagers` = paste0(round_any(`Profit: 1 Unit Wagers`, 0.1), ' units'),
-         `Profit: Suggested Wagers` = paste0(round_any(`Profit: Suggested Wagers`, 0.1), ' units'),
-         ROI = paste0(round_any(ROI*100, 0.01), '%')) %>% 
-  print()
-
-df_html_2 <- print(xtable(email_table_2), type = "html", print.results = FALSE)
 
 plot_data <- grades %>% 
   select(gamedate, Units, Kelly_Profit) %>% 
@@ -1864,39 +1865,48 @@ plot_html <- blastula::add_ggplot(plot_object = plot)
 
 bets_table <- bets3 %>% 
   filter(Kelly_Criteria > 0 &
-           Pick_Odds >= -200 &
+           Pick_Odds >= -180 &
            Pick_WinProb > 0.3 &
+           !str_detect(bet_type, "RFI") &
+           bet_type != "F5 Alt TT" &
            gamedate == Sys.Date()) %>% 
-  arrange(gamedate, AwayTeam, HomeTeam, AwayStartingPitcher, HomeStartingPitcher, desc(Kelly_Criteria)) %>% 
-  group_by(AwayTeam, HomeTeam, AwayStartingPitcher, HomeStartingPitcher) %>% 
-  dplyr::mutate(KC_Rank = row_number()) %>% 
-  arrange(gamedate, AwayTeam, HomeTeam, AwayStartingPitcher, HomeStartingPitcher, desc(EV)) %>% 
-  group_by(AwayTeam, HomeTeam, AwayStartingPitcher, HomeStartingPitcher) %>% 
-  dplyr::mutate(EV_Rank = row_number(),
-         Rank = (KC_Rank + EV_Rank) / 2) %>% 
-  arrange(gamedate, AwayTeam, HomeTeam, AwayStartingPitcher, HomeStartingPitcher, Rank) %>% 
+  arrange(gamedate, AwayTeam, HomeTeam, desc(EV)) %>% 
+  group_by(gamedate, AwayTeam, HomeTeam) %>% 
+  dplyr::mutate(EV_Rank = row_number()) %>% 
+  arrange(gamedate, AwayTeam, HomeTeam, desc(Kelly_Criteria)) %>% 
+  group_by(gamedate, AwayTeam, HomeTeam) %>% 
+  dplyr::mutate(KC_Rank = row_number(),
+                Rank = (KC_Rank + EV_Rank) / 2) %>% 
+  arrange(gamedate, gamedate, AwayTeam, HomeTeam, Rank) %>% 
   dplyr::mutate(Final_Rank = row_number()) %>% 
   filter(Final_Rank == 1) %>%
   arrange(gamedate, desc(Kelly_Criteria)) %>% 
   ungroup() %>% 
   dplyr::mutate(Pick = case_when(is.na(Pick_SpreadTotal) | Pick_SpreadTotal == 0 ~ paste0(Pick),
-                          str_detect(bet_type, "RL") & Pick_SpreadTotal > 0 ~ paste0(Pick, " +", Pick_SpreadTotal),
-                          str_detect(bet_type_full, HomeTeam) ~ paste0(HomeTeam, " ", Pick, " ", Pick_SpreadTotal),
-                          str_detect(bet_type_full, AwayTeam) ~ paste0(AwayTeam, " ", Pick, " ", Pick_SpreadTotal),
-                          TRUE ~ paste0(Pick, " ", Pick_SpreadTotal))) %>% 
+                                 str_detect(bet_type, "RL") & Pick_SpreadTotal > 0 ~ paste0(Pick, " +", Pick_SpreadTotal),
+                                 str_detect(bet_type_full, HomeTeam) ~ paste0(HomeTeam, " ", Pick, " ", Pick_SpreadTotal),
+                                 str_detect(bet_type_full, AwayTeam) ~ paste0(AwayTeam, " ", Pick, " ", Pick_SpreadTotal),
+                                 TRUE ~ paste0(Pick, " ", Pick_SpreadTotal))) %>% 
   select(gamedate, AwayTeam, HomeTeam, bet_type_full, Pick, Pick_Odds, Machine_Odds, KC_tier, EV_tier) %>% 
   dplyr::mutate(gamedate = as.character(gamedate)) %>% 
   dplyr::rename(`Game Date` = gamedate,
-         `Home Team` = HomeTeam,
-         `Away Team` = AwayTeam,
-         `Bet Type` = bet_type_full,
-         `Current Pick Odds` = Pick_Odds,
-         `Odds Should Be` = Machine_Odds,
-         KC = KC_tier,
-         EV = EV_tier) %>% 
+                `Home Team` = HomeTeam,
+                `Away Team` = AwayTeam,
+                `Bet Type` = bet_type_full,
+                `Current Pick Odds` = Pick_Odds,
+                `Odds Should Be` = Machine_Odds,
+                KC = KC_tier,
+                EV = EV_tier) %>% 
   dplyr::mutate(`Current Pick Odds` = as.integer(`Current Pick Odds`),
-         `Odds Should Be` = as.integer(`Odds Should Be`),
-         EV = as.integer(as.character(EV)))
+                `Odds Should Be` = as.integer(`Odds Should Be`),
+                EV = as.integer(as.character(EV)),
+                `Bet Grade` = case_when(as.numeric(as.character(KC)) < 0.1 &
+                                          as.numeric(as.character(EV)) < 1 ~ "C",
+                                        as.numeric(as.character(KC)) < 0.2 |
+                                          as.numeric(as.character(EV)) < 2 ~ "B",
+                                        as.numeric(as.character(KC)) < 0.35 ~ "A",
+                                        as.numeric(as.character(KC)) >= 0.35 ~ "A+",
+                                        TRUE ~ "No Grade"))
 
 df_html_bets <- if_else(nrow(bets_table)==0,
                         "<b>At the odds currently available, no bets are recommended</b>",
@@ -1922,11 +1932,7 @@ Email = Outlook$CreateItem(0)
 Email[["to"]] = "dnolen@smu.edu"
 Email[["subject"]] = paste0("Baseball Machine Picks: ", Sys.Date())
 Email[["HTMLbody"]] = sprintf("
-The Basebal Machine is now up and running! The Machine will suggest one bet per game to start off the season. We will refine our approach as we see how The Machine performs. Here are the results so far grouped by Kelly Criteria tier:
-</p><br></p>
-%s
-</p><br></p>
-And again by Expected Value tier:
+The Basebal Machine is now up and running! The Machine will suggest one bet per game to start off the season. We will refine our approach as we see how The Machine performs. Here are the results so far grouped by Bet Grade:
 </p><br></p>
 %s
 </p><br></p>
@@ -1940,7 +1946,7 @@ Below are the historical results for both a flat betting strategy (1 unit wagers
 </p><br></p>
 %s
 </p><br></p>
-", df_html_1, df_html_2, df_html_bets, itts_html, plot_html)
+", df_html_1, df_html_bets, itts_html, plot_html)
 Email[["attachments"]]$Add("C:/Users/danie/Desktop/SportsStuff/TheMachine/the-machine/Baseball Machine/v3.0/upcoming_bets.csv")
 
 Email$Send()
