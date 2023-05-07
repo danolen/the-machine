@@ -6,8 +6,7 @@ history2 <- readRDS("Baseball Machine/v3.0/PicksHistory_Outcomes.rds")
 
 types <- history2 %>%
   ungroup() %>% 
-  filter(Winner != "Push" &
-           Kelly_Criteria > 0 &
+  filter(Kelly_Criteria > 0 &
            Pick_Odds >= -180 &
            Pick_WinProb >= 0.3 &
            partition == 1 &
@@ -18,7 +17,7 @@ types <- history2 %>%
                     if_else(Pick_Odds > 0, Pick_Odds / 100, 1),
                     if_else(Pick_Odds > 0, -1, Pick_Odds / 100))) %>% 
   select(gamedate, AwayTeam, HomeTeam, bet_type, Pick_Odds, Pick_WinProb, Pick_LoseProb, Fract_Odds,
-         Kelly_Criteria, EV, KC_tier, Pick_Correct, Units, Kelly_Bet, Kelly_Profit, run_timestamp) %>% 
+         Kelly_Criteria, EV, KC_tier, Winner, Pick_Correct, Units, Kelly_Bet, Kelly_Profit, run_timestamp) %>% 
   dplyr::mutate(WinProb_tier = round_any(Pick_WinProb, 0.05, floor),
                 Odds_tier = round_any(Pick_Odds, 10, floor),
                 EV_tier = round_any(EV, 1, floor),
@@ -46,10 +45,11 @@ grades <- types %>%
          `Graded Risk` = case_when(`Bet Grade` == 'A+' ~ 2,
                                    `Bet Grade` == 'A' ~ 1.5,
                                    `Bet Grade` == 'B' ~ 1,
-                                   # `Bet Grade` == 'C' ~ 0.5,
+                                   `Bet Grade` == 'C' ~ 0.5,
                                    TRUE ~ 0),
          `Graded Profit` = Units*`Graded Risk`,
-         `Bet Grade` = factor(`Bet Grade`, levels = c('A+', 'A', 'B', 'C')))
+         `Bet Grade` = factor(`Bet Grade`, levels = c('A+', 'A', 'B', 'C'))) %>% 
+  filter(Winner != "Push")
 
 grades %>%
   # filter(`Bet Grade` == "A") %>% 
@@ -61,6 +61,7 @@ grades %>%
            `Suggested Wager` = case_when(`Bet Grade` == 'A+' ~ '2 units',
                                          `Bet Grade` == 'A' ~ '1.5 unit',
                                          `Bet Grade` == 'B' ~ '1 unit',
+                                         `Bet Grade` == 'C' ~ '0.5 unit',
                                          TRUE ~ 'No bet')) %>%
   dplyr::summarise(`Hit Rate` = mean(Pick_Correct),
                    `Average Implied Odds` = mean(if_else(Pick_Odds > 0, 100 / (Pick_Odds + 100), abs(Pick_Odds) / (abs(Pick_Odds) + 100))),
