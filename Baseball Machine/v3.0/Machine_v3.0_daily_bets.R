@@ -1782,34 +1782,42 @@ types <- history2 %>%
   dplyr::mutate(WinProb_tier = round_any(Pick_WinProb, 0.05, floor),
                 Odds_tier = round_any(Pick_Odds, 10, floor),
                 EV_tier = round_any(EV, 1, floor),
-                bets = as.integer(1))
+                bets = as.integer(1),
+                EV_Grade = case_when(EV_tier >= 3 ~ 3,
+                                     EV_tier == 2 ~ 2,
+                                     EV_tier == 1 ~ 1,
+                                     EV_tier < 1 ~ 0),
+                KC_Grade = case_when(as.numeric(as.character(KC_tier)) >= 0.35 ~ 4,
+                                     as.numeric(as.character(KC_tier)) >= 0.3 ~ 3,
+                                     as.numeric(as.character(KC_tier)) >= 0.15 ~ 2,
+                                     as.numeric(as.character(KC_tier)) == 0.1 ~ 1,
+                                     as.numeric(as.character(KC_tier)) < 0.1 ~ 0),
+                New_Grade = (KC_Grade + EV_Grade) / 2)
 
 grades <- types %>%
-  arrange(gamedate, AwayTeam, HomeTeam, desc(EV)) %>% 
-  group_by(gamedate, AwayTeam, HomeTeam) %>% 
-  dplyr::mutate(EV_Rank = row_number()) %>% 
-  arrange(gamedate, AwayTeam, HomeTeam, desc(Kelly_Criteria)) %>% 
-  group_by(gamedate, AwayTeam, HomeTeam) %>% 
+  arrange(gamedate, AwayTeam, HomeTeam, desc(EV)) %>%
+  group_by(gamedate, AwayTeam, HomeTeam) %>%
+  dplyr::mutate(EV_Rank = row_number()) %>%
+  arrange(gamedate, AwayTeam, HomeTeam, desc(Kelly_Criteria)) %>%
+  group_by(gamedate, AwayTeam, HomeTeam) %>%
   dplyr::mutate(KC_Rank = row_number(),
-                Rank = (KC_Rank + EV_Rank) / 2) %>% 
-  arrange(gamedate, gamedate, AwayTeam, HomeTeam, Rank) %>% 
-  dplyr::mutate(Final_Rank = row_number()) %>% 
-  filter(Final_Rank == 1) %>% 
+                Rank = (KC_Rank + EV_Rank) / 2) %>%
+  arrange(gamedate, gamedate, AwayTeam, HomeTeam, Rank) %>%
+  dplyr::mutate(Final_Rank = row_number()) %>%
+  filter(Final_Rank == 1) %>%
   ungroup() %>% 
-  dplyr::mutate(`Bet Grade` = case_when(as.numeric(as.character(KC_tier)) < 0.1 &
-                                          as.numeric(as.character(EV_tier)) < 1 ~ "C",
-                                        as.numeric(as.character(KC_tier)) < 0.2 |
-                                          as.numeric(as.character(EV_tier)) < 2 ~ "B",
-                                        as.numeric(as.character(KC_tier)) < 0.35 ~ "A",
-                                        as.numeric(as.character(KC_tier)) >= 0.35 ~ "A+",
-                                        TRUE ~ "No Grade"),
+  dplyr::mutate(`Bet Grade` = case_when(New_Grade > 3 ~ 'A+',
+                                        New_Grade >= 2.5 ~ 'A',
+                                        New_Grade >= 1.5 ~ 'B',
+                                        New_Grade >= 1 ~ 'C',
+                                        New_Grade < 1 ~ 'D'),
                 `Graded Risk` = case_when(`Bet Grade` == 'A+' ~ 2,
                                           `Bet Grade` == 'A' ~ 1.5,
                                           `Bet Grade` == 'B' ~ 1,
                                           `Bet Grade` == 'C' ~ 0.5,
-                                          TRUE ~ 0),
+                                          `Bet Grade` == 'D' ~ 0),
                 `Graded Profit` = Units*`Graded Risk`,
-                `Bet Grade` = factor(`Bet Grade`, levels = c('A+', 'A', 'B', 'C'))) %>% 
+                `Bet Grade` = factor(`Bet Grade`, levels = c('A+', 'A', 'B', 'C', 'D'))) %>% 
   filter(Winner != "Push")
 
 #### Final Email Tables ####
@@ -1901,14 +1909,23 @@ bets_table <- bets3 %>%
   dplyr::mutate(`Current Pick Odds` = as.integer(`Current Pick Odds`),
                 `Odds Should Be` = as.integer(`Odds Should Be`),
                 EV = as.integer(as.character(EV)),
-                `Bet Grade` = case_when(as.numeric(as.character(KC)) < 0.1 &
-                                          as.numeric(as.character(EV)) < 1 ~ "C",
-                                        as.numeric(as.character(KC)) < 0.2 |
-                                          as.numeric(as.character(EV)) < 2 ~ "B",
-                                        as.numeric(as.character(KC)) < 0.35 ~ "A",
-                                        as.numeric(as.character(KC)) >= 0.35 ~ "A+",
-                                        TRUE ~ "No Grade"),
-                `Bet Grade` = factor(`Bet Grade`, levels = c('A+', 'A', 'B', 'C'))) %>% 
+                EV_Grade = case_when(EV >= 3 ~ 3,
+                                     EV == 2 ~ 2,
+                                     EV == 1 ~ 1,
+                                     EV < 1 ~ 0),
+                KC_Grade = case_when(as.numeric(as.character(KC)) >= 0.35 ~ 4,
+                                     as.numeric(as.character(KC)) >= 0.3 ~ 3,
+                                     as.numeric(as.character(KC)) >= 0.15 ~ 2,
+                                     as.numeric(as.character(KC)) == 0.1 ~ 1,
+                                     as.numeric(as.character(KC)) < 0.1 ~ 0),
+                New_Grade = (KC_Grade + EV_Grade) / 2,
+                `Bet Grade` = case_when(New_Grade > 3 ~ 'A+',
+                                        New_Grade >= 2.5 ~ 'A',
+                                        New_Grade >= 1.5 ~ 'B',
+                                        New_Grade >= 1 ~ 'C',
+                                        New_Grade < 1 ~ 'D'),
+                `Bet Grade` = factor(`Bet Grade`, levels = c('A+', 'A', 'B', 'C', 'D'))) %>% 
+  select(-EV_Grade, -KC_Grade, -New_Grade) %>% 
   arrange(`Game Date`, `Bet Grade`, desc(KC))
 
 df_html_bets <- if_else(nrow(bets_table)==0,

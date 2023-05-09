@@ -1,5 +1,6 @@
 library(tidyverse)
 library(plyr)
+library(reshape2)
 
 bets3 <- read.csv("Baseball Machine/v3.0/upcoming_bets.csv")
 history2 <- readRDS("Baseball Machine/v3.0/PicksHistory_Outcomes.rds")
@@ -21,34 +22,42 @@ types <- history2 %>%
   dplyr::mutate(WinProb_tier = round_any(Pick_WinProb, 0.05, floor),
                 Odds_tier = round_any(Pick_Odds, 10, floor),
                 EV_tier = round_any(EV, 1, floor),
-                bets = as.integer(1))
+                bets = as.integer(1),
+                EV_Grade = case_when(EV_tier >= 3 ~ 3,
+                                     EV_tier == 2 ~ 2,
+                                     EV_tier == 1 ~ 1,
+                                     EV_tier < 1 ~ 0),
+                KC_Grade = case_when(as.numeric(as.character(KC_tier)) >= 0.35 ~ 4,
+                                     as.numeric(as.character(KC_tier)) >= 0.3 ~ 3,
+                                     as.numeric(as.character(KC_tier)) >= 0.15 ~ 2,
+                                     as.numeric(as.character(KC_tier)) == 0.1 ~ 1,
+                                     as.numeric(as.character(KC_tier)) < 0.1 ~ 0),
+                New_Grade = (KC_Grade + EV_Grade) / 2)
 
 grades <- types %>%
-  arrange(gamedate, AwayTeam, HomeTeam, desc(EV)) %>% 
-  group_by(gamedate, AwayTeam, HomeTeam) %>% 
-  dplyr::mutate(EV_Rank = row_number()) %>% 
-  arrange(gamedate, AwayTeam, HomeTeam, desc(Kelly_Criteria)) %>% 
-  group_by(gamedate, AwayTeam, HomeTeam) %>% 
+  arrange(gamedate, AwayTeam, HomeTeam, desc(EV)) %>%
+  group_by(gamedate, AwayTeam, HomeTeam) %>%
+  dplyr::mutate(EV_Rank = row_number()) %>%
+  arrange(gamedate, AwayTeam, HomeTeam, desc(Kelly_Criteria)) %>%
+  group_by(gamedate, AwayTeam, HomeTeam) %>%
   dplyr::mutate(KC_Rank = row_number(),
-                Rank = (KC_Rank + EV_Rank) / 2) %>% 
-  arrange(gamedate, gamedate, AwayTeam, HomeTeam, Rank) %>% 
-  dplyr::mutate(Final_Rank = row_number()) %>% 
-  filter(Final_Rank == 1) %>% 
+                Rank = (KC_Rank + EV_Rank) / 2) %>%
+  arrange(gamedate, gamedate, AwayTeam, HomeTeam, Rank) %>%
+  dplyr::mutate(Final_Rank = row_number()) %>%
+  filter(Final_Rank == 1) %>%
   ungroup() %>% 
-  dplyr::mutate(`Bet Grade` = case_when(as.numeric(as.character(KC_tier)) < 0.1 &
-                                   as.numeric(as.character(EV_tier)) < 1 ~ "C",
-                                 as.numeric(as.character(KC_tier)) < 0.2 |
-                                   as.numeric(as.character(EV_tier)) < 2 ~ "B",
-                                 as.numeric(as.character(KC_tier)) < 0.35 ~ "A",
-                                 as.numeric(as.character(KC_tier)) >= 0.35 ~ "A+",
-                                 TRUE ~ "No Grade"),
+  dplyr::mutate(`Bet Grade` = case_when(New_Grade > 3 ~ 'A+',
+                                        New_Grade >= 2.5 ~ 'A',
+                                        New_Grade >= 1.5 ~ 'B',
+                                        New_Grade >= 1 ~ 'C',
+                                        New_Grade < 1 ~ 'D'),
          `Graded Risk` = case_when(`Bet Grade` == 'A+' ~ 2,
                                    `Bet Grade` == 'A' ~ 1.5,
                                    `Bet Grade` == 'B' ~ 1,
                                    `Bet Grade` == 'C' ~ 0.5,
-                                   TRUE ~ 0),
+                                   `Bet Grade` == 'D' ~ 0),
          `Graded Profit` = Units*`Graded Risk`,
-         `Bet Grade` = factor(`Bet Grade`, levels = c('A+', 'A', 'B', 'C'))) %>% 
+         `Bet Grade` = factor(`Bet Grade`, levels = c('A+', 'A', 'B', 'C', 'D'))) %>% 
   filter(Winner != "Push")
 
 grades %>%
@@ -62,7 +71,7 @@ grades %>%
                                          `Bet Grade` == 'A' ~ '1.5 unit',
                                          `Bet Grade` == 'B' ~ '1 unit',
                                          `Bet Grade` == 'C' ~ '0.5 unit',
-                                         TRUE ~ 'No bet')) %>%
+                                         `Bet Grade` == 'D' ~ 'No bet')) %>%
   dplyr::summarise(`Hit Rate` = mean(Pick_Correct),
                    `Average Implied Odds` = mean(if_else(Pick_Odds > 0, 100 / (Pick_Odds + 100), abs(Pick_Odds) / (abs(Pick_Odds) + 100))),
                    `Average Odds` = if_else(`Average Implied Odds` < 0.5,
@@ -82,10 +91,44 @@ grades %>%
   print()
 
 ass <- grades %>% 
-  group_by(KC_tier = as.numeric(as.character(KC_tier)),
-           EV_tier = as.numeric(as.character(EV_tier))) %>%
+  # dplyr::mutate(New_Grade = (KC_Grade + EV_Grade) / 2,
+  #               `Bet Grade` = case_when(New_Grade > 3 ~ 'A+',
+  #                                       New_Grade >= 2.5 ~ 'A',
+  #                                       New_Grade >= 1.5 ~ 'B',
+  #                                       New_Grade >= 1 ~ 'C',
+  #                                       New_Grade < 1 ~ 'D')) %>% 
+  group_by(#`Bet Grade`,
+    # KC_Grade,
+    # KC_tier = as.numeric(as.character(KC_tier)),
+    # EV_Grade,
+    # EV_tier = as.numeric(as.character(EV_tier)),
+    New_Grade
+    # `Bet Grade` = factor(`Bet Grade`, levels = c('A+', 'A', 'B', 'C', 'D'))
+    ) %>%
   dplyr::summarise(total_bets = sum(bets),
                    ROI = sum(Units) / sum(bets))
+
+plot_data <- grades %>% 
+  filter(`Bet Grade` == 'D') %>% 
+  select(gamedate, Units, `Graded Profit`) %>% 
+  dplyr::rename(`Profit: 1 Unit Wagers` = Units,
+                `Profit: Suggested Wagers` = `Graded Profit`) %>% 
+  melt("gamedate", c("Profit: 1 Unit Wagers", "Profit: Suggested Wagers")) %>% 
+  group_by(gamedate, variable) %>% 
+  dplyr::summarise(value = sum(value)) %>% 
+  group_by(variable) %>% 
+  dplyr::mutate(cumulative_value = cumsum(value))
+
+ggplot(plot_data) +
+  aes(x = gamedate, y = cumulative_value, colour = variable) +
+  geom_line() +
+  theme_minimal() +
+  labs(
+    x = "Game Date",
+    y = "Cumulative Profit (Units)",
+    color = ""
+  ) +
+  theme(legend.position = "bottom")
 
 bets_table <- bets3 %>% 
   filter(Kelly_Criteria > 0 &
