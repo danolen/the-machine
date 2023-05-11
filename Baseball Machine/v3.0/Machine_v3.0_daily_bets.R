@@ -1926,7 +1926,8 @@ bets_table <- bets3 %>%
                                         New_Grade < 1 ~ 'D'),
                 `Bet Grade` = factor(`Bet Grade`, levels = c('A+', 'A', 'B', 'C', 'D'))) %>% 
   select(-EV_Grade, -KC_Grade, -New_Grade) %>% 
-  arrange(`Game Date`, `Bet Grade`, desc(KC))
+  arrange(`Game Date`, `Bet Grade`, desc(KC)) %>% 
+  select(-KC, -EV)
 
 df_html_bets <- if_else(nrow(bets_table)==0,
                         "<b>At the odds currently available, no bets are recommended</b>",
