@@ -1789,9 +1789,9 @@ types <- history2 %>%
                                      EV_tier < 1 ~ 0),
                 KC_Grade = case_when(as.numeric(as.character(KC_tier)) >= 0.35 ~ 4,
                                      as.numeric(as.character(KC_tier)) >= 0.3 ~ 3,
-                                     as.numeric(as.character(KC_tier)) >= 0.15 ~ 2,
-                                     as.numeric(as.character(KC_tier)) == 0.1 ~ 1,
-                                     as.numeric(as.character(KC_tier)) < 0.1 ~ 0),
+                                     as.numeric(as.character(KC_tier)) >= 0.2 ~ 2,
+                                     as.numeric(as.character(KC_tier)) == 0.15 ~ 1,
+                                     as.numeric(as.character(KC_tier)) < 0.15 ~ 0),
                 New_Grade = (KC_Grade + EV_Grade) / 2)
 
 grades <- types %>%
@@ -1808,7 +1808,7 @@ grades <- types %>%
   ungroup() %>% 
   dplyr::mutate(`Bet Grade` = case_when(New_Grade > 3 ~ 'A+',
                                         New_Grade >= 2.5 ~ 'A',
-                                        New_Grade >= 1.5 ~ 'B',
+                                        New_Grade >= 2 ~ 'B',
                                         New_Grade >= 1 ~ 'C',
                                         New_Grade < 1 ~ 'D'),
                 `Graded Risk` = case_when(`Bet Grade` == 'A+' ~ 2,
@@ -1915,13 +1915,13 @@ bets_table <- bets3 %>%
                                      EV < 1 ~ 0),
                 KC_Grade = case_when(as.numeric(as.character(KC)) >= 0.35 ~ 4,
                                      as.numeric(as.character(KC)) >= 0.3 ~ 3,
-                                     as.numeric(as.character(KC)) >= 0.15 ~ 2,
-                                     as.numeric(as.character(KC)) == 0.1 ~ 1,
-                                     as.numeric(as.character(KC)) < 0.1 ~ 0),
+                                     as.numeric(as.character(KC)) >= 0.2 ~ 2,
+                                     as.numeric(as.character(KC)) == 0.15 ~ 1,
+                                     as.numeric(as.character(KC)) < 0.15 ~ 0),
                 New_Grade = (KC_Grade + EV_Grade) / 2,
                 `Bet Grade` = case_when(New_Grade > 3 ~ 'A+',
                                         New_Grade >= 2.5 ~ 'A',
-                                        New_Grade >= 1.5 ~ 'B',
+                                        New_Grade >= 2 ~ 'B',
                                         New_Grade >= 1 ~ 'C',
                                         New_Grade < 1 ~ 'D'),
                 `Bet Grade` = factor(`Bet Grade`, levels = c('A+', 'A', 'B', 'C', 'D'))) %>% 
