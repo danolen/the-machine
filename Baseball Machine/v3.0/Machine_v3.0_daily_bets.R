@@ -451,7 +451,7 @@ daily_pitchers <- pitchers_s2d_today %>%
   select(-contains('url')) %>% 
   dplyr::mutate(Name = case_when(Name == "Luis Garcia" & Team == "HOU" ~ "Luis Garcia (HOU)",
                           # Name == "Luis Castillo" & Team == "DET" ~ "Luis Castillo (DET)",
-                          # Name == "Luis Ortiz" & Team == "SFG" ~ "Luis Ortiz (SFG)",
+                          Name == "Luis Ortiz" & Team == "PIT" ~ "Luis Ortiz (PIT)",
                           # Name == "Hyun-Jin Ryu" ~ "Hyun Jin Ryu",
                           TRUE ~ Name))
 
