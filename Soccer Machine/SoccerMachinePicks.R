@@ -22,11 +22,11 @@ library("tidyverse")
 setwd("C:/Users/danie/Desktop/SportsStuff/TheMachine/the-machine")
 
 mls_url <- "https://www.bovada.lv/services/sports/event/v2/events/A/description/soccer/north-america/united-states/mls"
-epl_url <- "https://www.bovada.lv/services/sports/event/v2/events/A/description/soccer/europe/england/premier-league"
-esp_url <- "https://www.bovada.lv/services/sports/event/v2/events/A/description/soccer/europe/spain/la-liga"
-ger_url <- "https://www.bovada.lv/services/sports/event/v2/events/A/description/soccer/europe/germany/1-bundesliga"
-fra_url <- "https://www.bovada.lv/services/sports/event/v2/events/A/description/soccer/europe/france/ligue-1"
-ita_url <- "https://www.bovada.lv/services/sports/event/v2/events/A/description/soccer/europe/italy/serie-a"
+# epl_url <- "https://www.bovada.lv/services/sports/event/v2/events/A/description/soccer/europe/england/premier-league"
+# esp_url <- "https://www.bovada.lv/services/sports/event/v2/events/A/description/soccer/europe/spain/la-liga"
+# ger_url <- "https://www.bovada.lv/services/sports/event/v2/events/A/description/soccer/europe/germany/1-bundesliga"
+# fra_url <- "https://www.bovada.lv/services/sports/event/v2/events/A/description/soccer/europe/france/ligue-1"
+# ita_url <- "https://www.bovada.lv/services/sports/event/v2/events/A/description/soccer/europe/italy/serie-a"
 # champ_url <- "https://www.bovada.lv/services/sports/event/v2/events/A/description/soccer/europe/england/championship"
 # mex_url <- "https://www.bovada.lv/services/sports/event/v2/events/A/description/soccer/north-america/mexico/liga-mx-clausura"
 
@@ -77,226 +77,226 @@ mls_odds <- fromJSON(mls_url) %>%
   filter((AUN.Odds >= 100 | AUN.Odds <= -100) & (HOY.Odds >= 100 | HOY.Odds <= -100)) %>%
   select(-D.SpreadTotal)
 
-epl_odds <- fromJSON(epl_url) %>%
-  .[[2]] %>%
-  .[[1]] %>%
-  select(description, link, displayGroups) %>%
-  mutate(gamedate = as.Date(str_sub(link, -12, -5), format = "%Y%m%d")) %>%
-  separate(description, c("HomeTeam", "AwayTeam"), " vs ") %>%
-  select(gamedate, HomeTeam, AwayTeam, displayGroups) %>%
-  unnest(displayGroups) %>%
-  filter(description %in% c("Game Lines", "Alternate Lines", "Both Teams to Score")) %>%
-  select(gamedate, HomeTeam, AwayTeam, markets) %>%
-  unnest(markets) %>%
-  filter(period$live == FALSE & period$description == "Regulation Time") %>%
-  mutate(bet_type = description) %>%
-  select(gamedate, HomeTeam, AwayTeam, bet_type, outcomes) %>%
-  unnest(outcomes) %>%
-  filter(is.na(price$handicap) == TRUE | (is.na(price$handicap) == FALSE & is.na(price$handicap2) == TRUE)) %>%
-  mutate(type = if_else(type == "X",
-                        if_else(description == "Yes", "Y","N"),
-                        type)) %>%
-  mutate(Odds = as.numeric(price$american),
-         SpreadTotal = price$handicap,
-         type = if_else(type == "H" | type == "O" | type == "Y", "HOY",
-                        if_else(type == "D", "D", "AUN"))) %>%
-  mutate(Odds = if_else(is.na(Odds), 100, Odds)) %>%
-  select(gamedate, HomeTeam, AwayTeam, bet_type, type, Odds, any_of("SpreadTotal")) %>%
-  mutate(HomeTeam = iconv(HomeTeam, from = 'UTF-8', to = 'ASCII//TRANSLIT'),
-         AwayTeam = iconv(AwayTeam, from = 'UTF-8', to = 'ASCII//TRANSLIT'),
-         bet_type = iconv(bet_type, from = 'UTF-8', to = 'ASCII//TRANSLIT'),
-         bet_type = case_when(bet_type == "Spread" & type == "HOY" ~ paste0("Alternate Spread - Home: ", as.numeric(SpreadTotal)),
-                              bet_type == "Spread" & type == "AUN" ~ paste0("Alternate Spread - Home: ", as.numeric(SpreadTotal)*-1),
-                              bet_type == "Total Goals O/U" ~ paste0("Alternate Total - ", abs(as.numeric(SpreadTotal))),
-                              grepl("Total Goals O/U - ", bet_type) ~ paste0(bet_type, " - ", abs(as.numeric(SpreadTotal))),
-                              TRUE ~ bet_type)) %>%
-  reshape2::melt(id.vars = c("gamedate", "HomeTeam", "AwayTeam", "bet_type", "type")) %>%
-  mutate(name = paste0(type, ".", variable)) %>%
-  select(-type, -variable) %>%
-  mutate(value = as.numeric(value)) %>%
-  reshape2::dcast(gamedate + HomeTeam + AwayTeam + bet_type ~ name, fun.aggregate = mean) %>%
-  mutate(AUN.Odds = round(AUN.Odds, 0),
-         HOY.Odds = round(HOY.Odds, 0),
-         D.Odds = round(D.Odds, 0)) %>%
-  filter((AUN.Odds >= 100 | AUN.Odds <= -100) & (HOY.Odds >= 100 | HOY.Odds <= -100)) %>%
-  select(-D.SpreadTotal)
-
-esp_odds <- fromJSON(esp_url) %>%
-  .[[2]] %>%
-  .[[1]] %>%
-  select(description, link, displayGroups) %>%
-  mutate(gamedate = as.Date(str_sub(link, -12, -5), format = "%Y%m%d")) %>%
-  separate(description, c("HomeTeam", "AwayTeam"), " vs ") %>%
-  select(gamedate, HomeTeam, AwayTeam, displayGroups) %>%
-  unnest(displayGroups) %>%
-  filter(description %in% c("Game Lines", "Alternate Lines", "Both Teams to Score")) %>%
-  select(gamedate, HomeTeam, AwayTeam, markets) %>%
-  unnest(markets) %>%
-  filter(period$live == FALSE & period$description == "Regulation Time") %>%
-  mutate(bet_type = description) %>%
-  select(gamedate, HomeTeam, AwayTeam, bet_type, outcomes) %>%
-  unnest(outcomes) %>%
-  filter(is.na(price$handicap) == TRUE | (is.na(price$handicap) == FALSE & is.na(price$handicap2) == TRUE)) %>%
-  mutate(type = if_else(type == "X",
-                        if_else(description == "Yes", "Y","N"),
-                        type)) %>%
-  mutate(Odds = as.numeric(price$american),
-         SpreadTotal = price$handicap,
-         type = if_else(type == "H" | type == "O" | type == "Y", "HOY",
-                        if_else(type == "D", "D", "AUN"))) %>%
-  mutate(Odds = if_else(is.na(Odds), 100, Odds)) %>%
-  select(gamedate, HomeTeam, AwayTeam, bet_type, type, Odds, any_of("SpreadTotal")) %>%
-  mutate(HomeTeam = iconv(HomeTeam, from = 'UTF-8', to = 'ASCII//TRANSLIT'),
-         AwayTeam = iconv(AwayTeam, from = 'UTF-8', to = 'ASCII//TRANSLIT'),
-         bet_type = iconv(bet_type, from = 'UTF-8', to = 'ASCII//TRANSLIT'),
-         bet_type = case_when(bet_type == "Spread" & type == "HOY" ~ paste0("Alternate Spread - Home: ", as.numeric(SpreadTotal)),
-                              bet_type == "Spread" & type == "AUN" ~ paste0("Alternate Spread - Home: ", as.numeric(SpreadTotal)*-1),
-                              bet_type == "Total Goals O/U" ~ paste0("Alternate Total - ", abs(as.numeric(SpreadTotal))),
-                              grepl("Total Goals O/U - ", bet_type) ~ paste0(bet_type, " - ", abs(as.numeric(SpreadTotal))),
-                              TRUE ~ bet_type)) %>%
-  reshape2::melt(id.vars = c("gamedate", "HomeTeam", "AwayTeam", "bet_type", "type")) %>%
-  mutate(name = paste0(type, ".", variable)) %>%
-  select(-type, -variable) %>%
-  mutate(value = as.numeric(value)) %>%
-  reshape2::dcast(gamedate + HomeTeam + AwayTeam + bet_type ~ name, fun.aggregate = mean) %>%
-  mutate(AUN.Odds = round(AUN.Odds, 0),
-         HOY.Odds = round(HOY.Odds, 0),
-         D.Odds = round(D.Odds, 0)) %>%
-  filter((AUN.Odds >= 100 | AUN.Odds <= -100) & (HOY.Odds >= 100 | HOY.Odds <= -100)) %>%
-  select(-D.SpreadTotal)
-
-ger_odds <- fromJSON(ger_url) %>%
-  .[[2]] %>%
-  .[[1]] %>%
-  select(description, link, displayGroups) %>%
-  mutate(gamedate = as.Date(str_sub(link, -12, -5), format = "%Y%m%d")) %>%
-  separate(description, c("HomeTeam", "AwayTeam"), " vs ") %>%
-  select(gamedate, HomeTeam, AwayTeam, displayGroups) %>%
-  unnest(displayGroups) %>%
-  filter(description %in% c("Game Lines", "Alternate Lines", "Both Teams to Score")) %>%
-  select(gamedate, HomeTeam, AwayTeam, markets) %>%
-  unnest(markets) %>%
-  filter(period$live == FALSE & period$description == "Regulation Time") %>%
-  mutate(bet_type = description) %>%
-  select(gamedate, HomeTeam, AwayTeam, bet_type, outcomes) %>%
-  unnest(outcomes) %>%
-  filter(is.na(price$handicap) == TRUE | (is.na(price$handicap) == FALSE & is.na(price$handicap2) == TRUE)) %>%
-  mutate(type = if_else(type == "X",
-                        if_else(description == "Yes", "Y","N"),
-                        type)) %>%
-  mutate(Odds = as.numeric(price$american),
-         SpreadTotal = price$handicap,
-         type = if_else(type == "H" | type == "O" | type == "Y", "HOY",
-                        if_else(type == "D", "D", "AUN"))) %>%
-  mutate(Odds = if_else(is.na(Odds), 100, Odds)) %>%
-  select(gamedate, HomeTeam, AwayTeam, bet_type, type, Odds, any_of("SpreadTotal")) %>%
-  mutate(HomeTeam = iconv(HomeTeam, from = 'UTF-8', to = 'ASCII//TRANSLIT'),
-         AwayTeam = iconv(AwayTeam, from = 'UTF-8', to = 'ASCII//TRANSLIT'),
-         bet_type = iconv(bet_type, from = 'UTF-8', to = 'ASCII//TRANSLIT'),
-         bet_type = case_when(bet_type == "Spread" & type == "HOY" ~ paste0("Alternate Spread - Home: ", as.numeric(SpreadTotal)),
-                              bet_type == "Spread" & type == "AUN" ~ paste0("Alternate Spread - Home: ", as.numeric(SpreadTotal)*-1),
-                              bet_type == "Total Goals O/U" ~ paste0("Alternate Total - ", abs(as.numeric(SpreadTotal))),
-                              grepl("Total Goals O/U - ", bet_type) ~ paste0(bet_type, " - ", abs(as.numeric(SpreadTotal))),
-                              TRUE ~ bet_type)) %>%
-  reshape2::melt(id.vars = c("gamedate", "HomeTeam", "AwayTeam", "bet_type", "type")) %>%
-  mutate(name = paste0(type, ".", variable)) %>%
-  select(-type, -variable) %>%
-  mutate(value = as.numeric(value)) %>%
-  reshape2::dcast(gamedate + HomeTeam + AwayTeam + bet_type ~ name, fun.aggregate = mean) %>%
-  mutate(AUN.Odds = round(AUN.Odds, 0),
-         HOY.Odds = round(HOY.Odds, 0),
-         D.Odds = round(D.Odds, 0)) %>%
-  filter((AUN.Odds >= 100 | AUN.Odds <= -100) & (HOY.Odds >= 100 | HOY.Odds <= -100)) %>%
-  select(-D.SpreadTotal)
-
-fra_odds <- fromJSON(fra_url) %>%
-  .[[2]] %>%
-  .[[1]] %>%
-  select(description, link, displayGroups) %>%
-  mutate(gamedate = as.Date(str_sub(link, -12, -5), format = "%Y%m%d")) %>%
-  separate(description, c("HomeTeam", "AwayTeam"), " vs ") %>%
-  select(gamedate, HomeTeam, AwayTeam, displayGroups) %>%
-  unnest(displayGroups) %>%
-  filter(description %in% c("Game Lines", "Alternate Lines", "Both Teams to Score")) %>%
-  select(gamedate, HomeTeam, AwayTeam, markets) %>%
-  unnest(markets) %>%
-  filter(period$live == FALSE & period$description == "Regulation Time") %>%
-  mutate(bet_type = description) %>%
-  select(gamedate, HomeTeam, AwayTeam, bet_type, outcomes) %>%
-  unnest(outcomes) %>%
-  filter(is.na(price$handicap) == TRUE | (is.na(price$handicap) == FALSE & is.na(price$handicap2) == TRUE)) %>%
-  mutate(type = if_else(type == "X",
-                        if_else(description == "Yes", "Y","N"),
-                        type)) %>%
-  mutate(Odds = as.numeric(price$american),
-         SpreadTotal = price$handicap,
-         type = if_else(type == "H" | type == "O" | type == "Y", "HOY",
-                        if_else(type == "D", "D", "AUN"))) %>%
-  mutate(Odds = if_else(is.na(Odds), 100, Odds)) %>%
-  select(gamedate, HomeTeam, AwayTeam, bet_type, type, Odds, any_of("SpreadTotal")) %>%
-  mutate(HomeTeam = iconv(HomeTeam, from = 'UTF-8', to = 'ASCII//TRANSLIT'),
-         AwayTeam = iconv(AwayTeam, from = 'UTF-8', to = 'ASCII//TRANSLIT'),
-         bet_type = iconv(bet_type, from = 'UTF-8', to = 'ASCII//TRANSLIT'),
-         bet_type = case_when(bet_type == "Spread" & type == "HOY" ~ paste0("Alternate Spread - Home: ", as.numeric(SpreadTotal)),
-                              bet_type == "Spread" & type == "AUN" ~ paste0("Alternate Spread - Home: ", as.numeric(SpreadTotal)*-1),
-                              bet_type == "Total Goals O/U" ~ paste0("Alternate Total - ", abs(as.numeric(SpreadTotal))),
-                              grepl("Total Goals O/U - ", bet_type) ~ paste0(bet_type, " - ", abs(as.numeric(SpreadTotal))),
-                              TRUE ~ bet_type)) %>%
-  reshape2::melt(id.vars = c("gamedate", "HomeTeam", "AwayTeam", "bet_type", "type")) %>%
-  mutate(name = paste0(type, ".", variable)) %>%
-  select(-type, -variable) %>%
-  mutate(value = as.numeric(value)) %>%
-  reshape2::dcast(gamedate + HomeTeam + AwayTeam + bet_type ~ name, fun.aggregate = mean) %>%
-  mutate(AUN.Odds = round(AUN.Odds, 0),
-         HOY.Odds = round(HOY.Odds, 0),
-         D.Odds = round(D.Odds, 0)) %>%
-  filter((AUN.Odds >= 100 | AUN.Odds <= -100) & (HOY.Odds >= 100 | HOY.Odds <= -100)) %>%
-  select(-D.SpreadTotal)
-
-ita_odds <- fromJSON(ita_url) %>%
-  .[[2]] %>%
-  .[[1]] %>%
-  select(description, link, displayGroups) %>%
-  mutate(gamedate = as.Date(str_sub(link, -12, -5), format = "%Y%m%d")) %>%
-  separate(description, c("HomeTeam", "AwayTeam"), " vs ") %>%
-  select(gamedate, HomeTeam, AwayTeam, displayGroups) %>%
-  unnest(displayGroups) %>%
-  filter(description %in% c("Game Lines", "Alternate Lines", "Both Teams to Score")) %>%
-  select(gamedate, HomeTeam, AwayTeam, markets) %>%
-  unnest(markets) %>%
-  filter(period$live == FALSE & period$description == "Regulation Time") %>%
-  mutate(bet_type = description) %>%
-  select(gamedate, HomeTeam, AwayTeam, bet_type, outcomes) %>%
-  unnest(outcomes) %>%
-  filter(is.na(price$handicap) == TRUE | (is.na(price$handicap) == FALSE & is.na(price$handicap2) == TRUE)) %>%
-  mutate(type = if_else(type == "X",
-                        if_else(description == "Yes", "Y","N"),
-                        type)) %>%
-  mutate(Odds = as.numeric(price$american),
-         SpreadTotal = price$handicap,
-         type = if_else(type == "H" | type == "O" | type == "Y", "HOY",
-                        if_else(type == "D", "D", "AUN"))) %>%
-  mutate(Odds = if_else(is.na(Odds), 100, Odds)) %>%
-  select(gamedate, HomeTeam, AwayTeam, bet_type, type, Odds, any_of("SpreadTotal")) %>%
-  mutate(HomeTeam = iconv(HomeTeam, from = 'UTF-8', to = 'ASCII//TRANSLIT'),
-         AwayTeam = iconv(AwayTeam, from = 'UTF-8', to = 'ASCII//TRANSLIT'),
-         bet_type = iconv(bet_type, from = 'UTF-8', to = 'ASCII//TRANSLIT'),
-         bet_type = case_when(bet_type == "Spread" & type == "HOY" ~ paste0("Alternate Spread - Home: ", as.numeric(SpreadTotal)),
-                              bet_type == "Spread" & type == "AUN" ~ paste0("Alternate Spread - Home: ", as.numeric(SpreadTotal)*-1),
-                              bet_type == "Total Goals O/U" ~ paste0("Alternate Total - ", abs(as.numeric(SpreadTotal))),
-                              grepl("Total Goals O/U - Inter Milan", bet_type) ~ paste0("Total Goals O/U - Inter Milano - ", abs(as.numeric(SpreadTotal))),
-                              grepl("Total Goals O/U - ", bet_type) ~ paste0(bet_type, " - ", abs(as.numeric(SpreadTotal))),
-                              TRUE ~ bet_type)) %>%
-  reshape2::melt(id.vars = c("gamedate", "HomeTeam", "AwayTeam", "bet_type", "type")) %>%
-  mutate(name = paste0(type, ".", variable)) %>%
-  select(-type, -variable) %>%
-  mutate(value = as.numeric(value)) %>%
-  reshape2::dcast(gamedate + HomeTeam + AwayTeam + bet_type ~ name, fun.aggregate = mean) %>%
-  mutate(AUN.Odds = round(AUN.Odds, 0),
-         HOY.Odds = round(HOY.Odds, 0),
-         D.Odds = round(D.Odds, 0)) %>%
-  filter((AUN.Odds >= 100 | AUN.Odds <= -100) & (HOY.Odds >= 100 | HOY.Odds <= -100)) %>%
-  select(-D.SpreadTotal)
+# epl_odds <- fromJSON(epl_url) %>%
+#   .[[2]] %>%
+#   .[[1]] %>%
+#   select(description, link, displayGroups) %>%
+#   mutate(gamedate = as.Date(str_sub(link, -12, -5), format = "%Y%m%d")) %>%
+#   separate(description, c("HomeTeam", "AwayTeam"), " vs ") %>%
+#   select(gamedate, HomeTeam, AwayTeam, displayGroups) %>%
+#   unnest(displayGroups) %>%
+#   filter(description %in% c("Game Lines", "Alternate Lines", "Both Teams to Score")) %>%
+#   select(gamedate, HomeTeam, AwayTeam, markets) %>%
+#   unnest(markets) %>%
+#   filter(period$live == FALSE & period$description == "Regulation Time") %>%
+#   mutate(bet_type = description) %>%
+#   select(gamedate, HomeTeam, AwayTeam, bet_type, outcomes) %>%
+#   unnest(outcomes) %>%
+#   filter(is.na(price$handicap) == TRUE | (is.na(price$handicap) == FALSE & is.na(price$handicap2) == TRUE)) %>%
+#   mutate(type = if_else(type == "X",
+#                         if_else(description == "Yes", "Y","N"),
+#                         type)) %>%
+#   mutate(Odds = as.numeric(price$american),
+#          SpreadTotal = price$handicap,
+#          type = if_else(type == "H" | type == "O" | type == "Y", "HOY",
+#                         if_else(type == "D", "D", "AUN"))) %>%
+#   mutate(Odds = if_else(is.na(Odds), 100, Odds)) %>%
+#   select(gamedate, HomeTeam, AwayTeam, bet_type, type, Odds, any_of("SpreadTotal")) %>%
+#   mutate(HomeTeam = iconv(HomeTeam, from = 'UTF-8', to = 'ASCII//TRANSLIT'),
+#          AwayTeam = iconv(AwayTeam, from = 'UTF-8', to = 'ASCII//TRANSLIT'),
+#          bet_type = iconv(bet_type, from = 'UTF-8', to = 'ASCII//TRANSLIT'),
+#          bet_type = case_when(bet_type == "Spread" & type == "HOY" ~ paste0("Alternate Spread - Home: ", as.numeric(SpreadTotal)),
+#                               bet_type == "Spread" & type == "AUN" ~ paste0("Alternate Spread - Home: ", as.numeric(SpreadTotal)*-1),
+#                               bet_type == "Total Goals O/U" ~ paste0("Alternate Total - ", abs(as.numeric(SpreadTotal))),
+#                               grepl("Total Goals O/U - ", bet_type) ~ paste0(bet_type, " - ", abs(as.numeric(SpreadTotal))),
+#                               TRUE ~ bet_type)) %>%
+#   reshape2::melt(id.vars = c("gamedate", "HomeTeam", "AwayTeam", "bet_type", "type")) %>%
+#   mutate(name = paste0(type, ".", variable)) %>%
+#   select(-type, -variable) %>%
+#   mutate(value = as.numeric(value)) %>%
+#   reshape2::dcast(gamedate + HomeTeam + AwayTeam + bet_type ~ name, fun.aggregate = mean) %>%
+#   mutate(AUN.Odds = round(AUN.Odds, 0),
+#          HOY.Odds = round(HOY.Odds, 0),
+#          D.Odds = round(D.Odds, 0)) %>%
+#   filter((AUN.Odds >= 100 | AUN.Odds <= -100) & (HOY.Odds >= 100 | HOY.Odds <= -100)) %>%
+#   select(-D.SpreadTotal)
+# 
+# esp_odds <- fromJSON(esp_url) %>%
+#   .[[2]] %>%
+#   .[[1]] %>%
+#   select(description, link, displayGroups) %>%
+#   mutate(gamedate = as.Date(str_sub(link, -12, -5), format = "%Y%m%d")) %>%
+#   separate(description, c("HomeTeam", "AwayTeam"), " vs ") %>%
+#   select(gamedate, HomeTeam, AwayTeam, displayGroups) %>%
+#   unnest(displayGroups) %>%
+#   filter(description %in% c("Game Lines", "Alternate Lines", "Both Teams to Score")) %>%
+#   select(gamedate, HomeTeam, AwayTeam, markets) %>%
+#   unnest(markets) %>%
+#   filter(period$live == FALSE & period$description == "Regulation Time") %>%
+#   mutate(bet_type = description) %>%
+#   select(gamedate, HomeTeam, AwayTeam, bet_type, outcomes) %>%
+#   unnest(outcomes) %>%
+#   filter(is.na(price$handicap) == TRUE | (is.na(price$handicap) == FALSE & is.na(price$handicap2) == TRUE)) %>%
+#   mutate(type = if_else(type == "X",
+#                         if_else(description == "Yes", "Y","N"),
+#                         type)) %>%
+#   mutate(Odds = as.numeric(price$american),
+#          SpreadTotal = price$handicap,
+#          type = if_else(type == "H" | type == "O" | type == "Y", "HOY",
+#                         if_else(type == "D", "D", "AUN"))) %>%
+#   mutate(Odds = if_else(is.na(Odds), 100, Odds)) %>%
+#   select(gamedate, HomeTeam, AwayTeam, bet_type, type, Odds, any_of("SpreadTotal")) %>%
+#   mutate(HomeTeam = iconv(HomeTeam, from = 'UTF-8', to = 'ASCII//TRANSLIT'),
+#          AwayTeam = iconv(AwayTeam, from = 'UTF-8', to = 'ASCII//TRANSLIT'),
+#          bet_type = iconv(bet_type, from = 'UTF-8', to = 'ASCII//TRANSLIT'),
+#          bet_type = case_when(bet_type == "Spread" & type == "HOY" ~ paste0("Alternate Spread - Home: ", as.numeric(SpreadTotal)),
+#                               bet_type == "Spread" & type == "AUN" ~ paste0("Alternate Spread - Home: ", as.numeric(SpreadTotal)*-1),
+#                               bet_type == "Total Goals O/U" ~ paste0("Alternate Total - ", abs(as.numeric(SpreadTotal))),
+#                               grepl("Total Goals O/U - ", bet_type) ~ paste0(bet_type, " - ", abs(as.numeric(SpreadTotal))),
+#                               TRUE ~ bet_type)) %>%
+#   reshape2::melt(id.vars = c("gamedate", "HomeTeam", "AwayTeam", "bet_type", "type")) %>%
+#   mutate(name = paste0(type, ".", variable)) %>%
+#   select(-type, -variable) %>%
+#   mutate(value = as.numeric(value)) %>%
+#   reshape2::dcast(gamedate + HomeTeam + AwayTeam + bet_type ~ name, fun.aggregate = mean) %>%
+#   mutate(AUN.Odds = round(AUN.Odds, 0),
+#          HOY.Odds = round(HOY.Odds, 0),
+#          D.Odds = round(D.Odds, 0)) %>%
+#   filter((AUN.Odds >= 100 | AUN.Odds <= -100) & (HOY.Odds >= 100 | HOY.Odds <= -100)) %>%
+#   select(-D.SpreadTotal)
+# 
+# ger_odds <- fromJSON(ger_url) %>%
+#   .[[2]] %>%
+#   .[[1]] %>%
+#   select(description, link, displayGroups) %>%
+#   mutate(gamedate = as.Date(str_sub(link, -12, -5), format = "%Y%m%d")) %>%
+#   separate(description, c("HomeTeam", "AwayTeam"), " vs ") %>%
+#   select(gamedate, HomeTeam, AwayTeam, displayGroups) %>%
+#   unnest(displayGroups) %>%
+#   filter(description %in% c("Game Lines", "Alternate Lines", "Both Teams to Score")) %>%
+#   select(gamedate, HomeTeam, AwayTeam, markets) %>%
+#   unnest(markets) %>%
+#   filter(period$live == FALSE & period$description == "Regulation Time") %>%
+#   mutate(bet_type = description) %>%
+#   select(gamedate, HomeTeam, AwayTeam, bet_type, outcomes) %>%
+#   unnest(outcomes) %>%
+#   filter(is.na(price$handicap) == TRUE | (is.na(price$handicap) == FALSE & is.na(price$handicap2) == TRUE)) %>%
+#   mutate(type = if_else(type == "X",
+#                         if_else(description == "Yes", "Y","N"),
+#                         type)) %>%
+#   mutate(Odds = as.numeric(price$american),
+#          SpreadTotal = price$handicap,
+#          type = if_else(type == "H" | type == "O" | type == "Y", "HOY",
+#                         if_else(type == "D", "D", "AUN"))) %>%
+#   mutate(Odds = if_else(is.na(Odds), 100, Odds)) %>%
+#   select(gamedate, HomeTeam, AwayTeam, bet_type, type, Odds, any_of("SpreadTotal")) %>%
+#   mutate(HomeTeam = iconv(HomeTeam, from = 'UTF-8', to = 'ASCII//TRANSLIT'),
+#          AwayTeam = iconv(AwayTeam, from = 'UTF-8', to = 'ASCII//TRANSLIT'),
+#          bet_type = iconv(bet_type, from = 'UTF-8', to = 'ASCII//TRANSLIT'),
+#          bet_type = case_when(bet_type == "Spread" & type == "HOY" ~ paste0("Alternate Spread - Home: ", as.numeric(SpreadTotal)),
+#                               bet_type == "Spread" & type == "AUN" ~ paste0("Alternate Spread - Home: ", as.numeric(SpreadTotal)*-1),
+#                               bet_type == "Total Goals O/U" ~ paste0("Alternate Total - ", abs(as.numeric(SpreadTotal))),
+#                               grepl("Total Goals O/U - ", bet_type) ~ paste0(bet_type, " - ", abs(as.numeric(SpreadTotal))),
+#                               TRUE ~ bet_type)) %>%
+#   reshape2::melt(id.vars = c("gamedate", "HomeTeam", "AwayTeam", "bet_type", "type")) %>%
+#   mutate(name = paste0(type, ".", variable)) %>%
+#   select(-type, -variable) %>%
+#   mutate(value = as.numeric(value)) %>%
+#   reshape2::dcast(gamedate + HomeTeam + AwayTeam + bet_type ~ name, fun.aggregate = mean) %>%
+#   mutate(AUN.Odds = round(AUN.Odds, 0),
+#          HOY.Odds = round(HOY.Odds, 0),
+#          D.Odds = round(D.Odds, 0)) %>%
+#   filter((AUN.Odds >= 100 | AUN.Odds <= -100) & (HOY.Odds >= 100 | HOY.Odds <= -100)) %>%
+#   select(-D.SpreadTotal)
+# 
+# fra_odds <- fromJSON(fra_url) %>%
+#   .[[2]] %>%
+#   .[[1]] %>%
+#   select(description, link, displayGroups) %>%
+#   mutate(gamedate = as.Date(str_sub(link, -12, -5), format = "%Y%m%d")) %>%
+#   separate(description, c("HomeTeam", "AwayTeam"), " vs ") %>%
+#   select(gamedate, HomeTeam, AwayTeam, displayGroups) %>%
+#   unnest(displayGroups) %>%
+#   filter(description %in% c("Game Lines", "Alternate Lines", "Both Teams to Score")) %>%
+#   select(gamedate, HomeTeam, AwayTeam, markets) %>%
+#   unnest(markets) %>%
+#   filter(period$live == FALSE & period$description == "Regulation Time") %>%
+#   mutate(bet_type = description) %>%
+#   select(gamedate, HomeTeam, AwayTeam, bet_type, outcomes) %>%
+#   unnest(outcomes) %>%
+#   filter(is.na(price$handicap) == TRUE | (is.na(price$handicap) == FALSE & is.na(price$handicap2) == TRUE)) %>%
+#   mutate(type = if_else(type == "X",
+#                         if_else(description == "Yes", "Y","N"),
+#                         type)) %>%
+#   mutate(Odds = as.numeric(price$american),
+#          SpreadTotal = price$handicap,
+#          type = if_else(type == "H" | type == "O" | type == "Y", "HOY",
+#                         if_else(type == "D", "D", "AUN"))) %>%
+#   mutate(Odds = if_else(is.na(Odds), 100, Odds)) %>%
+#   select(gamedate, HomeTeam, AwayTeam, bet_type, type, Odds, any_of("SpreadTotal")) %>%
+#   mutate(HomeTeam = iconv(HomeTeam, from = 'UTF-8', to = 'ASCII//TRANSLIT'),
+#          AwayTeam = iconv(AwayTeam, from = 'UTF-8', to = 'ASCII//TRANSLIT'),
+#          bet_type = iconv(bet_type, from = 'UTF-8', to = 'ASCII//TRANSLIT'),
+#          bet_type = case_when(bet_type == "Spread" & type == "HOY" ~ paste0("Alternate Spread - Home: ", as.numeric(SpreadTotal)),
+#                               bet_type == "Spread" & type == "AUN" ~ paste0("Alternate Spread - Home: ", as.numeric(SpreadTotal)*-1),
+#                               bet_type == "Total Goals O/U" ~ paste0("Alternate Total - ", abs(as.numeric(SpreadTotal))),
+#                               grepl("Total Goals O/U - ", bet_type) ~ paste0(bet_type, " - ", abs(as.numeric(SpreadTotal))),
+#                               TRUE ~ bet_type)) %>%
+#   reshape2::melt(id.vars = c("gamedate", "HomeTeam", "AwayTeam", "bet_type", "type")) %>%
+#   mutate(name = paste0(type, ".", variable)) %>%
+#   select(-type, -variable) %>%
+#   mutate(value = as.numeric(value)) %>%
+#   reshape2::dcast(gamedate + HomeTeam + AwayTeam + bet_type ~ name, fun.aggregate = mean) %>%
+#   mutate(AUN.Odds = round(AUN.Odds, 0),
+#          HOY.Odds = round(HOY.Odds, 0),
+#          D.Odds = round(D.Odds, 0)) %>%
+#   filter((AUN.Odds >= 100 | AUN.Odds <= -100) & (HOY.Odds >= 100 | HOY.Odds <= -100)) %>%
+#   select(-D.SpreadTotal)
+# 
+# ita_odds <- fromJSON(ita_url) %>%
+#   .[[2]] %>%
+#   .[[1]] %>%
+#   select(description, link, displayGroups) %>%
+#   mutate(gamedate = as.Date(str_sub(link, -12, -5), format = "%Y%m%d")) %>%
+#   separate(description, c("HomeTeam", "AwayTeam"), " vs ") %>%
+#   select(gamedate, HomeTeam, AwayTeam, displayGroups) %>%
+#   unnest(displayGroups) %>%
+#   filter(description %in% c("Game Lines", "Alternate Lines", "Both Teams to Score")) %>%
+#   select(gamedate, HomeTeam, AwayTeam, markets) %>%
+#   unnest(markets) %>%
+#   filter(period$live == FALSE & period$description == "Regulation Time") %>%
+#   mutate(bet_type = description) %>%
+#   select(gamedate, HomeTeam, AwayTeam, bet_type, outcomes) %>%
+#   unnest(outcomes) %>%
+#   filter(is.na(price$handicap) == TRUE | (is.na(price$handicap) == FALSE & is.na(price$handicap2) == TRUE)) %>%
+#   mutate(type = if_else(type == "X",
+#                         if_else(description == "Yes", "Y","N"),
+#                         type)) %>%
+#   mutate(Odds = as.numeric(price$american),
+#          SpreadTotal = price$handicap,
+#          type = if_else(type == "H" | type == "O" | type == "Y", "HOY",
+#                         if_else(type == "D", "D", "AUN"))) %>%
+#   mutate(Odds = if_else(is.na(Odds), 100, Odds)) %>%
+#   select(gamedate, HomeTeam, AwayTeam, bet_type, type, Odds, any_of("SpreadTotal")) %>%
+#   mutate(HomeTeam = iconv(HomeTeam, from = 'UTF-8', to = 'ASCII//TRANSLIT'),
+#          AwayTeam = iconv(AwayTeam, from = 'UTF-8', to = 'ASCII//TRANSLIT'),
+#          bet_type = iconv(bet_type, from = 'UTF-8', to = 'ASCII//TRANSLIT'),
+#          bet_type = case_when(bet_type == "Spread" & type == "HOY" ~ paste0("Alternate Spread - Home: ", as.numeric(SpreadTotal)),
+#                               bet_type == "Spread" & type == "AUN" ~ paste0("Alternate Spread - Home: ", as.numeric(SpreadTotal)*-1),
+#                               bet_type == "Total Goals O/U" ~ paste0("Alternate Total - ", abs(as.numeric(SpreadTotal))),
+#                               grepl("Total Goals O/U - Inter Milan", bet_type) ~ paste0("Total Goals O/U - Inter Milano - ", abs(as.numeric(SpreadTotal))),
+#                               grepl("Total Goals O/U - ", bet_type) ~ paste0(bet_type, " - ", abs(as.numeric(SpreadTotal))),
+#                               TRUE ~ bet_type)) %>%
+#   reshape2::melt(id.vars = c("gamedate", "HomeTeam", "AwayTeam", "bet_type", "type")) %>%
+#   mutate(name = paste0(type, ".", variable)) %>%
+#   select(-type, -variable) %>%
+#   mutate(value = as.numeric(value)) %>%
+#   reshape2::dcast(gamedate + HomeTeam + AwayTeam + bet_type ~ name, fun.aggregate = mean) %>%
+#   mutate(AUN.Odds = round(AUN.Odds, 0),
+#          HOY.Odds = round(HOY.Odds, 0),
+#          D.Odds = round(D.Odds, 0)) %>%
+#   filter((AUN.Odds >= 100 | AUN.Odds <= -100) & (HOY.Odds >= 100 | HOY.Odds <= -100)) %>%
+#   select(-D.SpreadTotal)
 
 # champ_odds <- fromJSON(champ_url) %>%
 #   .[[2]] %>%
@@ -386,11 +386,11 @@ ita_odds <- fromJSON(ita_url) %>%
 #   filter((AUN.Odds >= 100 | AUN.Odds <= -100) & (HOY.Odds >= 100 | HOY.Odds <= -100)) %>%
 #   select(-D.SpreadTotal)
 
-bovada_odds <- bind_rows(epl_odds, 
-                         esp_odds,
-                         ger_odds,
-                         ita_odds,
-                         fra_odds,
+bovada_odds <- bind_rows(#epl_odds, 
+                         # esp_odds,
+                         # ger_odds,
+                         # ita_odds,
+                         # fra_odds,
                          mls_odds#,
                          # champ_odds,
                          # mex_odds
