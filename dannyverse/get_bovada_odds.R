@@ -1,10 +1,10 @@
 ## Get odds from Bovada API
-get_bovada_odds <- function(sport, league) {
+get_bovada_odds <- function(sport) {
   library(tidyverse)
   library(tidyjson)
   library(jsonlite)
   library(reshape2)
-  url <- paste0("https://www.bovada.lv/services/sports/event/v2/events/A/description/",sport,"/",league)
+  url <- paste0("https://www.bovada.lv/services/sports/event/v2/events/A/description/",sport)
   
   bovada_odds <- fromJSON(url) %>%
     .[[2]] %>%

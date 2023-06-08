@@ -271,7 +271,7 @@ rosters <- get_daily_rosters(daily_rosters_max_date+1, Sys.Date())
 tmrw_rosters <- get_daily_rosters(Sys.Date()+1, Sys.Date()+1)
 
 ## Bovada Odds
-bovada_odds <- get_bovada_odds("baseball", "mlb") %>% 
+bovada_odds <- get_bovada_odds("baseball") %>% 
   dplyr::mutate(AwayStartingPitcher = case_when(str_detect(AwayStartingPitcher, "Shohei Ohtani") ~ "Shohei Ohtani",
                                          str_detect(AwayStartingPitcher, "Nestor Cortes") ~ "Nestor Cortes",
                                          TRUE ~ AwayStartingPitcher),
