@@ -89,11 +89,29 @@ MX <- fb_match_results(country = "MEX",
          xG.1 = as.numeric(xG.1),
          Season = paste0(Season-1,"-",Season))
 
+Brazil <- fb_match_results(country = "BRA",
+                       gender = "M",
+                       season_end_year = c(2019,2020,2021,2022,2023), tier = "1st") %>% 
+  select(Day, Date, Time, Home, Home_xG, HomeGoals, AwayGoals, Away_xG, Away,
+         Competition_Name, Season_End_Year) %>% 
+  rename(xG = Home_xG,
+         Home_Score = HomeGoals,
+         Away_Score = AwayGoals,
+         xG.1 = Away_xG,
+         League = Competition_Name,
+         Season = Season_End_Year) %>%
+  mutate(xG = as.numeric(xG),
+         Home_Score = as.numeric(Home_Score),
+         Away_Score = as.numeric(Away_Score),
+         xG.1 = as.numeric(xG.1),
+         League = "Brasileiro Serie A",
+         Season = paste0(Season-1,"-",Season))
+
 
 intervalEnd <- Sys.time()
 paste("Web scraping took",intervalEnd - intervalStart,attr(intervalEnd - intervalStart,"units"))
 
-fixtures <- rbind(Big5, mls, Champ, MX)
+fixtures <- rbind(Big5, mls, Champ, MX, Brazil)
 fixtures$Date <- as.Date(fixtures$Date)
 today <- Sys.Date()
 
@@ -267,7 +285,7 @@ train_df <- metrics %>%
                                      TRUE ~ "Under")))
 
 train <- train_df %>% 
-  filter(SplitGP > 1 & SplitGP_Opp > 1 & Date < today)%>% 
+  filter(SplitGP > 3 & SplitGP_Opp > 3 & Date < today)%>% 
   select(-ID,
          -Date,
          -Day,
@@ -340,7 +358,7 @@ saveRDS(pls_mod, "C:/Users/danie/Desktop/SportsStuff/TheMachine/SoccerModels/tra
 saveRDS(lm_mod, "C:/Users/danie/Desktop/SportsStuff/TheMachine/SoccerModels/train_lm.rds")
 
 train_prob <- train_df %>% 
-  filter(SplitGP > 1 & SplitGP_Opp > 1 & Date < today)%>% 
+  filter(SplitGP > 3 & SplitGP_Opp > 3 & Date < today)%>% 
   select(-ID,
          -Date,
          -Day,
