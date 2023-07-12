@@ -1,6 +1,7 @@
 ### The Machine v3.0
 ### Predictions
 
+overallStart <- Sys.time()
 library("pacman")
 p_load(
   "tidyverse",
@@ -25,9 +26,14 @@ DF22 <- readRDS("Baseball Machine/Daily Files/2022/full_training_data.rds") %>%
          AwaySP_WARP200 = case_when(!is.nan(AwaySP_WARP200) ~ AwaySP_WARP200)) %>% 
   rename(WARP200_HomeSP = HomeSP_WARP200,
          WARP200_AwaySP = AwaySP_WARP200)
+DF23 <- readRDS("Baseball Machine/Daily Files/2023/full_training_data.rds") %>%
+  ungroup() %>% 
+  rename(WARP200_HomeSP = HomeSP_WARP200,
+         WARP200_AwaySP = AwaySP_WARP200)
 
 DF <- DF19 %>% 
-  bind_rows(DF20, DF21, DF22)
+  bind_rows(DF20, DF21, DF22, DF23) %>% 
+  filter(doubleHeader == 'N')
 
 ## Adjust IP columns to use .333 instead of .1 for a third of an inning
 
@@ -187,7 +193,7 @@ DF_Rate_Adj <- DF_IP_Adj %>%
 train_full_game_home <- DF_Rate_Adj %>% 
   ungroup() %>% 
   select(home_runs_final, home_team_season, month, home_team_league_name, home_team_division_name,
-         doubleHeader, gameNumber, dayNight, venue.name, contains('_AwaySP'), contains('_HomeBatters'),
+         dayNight, venue.name, contains('_AwaySP'), contains('_HomeBatters'),
          -Def_L7_HomeBatters, -Def_L14_HomeBatters, -Def_L30_HomeBatters, -Def_HomeBatters,
          Def_L7_AwayBatters, Def_L14_AwayBatters, Def_L30_AwayBatters, Def_AwayBatters,
          contains('_AwayBullpen')) %>%
@@ -199,7 +205,7 @@ train_full_game_home <- DF_Rate_Adj %>%
 train_full_game_away <- DF_Rate_Adj %>% 
   ungroup() %>% 
   select(away_runs_final, home_team_season, month, away_team_league_name, away_team_division_name,
-         doubleHeader, gameNumber, dayNight, venue.name, contains('_HomeSP'), contains('_AwayBatters'),
+         dayNight, venue.name, contains('_HomeSP'), contains('_AwayBatters'),
          Def_L7_HomeBatters, Def_L14_HomeBatters, Def_L30_HomeBatters, Def_HomeBatters,
          -Def_L7_AwayBatters, -Def_L14_AwayBatters, -Def_L30_AwayBatters, -Def_AwayBatters,
          contains('_HomeBullpen')) %>%
@@ -243,7 +249,7 @@ train_full_game <- train_full_game_home %>%
 train_F5_home <- DF_Rate_Adj %>% 
   ungroup() %>% 
   select(home_runs_5th, home_team_season, month, home_team_league_name, home_team_division_name,
-         doubleHeader, gameNumber, dayNight, venue.name, contains('_AwaySP'), contains('_HomeBatters'),
+         dayNight, venue.name, contains('_AwaySP'), contains('_HomeBatters'),
          -Def_L7_HomeBatters, -Def_L14_HomeBatters, -Def_L30_HomeBatters, -Def_HomeBatters,
          Def_L7_AwayBatters, Def_L14_AwayBatters, Def_L30_AwayBatters, Def_AwayBatters) %>%
   rename_all(~gsub("home_","",.)) %>% 
@@ -254,7 +260,7 @@ train_F5_home <- DF_Rate_Adj %>%
 train_F5_away <- DF_Rate_Adj %>% 
   ungroup() %>% 
   select(away_runs_5th, home_team_season, month, away_team_league_name, away_team_division_name,
-         doubleHeader, gameNumber, dayNight, venue.name, contains('_HomeSP'), contains('_AwayBatters'),
+         dayNight, venue.name, contains('_HomeSP'), contains('_AwayBatters'),
          Def_L7_HomeBatters, Def_L14_HomeBatters, Def_L30_HomeBatters, Def_HomeBatters,
          -Def_L7_AwayBatters, -Def_L14_AwayBatters, -Def_L30_AwayBatters, -Def_AwayBatters) %>%
   rename_all(~gsub("home_","",.)) %>% 
@@ -290,7 +296,7 @@ train_F5 <- train_F5_home %>%
 train_F1_home <- DF_Rate_Adj %>% 
   ungroup() %>% 
   select(home_runs_1st, home_team_season, month, home_team_league_name, home_team_division_name,
-         doubleHeader, gameNumber, dayNight, venue.name, contains('_AwaySP'), contains('_HomeBatters'),
+         dayNight, venue.name, contains('_AwaySP'), contains('_HomeBatters'),
          -Def_L7_HomeBatters, -Def_L14_HomeBatters, -Def_L30_HomeBatters, -Def_HomeBatters,
          Def_L7_AwayBatters, Def_L14_AwayBatters, Def_L30_AwayBatters, Def_AwayBatters) %>%
   rename_all(~gsub("home_","",.)) %>% 
@@ -301,7 +307,7 @@ train_F1_home <- DF_Rate_Adj %>%
 train_F1_away <- DF_Rate_Adj %>% 
   ungroup() %>% 
   select(away_runs_1st, home_team_season, month, away_team_league_name, away_team_division_name,
-         doubleHeader, gameNumber, dayNight, venue.name, contains('_HomeSP'), contains('_AwayBatters'),
+         dayNight, venue.name, contains('_HomeSP'), contains('_AwayBatters'),
          Def_L7_HomeBatters, Def_L14_HomeBatters, Def_L30_HomeBatters, Def_HomeBatters,
          -Def_L7_AwayBatters, -Def_L14_AwayBatters, -Def_L30_AwayBatters, -Def_AwayBatters) %>%
   rename_all(~gsub("home_","",.)) %>% 
@@ -324,7 +330,7 @@ train_F1 <- train_F1_home %>%
 doubles <- DF_Rate_Adj %>% 
   ungroup() %>% 
   select(home_team_season, month, home_team_league_name, home_team_division_name,
-         doubleHeader, gameNumber, dayNight, venue.name, contains('_AwaySP'),
+         dayNight, venue.name, contains('_AwaySP'),
          contains('_HomeSP'), contains('_HomeBatters'), contains('_AwayBatters'),
          contains('_AwayBullpen'), contains('_HomeBullpen'), contains('Outcome_')) %>% 
   filter(!is.na(IP_HomeSP) &
@@ -1925,3 +1931,6 @@ paste("F1 ML classification model training took",intervalEnd - intervalStart,att
 saveRDS(F1_TT_0.5_gbm, "C:/Users/danie/Desktop/SportsStuff/TheMachine/BaseballModels/F1_TT_0.5_gbm.rds")
 saveRDS(F1_TT_0.5_pls, "C:/Users/danie/Desktop/SportsStuff/TheMachine/BaseballModels/F1_TT_0.5_pls.rds")
 saveRDS(F1_TT_0.5_xgb, "C:/Users/danie/Desktop/SportsStuff/TheMachine/BaseballModels/F1_TT_0.5_xgb.rds")
+
+overallEnd <- Sys.time()
+paste("Entire script took",overallEnd - overallStart,attr(overallEnd - overallStart,"units"))

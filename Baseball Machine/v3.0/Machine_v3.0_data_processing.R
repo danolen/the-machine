@@ -228,6 +228,68 @@ daily_pitchers_2022 <- daily_pitchers_2022 %>%
                           Name == "Hyun-Jin Ryu" ~ "Hyun Jin Ryu",
                           TRUE ~ Name))
 
+##2023
+
+team_batting_L7_2023 <- read.csv("Baseball Machine/Daily Files/2023/team_batting_L7_2023.csv") %>% 
+  select(-url)
+team_batting_L7_2023$Date <- as.Date(team_batting_L7_2023$Date)
+team_batting_L14_2023 <- read.csv("Baseball Machine/Daily Files/2023/team_batting_L14_2023.csv") %>% 
+  select(-url)
+team_batting_L14_2023$Date <- as.Date(team_batting_L14_2023$Date)
+team_batting_L30_2023 <- read.csv("Baseball Machine/Daily Files/2023/team_batting_L30_2023.csv") %>% 
+  select(-url)
+team_batting_L30_2023$Date <- as.Date(team_batting_L30_2023$Date)
+team_batting_s2d_2023 <- read.csv("Baseball Machine/Daily Files/2023/team_batting_s2d_2023.csv") %>% 
+  select(-url)
+team_batting_s2d_2023$Date <- as.Date(team_batting_s2d_2023$Date)
+
+daily_team_batting_2023 <- full_join(team_batting_L7_2023, team_batting_L14_2023, by = c("Team", "Date"), suffix = c("_L7", "_L14")) %>%
+  full_join(team_batting_L30_2023, by = c("Team", "Date"))
+colnames(daily_team_batting_2023)[57:83] <- paste0(colnames(daily_team_batting_2023)[57:83],'_L30')
+daily_team_batting_2023 <- full_join(daily_team_batting_2023, team_batting_s2d_2023, by = c("Team", "Date")) %>% 
+  left_join(team_names %>% 
+              select(Full.Name22, BR),
+            by = c("Team" = "BR")) %>% 
+  mutate(Team = Full.Name22) %>% 
+  select(-Full.Name22)
+
+team_bullpen_L7_2023 <- read.csv("Baseball Machine/Daily Files/2023/team_bullpen_L7_2023.csv") %>% 
+  select(-url)
+team_bullpen_L7_2023$Date <- as.Date(team_bullpen_L7_2023$Date)
+team_bullpen_L14_2023 <- read.csv("Baseball Machine/Daily Files/2023/team_bullpen_L14_2023.csv") %>% 
+  select(-url)
+team_bullpen_L14_2023$Date <- as.Date(team_bullpen_L14_2023$Date)
+team_bullpen_L30_2023 <- read.csv("Baseball Machine/Daily Files/2023/team_bullpen_L30_2023.csv") %>% 
+  select(-url)
+team_bullpen_L30_2023$Date <- as.Date(team_bullpen_L30_2023$Date)
+team_bullpen_s2d_2023 <- read.csv("Baseball Machine/Daily Files/2023/team_bullpen_s2d_2023.csv") %>% 
+  select(-url)
+team_bullpen_s2d_2023$Date <- as.Date(team_bullpen_s2d_2023$Date)
+
+daily_team_bullpen_2023 <- full_join(team_bullpen_L7_2023, team_bullpen_L14_2023, by = c("Team", "Date"), suffix = c("_L7", "_L14")) %>%
+  full_join(team_bullpen_L30_2023, by = c("Team", "Date"))
+colnames(daily_team_bullpen_2023)[51:74] <- paste0(colnames(daily_team_bullpen_2023)[51:74],'_L30')
+daily_team_bullpen_2023 <- full_join(daily_team_bullpen_2023, team_bullpen_s2d_2023, by = c("Team", "Date")) %>% 
+  left_join(team_names %>% 
+              select(Full.Name22, BR),
+            by = c("Team" = "BR")) %>% 
+  mutate(Team = Full.Name22) %>% 
+  select(-Full.Name22)
+
+daily_pitchers_2023 <- read.csv("Baseball Machine/Daily Files/2023/pitchers_s2d_2023.csv") %>% 
+  select(-url)
+daily_pitchers_2023$Date <- as.Date(daily_pitchers_2023$Date)
+dupe_SPs_23 <- daily_pitchers_2023 %>% 
+  filter(Date == max(daily_pitchers_2023$Date)) %>% 
+  group_by(Name) %>% 
+  summarise(records = n()) %>% 
+  filter(records > 1) %>% 
+  left_join(daily_pitchers_2023 %>% distinct(Name, Team))
+daily_pitchers_2023 <- daily_pitchers_2023 %>% 
+  mutate(Name = case_when(Name == "Luis Garcia" & Team == "HOU" ~ "Luis Garcia (HOU)",
+                          Name == "Luis Ortiz" & Team == "PIT" ~ "Luis Ortiz (PIT)",
+                          TRUE ~ Name))
+
 ## Load Game scorelines
 
 pks_19 <- read.csv("Baseball Machine/Daily Files/2019/game_pks_2019.csv")
@@ -238,6 +300,8 @@ pks_21 <- read.csv("Baseball Machine/Daily Files/2021/game_pks_2021.csv")
 gms_21 <- read.csv("Baseball Machine/Daily Files/2021/games_scores_2021.csv")
 pks_22 <- read.csv("Baseball Machine/Daily Files/2022/game_pks_2022.csv")
 gms_22 <- read.csv("Baseball Machine/Daily Files/2022/games_scores_2022.csv")
+pks_23 <- read.csv("Baseball Machine/Daily Files/2023/game_pks_2023.csv")
+gms_23 <- read.csv("Baseball Machine/Daily Files/2023/game_scores_2023.csv")
 
 scores_19 <- gms_19 %>% 
   distinct(game_pk, home_team_name, away_team_name, num, ordinal_num, home_runs, home_hits,
@@ -387,6 +451,43 @@ scores_22 <- gms_22 %>%
                         away_hits_final = sum(away_hits),
                         away_errors_final = sum(away_errors)))
 
+scores_23 <- gms_23 %>% 
+  distinct(game_pk, home_team_name, away_team_name, num, ordinal_num, home_runs, home_hits,
+           home_errors, away_runs, away_hits, away_errors, home_team_season, home_team_league_name,
+           home_team_division_name, away_team_league_name, away_team_division_name) %>%
+  inner_join(pks_23 %>% 
+               filter(status.detailedState %in% c('Final', 'Completed Early') &
+                        is.na(resumeDate) &
+                        is.na(resumedFrom) &
+                        seriesDescription == 'Regular Season' &
+                        scheduledInnings == 9) %>% 
+               select(game_pk, officialDate, doubleHeader, gameNumber, dayNight, scheduledInnings, venue.name)) %>% 
+  filter(!is.na(num)) %>% 
+  replace(is.na(.),0) %>% 
+  group_by(game_pk) %>% 
+  mutate(home_runs = cumsum(home_runs),
+         home_hits = cumsum(home_hits),
+         home_errors = cumsum(home_errors),
+         away_runs = cumsum(away_runs),
+         away_hits = cumsum(away_hits),
+         away_errors = cumsum(away_errors)) %>% 
+  filter(num <= 9) %>%
+  select(-num) %>%  
+  pivot_wider(names_from = ordinal_num, values_from = c(home_runs, home_hits, home_errors, away_runs, away_hits, away_errors)) %>% 
+  left_join(gms_23 %>% 
+              distinct(game_pk, home_team_name, away_team_name, num, ordinal_num, home_runs, home_hits,
+                       home_errors, away_runs, away_hits, away_errors, home_team_season, home_team_league_name,
+                       home_team_division_name, away_team_league_name, away_team_division_name) %>%
+              filter(!is.na(num)) %>% 
+              replace(is.na(.),0) %>% 
+              group_by(game_pk) %>% 
+              summarise(home_runs_final = sum(home_runs),
+                        home_hits_final = sum(home_hits),
+                        home_errors_final = sum(home_errors),
+                        away_runs_final = sum(away_runs),
+                        away_hits_final = sum(away_hits),
+                        away_errors_final = sum(away_errors)))
+
 ## Read in PECOTA Projections
 PECOTA_pitching_19 <- read_xlsx("Baseball Machine/PECOTA/2019/pecota_2019_03_20.xlsx", sheet = "Pitchers") %>% 
   select(MLBCODE, NAME, IP, WARP) %>% 
@@ -400,6 +501,9 @@ PECOTA_pitching_21 <- read_xlsx("Baseball Machine/PECOTA/2021/pecota2021_pitchin
 PECOTA_pitching_22 <- read_xlsx("Baseball Machine/PECOTA/2022/pecota2022_pitching_apr03.xlsx", sheet = "50") %>% 
   select(mlbid, name, ip, warp) %>% 
   mutate(WARP200 = (warp/ip)*200)
+PECOTA_pitching_23 <- read_xlsx("Baseball Machine/PECOTA/2023/pecota2023_pitching_mar29.xlsx", sheet = "50") %>% 
+  select(mlbid, name, ip, warp) %>% 
+  mutate(WARP200 = (warp/ip)*200)
 
 PECOTA_hitting_19 <- read_xlsx("Baseball Machine/PECOTA/2019/pecota_2019_03_20.xlsx", sheet = "Batters") %>% 
   select(MLBCODE, NAME, PA, WARP) %>% 
@@ -411,6 +515,9 @@ PECOTA_hitting_21 <- read_xlsx("Baseball Machine/PECOTA/2021/pecota2021_hitting_
   select(mlbid, name, pa, warp) %>% 
   mutate(WARP600 = (as.numeric(warp)/as.numeric(pa))*600)
 PECOTA_hitting_22 <- read_xlsx("Baseball Machine/PECOTA/2022/pecota2022_hitting_apr03.xlsx", sheet = "50") %>% 
+  select(mlbid, name, pa, warp) %>% 
+  mutate(WARP600 = (as.numeric(warp)/as.numeric(pa))*600)
+PECOTA_hitting_23 <- read_xlsx("Baseball Machine/PECOTA/2023/pecota2023_hitting_mar29.xlsx", sheet = "50") %>% 
   select(mlbid, name, pa, warp) %>% 
   mutate(WARP600 = (as.numeric(warp)/as.numeric(pa))*600)
 
@@ -470,6 +577,10 @@ SPs21 <- read.csv("Baseball Machine/Daily Files/2021/starting_pitchers_2021.csv"
             by = c("id" = "mlbid"))
 SPs22 <- read.csv("Baseball Machine/Daily Files/2022/starting_pitchers_2022.csv") %>% 
   left_join(PECOTA_pitching_22 %>% 
+              select(mlbid, WARP200),
+            by = c("id" = "mlbid"))
+SPs23 <- read.csv("Baseball Machine/Daily Files/2023/starting_pitchers_2023.csv") %>% 
+  left_join(PECOTA_pitching_23 %>% 
               select(mlbid, WARP200),
             by = c("id" = "mlbid"))
 
@@ -567,6 +678,16 @@ rosters_22 <- read.csv("Baseball Machine/Daily Files/2022/daily_rosters_2022.csv
   select(-X) %>% 
   filter(position_type != "Pitcher") %>% 
   left_join(PECOTA_hitting_22 %>% 
+              select(mlbid, WARP600),
+            by = c("person_id" = "mlbid")) %>% 
+  group_by(team_id, date) %>% 
+  summarise(WARP600 = sum(WARP600, na.rm = T)) %>% 
+  left_join(team_names %>% 
+              select(Full.Name22, id),
+            by = c("team_id" = "id"))
+rosters_23 <- read.csv("Baseball Machine/Daily Files/2023/daily_rosters_2023.csv") %>%
+  filter(position_type != "Pitcher") %>% 
+  left_join(PECOTA_hitting_23 %>% 
               select(mlbid, WARP600),
             by = c("person_id" = "mlbid")) %>% 
   group_by(team_id, date) %>% 
@@ -727,8 +848,93 @@ gamescores22 <- scores_22 %>%
   left_join(daily_team_bullpen_2022, by = c("officialDate" = "Date", "home_team_name" = "Team")) %>% 
   left_join(daily_team_bullpen_2022, by = c("officialDate" = "Date", "away_team_name" = "Team"), suffix = c("_HomeBullpen", "_AwayBullpen"))
 
+gamescores23 <- scores_23 %>% 
+  left_join(SPs23 %>% 
+              select(-team_id, -home_plate_full_name, -home_plate_id),
+            by = c("game_pk" = "game_pk",
+                   "officialDate" = "game_date",
+                   "home_team_name" = "team")) %>% 
+  rename(HomeSP_fullName = fullName,
+         HomeSP_id = id,
+         HomeSP_WARP200 = WARP200) %>% 
+  left_join(SPs23 %>% 
+              select(-team_id, -home_plate_full_name, -home_plate_id),
+            by = c("game_pk" = "game_pk",
+                   "officialDate" = "game_date",
+                   "away_team_name" = "team")) %>% 
+  rename(AwaySP_fullName = fullName,
+         AwaySP_id = id,
+         AwaySP_WARP200 = WARP200) %>% 
+  left_join(rosters_23 %>% 
+              ungroup() %>% 
+              select(-team_id),
+            by = c("officialDate" = "date",
+                   "home_team_name" = "Full.Name22")) %>% 
+  left_join(rosters_23 %>% 
+              ungroup() %>% 
+              select(-team_id),
+            by = c("officialDate" = "date",
+                   "away_team_name" = "Full.Name22"),
+            suffix = c("_HomeBatters", "_AwayBatters")) %>% 
+  mutate(officialDate = as.Date(officialDate)) %>% 
+  filter(!is.na(HomeSP_fullName) & !is.na(AwaySP_fullName)) %>% 
+  left_join(daily_pitchers_2023, by = c("officialDate" = "Date", "HomeSP_fullName" = "Name")) %>% 
+  left_join(daily_pitchers_2023, by = c("officialDate" = "Date", "AwaySP_fullName" = "Name"), suffix = c("_HomeSP", "_AwaySP")) %>% 
+  left_join(daily_team_batting_2023, by = c("officialDate" = "Date", "home_team_name" = "Team")) %>% 
+  left_join(daily_team_batting_2023, by = c("officialDate" = "Date", "away_team_name" = "Team"), suffix = c("_HomeBatters", "_AwayBatters")) %>% 
+  left_join(daily_team_bullpen_2023, by = c("officialDate" = "Date", "home_team_name" = "Team")) %>% 
+  left_join(daily_team_bullpen_2023, by = c("officialDate" = "Date", "away_team_name" = "Team"), suffix = c("_HomeBullpen", "_AwayBullpen"))
+
 ## Get Pitcher Game Logs
 player_ids <- baseballr::chadwick_player_lu()
+
+SPIDs19 <- SPs19 %>% 
+  filter(!is.na(fullName)) %>% 
+  distinct(fullName, id) %>% 
+  mutate(year = 2019) %>% 
+  left_join(player_ids %>% 
+              select(key_mlbam, key_fangraphs),
+            by = c("id" = "key_mlbam"))
+SPIDs20 <- SPs20 %>% 
+  filter(!is.na(fullName)) %>% 
+  distinct(fullName, id) %>% 
+  mutate(year = 2020) %>% 
+  left_join(player_ids %>% 
+              select(key_mlbam, key_fangraphs),
+            by = c("id" = "key_mlbam"))
+SPIDs21 <- SPs21 %>% 
+  filter(!is.na(fullName)) %>% 
+  distinct(fullName, id) %>% 
+  mutate(year = 2021) %>% 
+  left_join(player_ids %>% 
+              select(key_mlbam, key_fangraphs),
+            by = c("id" = "key_mlbam"))
+SPIDs22 <- SPs22 %>% 
+  filter(!is.na(fullName)) %>% 
+  distinct(fullName, id) %>% 
+  mutate(year = 2022) %>% 
+  left_join(player_ids %>% 
+              select(key_mlbam, key_fangraphs),
+            by = c("id" = "key_mlbam"))
+SPIDs23 <- SPs23 %>% 
+  filter(!is.na(fullName)) %>% 
+  distinct(fullName, id) %>% 
+  mutate(year = 2023) %>% 
+  left_join(player_ids %>% 
+              select(key_mlbam, key_fangraphs),
+            by = c("id" = "key_mlbam"))
+
+GLs19 <- get_pitcher_game_logs(SPIDs19)
+GLs20 <- get_pitcher_game_logs(SPIDs20)
+GLs21 <- get_pitcher_game_logs(SPIDs21)
+GLs22 <- get_pitcher_game_logs(SPIDs22)
+GLs23 <- get_pitcher_game_logs(SPIDs23)
+
+saveRDS(GLs19, "Baseball Machine/Daily Files/2019/pitcher_game_logs.rds")
+saveRDS(GLs20, "Baseball Machine/Daily Files/2020/pitcher_game_logs.rds")
+saveRDS(GLs21, "Baseball Machine/Daily Files/2021/pitcher_game_logs.rds")
+saveRDS(GLs22, "Baseball Machine/Daily Files/2022/pitcher_game_logs.rds")
+saveRDS(GLs23, "Baseball Machine/Daily Files/2023/pitcher_game_logs.rds")
 
 ## Save files
 
@@ -736,4 +942,5 @@ saveRDS(gamescores19, "Baseball Machine/Daily Files/2019/full_training_data.rds"
 saveRDS(gamescores20, "Baseball Machine/Daily Files/2020/full_training_data.rds")
 saveRDS(gamescores21, "Baseball Machine/Daily Files/2021/full_training_data.rds")
 saveRDS(gamescores22, "Baseball Machine/Daily Files/2022/full_training_data.rds")
+saveRDS(gamescores23, "Baseball Machine/Daily Files/2023/full_training_data.rds")
 
