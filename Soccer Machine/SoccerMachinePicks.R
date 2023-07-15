@@ -467,7 +467,7 @@ mls_22 <- load_match_results(country = "USA", gender = "M", season_end_year = 20
          League = "MLS",
          Season = as.character(Season))
 
-mls_23 <- load_match_results(country = "USA", gender = "M", season_end_year = 2023, tier = "1st") %>% 
+mls_23 <- fb_match_results(country = "USA", gender = "M", season_end_year = 2023, tier = "1st") %>% 
   select(Day, Date, Time, Home, Home_xG, HomeGoals, AwayGoals, Away_xG, Away, Competition_Name, Season_End_Year) %>% 
   rename(xG = Home_xG,
          Home_Score = HomeGoals,
@@ -545,7 +545,7 @@ Mex_23 <- load_match_results(country = "MEX", gender = "M", season_end_year = 20
          xG.1 = as.numeric(xG.1),
          Season = paste0(Season-1,"-",Season))
 
-bra_23 <- load_match_results(country = "BRA", gender = "M", season_end_year = 2023, tier = "1st") %>% 
+bra_23 <- fb_match_results(country = "BRA", gender = "M", season_end_year = 2023, tier = "1st") %>% 
   select(Day, Date, Time, Home, Home_xG, HomeGoals, AwayGoals, Away_xG, Away, Competition_Name, Season_End_Year) %>% 
   rename(xG = Home_xG,
          Home_Score = HomeGoals,
