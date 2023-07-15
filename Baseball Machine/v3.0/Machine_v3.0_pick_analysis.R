@@ -29,7 +29,7 @@ types <- history2 %>%
                                      EV_tier < 1 ~ 0),
                 KC_Grade = case_when(as.numeric(as.character(KC_tier)) >= 0.35 ~ 4,
                                      as.numeric(as.character(KC_tier)) >= 0.3 ~ 3,
-                                     as.numeric(as.character(KC_tier)) >= 0.2 ~ 2,
+                                     as.numeric(as.character(KC_tier)) >= 0.2 ~ 2.5,
                                      as.numeric(as.character(KC_tier)) == 0.15 ~ 1,
                                      as.numeric(as.character(KC_tier)) < 0.15 ~ 0),
                 New_Grade = (KC_Grade + EV_Grade) / 2)
@@ -48,15 +48,17 @@ grades <- types %>%
   ungroup() %>% 
   dplyr::mutate(`Bet Grade` = case_when(New_Grade > 3 ~ 'A+',
                                         New_Grade >= 2.5 ~ 'A',
-                                        New_Grade >= 2 ~ 'B',
-                                        New_Grade >= 1 ~ 'C',
-                                        New_Grade < 1 ~ 'D'),
+                                        New_Grade >= 1.75 ~ 'B',
+                                        # New_Grade >= 1 ~ 'C',
+                                        New_Grade < 1.75 ~ 'C'),
          `Graded Risk` = case_when(`Bet Grade` == 'A+' ~ 2,
-                                   `Bet Grade` == 'A' ~ 1.5,
-                                   `Bet Grade` == 'B' ~ 1,
-                                   `Bet Grade` == 'C' ~ 0.5,
+                                   `Bet Grade` == 'A' ~ 1,
+                                   `Bet Grade` == 'B' ~ 0,
+                                   `Bet Grade` == 'C' ~ 0,
                                    `Bet Grade` == 'D' ~ 0),
          `Graded Profit` = Units*`Graded Risk`,
+         `Bet Grade` = case_when(Kelly_Criteria >= 0.4 ~ 'C',
+                                 TRUE ~ `Bet Grade`),
          `Bet Grade` = factor(`Bet Grade`, levels = c('A+', 'A', 'B', 'C', 'D'))) %>% 
   filter(Winner != "Push")
 
@@ -68,9 +70,9 @@ grades %>%
   # group_by(EV_tier = as.numeric(as.character(EV_tier))) %>%
   group_by(`Bet Grade`,
            `Suggested Wager` = case_when(`Bet Grade` == 'A+' ~ '2 units',
-                                         `Bet Grade` == 'A' ~ '1.5 unit',
-                                         `Bet Grade` == 'B' ~ '1 unit',
-                                         `Bet Grade` == 'C' ~ '0.5 unit',
+                                         `Bet Grade` == 'A' ~ '1 unit',
+                                         `Bet Grade` == 'B' ~ 'No bet',
+                                         `Bet Grade` == 'C' ~ 'No bet',
                                          `Bet Grade` == 'D' ~ 'No bet')) %>%
   dplyr::summarise(`Hit Rate` = mean(Pick_Correct),
                    `Average Implied Odds` = mean(if_else(Pick_Odds > 0, 100 / (Pick_Odds + 100), abs(Pick_Odds) / (abs(Pick_Odds) + 100))),
@@ -102,14 +104,15 @@ ass <- grades %>%
     KC_tier = as.numeric(as.character(KC_tier)),
     # EV_Grade,
     EV_tier = as.numeric(as.character(EV_tier)),
-    # New_Grade
+    New_Grade
     # `Bet Grade` = factor(`Bet Grade`, levels = c('A+', 'A', 'B', 'C', 'D'))
     ) %>%
   dplyr::summarise(total_bets = sum(bets),
+                   won_bets = sum(Pick_Correct),
                    ROI = sum(Units) / sum(bets))
 
 plot_data <- grades %>% 
-  filter(`Bet Grade` == 'D') %>% 
+  filter(`Bet Grade` %in% c('A+','A')) %>%
   select(gamedate, Units, `Graded Profit`) %>% 
   dplyr::rename(`Profit: 1 Unit Wagers` = Units,
                 `Profit: Suggested Wagers` = `Graded Profit`) %>% 
