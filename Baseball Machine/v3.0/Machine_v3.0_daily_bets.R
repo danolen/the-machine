@@ -1703,6 +1703,7 @@ history2 <- history %>%
              by = c("gamedate" = "officialDate",
                     "AwayTeam" = "away_team_name",
                     "HomeTeam" = "home_team_name")) %>% 
+  filter(!paste0(gamedate, AwayTeam, HomeTeam) %in% c('2023-07-17San Francisco GiantsCincinnati Reds','2023-07-18San Francisco GiantsCincinnati Reds')) %>% 
   dplyr::mutate(Winner = case_when(bet_type == 'FG ML' ~ 
                               case_when(away_runs_final > home_runs_final ~ AwayTeam,
                                         TRUE ~ HomeTeam),
@@ -1821,14 +1822,14 @@ grades <- types %>%
                                         New_Grade >= 1.75 ~ 'B',
                                         # New_Grade >= 1 ~ 'C',
                                         New_Grade < 1.75 ~ 'C'),
+                `Bet Grade` = case_when(Kelly_Criteria >= 0.4 ~ 'C',
+                                        TRUE ~ `Bet Grade`),
                 `Graded Risk` = case_when(`Bet Grade` == 'A+' ~ 2,
                                           `Bet Grade` == 'A' ~ 1,
                                           `Bet Grade` == 'B' ~ 0,
                                           `Bet Grade` == 'C' ~ 0,
                                           `Bet Grade` == 'D' ~ 0),
                 `Graded Profit` = Units*`Graded Risk`,
-                `Bet Grade` = case_when(Kelly_Criteria >= 0.4 ~ 'C',
-                                        TRUE ~ `Bet Grade`),
                 `Bet Grade` = factor(`Bet Grade`, levels = c('A+', 'A', 'B', 'C', 'D'))) %>% 
   filter(Winner != "Push")
 
@@ -1984,6 +1985,7 @@ Email[["bcc"]] = paste("jamesorler@gmail.com",
                        "mattgodelman@gmail.com",
                        "dnassar15@gmail.com",
                        "vtloncto@gmail.com",
+                       "bcap15@yahoo.com",
                        sep = ";",
                        collapse = NULL)
 Email[["subject"]] = paste0("Baseball Machine Picks: ", Sys.Date())
