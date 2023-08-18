@@ -1535,7 +1535,8 @@ Email[["to"]] = "dnolen@smu.edu"
 Email[["bcc"]] = paste("jamesorler@gmail.com", "asnolen@crimson.ua.edu", "jamestodd425@gmail.com",
                        "jordanreticker@gmail.com", "brentcaminiti@gmail.com", "dougmyers4987@gmail.com",
                        "ralphmstudley@gmail.com", "johnpavese@gmail.com", "amishra1293@gmail.com",
-                       "rfinstra@gmail.com", "james_bueck@yahoo.com", sep = ";", collapse = NULL)
+                       "rfinstra@gmail.com", "james_bueck@yahoo.com", "jouanscott@gmail.com",
+                       sep = ";", collapse = NULL)
 Email[["subject"]] = paste0("Soccer Machine Picks: ", Sys.Date())
 Email[["HTMLbody"]] = sprintf("
 The Machine's picks for upcoming soccer matches are in! The Machine currently offers picks for the Big 5 European Leagues plus MLS, the EFL Championship, and Liga MX. The attached documents contains all of the pertinent betting information for the upcoming matches, as well as a glossary. Good luck!
