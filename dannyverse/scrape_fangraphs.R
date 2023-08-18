@@ -21,7 +21,7 @@ scrape_fangraphs <- function(position = c("team batting", "starting pitchers", "
     enddate <- as.Date(start_date)-1
     urls <- list()
     while (enddate < as.Date(end_date)) {
-      url = paste0('https://www.fangraphs.com/leaders.aspx?pos=all&stats=bat&lg=all&qual=0&type=c,6,11,12,13,21,34,35,40,41,23,37,38,50,61,305,111,203,199,58,43,44,45,47,102,110,308,311&season=',season,'&month=1000&season1=',season,'&ind=0&team=0,ts&rost=0&age=0&filter=&players=0&startdate=',startdate,'&enddate=',enddate)
+      url = paste0('https://www.fangraphs.com/leaders-legacy.aspx?pos=all&stats=bat&lg=all&qual=0&type=c,6,11,12,13,21,34,35,40,41,23,37,38,50,61,305,111,203,199,58,43,44,45,47,102,110,308,311&season=',season,'&month=1000&season1=',season,'&ind=0&team=0,ts&rost=0&age=0&filter=&players=0&startdate=',startdate,'&enddate=',enddate)
       urls[[i]] = url
       i <- i + 1
       startdate <- startdate + case_when(time_frame == "s2d" ~ 0,
@@ -66,7 +66,7 @@ scrape_fangraphs <- function(position = c("team batting", "starting pitchers", "
     enddate <- as.Date(start_date)-1
     urls <- list()
     while (enddate < as.Date(end_date)) {
-      url = paste0('https://www.fangraphs.com/leaders.aspx?pos=all&stats=pit&lg=all&qual=0&type=c%2C7%2C8%2C13%2C120%2C121%2C40%2C43%2C44%2C48%2C47%2C49%2C51%2C322%2C42%2C6%2C45%2C62%2C122%2C59%2C55%2C57%2C105%2C112%2C113%2C111%2C325%2C328&season=',season,'&month=1000&season1=',season,'&ind=0&team=0&rost=0&age=0&filter=&players=0&startdate=',startdate,'&enddate=',enddate,'&page=1_1000')
+      url = paste0('https://www.fangraphs.com/leaders-legacy.aspx?pos=all&stats=pit&lg=all&qual=0&type=c%2C7%2C8%2C13%2C120%2C121%2C40%2C43%2C44%2C48%2C47%2C49%2C51%2C322%2C42%2C6%2C45%2C62%2C122%2C59%2C55%2C57%2C105%2C112%2C113%2C111%2C325%2C328&season=',season,'&month=1000&season1=',season,'&ind=0&team=0&rost=0&age=0&filter=&players=0&startdate=',startdate,'&enddate=',enddate,'&page=1_1000')
       urls[[i]] = url
       i <- i + 1
       startdate <- startdate + case_when(time_frame == "s2d" ~ 0,
@@ -110,7 +110,7 @@ scrape_fangraphs <- function(position = c("team batting", "starting pitchers", "
     enddate <- as.Date(start_date)-1
     urls <- list()
     while (enddate < as.Date(end_date)) {
-      url = paste0('https://www.fangraphs.com/leaders.aspx?pos=all&stats=rel&lg=all&qual=0&type=c%2C7%2C13%2C120%2C121%2C40%2C43%2C44%2C48%2C47%2C49%2C51%2C322%2C42%2C6%2C45%2C62%2C122%2C59%2C105%2C112%2C113%2C111%2C325%2C328&season=',season,'&month=1000&season1=',season,'&ind=0&team=0%2Cts&rost=0&age=0&filter=&players=0&startdate=',startdate,'&enddate=',enddate)
+      url = paste0('https://www.fangraphs.com/leaders-legacy.aspx?pos=all&stats=rel&lg=all&qual=0&type=c%2C7%2C13%2C120%2C121%2C40%2C43%2C44%2C48%2C47%2C49%2C51%2C322%2C42%2C6%2C45%2C62%2C122%2C59%2C105%2C112%2C113%2C111%2C325%2C328&season=',season,'&month=1000&season1=',season,'&ind=0&team=0%2Cts&rost=0&age=0&filter=&players=0&startdate=',startdate,'&enddate=',enddate)
       urls[[i]] = url
       i <- i + 1
       startdate <- startdate + case_when(time_frame == "s2d" ~ 0,

@@ -2018,7 +2018,7 @@ write.csv(team_bullpen_L7_update, paste0("Baseball Machine/Daily Files/",season,
 write.csv(team_bullpen_L14_update, paste0("Baseball Machine/Daily Files/",season,"/team_bullpen_L14_",season,".csv"), row.names = FALSE)
 write.csv(team_bullpen_L30_update, paste0("Baseball Machine/Daily Files/",season,"/team_bullpen_L30_",season,".csv"), row.names = FALSE)
 write.csv(team_bullpen_s2d_update, paste0("Baseball Machine/Daily Files/",season,"/team_bullpen_s2d_",season,".csv"), row.names = FALSE)
-write.csv(pks_update), paste0("Baseball Machine/Daily Files/",season,"/game_pks_",season,".csv"), row.names = FALSE)
+write.csv(pks_update, paste0("Baseball Machine/Daily Files/",season,"/game_pks_",season,".csv"), row.names = FALSE)
 write.csv(scores_update, paste0("Baseball Machine/Daily Files/",season,"/game_scores_",season,".csv"), row.names = FALSE)
 write.csv(probables_update, paste0("Baseball Machine/Daily Files/",season,"/starting_pitchers_",season,".csv"), row.names = FALSE)
 write.csv(rosters_update, paste0("Baseball Machine/Daily Files/",season,"/daily_rosters_",season,".csv"), row.names = FALSE)
