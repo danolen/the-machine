@@ -316,7 +316,8 @@ pks_update <- game_pks %>%
          status.abstractGameCode = as.character(status.abstractGameCode),
          teams.away.leagueRecord.pct = as.character(teams.away.leagueRecord.pct),
          teams.home.leagueRecord.pct = as.character(teams.home.leagueRecord.pct)) %>% 
-  bind_rows(pks)
+  bind_rows(pks) %>% 
+  distinct()
 scores_update <- game_scores %>% 
   dplyr::mutate(home_team_id = as.character(home_team_id),
          away_team_id = as.character(away_team_id),
@@ -352,7 +353,8 @@ scores_update <- game_scores %>%
          away_team_record_losses = as.character(away_team_record_losses),
          away_team_record_winning_percentage = as.character(away_team_record_winning_percentage),
          away_team_active = as.character(away_team_active)) %>% 
-  bind_rows(scores)
+  bind_rows(scores %>% 
+              filter(!game_pk %in% unique(game_scores$game_pk)))
 
 probables_update <- starting_pitchers %>% 
   union(probables)
@@ -366,8 +368,8 @@ results <- scores_update %>%
            home_team_division_name, away_team_league_name, away_team_division_name) %>%
   inner_join(pks_update %>% 
                filter(status.detailedState %in% c('Final', 'Completed Early') &
-                        # is.na(resumeDate) &
-                        # is.na(resumedFrom) &
+                        is.na(resumeDate) &
+                        is.na(resumedFrom) &
                         seriesDescription == 'Regular Season' &
                         scheduledInnings == 9) %>% 
                select(game_pk, officialDate, doubleHeader, gameNumber, dayNight, scheduledInnings, venue.name)) %>% 
@@ -452,7 +454,7 @@ daily_pitchers <- pitchers_s2d_today %>%
   dplyr::mutate(Name = case_when(Name == "Luis Garcia" & Team == "HOU" ~ "Luis Garcia (HOU)",
                           # Name == "Luis Castillo" & Team == "DET" ~ "Luis Castillo (DET)",
                           Name == "Luis Ortiz" & Team == "PIT" ~ "Luis Ortiz (PIT)",
-                          # Name == "Hyun-Jin Ryu" ~ "Hyun Jin Ryu",
+                          Name == "Hyun-Jin Ryu" ~ "Hyun Jin Ryu",
                           TRUE ~ Name))
 
 PECOTA_pitching_23 <- readxl::read_xlsx(paste0("Baseball Machine/PECOTA/",season,"/pecota2023_pitching_mar29.xlsx"), sheet = "50") %>% 
@@ -1703,7 +1705,11 @@ history2 <- history %>%
              by = c("gamedate" = "officialDate",
                     "AwayTeam" = "away_team_name",
                     "HomeTeam" = "home_team_name")) %>% 
-  filter(!paste0(gamedate, AwayTeam, HomeTeam) %in% c('2023-07-17San Francisco GiantsCincinnati Reds','2023-07-18San Francisco GiantsCincinnati Reds')) %>% 
+  # filter(!paste0(gamedate, AwayTeam, HomeTeam) %in% c('2023-07-17San Francisco GiantsCincinnati Reds','2023-07-18San Francisco GiantsCincinnati Reds',
+  #                                                     '2023-05-13New York MetsWashington Nationals','2023-05-03Toronto Blue JaysBoston Red Sox',
+  #                                                     '2023-05-19Chicago CubsPhiladelphia Phillies','2023-05-20Baltimore OriolesToronto Blue Jays',
+  #                                                     '2023-06-02Los Angeles AngelsHouston Astros','2023-06-13Miami MarlinsSeattle Mariners',
+  #                                                     '2023-06-18Philadelphia PhilliesOakland Athletics')) %>% 
   dplyr::mutate(Winner = case_when(bet_type == 'FG ML' ~ 
                               case_when(away_runs_final > home_runs_final ~ AwayTeam,
                                         TRUE ~ HomeTeam),
@@ -2018,8 +2024,8 @@ write.csv(team_bullpen_L7_update, paste0("Baseball Machine/Daily Files/",season,
 write.csv(team_bullpen_L14_update, paste0("Baseball Machine/Daily Files/",season,"/team_bullpen_L14_",season,".csv"), row.names = FALSE)
 write.csv(team_bullpen_L30_update, paste0("Baseball Machine/Daily Files/",season,"/team_bullpen_L30_",season,".csv"), row.names = FALSE)
 write.csv(team_bullpen_s2d_update, paste0("Baseball Machine/Daily Files/",season,"/team_bullpen_s2d_",season,".csv"), row.names = FALSE)
-write.csv(pks_update, paste0("Baseball Machine/Daily Files/",season,"/game_pks_",season,".csv"), row.names = FALSE)
-write.csv(scores_update, paste0("Baseball Machine/Daily Files/",season,"/game_scores_",season,".csv"), row.names = FALSE)
 write.csv(probables_update, paste0("Baseball Machine/Daily Files/",season,"/starting_pitchers_",season,".csv"), row.names = FALSE)
 write.csv(rosters_update, paste0("Baseball Machine/Daily Files/",season,"/daily_rosters_",season,".csv"), row.names = FALSE)
+write.csv(scores_update, paste0("Baseball Machine/Daily Files/",season,"/game_scores_",season,".csv"), row.names = FALSE)
+write.csv(pks_update %>% select(-dates), paste0("Baseball Machine/Daily Files/",season,"/game_pks_",season,".csv"), row.names = FALSE)
 
