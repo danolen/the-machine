@@ -22,14 +22,81 @@ library("tidyverse")
 setwd("C:/Users/danie/Desktop/SportsStuff/TheMachine/the-machine")
 
 mls_url <- "https://www.bovada.lv/services/sports/event/v2/events/A/description/soccer/north-america/united-states/mls"
-# epl_url <- "https://www.bovada.lv/services/sports/event/v2/events/A/description/soccer/europe/england/premier-league"
-# esp_url <- "https://www.bovada.lv/services/sports/event/v2/events/A/description/soccer/europe/spain/la-liga"
-# ger_url <- "https://www.bovada.lv/services/sports/event/v2/events/A/description/soccer/europe/germany/1-bundesliga"
-# fra_url <- "https://www.bovada.lv/services/sports/event/v2/events/A/description/soccer/europe/france/ligue-1"
-# ita_url <- "https://www.bovada.lv/services/sports/event/v2/events/A/description/soccer/europe/italy/serie-a"
-# champ_url <- "https://www.bovada.lv/services/sports/event/v2/events/A/description/soccer/europe/england/championship"
-# mex_url <- "https://www.bovada.lv/services/sports/event/v2/events/A/description/soccer/north-america/mexico/liga-mx-clausura"
+epl_url <- "https://www.bovada.lv/services/sports/event/v2/events/A/description/soccer/europe/england/premier-league"
+esp_url <- "https://www.bovada.lv/services/sports/event/v2/events/A/description/soccer/europe/spain/la-liga"
+ger_url <- "https://www.bovada.lv/services/sports/event/v2/events/A/description/soccer/europe/germany/1-bundesliga"
+fra_url <- "https://www.bovada.lv/services/sports/event/v2/events/A/description/soccer/europe/france/ligue-1"
+ita_url <- "https://www.bovada.lv/services/sports/event/v2/events/A/description/soccer/europe/italy/serie-a"
+champ_url <- "https://www.bovada.lv/services/sports/event/v2/events/A/description/soccer/europe/england/championship"
+mex_cl_url <- "https://www.bovada.lv/services/sports/event/v2/events/A/description/soccer/north-america/mexico/liga-mx-clausura"
+mex_ap_url <- "https://www.bovada.lv/services/sports/event/v2/events/A/description/soccer/north-america/mexico/liga-mx-apertura"
 bra_url <- "https://www.bovada.lv/services/sports/event/v2/events/A/description/soccer/south-america/brazil/brasileirao-serie-a"
+
+
+loadOdds <- function(url) {
+  out <- tryCatch(
+    {
+      odds <- fromJSON(url) %>%
+        .[[2]] %>%
+        .[[1]] %>%
+        select(description, link, displayGroups) %>%
+        mutate(gamedate = as.Date(str_sub(link, -12, -5), format = "%Y%m%d")) %>%
+        separate(description, c("HomeTeam", "AwayTeam"), " vs ") %>%
+        select(gamedate, HomeTeam, AwayTeam, displayGroups) %>%
+        unnest(displayGroups) %>%
+        filter(description %in% c("Game Lines", "Alternate Lines", "Both Teams to Score")) %>%
+        select(gamedate, HomeTeam, AwayTeam, markets) %>%
+        unnest(markets) %>%
+        filter(period$live == FALSE & period$description == "Regulation Time") %>%
+        mutate(bet_type = description) %>%
+        select(gamedate, HomeTeam, AwayTeam, bet_type, outcomes) %>%
+        unnest(outcomes) %>%
+        filter(is.na(price$handicap) == TRUE | (is.na(price$handicap) == FALSE & is.na(price$handicap2) == TRUE)) %>%
+        mutate(type = if_else(type == "X",
+                              if_else(description == "Yes", "Y","N"),
+                              type)) %>%
+        mutate(Odds = as.numeric(price$american),
+               SpreadTotal = price$handicap,
+               type = if_else(type == "H" | type == "O" | type == "Y", "HOY",
+                              if_else(type == "D", "D", "AUN"))) %>%
+        mutate(Odds = if_else(is.na(Odds), 100, Odds)) %>%
+        select(gamedate, HomeTeam, AwayTeam, bet_type, type, Odds, any_of("SpreadTotal")) %>%
+        mutate(HomeTeam = iconv(HomeTeam, from = 'UTF-8', to = 'ASCII//TRANSLIT'),
+               AwayTeam = iconv(AwayTeam, from = 'UTF-8', to = 'ASCII//TRANSLIT'),
+               bet_type = iconv(bet_type, from = 'UTF-8', to = 'ASCII//TRANSLIT'),
+               bet_type = case_when(bet_type == "Spread" & type == "HOY" ~ paste0("Alternate Spread - Home: ", as.numeric(SpreadTotal)),
+                                    bet_type == "Spread" & type == "AUN" ~ paste0("Alternate Spread - Home: ", as.numeric(SpreadTotal)*-1),
+                                    bet_type == "Total Goals O/U" ~ paste0("Alternate Total - ", abs(as.numeric(SpreadTotal))),
+                                    grepl("Total Goals O/U - ", bet_type) ~ paste0(bet_type, " - ", abs(as.numeric(SpreadTotal))),
+                                    TRUE ~ bet_type)) %>%
+        reshape2::melt(id.vars = c("gamedate", "HomeTeam", "AwayTeam", "bet_type", "type")) %>%
+        mutate(name = paste0(type, ".", variable)) %>%
+        select(-type, -variable) %>%
+        mutate(value = as.numeric(value)) %>%
+        reshape2::dcast(gamedate + HomeTeam + AwayTeam + bet_type ~ name, fun.aggregate = mean) %>%
+        mutate(AUN.Odds = round(AUN.Odds, 0),
+               HOY.Odds = round(HOY.Odds, 0),
+               D.Odds = round(D.Odds, 0)) %>%
+        filter((AUN.Odds >= 100 | AUN.Odds <= -100) & (HOY.Odds >= 100 | HOY.Odds <= -100)) %>%
+        select(-D.SpreadTotal)
+    },
+    error=function(e) {
+      odds <- data.frame()
+    }
+  )    
+  return(out)
+}
+
+epl_odds <- loadOdds(epl_url)
+esp_odds <- loadOdds(esp_url)
+ger_odds <- loadOdds(ger_url)
+ita_odds <- loadOdds(ita_url)
+fra_odds <- loadOdds(fra_url)
+mls_odds <- loadOdds(mls_url)
+champ_odds <- loadOdds(champ_url)
+mex_cl_odds <- loadOdds(mex_cl_url)
+mex_ap_odds <- loadOdds(mex_ap_url)
+bra_odds <- loadOdds(bra_url)
 
 
 # mls_odds <- fromJSON(mls_url) %>%
@@ -77,7 +144,7 @@ bra_url <- "https://www.bovada.lv/services/sports/event/v2/events/A/description/
 #          D.Odds = round(D.Odds, 0)) %>%
 #   filter((AUN.Odds >= 100 | AUN.Odds <= -100) & (HOY.Odds >= 100 | HOY.Odds <= -100)) %>%
 #   select(-D.SpreadTotal)
-
+# 
 # epl_odds <- fromJSON(epl_url) %>%
 #   .[[2]] %>%
 #   .[[1]] %>%
@@ -298,7 +365,7 @@ bra_url <- "https://www.bovada.lv/services/sports/event/v2/events/A/description/
 #          D.Odds = round(D.Odds, 0)) %>%
 #   filter((AUN.Odds >= 100 | AUN.Odds <= -100) & (HOY.Odds >= 100 | HOY.Odds <= -100)) %>%
 #   select(-D.SpreadTotal)
-
+# 
 # champ_odds <- fromJSON(champ_url) %>%
 #   .[[2]] %>%
 #   .[[1]] %>%
@@ -342,7 +409,7 @@ bra_url <- "https://www.bovada.lv/services/sports/event/v2/events/A/description/
 #          D.Odds = round(D.Odds, 0)) %>%
 #   filter((AUN.Odds >= 100 | AUN.Odds <= -100) & (HOY.Odds >= 100 | HOY.Odds <= -100)) %>%
 #   select(-D.SpreadTotal)
-
+# 
 # mex_odds <- fromJSON(mex_url) %>%
 #   .[[2]] %>%
 #   .[[1]] %>%
@@ -386,61 +453,62 @@ bra_url <- "https://www.bovada.lv/services/sports/event/v2/events/A/description/
 #          D.Odds = round(D.Odds, 0)) %>%
 #   filter((AUN.Odds >= 100 | AUN.Odds <= -100) & (HOY.Odds >= 100 | HOY.Odds <= -100)) %>%
 #   select(-D.SpreadTotal)
+# 
+# bra_odds <- fromJSON(bra_url) %>%
+#   .[[2]] %>%
+#   .[[1]] %>%
+#   select(description, link, displayGroups) %>%
+#   mutate(gamedate = as.Date(str_sub(link, -12, -5), format = "%Y%m%d")) %>%
+#   separate(description, c("HomeTeam", "AwayTeam"), " vs ") %>%
+#   select(gamedate, HomeTeam, AwayTeam, displayGroups) %>%
+#   unnest(displayGroups) %>%
+#   filter(description %in% c("Game Lines", "Alternate Lines", "Both Teams to Score")) %>%
+#   select(gamedate, HomeTeam, AwayTeam, markets) %>%
+#   unnest(markets) %>%
+#   filter(period$live == FALSE & period$description == "Regulation Time") %>%
+#   mutate(bet_type = description) %>%
+#   select(gamedate, HomeTeam, AwayTeam, bet_type, outcomes) %>%
+#   unnest(outcomes) %>%
+#   filter(is.na(price$handicap) == TRUE | (is.na(price$handicap) == FALSE & is.na(price$handicap2) == TRUE)) %>%
+#   mutate(type = if_else(type == "X",
+#                         if_else(description == "Yes", "Y","N"),
+#                         type)) %>%
+#   mutate(Odds = as.numeric(price$american),
+#          SpreadTotal = price$handicap,
+#          type = if_else(type == "H" | type == "O" | type == "Y", "HOY",
+#                         if_else(type == "D", "D", "AUN"))) %>%
+#   mutate(Odds = if_else(is.na(Odds), 100, Odds)) %>%
+#   select(gamedate, HomeTeam, AwayTeam, bet_type, type, Odds, any_of("SpreadTotal")) %>%
+#   mutate(HomeTeam = iconv(HomeTeam, from = 'UTF-8', to = 'ASCII//TRANSLIT'),
+#          AwayTeam = iconv(AwayTeam, from = 'UTF-8', to = 'ASCII//TRANSLIT'),
+#          bet_type = iconv(bet_type, from = 'UTF-8', to = 'ASCII//TRANSLIT'),
+#          bet_type = case_when(bet_type == "Spread" & type == "HOY" ~ paste0("Alternate Spread - Home: ", as.numeric(SpreadTotal)),
+#                               bet_type == "Spread" & type == "AUN" ~ paste0("Alternate Spread - Home: ", as.numeric(SpreadTotal)*-1),
+#                               bet_type == "Total Goals O/U" ~ paste0("Alternate Total - ", abs(as.numeric(SpreadTotal))),
+#                               grepl("Total Goals O/U - Orlando City", bet_type) ~ paste0("Total Goals O/U - Orlando City SC", " - ", abs(as.numeric(SpreadTotal))),
+#                               grepl("Total Goals O/U - LA Galaxy", bet_type) ~ paste0("Total Goals O/U - Los Angeles Galaxy", " - ", abs(as.numeric(SpreadTotal))),
+#                               grepl("Total Goals O/U - ", bet_type) ~ paste0(bet_type, " - ", abs(as.numeric(SpreadTotal))),
+#                               TRUE ~ bet_type)) %>%
+#   reshape2::melt(id.vars = c("gamedate", "HomeTeam", "AwayTeam", "bet_type", "type")) %>%
+#   mutate(name = paste0(type, ".", variable)) %>%
+#   select(-type, -variable) %>%
+#   mutate(value = as.numeric(value)) %>%
+#   reshape2::dcast(gamedate + HomeTeam + AwayTeam + bet_type ~ name, fun.aggregate = mean) %>%
+#   mutate(AUN.Odds = round(AUN.Odds, 0),
+#          HOY.Odds = round(HOY.Odds, 0),
+#          D.Odds = round(D.Odds, 0)) %>%
+#   filter((AUN.Odds >= 100 | AUN.Odds <= -100) & (HOY.Odds >= 100 | HOY.Odds <= -100)) %>%
+#   select(-D.SpreadTotal)
 
-bra_odds <- fromJSON(bra_url) %>%
-  .[[2]] %>%
-  .[[1]] %>%
-  select(description, link, displayGroups) %>%
-  mutate(gamedate = as.Date(str_sub(link, -12, -5), format = "%Y%m%d")) %>%
-  separate(description, c("HomeTeam", "AwayTeam"), " vs ") %>%
-  select(gamedate, HomeTeam, AwayTeam, displayGroups) %>%
-  unnest(displayGroups) %>%
-  filter(description %in% c("Game Lines", "Alternate Lines", "Both Teams to Score")) %>%
-  select(gamedate, HomeTeam, AwayTeam, markets) %>%
-  unnest(markets) %>%
-  filter(period$live == FALSE & period$description == "Regulation Time") %>%
-  mutate(bet_type = description) %>%
-  select(gamedate, HomeTeam, AwayTeam, bet_type, outcomes) %>%
-  unnest(outcomes) %>%
-  filter(is.na(price$handicap) == TRUE | (is.na(price$handicap) == FALSE & is.na(price$handicap2) == TRUE)) %>%
-  mutate(type = if_else(type == "X",
-                        if_else(description == "Yes", "Y","N"),
-                        type)) %>%
-  mutate(Odds = as.numeric(price$american),
-         SpreadTotal = price$handicap,
-         type = if_else(type == "H" | type == "O" | type == "Y", "HOY",
-                        if_else(type == "D", "D", "AUN"))) %>%
-  mutate(Odds = if_else(is.na(Odds), 100, Odds)) %>%
-  select(gamedate, HomeTeam, AwayTeam, bet_type, type, Odds, any_of("SpreadTotal")) %>%
-  mutate(HomeTeam = iconv(HomeTeam, from = 'UTF-8', to = 'ASCII//TRANSLIT'),
-         AwayTeam = iconv(AwayTeam, from = 'UTF-8', to = 'ASCII//TRANSLIT'),
-         bet_type = iconv(bet_type, from = 'UTF-8', to = 'ASCII//TRANSLIT'),
-         bet_type = case_when(bet_type == "Spread" & type == "HOY" ~ paste0("Alternate Spread - Home: ", as.numeric(SpreadTotal)),
-                              bet_type == "Spread" & type == "AUN" ~ paste0("Alternate Spread - Home: ", as.numeric(SpreadTotal)*-1),
-                              bet_type == "Total Goals O/U" ~ paste0("Alternate Total - ", abs(as.numeric(SpreadTotal))),
-                              grepl("Total Goals O/U - Orlando City", bet_type) ~ paste0("Total Goals O/U - Orlando City SC", " - ", abs(as.numeric(SpreadTotal))),
-                              grepl("Total Goals O/U - LA Galaxy", bet_type) ~ paste0("Total Goals O/U - Los Angeles Galaxy", " - ", abs(as.numeric(SpreadTotal))),
-                              grepl("Total Goals O/U - ", bet_type) ~ paste0(bet_type, " - ", abs(as.numeric(SpreadTotal))),
-                              TRUE ~ bet_type)) %>%
-  reshape2::melt(id.vars = c("gamedate", "HomeTeam", "AwayTeam", "bet_type", "type")) %>%
-  mutate(name = paste0(type, ".", variable)) %>%
-  select(-type, -variable) %>%
-  mutate(value = as.numeric(value)) %>%
-  reshape2::dcast(gamedate + HomeTeam + AwayTeam + bet_type ~ name, fun.aggregate = mean) %>%
-  mutate(AUN.Odds = round(AUN.Odds, 0),
-         HOY.Odds = round(HOY.Odds, 0),
-         D.Odds = round(D.Odds, 0)) %>%
-  filter((AUN.Odds >= 100 | AUN.Odds <= -100) & (HOY.Odds >= 100 | HOY.Odds <= -100)) %>%
-  select(-D.SpreadTotal)
-
-bovada_odds <- bind_rows(#epl_odds, 
-                         # esp_odds,
-                         # ger_odds,
-                         # ita_odds,
-                         # fra_odds,
-                         # mls_odds,
-                         # champ_odds,
-                         # mex_odds,
+bovada_odds <- bind_rows(epl_odds, 
+                         esp_odds,
+                         ger_odds,
+                         ita_odds,
+                         fra_odds,
+                         mls_odds,
+                         champ_odds,
+                         mex_cl_odds,
+                         mex_ap_odds,
                          bra_odds
                          )
 
@@ -467,7 +535,7 @@ mls_22 <- load_match_results(country = "USA", gender = "M", season_end_year = 20
          League = "MLS",
          Season = as.character(Season))
 
-mls_23 <- fb_match_results(country = "USA", gender = "M", season_end_year = 2023, tier = "1st") %>% 
+mls_23 <- load_match_results(country = "USA", gender = "M", season_end_year = 2023, tier = "1st") %>% 
   select(Day, Date, Time, Home, Home_xG, HomeGoals, AwayGoals, Away_xG, Away, Competition_Name, Season_End_Year) %>% 
   rename(xG = Home_xG,
          Home_Score = HomeGoals,
@@ -483,7 +551,7 @@ mls_23 <- fb_match_results(country = "USA", gender = "M", season_end_year = 2023
          League = "MLS",
          Season = as.character(Season))
 
-Big5_22 <- load_match_results(country = c("ENG", "ESP", "ITA", "GER", "FRA"), gender = "M", season_end_year = 2022, tier = "1st") %>% 
+Big5_2223 <- load_match_results(country = c("ENG", "ESP", "ITA", "GER", "FRA"), gender = "M", season_end_year = c(2022,2023), tier = "1st") %>% 
   select(Day, Date, Time, Home, Home_xG, HomeGoals, AwayGoals, Away_xG, Away, Competition_Name, Season_End_Year) %>% 
   rename(xG = Home_xG,
          Home_Score = HomeGoals,
@@ -500,7 +568,7 @@ Big5_22 <- load_match_results(country = c("ENG", "ESP", "ITA", "GER", "FRA"), ge
                             TRUE ~ League),
          Season = paste0(Season-1,"-",Season))
 
-Big5_23 <- load_match_results(country = c("ENG", "ESP", "ITA", "GER", "FRA"), gender = "M", season_end_year = 2023, tier = "1st") %>% 
+Big5_24 <- load_match_results(country = c("ENG", "ESP", "ITA", "GER", "FRA"), gender = "M", season_end_year = 2024, tier = "1st") %>% 
   select(Day, Date, Time, Home, Home_xG, HomeGoals, AwayGoals, Away_xG, Away, Competition_Name, Season_End_Year) %>% 
   rename(xG = Home_xG,
          Home_Score = HomeGoals,
@@ -531,6 +599,20 @@ Champ_23 <- load_match_results(country = "ENG", gender = "M", season_end_year = 
          xG.1 = as.numeric(xG.1),
          Season = paste0(Season-1,"-",Season))
 
+Champ_24 <- load_match_results(country = "ENG", gender = "M", season_end_year = 2024, tier = "2nd") %>% 
+  select(Day, Date, Time, Home, Home_xG, HomeGoals, AwayGoals, Away_xG, Away, Competition_Name, Season_End_Year) %>% 
+  rename(xG = Home_xG,
+         Home_Score = HomeGoals,
+         Away_Score = AwayGoals,
+         xG.1 = Away_xG,
+         League = Competition_Name,
+         Season = Season_End_Year) %>%
+  mutate(xG = as.numeric(xG),
+         Home_Score = as.numeric(Home_Score),
+         Away_Score = as.numeric(Away_Score),
+         xG.1 = as.numeric(xG.1),
+         Season = paste0(Season-1,"-",Season))
+
 Mex_23 <- load_match_results(country = "MEX", gender = "M", season_end_year = 2023, tier = "1st") %>% 
   select(Day, Date, Time, Home, Home_xG, HomeGoals, AwayGoals, Away_xG, Away, Competition_Name, Season_End_Year) %>% 
   rename(xG = Home_xG,
@@ -545,7 +627,21 @@ Mex_23 <- load_match_results(country = "MEX", gender = "M", season_end_year = 20
          xG.1 = as.numeric(xG.1),
          Season = paste0(Season-1,"-",Season))
 
-bra_23 <- fb_match_results(country = "BRA", gender = "M", season_end_year = 2023, tier = "1st") %>% 
+Mex_24 <- load_match_results(country = "MEX", gender = "M", season_end_year = 2024, tier = "1st") %>% 
+  select(Day, Date, Time, Home, Home_xG, HomeGoals, AwayGoals, Away_xG, Away, Competition_Name, Season_End_Year) %>% 
+  rename(xG = Home_xG,
+         Home_Score = HomeGoals,
+         Away_Score = AwayGoals,
+         xG.1 = Away_xG,
+         League = Competition_Name,
+         Season = Season_End_Year) %>%
+  mutate(xG = as.numeric(xG),
+         Home_Score = as.numeric(Home_Score),
+         Away_Score = as.numeric(Away_Score),
+         xG.1 = as.numeric(xG.1),
+         Season = paste0(Season-1,"-",Season))
+
+bra_23 <- load_match_results(country = "BRA", gender = "M", season_end_year = 2023, tier = "1st") %>% 
   select(Day, Date, Time, Home, Home_xG, HomeGoals, AwayGoals, Away_xG, Away, Competition_Name, Season_End_Year) %>% 
   rename(xG = Home_xG,
          Home_Score = HomeGoals,
@@ -561,11 +657,14 @@ bra_23 <- fb_match_results(country = "BRA", gender = "M", season_end_year = 2023
          League = "Brasileiro Serie A",
          Season = as.character(Season))
 
-fixtures <- rbind(Big5_22, Big5_23
+fixtures <- rbind(Big5_2223
+                  , Big5_24
                   , mls_22
                   , mls_23
                   , Champ_23
+                  , Champ_24
                   , Mex_23
+                  , Mex_24
                   , bra_23
                   ) 
   
@@ -693,14 +792,14 @@ metrics_df <- metrics %>%
   left_join(metrics, by = c("ID" = "ID", "Date" = "Date", "Day" = "Day", "Time" = "Time",
                             "League" = "League", "Season" = "Season", "Opponent" = "Team"),
             suffix = c("", "_Opp")) %>% 
-  filter(Home_or_Away == "Home" & Date >= today & SplitGP > 0 & SplitGP_Opp > 0) %>%
+  filter(Home_or_Away == "Home" & Date >= today & SplitGP > 3 & SplitGP_Opp > 3) %>%
   select(-(Home_or_Away:GoalsAllowed), -(Opponent_Opp:GoalsAllowed_Opp))
 
 metrics_tt <- metrics %>% 
   left_join(metrics, by = c("ID" = "ID", "Date" = "Date", "Day" = "Day", "Time" = "Time",
                             "League" = "League", "Season" = "Season", "Opponent" = "Team"),
             suffix = c("", "_Opp")) %>%
-  filter(Date >= today & SplitGP > 0 & SplitGP_Opp > 0) %>% 
+  filter(Date >= today & SplitGP > 3 & SplitGP_Opp > 3) %>% 
   select(-(xG:GoalsAllowed), -(Opponent_Opp:GoalsAllowed_Opp))
 
 gbm_reg <- readRDS("C:/Users/danie/Desktop/SportsStuff/TheMachine/SoccerModels/train_gbm.rds")
@@ -1374,6 +1473,16 @@ types <- filter(history2,
          `Graded Profit` = Units*`Graded Risk`,
          `Bet Grade` = factor(`Bet Grade`, levels = c('A+', 'A', 'B', 'C', 'D', 'F')))
 
+season_starts <- fixtures %>% 
+  group_by(League, Season) %>% 
+  summarise(start_date = min(Date)) %>% 
+  group_by(League) %>% 
+  arrange(desc(start_date)) %>% 
+  mutate(row_num = row_number())%>% 
+  ungroup() %>% 
+  filter(row_num == 1) %>% 
+  select(League, start_date)
+
 grades <- types %>% 
   filter(Pick_Odds > -220) %>%
   arrange(gamedate, ID, desc(Kelly_Criteria)) %>%
@@ -1385,12 +1494,13 @@ grades <- types %>%
          Rank = (KC_Rank + EV_Rank) / 2) %>%
   arrange(gamedate, ID, Rank) %>%
   mutate(Final_Rank = row_number()) %>%
-  filter(Final_Rank == 1) 
+  filter(Final_Rank == 1) %>% 
+  left_join(season_starts)
 
 ## Create email tables (New)
 
 email_table_1 <- grades %>%
-  # filter(gamedate >= as.Date('2022-08-01')) %>%
+  filter(gamedate >= start_date) %>%
   group_by(`Bet Grade`,
            # Side_or_Total,
            # Odds = case_when(Pick_Odds > 0 ~ "Positive",
@@ -1409,7 +1519,7 @@ email_table_1 <- grades %>%
                    `Profit: 1 Unit Wagers` = sum(Units),
                    `Profit: Suggested Wagers` = sum(`Graded Profit`)) %>%
   # mutate(ROI = `Profit: 1 Unit Wagers` / Bets) %>%
-  mutate(ROI = case_when(`Bet Grade` %in% c('C', 'D', 'F') ~ 0,
+  mutate(ROI = case_when(`Bet Grade` %in% c('B', 'C', 'D', 'F') ~ 0,
                          TRUE ~ `Profit: 1 Unit Wagers` / Bets)) %>%
   mutate(`Hit Rate` = paste0(round_any(`Hit Rate`*100, 1), '%'),
          `Average Odds` = as.integer(round_any(`Average Odds`,1)),
@@ -1423,6 +1533,31 @@ email_table_1 <- grades %>%
 
 df_html_1 <- print(xtable(email_table_1), type = "html", print.results = FALSE)
 
+email_table_1b <- grades %>%
+  filter(gamedate >= start_date &
+           `Bet Grade` %in% c('A+', 'A')) %>%
+  group_by(League) %>% 
+  dplyr::summarise(`Hit Rate` = mean(Pick_Correct),
+                   `Average Implied Odds` = mean(if_else(Pick_Odds > 0, 100 / (Pick_Odds + 100), abs(Pick_Odds) / (abs(Pick_Odds) + 100))),
+                   `Average Odds` = if_else(`Average Implied Odds` < 0.5,
+                                            (100 / `Average Implied Odds`) - 100,
+                                            -1 * (100 * `Average Implied Odds`) / (1 - `Average Implied Odds`)),
+                   Bets = sum(bets),
+                   `Profit: 1 Unit Wagers` = sum(Units),
+                   `Profit: Suggested Wagers` = sum(`Graded Profit`)) %>%
+  mutate(ROI = `Profit: 1 Unit Wagers` / Bets) %>%
+  mutate(`Hit Rate` = paste0(round_any(`Hit Rate`*100, 1), '%'),
+         `Average Odds` = as.integer(round_any(`Average Odds`,1)),
+         `Average Implied Odds` = paste0(round_any(`Average Implied Odds`*100, 1), '%'),
+         Bets = formatC(Bets, format="d", big.mark=","),
+         `Profit: 1 Unit Wagers` = paste0(round_any(`Profit: 1 Unit Wagers`, 0.1), ' units'),
+         `Profit: Suggested Wagers` = paste0(round_any(`Profit: Suggested Wagers`, 0.1), ' units'),
+         ROI = paste0(round_any(ROI*100, 0.01), '%')) %>% 
+  select(League, `Hit Rate`, `Average Odds`, `Average Implied Odds`, Bets, `Profit: 1 Unit Wagers`, `Profit: Suggested Wagers`, ROI) %>% 
+  print(n=40)
+
+df_html_1b <- print(xtable(email_table_1b), type = "html", print.results = FALSE)
+
 email_table_2 <- scores %>% 
   group_by(League) %>% 
   summarise(`Most Recent Game Data` = as.character(max(Date)))%>% 
@@ -1431,7 +1566,7 @@ email_table_2 <- scores %>%
 df_html_2 <- print(xtable(email_table_2), type = "html", print.results = FALSE)
 
 plot_data <- grades %>% 
-  filter(`Bet Grade` %in% c('A+', 'A', 'B')) %>% 
+  filter(gamedate >= start_date & `Bet Grade` %in% c('A+', 'A')) %>% 
   select(gamedate, Units, `Graded Profit`) %>% 
   rename(`Profit: 1 Unit Wagers` = Units,
          `Profit: Suggested Wagers` = `Graded Profit`) %>% 
@@ -1518,7 +1653,8 @@ bets_table2 <- bind_rows(bets_table
                                  League == 'MLS' ~ 6,
                                  League == 'EFL Championship' ~ 7,
                                  League == 'Liga MX' ~ 8,
-                                 League == '--' ~ 9)) %>% 
+                                 League == 'Brasileiro Serie A' ~ 9,
+                                 League == '--' ~ 10)) %>% 
   mutate(`Current Pick Odds` = as.integer(`Current Pick Odds`),
          `Odds Should Be` = as.integer(`Odds Should Be`))
 
@@ -1539,11 +1675,11 @@ Email[["bcc"]] = paste("jamesorler@gmail.com", "asnolen@crimson.ua.edu", "jamest
                        sep = ";", collapse = NULL)
 Email[["subject"]] = paste0("Soccer Machine Picks: ", Sys.Date())
 Email[["HTMLbody"]] = sprintf("
-The Machine's picks for upcoming soccer matches are in! The Machine currently offers picks for the Big 5 European Leagues plus MLS, the EFL Championship, and Liga MX. The attached documents contains all of the pertinent betting information for the upcoming matches, as well as a glossary. Good luck!
+The Machine's picks for upcoming soccer matches are in! The Machine currently offers picks for the Big 5 European Leagues plus MLS, the EFL Championship, Liga MX, and the Brazilian Serie A. The attached documents contains all of the pertinent betting information for the upcoming matches, as well as a glossary. Good luck!
 </p><br></p>
-UPDATE: The Machine will no longer include B bets in the suggested bets. I apologize for the poor performance lately - I should have removed these earlier but I have been more focused on preparing for baseball season lately. Hopefully you have just been tailing the A+ and A bets.
+UPDATE: The historical results below will now only include the current season for each league. If you are interested in the historical results for previous season feel free to reach out to me. I have also included below a breakdown of The Machine's performance by league. The Machine may perform better or worse with certain leagues so this will help to identify those trends.
 </p><br></p>
-Speaking of baseball...I am working on the baseball version of The Machine. I hope to have this up and running in the next month or so. If you have any interest in the baseball version, feel free to let me know!
+%s
 </p><br></p>
 %s
 </p><br></p>
@@ -1561,7 +1697,7 @@ Most recent date with complete game data for each league:
 </p><br></p>
 %s
 </p><br></p>
-", df_html_1, df_html_bets, plot_html, df_html_2)
+", df_html_1, df_html_1b, df_html_bets, plot_html, df_html_2)
 Email[["attachments"]]$Add("C:/Users/danie/Desktop/SportsStuff/TheMachine/the-machine/Soccer Machine/upcoming_bets.csv")
 Email[["attachments"]]$Add("C:/Users/danie/Desktop/SportsStuff/TheMachine/the-machine/Soccer Machine/Glossary.pdf")
 
