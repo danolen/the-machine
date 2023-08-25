@@ -110,7 +110,9 @@ bovada_odds <- bind_rows(epl_odds,
                          bra_odds
                          )
 
-club_names <- read_excel("Soccer Machine/Club Names.xlsx")
+club_names <- read_excel("Soccer Machine/Club Names.xlsx") %>% 
+  mutate(FBRef = iconv(FBRef, from = 'UTF-8', to = 'ASCII//TRANSLIT'),
+         Bovada = iconv(Bovada, from = 'UTF-8', to = 'ASCII//TRANSLIT'))
 
 bovada_odds <- FindReplace(bovada_odds, Var = "HomeTeam", replaceData = club_names,
                            from = "Bovada", to = "Name")
