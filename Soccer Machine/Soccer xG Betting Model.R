@@ -55,6 +55,23 @@ Big5 <- fb_match_results(country = c("ENG","ESP","ITA","GER","FRA"),
                             TRUE ~ League),
          Season = paste0(Season-1,"-",Season))
 
+uefa <- fb_match_results(country = c("NED","POR"),
+                         gender = "M",
+                         season_end_year = c(2019,2020,2021,2022,2023), tier = "1st") %>% 
+  select(Day, Date, Time, Home, Home_xG, HomeGoals, AwayGoals, Away_xG, Away,
+         Competition_Name, Season_End_Year) %>% 
+  rename(xG = Home_xG,
+         Home_Score = HomeGoals,
+         Away_Score = AwayGoals,
+         xG.1 = Away_xG,
+         League = Competition_Name,
+         Season = Season_End_Year) %>%
+  mutate(xG = as.numeric(xG),
+         Home_Score = as.numeric(Home_Score),
+         Away_Score = as.numeric(Away_Score),
+         xG.1 = as.numeric(xG.1),
+         Season = paste0(Season-1,"-",Season))
+
 Champ <- fb_match_results(country = "ENG",
                               gender = "M",
                               season_end_year = c(2019,2020,2021,2022,2023), tier = "2nd") %>% 
@@ -107,11 +124,57 @@ Brazil <- fb_match_results(country = "BRA",
          League = "Brasileiro Serie A",
          Season = paste0(Season-1,"-",Season))
 
+ucl <- fb_match_results(country = "",
+                        gender = "M",
+                        season_end_year = c(2018,2019,2020,2021,2022,2023),
+                        tier = "",
+                        non_dom_league_url = "https://fbref.com/en/comps/8/history/Champions-League-Seasons") %>% 
+  select(Day, Date, Time, Home, Home_xG, HomeGoals, AwayGoals, Away_xG, Away,
+         Competition_Name, Season_End_Year) %>% 
+  rename(xG = Home_xG,
+         Home_Score = HomeGoals,
+         Away_Score = AwayGoals,
+         xG.1 = Away_xG,
+         League = Competition_Name,
+         Season = Season_End_Year) %>%
+  mutate(xG = as.numeric(xG),
+         Home_Score = as.numeric(Home_Score),
+         Away_Score = as.numeric(Away_Score),
+         xG.1 = as.numeric(xG.1),
+         Season = paste0(Season-1,"-",Season)) %>% 
+  mutate(Home = trimws(substr(Home, 1, nchar(Home)-3)),
+         Away = trimws(substr(Away, 4, nchar(Away))))
+
+uel <- fb_match_results(country = "",
+                        gender = "M",
+                        season_end_year = c(2018,2019,2020,2021,2022,2023),
+                        tier = "",
+                        non_dom_league_url = "https://fbref.com/en/comps/19/history/Europa-League-Seasons") %>% 
+  select(Day, Date, Time, Home, Home_xG, HomeGoals, AwayGoals, Away_xG, Away,
+         Competition_Name, Season_End_Year) %>% 
+  rename(xG = Home_xG,
+         Home_Score = HomeGoals,
+         Away_Score = AwayGoals,
+         xG.1 = Away_xG,
+         League = Competition_Name,
+         Season = Season_End_Year) %>%
+  mutate(xG = as.numeric(xG),
+         Home_Score = as.numeric(Home_Score),
+         Away_Score = as.numeric(Away_Score),
+         xG.1 = as.numeric(xG.1),
+         Season = paste0(Season-1,"-",Season)) %>% 
+  mutate(Home = trimws(substr(Home, 1, nchar(Home)-3)),
+         Away = trimws(substr(Away, 4, nchar(Away))))
+
+uel <- uel_save %>% 
+  mutate(Home = trimws(substr(Home, 1, nchar(Home)-3)),
+         Away = trimws(substr(Away, 4, nchar(Away))))
+
 
 intervalEnd <- Sys.time()
 paste("Web scraping took",intervalEnd - intervalStart,attr(intervalEnd - intervalStart,"units"))
 
-fixtures <- rbind(Big5, mls, Champ, MX, Brazil)
+fixtures <- bind_rows(Big5, mls, Champ, MX, Brazil, uefa, ucl, uel)
 fixtures$Date <- as.Date(fixtures$Date)
 today <- Sys.Date()
 
@@ -151,7 +214,8 @@ away <- scores %>%
 
 metrics <- bind_rows(home, away) %>% 
   arrange(Date, Time, League, ID) %>%
-  filter(!League %in% c('UCL', 'UEL')) %>%
+  filter(!League %in% c('UEFA Champions League', 'UEFA Europa League',
+                        'Eredivisie', 'Primeira Liga')) %>%
   group_by(Team, League, Season, Home_or_Away) %>% 
   dplyr::mutate(SplitxG = cumsum(xG) - xG,
          SplitxGA = cumsum(xGA) - xGA,
@@ -1429,6 +1493,154 @@ paste("TT3.5 classification model training took",intervalEnd - intervalStart,att
 saveRDS(tt3.5_gbm, "C:/Users/danie/Desktop/SportsStuff/TheMachine/SoccerModels/tt3.5_gbm.rds")
 saveRDS(tt3.5_pls, "C:/Users/danie/Desktop/SportsStuff/TheMachine/SoccerModels/tt3.5_pls.rds")
 saveRDS(tt3.5_xgb, "C:/Users/danie/Desktop/SportsStuff/TheMachine/SoccerModels/tt3.5_xgb.rds")
+
+cup_metrics <- bind_rows(home, away) %>% 
+  arrange(Date, Time, League, ID) %>%
+  filter(League %in% c('UEFA Champions League', 'UEFA Europa League')) %>%
+  group_by(Team, League, Season, Home_or_Away) %>% 
+  dplyr::mutate(SplitxG = cumsum(xG) - xG,
+                SplitxGA = cumsum(xGA) - xGA,
+                SplitGoals = cumsum(Goals) - Goals,
+                SplitGoalsAllowed = cumsum(GoalsAllowed) - GoalsAllowed,
+                SplitGP = row_number() - 1,
+                SplitxG_roll4 = case_when(SplitGP == 1 ~ lag(xG,1),
+                                          SplitGP == 2 ~ (lag(xG,1)+lag(xG,2))/2,
+                                          SplitGP == 3 ~ (lag(xG,1)+lag(xG,2)+lag(xG,3))/3,
+                                          TRUE ~ (lag(xG,1)+lag(xG,2)+lag(xG,3)+lag(xG,4))/4),
+                SplitxGA_roll4 = case_when(SplitGP == 1 ~ lag(xGA,1),
+                                           SplitGP == 2 ~ (lag(xGA,1)+lag(xGA,2))/2,
+                                           SplitGP == 3 ~ (lag(xGA,1)+lag(xGA,2)+lag(xGA,3))/3,
+                                           TRUE ~ (lag(xGA,1)+lag(xGA,2)+lag(xGA,3)+lag(xGA,4))/4),
+                SplitGoals_roll4 = case_when(SplitGP == 1 ~ lag(Goals,1),
+                                             SplitGP == 2 ~ (lag(Goals,1)+lag(Goals,2))/2,
+                                             SplitGP == 3 ~ (lag(Goals,1)+lag(Goals,2)+lag(Goals,3))/3,
+                                             TRUE ~ (lag(Goals,1)+lag(Goals,2)+lag(Goals)+lag(Goals,4))/4),
+                SplitGoalsAllowed_roll4 = case_when(SplitGP == 1 ~ lag(GoalsAllowed,1),
+                                                    SplitGP == 2 ~ (lag(GoalsAllowed,1)+lag(GoalsAllowed,2))/2,
+                                                    SplitGP == 3 ~ (lag(GoalsAllowed,1)+lag(GoalsAllowed,2)+lag(GoalsAllowed,3))/3,
+                                                    TRUE ~ (lag(GoalsAllowed,1)+lag(GoalsAllowed,2)+lag(GoalsAllowed,3)+lag(GoalsAllowed,4))/4)) %>% 
+  group_by(Team, League, Season) %>% 
+  dplyr::mutate(SeasonxG = cumsum(xG) - xG,
+                SeasonxGA = cumsum(xGA) - xGA,
+                SeasonGoals = cumsum(Goals) - Goals,
+                SeasonGoalsAllowed = cumsum(GoalsAllowed) - GoalsAllowed,
+                SeasonGP = row_number() - 1,
+                SeasonxG_roll4 = case_when(SeasonGP == 1 ~ lag(xG,1),
+                                           SeasonGP == 2 ~ (lag(xG,1)+lag(xG,2))/2,
+                                           SeasonGP == 3 ~ (lag(xG,1)+lag(xG,2)+lag(xG,3))/4,
+                                           TRUE ~ (lag(xG,1)+lag(xG,2)+lag(xG,3)+lag(xG,4))/4),
+                SeasonxGA_roll4 = case_when(SeasonGP == 1 ~ lag(xGA,1),
+                                            SeasonGP == 2 ~ (lag(xGA,1)+lag(xGA,2))/2,
+                                            SeasonGP == 3 ~ (lag(xGA,1)+lag(xGA,2)+lag(xGA,3))/4,
+                                            TRUE ~ (lag(xGA,1)+lag(xGA,2)+lag(xGA,3)+lag(xGA,4))/4),
+                SeasonGoals_roll4 = case_when(SeasonGP == 1 ~ lag(Goals,1),
+                                              SeasonGP == 2 ~ (lag(Goals,1)+lag(Goals,2))/2,
+                                              SeasonGP == 3 ~ (lag(Goals,1)+lag(Goals,2)+lag(Goals))/4,
+                                              TRUE ~ (lag(Goals,1)+lag(Goals,2)+lag(Goals,3)+lag(Goals,4))/4),
+                SeasonGoalsAllowed_roll4 = case_when(SeasonGP == 1 ~ lag(GoalsAllowed,1),
+                                                     SeasonGP == 2 ~ (lag(GoalsAllowed,1)+lag(GoalsAllowed,2))/2,
+                                                     SeasonGP == 3 ~ (lag(GoalsAllowed,1)+lag(GoalsAllowed,2)+lag(GoalsAllowed))/4,
+                                                     TRUE ~ (lag(GoalsAllowed,1)+lag(GoalsAllowed,2)+lag(GoalsAllowed,3)+lag(GoalsAllowed,4))/4)) %>% 
+  ungroup() %>% 
+  dplyr::mutate(SplitxG = SplitxG / SplitGP,
+                SplitxGA = SplitxGA / SplitGP,
+                SplitGoals = SplitGoals / SplitGP,
+                SplitGoalsAllowed = SplitGoalsAllowed / SplitGP,
+                SeasonxG = SeasonxG / SeasonGP,
+                SeasonxGA = SeasonxGA / SeasonGP,
+                SeasonGoals = SeasonGoals / SeasonGP,
+                SeasonGoalsAllowed = SeasonGoalsAllowed / SeasonGP) %>% 
+  replace(is.na(.), 0)
+
+train_df <- metrics %>% 
+  left_join(metrics, by = c("ID" = "ID", "Opponent" = "Team"), suffix = c("", "_Opp")) %>% 
+  select(-(Date_Opp:GoalsAllowed_Opp)) %>% 
+  mutate(Outcome = as.factor(case_when(Goals > GoalsAllowed ~ 'Win',
+                                       Goals == GoalsAllowed ~ 'Draw',
+                                       TRUE ~ 'Lose')),
+         Minus0.5 = as.factor(case_when(Goals - 0.5 > GoalsAllowed ~ "Win",
+                                        TRUE ~ "Lose")),
+         Minus1 = as.factor(case_when(Goals - 1 > GoalsAllowed ~ "Win",
+                                      Goals - 1 == GoalsAllowed ~ "Push",
+                                      TRUE ~ "Lose")),
+         Minus1.5 = as.factor(case_when(Goals - 1.5 > GoalsAllowed ~ "Win",
+                                        TRUE ~ "Lose")),
+         Minus2 = as.factor(case_when(Goals - 2 > GoalsAllowed ~ "Win",
+                                      Goals - 2 == GoalsAllowed ~ "Push",
+                                      TRUE ~ "Lose")),
+         Minus2.5 = as.factor(case_when(Goals - 2.5 > GoalsAllowed ~ "Win",
+                                        TRUE ~ "Lose")),
+         Minus3 = as.factor(case_when(Goals - 3 > GoalsAllowed ~ "Win",
+                                      Goals - 3 == GoalsAllowed ~ "Push",
+                                      TRUE ~ "Lose")),
+         Minus3.5 = as.factor(case_when(Goals - 3.5 > GoalsAllowed ~ "Win",
+                                        TRUE ~ "Lose")),
+         Plus0.5 = as.factor(case_when(Goals + 0.5 > GoalsAllowed ~ "Win",
+                                       TRUE ~ "Lose")),
+         Plus1 = as.factor(case_when(Goals + 1 > GoalsAllowed ~ "Win",
+                                     Goals + 1 == GoalsAllowed ~ "Push",
+                                     TRUE ~ "Lose")),
+         Plus1.5 = as.factor(case_when(Goals + 1.5 > GoalsAllowed ~ "Win",
+                                       TRUE ~ "Lose")),
+         Plus2 = as.factor(case_when(Goals + 2 > GoalsAllowed ~ "Win",
+                                     Goals + 2 == GoalsAllowed ~ "Push",
+                                     TRUE ~ "Lose")),
+         Plus2.5 = as.factor(case_when(Goals + 2.5 > GoalsAllowed ~ "Win",
+                                       TRUE ~ "Lose")),
+         Plus3 = as.factor(case_when(Goals + 3 > GoalsAllowed ~ "Win",
+                                     Goals + 3 == GoalsAllowed ~ "Push",
+                                     TRUE ~ "Lose")),
+         Plus3.5 = as.factor(case_when(Goals + 3.5 > GoalsAllowed ~ "Win",
+                                       TRUE ~ "Lose")),
+         Total1.5 = as.factor(case_when(Goals + GoalsAllowed > 1.5 ~ "Over",
+                                        TRUE ~ "Under")),
+         Total2 = as.factor(case_when(Goals + GoalsAllowed > 2 ~ "Over",
+                                      Goals + GoalsAllowed == 2 ~ "Push",
+                                      TRUE ~ "Under")),
+         Total2.5 = as.factor(case_when(Goals + GoalsAllowed > 2.5 ~ "Over",
+                                        TRUE ~ "Under")),
+         Total3 = as.factor(case_when(Goals + GoalsAllowed > 3 ~ "Over",
+                                      Goals + GoalsAllowed == 3 ~ "Push",
+                                      TRUE ~ "Under")),
+         Total3.5 = as.factor(case_when(Goals + GoalsAllowed > 3.5 ~ "Over",
+                                        TRUE ~ "Under")),
+         Total4 = as.factor(case_when(Goals + GoalsAllowed > 4 ~ "Over",
+                                      Goals + GoalsAllowed == 4 ~ "Push",
+                                      TRUE ~ "Under")),
+         Total4.5 = as.factor(case_when(Goals + GoalsAllowed > 4.5 ~ "Over",
+                                        TRUE ~ "Under")),
+         BTTS = as.factor(case_when(Goals > 0 & GoalsAllowed > 0 ~ "Yes",
+                                    TRUE ~ "No")),
+         TT0.5 = as.factor(case_when(Goals > 0.5 ~ "Over",
+                                     TRUE ~ "Under")),
+         TT1 = as.factor(case_when(Goals > 1 ~ "Over",
+                                   Goals == 1 ~ "Push",
+                                   TRUE ~ "Under")),
+         TT1.5 = as.factor(case_when(Goals > 1.5 ~ "Over",
+                                     TRUE ~ "Under")),
+         TT2 = as.factor(case_when(Goals > 2 ~ "Over",
+                                   Goals == 2 ~ "Push",
+                                   TRUE ~ "Under")),
+         TT2.5 = as.factor(case_when(Goals > 2.5 ~ "Over",
+                                     TRUE ~ "Under")),
+         TT3 = as.factor(case_when(Goals > 3 ~ "Over",
+                                   Goals == 3 ~ "Push",
+                                   TRUE ~ "Under")),
+         TT3.5 = as.factor(case_when(Goals > 3.5 ~ "Over",
+                                     TRUE ~ "Under")))
+
+train <- train_df %>% 
+  filter(SplitGP > 3 & SplitGP_Opp > 3 & Date < today)%>% 
+  select(-ID,
+         -Date,
+         -Day,
+         -Time, 
+         -Team,
+         -Opponent,
+         -xG,
+         -xGA,
+         -GoalsAllowed,
+         -(Outcome:TT3.5))
 
 overallEnd <- Sys.time()
 paste("Entire script took",overallEnd - overallStart,attr(overallEnd - overallStart,"units"))

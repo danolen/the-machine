@@ -956,6 +956,8 @@ write.csv(bets4, "Soccer Machine/upcoming_bets.csv", row.names = FALSE, na = "")
 ## Analyze performance
 
 history <- readRDS("Soccer Machine/PicksHistory.rds") %>% 
+  mutate(HomeTeam = iconv(HomeTeam, from = 'UTF-8', to = 'ASCII//TRANSLIT'),
+         AwayTeam = iconv(AwayTeam, from = 'UTF-8', to = 'ASCII//TRANSLIT')) %>% 
   bind_rows(bets4) %>% 
   distinct()
 
