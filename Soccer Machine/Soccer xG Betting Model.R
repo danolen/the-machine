@@ -56,7 +56,7 @@ Big5 <- fb_match_results(country = c("ENG","ESP","ITA","GER","FRA"),
                             TRUE ~ League),
          Season = paste0(Season-1,"-",Season))
 
-uefa <- fb_match_results(country = c("NED","POR"),
+uefa <- fb_match_results(country = c("NED","POR","BEL"),
                          gender = "M",
                          season_end_year = c(2019,2020,2021,2022,2023,2024), tier = "1st") %>% 
   select(Day, Date, Time, Home, Home_xG, HomeGoals, AwayGoals, Away_xG, Away,
@@ -212,7 +212,7 @@ away <- scores %>%
 metrics <- bind_rows(home, away) %>% 
   arrange(Date, Time, League, ID) %>%
   filter(!League %in% c('UEFA Champions League', 'UEFA Europa League',
-                        'Eredivisie', 'Primeira Liga')) %>%
+                        'Eredivisie', 'Primeira Liga', 'Belgian Pro League')) %>%
   group_by(Team, League, Season, Home_or_Away) %>% 
   dplyr::mutate(SplitxG = cumsum(xG) - xG,
          SplitxGA = cumsum(xGA) - xGA,
@@ -365,7 +365,7 @@ cup_fixtures <- bind_rows(home, away) %>%
 domestic_leagues <- bind_rows(home, away) %>% 
   arrange(Date, Time, League, ID) %>%
   filter(League %in% c('EPL', 'La Liga', 'Bundesliga', 'Ligue 1', 'Serie A',
-                       'Eredivisie', 'Primeira Liga')) %>%
+                       'Eredivisie', 'Primeira Liga', 'Belgian Pro League')) %>%
   group_by(Team, League, Season, Home_or_Away) %>% 
   dplyr::mutate(SplitxG = cumsum(xG) - xG,
                 SplitxGA = cumsum(xGA) - xGA,
