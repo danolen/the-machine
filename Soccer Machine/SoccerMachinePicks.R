@@ -31,7 +31,8 @@ champ_url <- "https://www.bovada.lv/services/sports/event/v2/events/A/descriptio
 mex_cl_url <- "https://www.bovada.lv/services/sports/event/v2/events/A/description/soccer/north-america/mexico/liga-mx-clausura"
 mex_ap_url <- "https://www.bovada.lv/services/sports/event/v2/events/A/description/soccer/north-america/mexico/liga-mx-apertura"
 bra_url <- "https://www.bovada.lv/services/sports/event/v2/events/A/description/soccer/south-america/brazil/brasileirao-serie-a"
-
+ucl_url <- "https://www.bovada.lv/services/sports/event/v2/events/A/description/soccer/international-club/uefa-champions-league"
+uel_url <- "https://www.bovada.lv/services/sports/event/v2/events/A/description/soccer/international-club/uefa-europa-league"
 
 loadOdds <- function(url) {
   out <- tryCatch(
@@ -97,6 +98,8 @@ champ_odds <- loadOdds(champ_url)
 mex_cl_odds <- loadOdds(mex_cl_url)
 mex_ap_odds <- loadOdds(mex_ap_url)
 bra_odds <- loadOdds(bra_url)
+ucl_odds <- loadOdds(ucl_url)
+uel_odds <- loadOdds(uel_url)
 
 bovada_odds <- bind_rows(epl_odds, 
                          esp_odds,
@@ -107,10 +110,12 @@ bovada_odds <- bind_rows(epl_odds,
                          champ_odds,
                          mex_cl_odds,
                          mex_ap_odds,
-                         bra_odds
+                         bra_odds,
+                         ucl_odds,
+                         uel_odds
                          )
 
-club_names <- read_excel("Soccer Machine/Club Names.xlsx") %>% 
+club_names <- read_excel("Soccer Machine/Club Names.xlsx") %>%
   mutate(FBRef = iconv(FBRef, from = 'UTF-8', to = 'ASCII//TRANSLIT'),
          Bovada = iconv(Bovada, from = 'UTF-8', to = 'ASCII//TRANSLIT'))
 
@@ -135,7 +140,7 @@ mls_22 <- load_match_results(country = "USA", gender = "M", season_end_year = 20
          League = "MLS",
          Season = as.character(Season))
 
-mls_23 <- load_match_results(country = "USA", gender = "M", season_end_year = 2023, tier = "1st") %>% 
+mls_23 <- fb_match_results(country = "USA", gender = "M", season_end_year = 2023, tier = "1st") %>% 
   select(Day, Date, Time, Home, Home_xG, HomeGoals, AwayGoals, Away_xG, Away, Competition_Name, Season_End_Year) %>% 
   rename(xG = Home_xG,
          Home_Score = HomeGoals,
@@ -168,7 +173,7 @@ Big5_2223 <- load_match_results(country = c("ENG", "ESP", "ITA", "GER", "FRA"), 
                             TRUE ~ League),
          Season = paste0(Season-1,"-",Season))
 
-Big5_24 <- load_match_results(country = c("ENG", "ESP", "ITA", "GER", "FRA"), gender = "M", season_end_year = 2024, tier = "1st") %>% 
+Big5_24 <- fb_match_results(country = c("ENG", "ESP", "ITA", "GER", "FRA"), gender = "M", season_end_year = 2024, tier = "1st") %>% 
   select(Day, Date, Time, Home, Home_xG, HomeGoals, AwayGoals, Away_xG, Away, Competition_Name, Season_End_Year) %>% 
   rename(xG = Home_xG,
          Home_Score = HomeGoals,
@@ -199,7 +204,7 @@ Champ_23 <- load_match_results(country = "ENG", gender = "M", season_end_year = 
          xG.1 = as.numeric(xG.1),
          Season = paste0(Season-1,"-",Season))
 
-Champ_24 <- load_match_results(country = "ENG", gender = "M", season_end_year = 2024, tier = "2nd") %>% 
+Champ_24 <- fb_match_results(country = "ENG", gender = "M", season_end_year = 2024, tier = "2nd") %>% 
   select(Day, Date, Time, Home, Home_xG, HomeGoals, AwayGoals, Away_xG, Away, Competition_Name, Season_End_Year) %>% 
   rename(xG = Home_xG,
          Home_Score = HomeGoals,
@@ -227,7 +232,7 @@ Mex_23 <- load_match_results(country = "MEX", gender = "M", season_end_year = 20
          xG.1 = as.numeric(xG.1),
          Season = paste0(Season-1,"-",Season))
 
-Mex_24 <- load_match_results(country = "MEX", gender = "M", season_end_year = 2024, tier = "1st") %>% 
+Mex_24 <- fb_match_results(country = "MEX", gender = "M", season_end_year = 2024, tier = "1st") %>% 
   select(Day, Date, Time, Home, Home_xG, HomeGoals, AwayGoals, Away_xG, Away, Competition_Name, Season_End_Year) %>% 
   rename(xG = Home_xG,
          Home_Score = HomeGoals,
@@ -241,7 +246,7 @@ Mex_24 <- load_match_results(country = "MEX", gender = "M", season_end_year = 20
          xG.1 = as.numeric(xG.1),
          Season = paste0(Season-1,"-",Season))
 
-bra_23 <- load_match_results(country = "BRA", gender = "M", season_end_year = 2023, tier = "1st") %>% 
+bra_23 <- fb_match_results(country = "BRA", gender = "M", season_end_year = 2023, tier = "1st") %>% 
   select(Day, Date, Time, Home, Home_xG, HomeGoals, AwayGoals, Away_xG, Away, Competition_Name, Season_End_Year) %>% 
   rename(xG = Home_xG,
          Home_Score = HomeGoals,
@@ -257,6 +262,62 @@ bra_23 <- load_match_results(country = "BRA", gender = "M", season_end_year = 20
          League = "Brasileiro Serie A",
          Season = as.character(Season))
 
+ned_por_24 <- fb_match_results(country = c("NED","POR"), gender = "M", season_end_year = 2024, tier = "1st") %>% 
+  select(Day, Date, Time, Home, Home_xG, HomeGoals, AwayGoals, Away_xG, Away, Competition_Name, Season_End_Year) %>% 
+  rename(xG = Home_xG,
+         Home_Score = HomeGoals,
+         Away_Score = AwayGoals,
+         xG.1 = Away_xG,
+         League = Competition_Name,
+         Season = Season_End_Year) %>%
+  mutate(xG = as.numeric(xG),
+         Home_Score = as.numeric(Home_Score),
+         Away_Score = as.numeric(Away_Score),
+         xG.1 = as.numeric(xG.1),
+         Season = paste0(Season-1,"-",Season))
+
+ucl_24 <- fb_match_results(country = "",
+                        gender = "M",
+                        season_end_year = 2024,
+                        tier = "",
+                        non_dom_league_url = "https://fbref.com/en/comps/8/history/Champions-League-Seasons") %>% 
+  select(Day, Date, Time, Home, Home_xG, HomeGoals, AwayGoals, Away_xG, Away,
+         Competition_Name, Season_End_Year) %>% 
+  rename(xG = Home_xG,
+         Home_Score = HomeGoals,
+         Away_Score = AwayGoals,
+         xG.1 = Away_xG,
+         League = Competition_Name,
+         Season = Season_End_Year) %>%
+  mutate(xG = as.numeric(xG),
+         Home_Score = as.numeric(Home_Score),
+         Away_Score = as.numeric(Away_Score),
+         xG.1 = as.numeric(xG.1),
+         Season = paste0(Season-1,"-",Season)) %>% 
+  mutate(Home = trimws(substr(Home, 1, nchar(Home)-3)),
+         Away = trimws(substr(Away, 4, nchar(Away))))
+
+uel_24 <- fb_match_results(country = "",
+                        gender = "M",
+                        season_end_year = 2024,
+                        tier = "",
+                        non_dom_league_url = "https://fbref.com/en/comps/19/history/Europa-League-Seasons") %>% 
+  select(Day, Date, Time, Home, Home_xG, HomeGoals, AwayGoals, Away_xG, Away,
+         Competition_Name, Season_End_Year) %>% 
+  rename(xG = Home_xG,
+         Home_Score = HomeGoals,
+         Away_Score = AwayGoals,
+         xG.1 = Away_xG,
+         League = Competition_Name,
+         Season = Season_End_Year) %>%
+  mutate(xG = as.numeric(xG),
+         Home_Score = as.numeric(Home_Score),
+         Away_Score = as.numeric(Away_Score),
+         xG.1 = as.numeric(xG.1),
+         Season = paste0(Season-1,"-",Season)) %>% 
+  mutate(Home = trimws(substr(Home, 1, nchar(Home)-3)),
+         Away = trimws(substr(Away, 4, nchar(Away))))
+
 fixtures <- rbind(Big5_2223
                   , Big5_24
                   , mls_22
@@ -266,7 +327,13 @@ fixtures <- rbind(Big5_2223
                   , Mex_23
                   , Mex_24
                   , bra_23
-                  ) 
+                  , ned_por_24
+                  , ucl_24
+                  , uel_24
+                  ) %>% 
+  mutate(Home = iconv(Home, from = 'UTF-8', to = 'ASCII//TRANSLIT'),
+         Away = iconv(Away, from = 'UTF-8', to = 'ASCII//TRANSLIT'))
+
   
 # fixtures$Date <- as.Date(fixtures$Date)
 today <- Sys.Date()
@@ -310,6 +377,8 @@ metrics <- bind_rows(home, away) %>%
   filter(!is.na(Date) & (!is.na(xG) | Date >= Sys.Date())) %>% 
   replace(is.na(.), 0) %>% 
   arrange(Date, Time, League, ID) %>%
+  filter(!League %in% c('UEFA Champions League', 'UEFA Europa League',
+                        'Eredivisie', 'Primeira Liga')) %>%
   group_by(Team, League, Season, Home_or_Away) %>% 
   mutate(SplitxG = cumsum(xG) - xG,
          SplitxGA = cumsum(xGA) - xGA,
@@ -392,14 +461,14 @@ metrics_df <- metrics %>%
   left_join(metrics, by = c("ID" = "ID", "Date" = "Date", "Day" = "Day", "Time" = "Time",
                             "League" = "League", "Season" = "Season", "Opponent" = "Team"),
             suffix = c("", "_Opp")) %>% 
-  filter(Home_or_Away == "Home" & Date >= today & SplitGP > 3 & SplitGP_Opp > 3) %>%
+  filter(Home_or_Away == "Home" & Date >= today & SplitGP > 0 & SplitGP_Opp > 0) %>%
   select(-(Home_or_Away:GoalsAllowed), -(Opponent_Opp:GoalsAllowed_Opp))
 
 metrics_tt <- metrics %>% 
   left_join(metrics, by = c("ID" = "ID", "Date" = "Date", "Day" = "Day", "Time" = "Time",
                             "League" = "League", "Season" = "Season", "Opponent" = "Team"),
             suffix = c("", "_Opp")) %>%
-  filter(Date >= today & SplitGP > 3 & SplitGP_Opp > 3) %>% 
+  filter(Date >= today & SplitGP > 0 & SplitGP_Opp > 0) %>% 
   select(-(xG:GoalsAllowed), -(Opponent_Opp:GoalsAllowed_Opp))
 
 gbm_reg <- readRDS("C:/Users/danie/Desktop/SportsStuff/TheMachine/SoccerModels/train_gbm.rds")
@@ -956,8 +1025,8 @@ write.csv(bets4, "Soccer Machine/upcoming_bets.csv", row.names = FALSE, na = "")
 ## Analyze performance
 
 history <- readRDS("Soccer Machine/PicksHistory.rds") %>% 
-  mutate(HomeTeam = iconv(HomeTeam, from = 'UTF-8', to = 'ASCII//TRANSLIT'),
-         AwayTeam = iconv(AwayTeam, from = 'UTF-8', to = 'ASCII//TRANSLIT')) %>% 
+  # mutate(HomeTeam = iconv(HomeTeam, from = 'UTF-8', to = 'ASCII//TRANSLIT'),
+  #        AwayTeam = iconv(AwayTeam, from = 'UTF-8', to = 'ASCII//TRANSLIT')) %>% 
   bind_rows(bets4) %>% 
   distinct()
 

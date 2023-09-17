@@ -38,7 +38,7 @@ mls <- fb_match_results(country = "USA",
 
 Big5 <- fb_match_results(country = c("ENG","ESP","ITA","GER","FRA"),
                            gender = "M",
-                           season_end_year = c(2018,2019,2020,2021,2022,2023), tier = "1st") %>% 
+                           season_end_year = c(2018,2019,2020,2021,2022,2023,2024), tier = "1st") %>% 
   select(Day, Date, Time, Home, Home_xG, HomeGoals, AwayGoals, Away_xG, Away,
          Competition_Name, Season_End_Year) %>% 
   rename(xG = Home_xG,
@@ -58,7 +58,7 @@ Big5 <- fb_match_results(country = c("ENG","ESP","ITA","GER","FRA"),
 
 uefa <- fb_match_results(country = c("NED","POR"),
                          gender = "M",
-                         season_end_year = c(2019,2020,2021,2022,2023), tier = "1st") %>% 
+                         season_end_year = c(2019,2020,2021,2022,2023,2024), tier = "1st") %>% 
   select(Day, Date, Time, Home, Home_xG, HomeGoals, AwayGoals, Away_xG, Away,
          Competition_Name, Season_End_Year) %>% 
   rename(xG = Home_xG,
@@ -75,7 +75,7 @@ uefa <- fb_match_results(country = c("NED","POR"),
 
 Champ <- fb_match_results(country = "ENG",
                               gender = "M",
-                              season_end_year = c(2019,2020,2021,2022,2023), tier = "2nd") %>% 
+                              season_end_year = c(2019,2020,2021,2022,2023,2024), tier = "2nd") %>% 
   select(Day, Date, Time, Home, Home_xG, HomeGoals, AwayGoals, Away_xG, Away,
          Competition_Name, Season_End_Year) %>% 
   rename(xG = Home_xG,
@@ -92,7 +92,7 @@ Champ <- fb_match_results(country = "ENG",
 
 MX <- fb_match_results(country = "MEX",
                           gender = "M",
-                          season_end_year = c(2019,2020,2021,2022,2023), tier = "1st") %>% 
+                          season_end_year = c(2019,2020,2021,2022,2023,2024), tier = "1st") %>% 
   select(Day, Date, Time, Home, Home_xG, HomeGoals, AwayGoals, Away_xG, Away,
          Competition_Name, Season_End_Year) %>% 
   rename(xG = Home_xG,
@@ -127,7 +127,7 @@ Brazil <- fb_match_results(country = "BRA",
 
 ucl <- fb_match_results(country = "",
                         gender = "M",
-                        season_end_year = c(2018,2019,2020,2021,2022,2023),
+                        season_end_year = c(2018,2019,2020,2021,2022,2023,2024),
                         tier = "",
                         non_dom_league_url = "https://fbref.com/en/comps/8/history/Champions-League-Seasons") %>% 
   select(Day, Date, Time, Home, Home_xG, HomeGoals, AwayGoals, Away_xG, Away,
@@ -148,7 +148,7 @@ ucl <- fb_match_results(country = "",
 
 uel <- fb_match_results(country = "",
                         gender = "M",
-                        season_end_year = c(2018,2019,2020,2021,2022,2023),
+                        season_end_year = c(2018,2019,2020,2021,2022,2023,2024),
                         tier = "",
                         non_dom_league_url = "https://fbref.com/en/comps/19/history/Europa-League-Seasons") %>% 
   select(Day, Date, Time, Home, Home_xG, HomeGoals, AwayGoals, Away_xG, Away,
@@ -346,7 +346,7 @@ train_df <- metrics %>%
                                      TRUE ~ "Under")))
 
 train <- train_df %>% 
-  filter(SplitGP > 3 & SplitGP_Opp > 3 & Date < today)%>% 
+  filter(SplitGP > 0 & SplitGP_Opp > 0 & Date < today)%>% 
   select(-ID,
          -Date,
          -Day,
@@ -529,7 +529,7 @@ cup_metrics <- uefa_metrics %>%
                                      TRUE ~ "Under")))
 
 train_cups <- cup_metrics %>% 
-  filter(SplitGP > 3 & SplitGP_Opp > 3 & Date < today
+  filter(SplitGP > 0 & SplitGP_Opp > 0 & Date < today
          & !is.na(SplitxG) & !is.na(SplitxG_Opp)) %>% 
   select(-ID,
          -Date,
@@ -648,7 +648,7 @@ saveRDS(pls_mod_cups, "C:/Users/danie/Desktop/SportsStuff/TheMachine/SoccerModel
 saveRDS(lm_mod_cups, "C:/Users/danie/Desktop/SportsStuff/TheMachine/SoccerModels/train_lm_cups.rds")
 
 train_prob <- train_df %>% 
-  filter(SplitGP > 3 & SplitGP_Opp > 3 & Date < today)%>% 
+  filter(SplitGP > 0 & SplitGP_Opp > 0 & Date < today)%>% 
   select(-ID,
          -Date,
          -Day,
@@ -667,7 +667,7 @@ Outcome_df <- train_prob %>%
   select(-Home_or_Away, -(Minus0.5:TT3.5))
 
 train_prob_cups <- cup_metrics %>% 
-  filter(SplitGP > 3 & SplitGP_Opp > 3 & Date < today
+  filter(SplitGP > 0 & SplitGP_Opp > 0 & Date < today
          & !is.na(SplitxG) & !is.na(SplitxG_Opp))%>% 
   select(-ID,
          -Date,
