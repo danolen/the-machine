@@ -18,6 +18,7 @@ library("esquisse")
 library("blastula")
 library(worldfootballR)
 library("tidyverse")
+library(zoo)
 
 setwd("C:/Users/danie/Desktop/SportsStuff/TheMachine/the-machine")
 
@@ -115,9 +116,10 @@ bovada_odds <- bind_rows(epl_odds,
                          uel_odds
                          )
 
-club_names <- read_excel("Soccer Machine/Club Names.xlsx") %>%
-  mutate(FBRef = iconv(FBRef, from = 'UTF-8', to = 'ASCII//TRANSLIT'),
-         Bovada = iconv(Bovada, from = 'UTF-8', to = 'ASCII//TRANSLIT'))
+club_names <- read_excel("Soccer Machine/Club Names.xlsx")
+# %>%
+#   mutate(FBRef = iconv(FBRef, from = 'UTF-8', to = 'ASCII//TRANSLIT'),
+#          Bovada = iconv(Bovada, from = 'UTF-8', to = 'ASCII//TRANSLIT'))
 
 bovada_odds <- FindReplace(bovada_odds, Var = "HomeTeam", replaceData = club_names,
                            from = "Bovada", to = "Name")
@@ -262,7 +264,7 @@ bra_23 <- fb_match_results(country = "BRA", gender = "M", season_end_year = 2023
          League = "Brasileiro Serie A",
          Season = as.character(Season))
 
-ned_por_24 <- fb_match_results(country = c("NED","POR"), gender = "M", season_end_year = 2024, tier = "1st") %>% 
+uefa_24 <- fb_match_results(country = c("NED","POR","BEL"), gender = "M", season_end_year = 2024, tier = "1st") %>% 
   select(Day, Date, Time, Home, Home_xG, HomeGoals, AwayGoals, Away_xG, Away, Competition_Name, Season_End_Year) %>% 
   rename(xG = Home_xG,
          Home_Score = HomeGoals,
@@ -327,12 +329,13 @@ fixtures <- rbind(Big5_2223
                   , Mex_23
                   , Mex_24
                   , bra_23
-                  , ned_por_24
+                  , uefa_24
                   , ucl_24
                   , uel_24
-                  ) %>% 
-  mutate(Home = iconv(Home, from = 'UTF-8', to = 'ASCII//TRANSLIT'),
-         Away = iconv(Away, from = 'UTF-8', to = 'ASCII//TRANSLIT'))
+                  ) 
+# %>% 
+#   mutate(Home = iconv(Home, from = 'UTF-8', to = 'ASCII//TRANSLIT'),
+#          Away = iconv(Away, from = 'UTF-8', to = 'ASCII//TRANSLIT'))
 
   
 # fixtures$Date <- as.Date(fixtures$Date)
@@ -378,7 +381,7 @@ metrics <- bind_rows(home, away) %>%
   replace(is.na(.), 0) %>% 
   arrange(Date, Time, League, ID) %>%
   filter(!League %in% c('UEFA Champions League', 'UEFA Europa League',
-                        'Eredivisie', 'Primeira Liga')) %>%
+                        'Eredivisie', 'Primeira Liga', 'Belgian Pro League')) %>%
   group_by(Team, League, Season, Home_or_Away) %>% 
   mutate(SplitxG = cumsum(xG) - xG,
          SplitxGA = cumsum(xGA) - xGA,
@@ -466,6 +469,137 @@ metrics_df <- metrics %>%
 
 metrics_tt <- metrics %>% 
   left_join(metrics, by = c("ID" = "ID", "Date" = "Date", "Day" = "Day", "Time" = "Time",
+                            "League" = "League", "Season" = "Season", "Opponent" = "Team"),
+            suffix = c("", "_Opp")) %>%
+  filter(Date >= today & SplitGP > 0 & SplitGP_Opp > 0) %>% 
+  select(-(xG:GoalsAllowed), -(Opponent_Opp:GoalsAllowed_Opp))
+
+cup_fixtures <- bind_rows(home, away) %>% 
+  arrange(Date, Time, League, ID) %>%
+  filter(League %in% c('UEFA Champions League', 'UEFA Europa League'))
+
+domestic_leagues <- bind_rows(home, away) %>% 
+  filter(!is.na(Date) & (!is.na(xG) | Date >= Sys.Date())) %>% 
+  replace(is.na(.), 0) %>% 
+  arrange(Date, Time, League, ID) %>%
+  filter(League %in% c('EPL', 'La Liga', 'Bundesliga', 'Ligue 1', 'Serie A',
+                       'Eredivisie', 'Primeira Liga', 'Belgian Pro League'
+                       )) %>%
+  group_by(Team, League, Season, Home_or_Away) %>% 
+  dplyr::mutate(SplitxG = cumsum(xG) - xG,
+                SplitxGA = cumsum(xGA) - xGA,
+                SplitGoals = cumsum(Goals) - Goals,
+                SplitGoalsAllowed = cumsum(GoalsAllowed) - GoalsAllowed,
+                SplitGP = row_number() - 1,
+                SplitxG_roll4 = case_when(SplitGP == 1 ~ lag(xG,1),
+                                          SplitGP == 2 ~ (lag(xG,1)+lag(xG,2))/2,
+                                          SplitGP == 3 ~ (lag(xG,1)+lag(xG,2)+lag(xG,3))/3,
+                                          TRUE ~ (lag(xG,1)+lag(xG,2)+lag(xG,3)+lag(xG,4))/4),
+                SplitxGA_roll4 = case_when(SplitGP == 1 ~ lag(xGA,1),
+                                           SplitGP == 2 ~ (lag(xGA,1)+lag(xGA,2))/2,
+                                           SplitGP == 3 ~ (lag(xGA,1)+lag(xGA,2)+lag(xGA,3))/3,
+                                           TRUE ~ (lag(xGA,1)+lag(xGA,2)+lag(xGA,3)+lag(xGA,4))/4),
+                SplitGoals_roll4 = case_when(SplitGP == 1 ~ lag(Goals,1),
+                                             SplitGP == 2 ~ (lag(Goals,1)+lag(Goals,2))/2,
+                                             SplitGP == 3 ~ (lag(Goals,1)+lag(Goals,2)+lag(Goals,3))/3,
+                                             TRUE ~ (lag(Goals,1)+lag(Goals,2)+lag(Goals)+lag(Goals,4))/4),
+                SplitGoalsAllowed_roll4 = case_when(SplitGP == 1 ~ lag(GoalsAllowed,1),
+                                                    SplitGP == 2 ~ (lag(GoalsAllowed,1)+lag(GoalsAllowed,2))/2,
+                                                    SplitGP == 3 ~ (lag(GoalsAllowed,1)+lag(GoalsAllowed,2)+lag(GoalsAllowed,3))/3,
+                                                    TRUE ~ (lag(GoalsAllowed,1)+lag(GoalsAllowed,2)+lag(GoalsAllowed,3)+lag(GoalsAllowed,4))/4)) %>% 
+  group_by(Team, League, Season) %>% 
+  dplyr::mutate(SeasonxG = cumsum(xG) - xG,
+                SeasonxGA = cumsum(xGA) - xGA,
+                SeasonGoals = cumsum(Goals) - Goals,
+                SeasonGoalsAllowed = cumsum(GoalsAllowed) - GoalsAllowed,
+                SeasonGP = row_number() - 1,
+                SeasonxG_roll4 = case_when(SeasonGP == 1 ~ lag(xG,1),
+                                           SeasonGP == 2 ~ (lag(xG,1)+lag(xG,2))/2,
+                                           SeasonGP == 3 ~ (lag(xG,1)+lag(xG,2)+lag(xG,3))/4,
+                                           TRUE ~ (lag(xG,1)+lag(xG,2)+lag(xG,3)+lag(xG,4))/4),
+                SeasonxGA_roll4 = case_when(SeasonGP == 1 ~ lag(xGA,1),
+                                            SeasonGP == 2 ~ (lag(xGA,1)+lag(xGA,2))/2,
+                                            SeasonGP == 3 ~ (lag(xGA,1)+lag(xGA,2)+lag(xGA,3))/4,
+                                            TRUE ~ (lag(xGA,1)+lag(xGA,2)+lag(xGA,3)+lag(xGA,4))/4),
+                SeasonGoals_roll4 = case_when(SeasonGP == 1 ~ lag(Goals,1),
+                                              SeasonGP == 2 ~ (lag(Goals,1)+lag(Goals,2))/2,
+                                              SeasonGP == 3 ~ (lag(Goals,1)+lag(Goals,2)+lag(Goals))/4,
+                                              TRUE ~ (lag(Goals,1)+lag(Goals,2)+lag(Goals,3)+lag(Goals,4))/4),
+                SeasonGoalsAllowed_roll4 = case_when(SeasonGP == 1 ~ lag(GoalsAllowed,1),
+                                                     SeasonGP == 2 ~ (lag(GoalsAllowed,1)+lag(GoalsAllowed,2))/2,
+                                                     SeasonGP == 3 ~ (lag(GoalsAllowed,1)+lag(GoalsAllowed,2)+lag(GoalsAllowed))/4,
+                                                     TRUE ~ (lag(GoalsAllowed,1)+lag(GoalsAllowed,2)+lag(GoalsAllowed,3)+lag(GoalsAllowed,4))/4)) %>% 
+  ungroup() %>% 
+  dplyr::mutate(SplitxG = SplitxG / SplitGP,
+                SplitxGA = SplitxGA / SplitGP,
+                SplitGoals = SplitGoals / SplitGP,
+                SplitGoalsAllowed = SplitGoalsAllowed / SplitGP,
+                SeasonxG = SeasonxG / SeasonGP,
+                SeasonxGA = SeasonxGA / SeasonGP,
+                SeasonGoals = SeasonGoals / SeasonGP,
+                SeasonGoalsAllowed = SeasonGoalsAllowed / SeasonGP) %>% 
+  group_by(Team, League, Season, Home_or_Away) %>% 
+  mutate(SplitxG_roll4 = case_when(SplitGP == lag(SplitGP,1) ~ lag(SplitxG_roll4,1),
+                                   TRUE ~ SplitxG_roll4),
+         SplitxGA_roll4 = case_when(SplitGP == lag(SplitGP,1) ~ lag(SplitxGA_roll4,1),
+                                    TRUE ~ SplitxGA_roll4),
+         SplitGoals_roll4 = case_when(SplitGP == lag(SplitGP,1) ~ lag(SplitGoals_roll4,1),
+                                      TRUE ~ SplitGoals_roll4),
+         SplitGoalsAllowed_roll4 = case_when(SplitGP == lag(SplitGP,1) ~ lag(SplitGoalsAllowed_roll4,1),
+                                             TRUE ~ SplitGoalsAllowed_roll4)) %>% 
+  group_by(Team, League, Season) %>% 
+  mutate(SeasonxG_roll4 = case_when(SeasonGP == lag(SeasonGP,1) ~ lag(SeasonxG_roll4,1),
+                                    TRUE ~ SeasonxG_roll4),
+         SeasonxGA_roll4 = case_when(SeasonGP == lag(SeasonGP,1) ~ lag(SeasonxGA_roll4,1),
+                                     TRUE ~ SeasonxGA_roll4),
+         SeasonGoals_roll4 = case_when(SeasonGP == lag(SeasonGP,1) ~ lag(SeasonGoals_roll4,1),
+                                       TRUE ~ SeasonGoals_roll4),
+         SeasonGoalsAllowed_roll4 = case_when(SeasonGP == lag(SeasonGP,1) ~ lag(SeasonGoalsAllowed_roll4,1),
+                                              TRUE ~ SeasonGoalsAllowed_roll4)) %>% 
+  ungroup() %>% 
+  replace(is.na(.), 0)
+
+team_leagues <- domestic_leagues %>% 
+  distinct(Team, League) %>% 
+  rename(DomesticLeague = League)
+
+uefa_metrics <- domestic_leagues %>% 
+  bind_rows(cup_fixtures) %>% 
+  arrange(Date, Time, League, ID) %>% 
+  group_by(Team, Home_or_Away) %>% 
+  mutate(SplitxG = ifelse(is.na(SplitxG), na.locf(SplitxG, fromLast = TRUE), SplitxG),
+         SplitxGA = ifelse(is.na(SplitxGA), na.locf(SplitxGA, fromLast = TRUE), SplitxGA),
+         SplitGoals = ifelse(is.na(SplitGoals), na.locf(SplitGoals, fromLast = TRUE), SplitGoals),
+         SplitGoalsAllowed = ifelse(is.na(SplitGoalsAllowed), na.locf(SplitGoalsAllowed, fromLast = TRUE), SplitGoalsAllowed),
+         SplitGP = ifelse(is.na(SplitGP), na.locf(SplitGP, fromLast = TRUE), SplitGP),
+         SplitxG_roll4 = ifelse(is.na(SplitxG_roll4), na.locf(SplitxG_roll4, fromLast = TRUE), SplitxG_roll4),
+         SplitxGA_roll4 = ifelse(is.na(SplitxGA_roll4), na.locf(SplitxGA_roll4, fromLast = TRUE), SplitxGA_roll4),
+         SplitGoals_roll4 = ifelse(is.na(SplitGoals_roll4), na.locf(SplitGoals_roll4, fromLast = TRUE), SplitGoals_roll4),
+         SplitGoalsAllowed_roll4 = ifelse(is.na(SplitGoalsAllowed_roll4), na.locf(SplitGoalsAllowed_roll4, fromLast = TRUE), SplitGoalsAllowed_roll4),
+         SeasonxG = ifelse(is.na(SeasonxG), na.locf(SeasonxG, fromLast = TRUE), SeasonxG),
+         SeasonxGA = ifelse(is.na(SeasonxGA), na.locf(SeasonxGA, fromLast = TRUE), SeasonxGA),
+         SeasonGoals = ifelse(is.na(SeasonGoals), na.locf(SeasonGoals, fromLast = TRUE), SeasonGoals),
+         SeasonGoalsAllowed = ifelse(is.na(SeasonGoalsAllowed), na.locf(SeasonGoalsAllowed, fromLast = TRUE), SeasonGoalsAllowed),
+         SeasonGP = ifelse(is.na(SeasonGP), na.locf(SeasonGP, fromLast = TRUE), SeasonGP),
+         SeasonxG_roll4 = ifelse(is.na(SeasonxG_roll4), na.locf(SeasonxG_roll4, fromLast = TRUE), SeasonxG_roll4),
+         SeasonxGA_roll4 = ifelse(is.na(SeasonxGA_roll4), na.locf(SeasonxGA_roll4, fromLast = TRUE), SeasonxGA_roll4),
+         SeasonGoals_roll4 = ifelse(is.na(SeasonGoals_roll4), na.locf(SeasonGoals_roll4, fromLast = TRUE), SeasonGoals_roll4),
+         SeasonGoalsAllowed_roll4 = ifelse(is.na(SeasonGoalsAllowed_roll4), na.locf(SeasonGoalsAllowed_roll4, fromLast = TRUE), SeasonGoalsAllowed_roll4)) %>%
+  ungroup() %>% 
+  left_join(team_leagues) %>% 
+  filter(League %in% c('UEFA Champions League', 'UEFA Europa League')) %>% 
+  mutate(Season = case_when(Season == '2023-2024' ~ '2022-2023',
+                            TRUE ~ Season))
+
+cup_metrics_df <- uefa_metrics %>% 
+  left_join(uefa_metrics, by = c("ID" = "ID", "Date" = "Date", "Day" = "Day", "Time" = "Time",
+                            "League" = "League", "Season" = "Season", "Opponent" = "Team"),
+            suffix = c("", "_Opp")) %>% 
+  filter(Home_or_Away == "Home" & Date >= today & SplitGP > 0 & SplitGP_Opp > 0) %>%
+  select(-(Home_or_Away:GoalsAllowed), -(Opponent_Opp:GoalsAllowed_Opp))
+
+cup_metrics_tt <- uefa_metrics %>% 
+  left_join(uefa_metrics, by = c("ID" = "ID", "Date" = "Date", "Day" = "Day", "Time" = "Time",
                             "League" = "League", "Season" = "Season", "Opponent" = "Team"),
             suffix = c("", "_Opp")) %>%
   filter(Date >= today & SplitGP > 0 & SplitGP_Opp > 0) %>% 
@@ -561,6 +695,97 @@ tt3_xgb <- readRDS("C:/Users/danie/Desktop/SportsStuff/TheMachine/SoccerModels/t
 tt3.5_gbm <- readRDS("C:/Users/danie/Desktop/SportsStuff/TheMachine/SoccerModels/tt3.5_gbm.rds")
 tt3.5_pls <- readRDS("C:/Users/danie/Desktop/SportsStuff/TheMachine/SoccerModels/tt3.5_pls.rds")
 tt3.5_xgb <- readRDS("C:/Users/danie/Desktop/SportsStuff/TheMachine/SoccerModels/tt3.5_xgb.rds")
+
+gbm_reg_cups <- readRDS("C:/Users/danie/Desktop/SportsStuff/TheMachine/SoccerModels/train_gbm_cups.rds")
+cub_reg_cups <- readRDS("C:/Users/danie/Desktop/SportsStuff/TheMachine/SoccerModels/train_cub_cups.rds")
+rf_reg_cups <- readRDS("C:/Users/danie/Desktop/SportsStuff/TheMachine/SoccerModels/train_rf_cups.rds")
+ctree_reg_cups <- readRDS("C:/Users/danie/Desktop/SportsStuff/TheMachine/SoccerModels/train_ctree_cups.rds")
+pls_reg_cups <- readRDS("C:/Users/danie/Desktop/SportsStuff/TheMachine/SoccerModels/train_pls_cups.rds")
+lm_reg_cups <- readRDS("C:/Users/danie/Desktop/SportsStuff/TheMachine/SoccerModels/train_lm_cups.rds")
+outcome_gbm_cups <- readRDS("C:/Users/danie/Desktop/SportsStuff/TheMachine/SoccerModels/outcome_gbm_cups.rds")
+outcome_pls_cups <- readRDS("C:/Users/danie/Desktop/SportsStuff/TheMachine/SoccerModels/outcome_pls_cups.rds")
+outcome_xgb_cups <- readRDS("C:/Users/danie/Desktop/SportsStuff/TheMachine/SoccerModels/outcome_xgb_cups.rds")
+minus1_gbm_cups <- readRDS("C:/Users/danie/Desktop/SportsStuff/TheMachine/SoccerModels/minus1_gbm_cups.rds")
+minus1_pls_cups <- readRDS("C:/Users/danie/Desktop/SportsStuff/TheMachine/SoccerModels/minus1_pls_cups.rds")
+minus1_xgb_cups <- readRDS("C:/Users/danie/Desktop/SportsStuff/TheMachine/SoccerModels/minus1_xgb_cups.rds")
+minus1.5_gbm_cups <- readRDS("C:/Users/danie/Desktop/SportsStuff/TheMachine/SoccerModels/minus1.5_gbm_cups.rds")
+minus1.5_pls_cups <- readRDS("C:/Users/danie/Desktop/SportsStuff/TheMachine/SoccerModels/minus1.5_pls_cups.rds")
+minus1.5_xgb_cups <- readRDS("C:/Users/danie/Desktop/SportsStuff/TheMachine/SoccerModels/minus1.5_xgb_cups.rds")
+minus2_gbm_cups <- readRDS("C:/Users/danie/Desktop/SportsStuff/TheMachine/SoccerModels/minus2_gbm_cups.rds")
+minus2_pls_cups <- readRDS("C:/Users/danie/Desktop/SportsStuff/TheMachine/SoccerModels/minus2_pls_cups.rds")
+minus2_xgb_cups <- readRDS("C:/Users/danie/Desktop/SportsStuff/TheMachine/SoccerModels/minus2_xgb_cups.rds")
+minus2.5_gbm_cups <- readRDS("C:/Users/danie/Desktop/SportsStuff/TheMachine/SoccerModels/minus2.5_gbm_cups.rds")
+minus2.5_pls_cups <- readRDS("C:/Users/danie/Desktop/SportsStuff/TheMachine/SoccerModels/minus2.5_pls_cups.rds")
+minus2.5_xgb_cups <- readRDS("C:/Users/danie/Desktop/SportsStuff/TheMachine/SoccerModels/minus2.5_xgb_cups.rds")
+minus3_gbm_cups <- readRDS("C:/Users/danie/Desktop/SportsStuff/TheMachine/SoccerModels/minus3_gbm_cups.rds")
+minus3_pls_cups <- readRDS("C:/Users/danie/Desktop/SportsStuff/TheMachine/SoccerModels/minus3_pls_cups.rds")
+minus3_xgb_cups <- readRDS("C:/Users/danie/Desktop/SportsStuff/TheMachine/SoccerModels/minus3_xgb_cups.rds")
+minus3.5_gbm_cups <- readRDS("C:/Users/danie/Desktop/SportsStuff/TheMachine/SoccerModels/minus3.5_gbm_cups.rds")
+minus3.5_pls_cups <- readRDS("C:/Users/danie/Desktop/SportsStuff/TheMachine/SoccerModels/minus3.5_pls_cups.rds")
+minus3.5_xgb_cups <- readRDS("C:/Users/danie/Desktop/SportsStuff/TheMachine/SoccerModels/minus3.5_xgb_cups.rds")
+plus1_gbm_cups <- readRDS("C:/Users/danie/Desktop/SportsStuff/TheMachine/SoccerModels/plus1_gbm_cups.rds")
+plus1_pls_cups <- readRDS("C:/Users/danie/Desktop/SportsStuff/TheMachine/SoccerModels/plus1_pls_cups.rds")
+plus1_xgb_cups <- readRDS("C:/Users/danie/Desktop/SportsStuff/TheMachine/SoccerModels/plus1_xgb_cups.rds")
+plus1.5_gbm_cups <- readRDS("C:/Users/danie/Desktop/SportsStuff/TheMachine/SoccerModels/plus1.5_gbm_cups.rds")
+plus1.5_pls_cups <- readRDS("C:/Users/danie/Desktop/SportsStuff/TheMachine/SoccerModels/plus1.5_pls_cups.rds")
+plus1.5_xgb_cups <- readRDS("C:/Users/danie/Desktop/SportsStuff/TheMachine/SoccerModels/plus1.5_xgb_cups.rds")
+plus2_gbm_cups <- readRDS("C:/Users/danie/Desktop/SportsStuff/TheMachine/SoccerModels/plus2_gbm_cups.rds")
+plus2_pls_cups <- readRDS("C:/Users/danie/Desktop/SportsStuff/TheMachine/SoccerModels/plus2_pls_cups.rds")
+plus2_xgb_cups <- readRDS("C:/Users/danie/Desktop/SportsStuff/TheMachine/SoccerModels/plus2_xgb_cups.rds")
+plus2.5_gbm_cups <- readRDS("C:/Users/danie/Desktop/SportsStuff/TheMachine/SoccerModels/plus2.5_gbm_cups.rds")
+plus2.5_pls_cups <- readRDS("C:/Users/danie/Desktop/SportsStuff/TheMachine/SoccerModels/plus2.5_pls_cups.rds")
+plus2.5_xgb_cups <- readRDS("C:/Users/danie/Desktop/SportsStuff/TheMachine/SoccerModels/plus2.5_xgb_cups.rds")
+plus3_gbm_cups <- readRDS("C:/Users/danie/Desktop/SportsStuff/TheMachine/SoccerModels/plus3_gbm_cups.rds")
+plus3_pls_cups <- readRDS("C:/Users/danie/Desktop/SportsStuff/TheMachine/SoccerModels/plus3_pls_cups.rds")
+plus3_xgb_cups <- readRDS("C:/Users/danie/Desktop/SportsStuff/TheMachine/SoccerModels/plus3_xgb_cups.rds")
+plus3.5_gbm_cups <- readRDS("C:/Users/danie/Desktop/SportsStuff/TheMachine/SoccerModels/plus3.5_gbm_cups.rds")
+plus3.5_pls_cups <- readRDS("C:/Users/danie/Desktop/SportsStuff/TheMachine/SoccerModels/plus3.5_pls_cups.rds")
+plus3.5_xgb_cups <- readRDS("C:/Users/danie/Desktop/SportsStuff/TheMachine/SoccerModels/plus3.5_xgb_cups.rds")
+total1.5_gbm_cups <- readRDS("C:/Users/danie/Desktop/SportsStuff/TheMachine/SoccerModels/total1.5_gbm_cups.rds")
+total1.5_pls_cups <- readRDS("C:/Users/danie/Desktop/SportsStuff/TheMachine/SoccerModels/total1.5_pls_cups.rds")
+total1.5_xgb_cups <- readRDS("C:/Users/danie/Desktop/SportsStuff/TheMachine/SoccerModels/total1.5_xgb_cups.rds")
+total2_gbm_cups <- readRDS("C:/Users/danie/Desktop/SportsStuff/TheMachine/SoccerModels/total2_gbm_cups.rds")
+total2_pls_cups <- readRDS("C:/Users/danie/Desktop/SportsStuff/TheMachine/SoccerModels/total2_pls_cups.rds")
+total2_xgb_cups <- readRDS("C:/Users/danie/Desktop/SportsStuff/TheMachine/SoccerModels/total2_xgb_cups.rds")
+total2.5_gbm_cups <- readRDS("C:/Users/danie/Desktop/SportsStuff/TheMachine/SoccerModels/total2.5_gbm_cups.rds")
+total2.5_pls_cups <- readRDS("C:/Users/danie/Desktop/SportsStuff/TheMachine/SoccerModels/total2.5_pls_cups.rds")
+total2.5_xgb_cups <- readRDS("C:/Users/danie/Desktop/SportsStuff/TheMachine/SoccerModels/total2.5_xgb_cups.rds")
+total3_gbm_cups <- readRDS("C:/Users/danie/Desktop/SportsStuff/TheMachine/SoccerModels/total3_gbm_cups.rds")
+total3_pls_cups <- readRDS("C:/Users/danie/Desktop/SportsStuff/TheMachine/SoccerModels/total3_pls_cups.rds")
+total3_xgb_cups <- readRDS("C:/Users/danie/Desktop/SportsStuff/TheMachine/SoccerModels/total3_xgb_cups.rds")
+total3.5_gbm_cups <- readRDS("C:/Users/danie/Desktop/SportsStuff/TheMachine/SoccerModels/total3.5_gbm_cups.rds")
+total3.5_pls_cups <- readRDS("C:/Users/danie/Desktop/SportsStuff/TheMachine/SoccerModels/total3.5_pls_cups.rds")
+total3.5_xgb_cups <- readRDS("C:/Users/danie/Desktop/SportsStuff/TheMachine/SoccerModels/total3.5_xgb_cups.rds")
+total4_gbm_cups <- readRDS("C:/Users/danie/Desktop/SportsStuff/TheMachine/SoccerModels/total4_gbm_cups.rds")
+total4_pls_cups <- readRDS("C:/Users/danie/Desktop/SportsStuff/TheMachine/SoccerModels/total4_pls_cups.rds")
+total4_xgb_cups <- readRDS("C:/Users/danie/Desktop/SportsStuff/TheMachine/SoccerModels/total4_xgb_cups.rds")
+total4.5_gbm_cups <- readRDS("C:/Users/danie/Desktop/SportsStuff/TheMachine/SoccerModels/total4.5_gbm_cups.rds")
+total4.5_pls_cups <- readRDS("C:/Users/danie/Desktop/SportsStuff/TheMachine/SoccerModels/total4.5_pls_cups.rds")
+total4.5_xgb_cups <- readRDS("C:/Users/danie/Desktop/SportsStuff/TheMachine/SoccerModels/total4.5_xgb_cups.rds")
+BTTS_gbm_cups <- readRDS("C:/Users/danie/Desktop/SportsStuff/TheMachine/SoccerModels/BTTS_gbm_cups.rds")
+BTTS_pls_cups <- readRDS("C:/Users/danie/Desktop/SportsStuff/TheMachine/SoccerModels/BTTS_pls_cups.rds")
+BTTS_xgb_cups <- readRDS("C:/Users/danie/Desktop/SportsStuff/TheMachine/SoccerModels/BTTS_xgb_cups.rds")
+tt0.5_gbm_cups <- readRDS("C:/Users/danie/Desktop/SportsStuff/TheMachine/SoccerModels/tt0.5_gbm_cups.rds")
+tt0.5_pls_cups <- readRDS("C:/Users/danie/Desktop/SportsStuff/TheMachine/SoccerModels/tt0.5_pls_cups.rds")
+tt0.5_xgb_cups <- readRDS("C:/Users/danie/Desktop/SportsStuff/TheMachine/SoccerModels/tt0.5_xgb_cups.rds")
+tt1_gbm_cups <- readRDS("C:/Users/danie/Desktop/SportsStuff/TheMachine/SoccerModels/tt1_gbm_cups.rds")
+tt1_pls_cups <- readRDS("C:/Users/danie/Desktop/SportsStuff/TheMachine/SoccerModels/tt1_pls_cups.rds")
+tt1_xgb_cups <- readRDS("C:/Users/danie/Desktop/SportsStuff/TheMachine/SoccerModels/tt1_xgb_cups.rds")
+tt1.5_gbm_cups <- readRDS("C:/Users/danie/Desktop/SportsStuff/TheMachine/SoccerModels/tt1.5_gbm_cups.rds")
+tt1.5_pls_cups <- readRDS("C:/Users/danie/Desktop/SportsStuff/TheMachine/SoccerModels/tt1.5_pls_cups.rds")
+tt1.5_xgb_cups <- readRDS("C:/Users/danie/Desktop/SportsStuff/TheMachine/SoccerModels/tt1.5_xgb_cups.rds")
+tt2_gbm_cups <- readRDS("C:/Users/danie/Desktop/SportsStuff/TheMachine/SoccerModels/tt2_gbm_cups.rds")
+tt2_pls_cups <- readRDS("C:/Users/danie/Desktop/SportsStuff/TheMachine/SoccerModels/tt2_pls_cups.rds")
+tt2_xgb_cups <- readRDS("C:/Users/danie/Desktop/SportsStuff/TheMachine/SoccerModels/tt2_xgb_cups.rds")
+tt2.5_gbm_cups <- readRDS("C:/Users/danie/Desktop/SportsStuff/TheMachine/SoccerModels/tt2.5_gbm_cups.rds")
+tt2.5_pls_cups <- readRDS("C:/Users/danie/Desktop/SportsStuff/TheMachine/SoccerModels/tt2.5_pls_cups.rds")
+tt2.5_xgb_cups <- readRDS("C:/Users/danie/Desktop/SportsStuff/TheMachine/SoccerModels/tt2.5_xgb_cups.rds")
+tt3_gbm_cups <- readRDS("C:/Users/danie/Desktop/SportsStuff/TheMachine/SoccerModels/tt3_gbm_cups.rds")
+tt3_pls_cups <- readRDS("C:/Users/danie/Desktop/SportsStuff/TheMachine/SoccerModels/tt3_pls_cups.rds")
+tt3_xgb_cups <- readRDS("C:/Users/danie/Desktop/SportsStuff/TheMachine/SoccerModels/tt3_xgb_cups.rds")
+tt3.5_gbm_cups <- readRDS("C:/Users/danie/Desktop/SportsStuff/TheMachine/SoccerModels/tt3.5_gbm_cups.rds")
+tt3.5_pls_cups <- readRDS("C:/Users/danie/Desktop/SportsStuff/TheMachine/SoccerModels/tt3.5_pls_cups.rds")
+tt3.5_xgb_cups <- readRDS("C:/Users/danie/Desktop/SportsStuff/TheMachine/SoccerModels/tt3.5_xgb_cups.rds")
 
 singles <- metrics_tt
 singles$pG_gbm <- predict(gbm_reg, metrics_tt)
@@ -705,8 +930,153 @@ doubles2 <- doubles %>%
   rename(Home = Team,
          Away = Opponent)
 
+cup_singles <- cup_metrics_tt
+cup_singles$pG_gbm <- predict(gbm_reg_cups, cup_metrics_tt)
+cup_singles$pG_cub <- predict(cub_reg_cups, cup_metrics_tt)
+cup_singles$pG_rf <- predict(rf_reg_cups, cup_metrics_tt)
+cup_singles$pG_ctree <- predict(ctree_reg_cups, cup_metrics_tt)
+cup_singles$pG_pls <- predict(pls_reg_cups, cup_metrics_tt)
+cup_singles$pG_lm <- predict(lm_reg_cups, cup_metrics_tt)
+cup_singles$tt0.5_gbm <- predict(tt0.5_gbm_cups, cup_metrics_tt, type = "prob")
+cup_singles$tt0.5_pls <- predict(tt0.5_pls_cups, cup_metrics_tt, type = "prob")
+cup_singles$tt0.5_xgb <- predict(tt0.5_xgb_cups, cup_metrics_tt, type = "prob")
+cup_singles$tt1_gbm <- predict(tt1_gbm_cups, cup_metrics_tt, type = "prob")
+cup_singles$tt1_pls <- predict(tt1_pls_cups, cup_metrics_tt, type = "prob")
+cup_singles$tt1_xgb <- predict(tt1_xgb_cups, cup_metrics_tt, type = "prob")
+cup_singles$tt1.5_gbm <- predict(tt1.5_gbm_cups, cup_metrics_tt, type = "prob")
+cup_singles$tt1.5_pls <- predict(tt1.5_pls_cups, cup_metrics_tt, type = "prob")
+cup_singles$tt1.5_xgb <- predict(tt1.5_xgb_cups, cup_metrics_tt, type = "prob")
+cup_singles$tt2_gbm <- predict(tt2_gbm_cups, cup_metrics_tt, type = "prob")
+cup_singles$tt2_pls <- predict(tt2_pls_cups, cup_metrics_tt, type = "prob")
+cup_singles$tt2_xgb <- predict(tt2_xgb_cups, cup_metrics_tt, type = "prob")
+cup_singles$tt2.5_gbm <- predict(tt2.5_gbm_cups, cup_metrics_tt, type = "prob")
+cup_singles$tt2.5_pls <- predict(tt2.5_pls_cups, cup_metrics_tt, type = "prob")
+cup_singles$tt2.5_xgb <- predict(tt2.5_xgb_cups, cup_metrics_tt, type = "prob")
+cup_singles$tt3_gbm <- predict(tt3_gbm_cups, cup_metrics_tt, type = "prob")
+cup_singles$tt3_pls <- predict(tt3_pls_cups, cup_metrics_tt, type = "prob")
+cup_singles$tt3_xgb <- predict(tt3_xgb_cups, cup_metrics_tt, type = "prob")
+cup_singles$tt3.5_gbm <- predict(tt3.5_gbm_cups, cup_metrics_tt, type = "prob")
+cup_singles$tt3.5_pls <- predict(tt3.5_pls_cups, cup_metrics_tt, type = "prob")
+cup_singles$tt3.5_xgb <- predict(tt3.5_xgb_cups, cup_metrics_tt, type = "prob")
+cup_singles <- cup_singles %>% 
+  mutate(pG_ens = (pG_gbm + pG_cub + pG_rf + pG_ctree + pG_pls + pG_lm) / 6,
+         pG_ensrf = (pG_ens + pG_rf) / 2,
+         ptt0.5 = (tt0.5_gbm + tt0.5_pls + tt0.5_xgb) / 3,
+         ptt1 = (tt1_gbm + tt1_pls + tt1_xgb) / 3,
+         ptt1.5 = (tt1.5_gbm + tt1.5_pls + tt1.5_xgb) / 3,
+         ptt2 = (tt2_gbm + tt2_pls + tt2_xgb) / 3,
+         ptt2.5 = (tt2.5_gbm + tt2.5_pls + tt2.5_xgb) / 3,
+         ptt3 = (tt3_gbm + tt3_pls + tt3_xgb) / 3,
+         ptt3.5 = (tt3.5_gbm + tt3.5_pls + tt3.5_xgb) / 3)
+
+cup_singles2 <- cup_singles %>% 
+  select(ID:Home_or_Away, pG_ensrf:ptt3.5) %>%
+  left_join(cup_singles %>% 
+              select(ID:Home_or_Away, pG_ensrf:ptt3.5),
+            by = c("ID", "Date", "Day", "Time", "League", "Season", "Team" = "Opponent", "Opponent" = "Team"),
+            suffix = c("_Home", "_Away")) %>% 
+  select(ID:pG_ensrf_Home, pG_ensrf_Away, ptt0.5_Home:ptt3.5_Away, -Home_or_Away_Away) %>% 
+  rename(Home = Team,
+         Away = Opponent) %>% 
+  filter(Home_or_Away_Home == "Home") %>% 
+  select(-Home_or_Away_Home)
+
+cup_doubles <- cup_metrics_df
+cup_doubles$outcome_gbm <- predict(outcome_gbm_cups, cup_metrics_df, type = "prob")
+cup_doubles$outcome_pls <- predict(outcome_pls_cups, cup_metrics_df, type = "prob")
+cup_doubles$outcome_xgb <- predict(outcome_xgb_cups, cup_metrics_df, type = "prob")
+cup_doubles$minus1_gbm <- predict(minus1_gbm_cups, cup_metrics_df, type = "prob")
+cup_doubles$minus1_pls <- predict(minus1_pls_cups, cup_metrics_df, type = "prob")
+cup_doubles$minus1_xgb <- predict(minus1_xgb_cups, cup_metrics_df, type = "prob")
+cup_doubles$minus1.5_gbm <- predict(minus2.5_gbm_cups, cup_metrics_df, type = "prob")
+cup_doubles$minus1.5_pls <- predict(minus2.5_pls_cups, cup_metrics_df, type = "prob")
+cup_doubles$minus1.5_xgb <- predict(minus2.5_xgb_cups, cup_metrics_df, type = "prob")
+cup_doubles$minus2_gbm <- predict(minus2_gbm_cups, cup_metrics_df, type = "prob")
+cup_doubles$minus2_pls <- predict(minus2_pls_cups, cup_metrics_df, type = "prob")
+cup_doubles$minus2_xgb <- predict(minus2_xgb_cups, cup_metrics_df, type = "prob")
+cup_doubles$minus2.5_gbm <- predict(minus2.5_gbm_cups, cup_metrics_df, type = "prob")
+cup_doubles$minus2.5_pls <- predict(minus2.5_pls_cups, cup_metrics_df, type = "prob")
+cup_doubles$minus2.5_xgb <- predict(minus2.5_xgb_cups, cup_metrics_df, type = "prob")
+cup_doubles$minus3_gbm <- predict(minus3_gbm_cups, cup_metrics_df, type = "prob")
+cup_doubles$minus3_pls <- predict(minus3_pls_cups, cup_metrics_df, type = "prob")
+cup_doubles$minus3_xgb <- predict(minus3_xgb_cups, cup_metrics_df, type = "prob")
+cup_doubles$minus3.5_gbm <- predict(minus3.5_gbm_cups, cup_metrics_df, type = "prob")
+cup_doubles$minus3.5_pls <- predict(minus3.5_pls_cups, cup_metrics_df, type = "prob")
+cup_doubles$minus3.5_xgb <- predict(minus3.5_xgb_cups, cup_metrics_df, type = "prob")
+cup_doubles$plus1_gbm <- predict(plus1_gbm_cups, cup_metrics_df, type = "prob")
+cup_doubles$plus1_pls <- predict(plus1_pls_cups, cup_metrics_df, type = "prob")
+cup_doubles$plus1_xgb <- predict(plus1_xgb_cups, cup_metrics_df, type = "prob")
+cup_doubles$plus1.5_gbm <- predict(plus2.5_gbm_cups, cup_metrics_df, type = "prob")
+cup_doubles$plus1.5_pls <- predict(plus2.5_pls_cups, cup_metrics_df, type = "prob")
+cup_doubles$plus1.5_xgb <- predict(plus2.5_xgb_cups, cup_metrics_df, type = "prob")
+cup_doubles$plus2_gbm <- predict(plus2_gbm_cups, cup_metrics_df, type = "prob")
+cup_doubles$plus2_pls <- predict(plus2_pls_cups, cup_metrics_df, type = "prob")
+cup_doubles$plus2_xgb <- predict(plus2_xgb_cups, cup_metrics_df, type = "prob")
+cup_doubles$plus2.5_gbm <- predict(plus2.5_gbm_cups, cup_metrics_df, type = "prob")
+cup_doubles$plus2.5_pls <- predict(plus2.5_pls_cups, cup_metrics_df, type = "prob")
+cup_doubles$plus2.5_xgb <- predict(plus2.5_xgb_cups, cup_metrics_df, type = "prob")
+cup_doubles$plus3_gbm <- predict(plus3_gbm_cups, cup_metrics_df, type = "prob")
+cup_doubles$plus3_pls <- predict(plus3_pls_cups, cup_metrics_df, type = "prob")
+cup_doubles$plus3_xgb <- predict(plus3_xgb_cups, cup_metrics_df, type = "prob")
+cup_doubles$plus3.5_gbm <- predict(plus3.5_gbm_cups, cup_metrics_df, type = "prob")
+cup_doubles$plus3.5_pls <- predict(plus3.5_pls_cups, cup_metrics_df, type = "prob")
+cup_doubles$plus3.5_xgb <- predict(plus3.5_xgb_cups, cup_metrics_df, type = "prob")
+cup_doubles$total1.5_gbm <- predict(total2.5_gbm_cups, cup_metrics_df, type = "prob")
+cup_doubles$total1.5_pls <- predict(total2.5_pls_cups, cup_metrics_df, type = "prob")
+cup_doubles$total1.5_xgb <- predict(total2.5_xgb_cups, cup_metrics_df, type = "prob")
+cup_doubles$total2_gbm <- predict(total2_gbm_cups, cup_metrics_df, type = "prob")
+cup_doubles$total2_pls <- predict(total2_pls_cups, cup_metrics_df, type = "prob")
+cup_doubles$total2_xgb <- predict(total2_xgb_cups, cup_metrics_df, type = "prob")
+cup_doubles$total2.5_gbm <- predict(total2.5_gbm_cups, cup_metrics_df, type = "prob")
+cup_doubles$total2.5_pls <- predict(total2.5_pls_cups, cup_metrics_df, type = "prob")
+cup_doubles$total2.5_xgb <- predict(total2.5_xgb_cups, cup_metrics_df, type = "prob")
+cup_doubles$total3_gbm <- predict(total3_gbm_cups, cup_metrics_df, type = "prob")
+cup_doubles$total3_pls <- predict(total3_pls_cups, cup_metrics_df, type = "prob")
+cup_doubles$total3_xgb <- predict(total3_xgb_cups, cup_metrics_df, type = "prob")
+cup_doubles$total3.5_gbm <- predict(total3.5_gbm_cups, cup_metrics_df, type = "prob")
+cup_doubles$total3.5_pls <- predict(total3.5_pls_cups, cup_metrics_df, type = "prob")
+cup_doubles$total3.5_xgb <- predict(total3.5_xgb_cups, cup_metrics_df, type = "prob")
+cup_doubles$total4_gbm <- predict(total4_gbm_cups, cup_metrics_df, type = "prob")
+cup_doubles$total4_pls <- predict(total4_pls_cups, cup_metrics_df, type = "prob")
+cup_doubles$total4_xgb <- predict(total4_xgb_cups, cup_metrics_df, type = "prob")
+cup_doubles$total4.5_gbm <- predict(total4.5_gbm_cups, cup_metrics_df, type = "prob")
+cup_doubles$total4.5_pls <- predict(total4.5_pls_cups, cup_metrics_df, type = "prob")
+cup_doubles$total4.5_xgb <- predict(total4.5_xgb_cups, cup_metrics_df, type = "prob")
+cup_doubles$BTTS_gbm <- predict(BTTS_gbm_cups, cup_metrics_df, type = "prob")
+cup_doubles$BTTS_pls <- predict(BTTS_pls_cups, cup_metrics_df, type = "prob")
+cup_doubles$BTTS_xgb <- predict(BTTS_xgb_cups, cup_metrics_df, type = "prob")
+cup_doubles <- cup_doubles %>% 
+  mutate(poutcome = (outcome_gbm + outcome_pls + outcome_xgb) / 3,
+         pminus1 = (minus1_gbm + minus1_pls + minus1_xgb) / 3,
+         pminus1.5 = (minus1.5_gbm + minus1.5_pls + minus1.5_xgb) / 3,
+         pminus2 = (minus2_gbm + minus2_pls + minus2_xgb) / 3,
+         pminus2.5 = (minus2.5_gbm + minus2.5_pls + minus2.5_xgb) / 3,
+         pminus3 = (minus3_gbm + minus3_pls + minus3_xgb) / 3,
+         pminus3.5 = (minus3.5_gbm + minus3.5_pls + minus3.5_xgb) / 3,
+         pplus1 = (plus1_gbm + plus1_pls + plus1_xgb) / 3,
+         pplus1.5 = (plus1.5_gbm + plus1.5_pls + plus1.5_xgb) / 3,
+         pplus2 = (plus2_gbm + plus2_pls + plus2_xgb) / 3,
+         pplus2.5 = (plus2.5_gbm + plus2.5_pls + plus2.5_xgb) / 3,
+         pplus3 = (plus3_gbm + plus3_pls + plus3_xgb) / 3,
+         pplus3.5 = (plus3.5_gbm + plus3.5_pls + plus3.5_xgb) / 3,
+         ptotal1.5 = (total1.5_gbm + total1.5_pls + total1.5_xgb) / 3,
+         ptotal2 = (total2_gbm + total2_pls + total2_xgb) / 3,
+         ptotal2.5 = (total2.5_gbm + total2.5_pls + total2.5_xgb) / 3,
+         ptotal3 = (total3_gbm + total3_pls + total3_xgb) / 3,
+         ptotal3.5 = (total3.5_gbm + total3.5_pls + total3.5_xgb) / 3,
+         ptotal4 = (total4_gbm + total4_pls + total4_xgb) / 3,
+         ptotal4.5 = (total4.5_gbm + total4.5_pls + total4.5_xgb) / 3,
+         pBTTS = (BTTS_gbm + BTTS_pls + BTTS_xgb) / 3)
+
+cup_doubles2 <- cup_doubles %>% 
+  select(ID:Opponent, poutcome:pBTTS) %>% 
+  rename(Home = Team,
+         Away = Opponent)
+
 predsDF <- doubles2 %>% 
-  left_join(singles2)
+  left_join(singles2) %>% 
+  bind_rows(cup_doubles2 %>% 
+              left_join(cup_singles2))
 
 upcoming <- left_join(bovada_odds, predsDF,
                       by = c("gamedate" = "Date", "HomeTeam" = "Home", "AwayTeam" = "Away")) %>%
@@ -1024,13 +1394,13 @@ write.csv(bets4, "Soccer Machine/upcoming_bets.csv", row.names = FALSE, na = "")
 
 ## Analyze performance
 
-history <- readRDS("Soccer Machine/PicksHistory.rds") %>% 
+history <- readRDS("Soccer Machine/PicksHistory_current_season.rds") %>% 
   # mutate(HomeTeam = iconv(HomeTeam, from = 'UTF-8', to = 'ASCII//TRANSLIT'),
   #        AwayTeam = iconv(AwayTeam, from = 'UTF-8', to = 'ASCII//TRANSLIT')) %>% 
   bind_rows(bets4) %>% 
   distinct()
 
-saveRDS(history, "Soccer Machine/PicksHistory.rds")
+saveRDS(history, "Soccer Machine/PicksHistory_current_season.rds")
 
 history <- inner_join(history, scores, by = c("gamedate" = "Date", "HomeTeam" = "Home",
                                               "AwayTeam" = "Away", "Day" = "Day",
@@ -1097,7 +1467,7 @@ history2 <- history %>%
   group_by(ID, bet_type_full) %>%
   mutate(partition = row_number())
 
-saveRDS(history2, "Soccer Machine/PicksHistory_Outcomes.rds")
+saveRDS(history2, "Soccer Machine/PicksHistory_Outcomes_current_season.rds")
 
 types <- filter(history2,
                 Winner != "Push" &
@@ -1155,7 +1525,7 @@ season_starts <- fixtures %>%
   select(League, start_date)
 
 grades <- types %>% 
-  filter(Pick_Odds > -220) %>%
+  filter(Pick_Odds > -180) %>%
   arrange(gamedate, ID, desc(Kelly_Criteria)) %>%
   group_by(ID) %>%
   mutate(KC_Rank = row_number()) %>%
@@ -1200,7 +1570,7 @@ email_table_1 <- grades %>%
          `Profit: Suggested Wagers` = paste0(round_any(`Profit: Suggested Wagers`, 0.1), ' units'),
          ROI = paste0(round_any(ROI*100, 0.01), '%')) %>% 
   select(`Bet Grade`, `Suggested Wager`, `Hit Rate`, `Average Odds`, `Average Implied Odds`, Bets, `Profit: 1 Unit Wagers`, `Profit: Suggested Wagers`, ROI) %>% 
-  print(n=40)
+  print(n=150)
 
 df_html_1 <- print(xtable(email_table_1), type = "html", print.results = FALSE)
 
@@ -1283,7 +1653,7 @@ bets_table <- #read.csv("Soccer Machine/upcoming_bets.csv") %>%
                                                   TRUE ~ 'F')),
          `Bet Grade` = factor(`Bet Grade`, levels = c('A+', 'A', 'B', 'C', 'D', 'F'))) %>% 
   filter(Kelly_Criteria > 0 &
-           Pick_Odds > -220 &
+           Pick_Odds > -180 &
            Pick_WinProb >= 0.3 &
            bet_type_full != 'Alternate Total - 1.5' &
            gamedate <= Sys.Date() + 4) %>%
@@ -1348,7 +1718,7 @@ Email[["subject"]] = paste0("Soccer Machine Picks: ", Sys.Date())
 Email[["HTMLbody"]] = sprintf("
 The Machine's picks for upcoming soccer matches are in! The Machine currently offers picks for the Big 5 European Leagues plus MLS, the EFL Championship, Liga MX, and the Brazilian Serie A. The attached documents contains all of the pertinent betting information for the upcoming matches, as well as a glossary. Good luck!
 </p><br></p>
-UPDATE: The historical results below will now only include the current season for each league. If you are interested in the historical results for previous season feel free to reach out to me. I have also included below a breakdown of The Machine's performance by league. The Machine may perform better or worse with certain leagues so this will help to identify those trends.
+UPDATES: The Machine has started using a new model for the Champions League and Europa League. For these competitions it is important to consider how important the match is to each team. If a team is already elimitated or secured a spot in the next round they may rotate the squad instead of playing their starters. It is recommended to avoid any suggested bets where one team may be significantly more motivated to win than the other. The historical results below will now only include the current season for each league. If you are interested in the historical results for previous season feel free to reach out to me. I have also included below a breakdown of The Machine's performance by league. The Machine may perform better or worse with certain leagues so this will help to identify those trends.
 </p><br></p>
 %s
 </p><br></p>
@@ -1361,8 +1731,6 @@ These are the bets that The Machine recommends that you should make for games co
 Below are the historical results for both a flat betting strategy (1 unit wagers), and the suggested wager sizes from above:
 </p><br></p>
 %s
-</p><br></p>
-NOTE: I filtered out bets where the odds are less than -220 from this analysis. I suggest never betting juice higher than -220. I also filtered out bets that have less than a 30%% win probability. I don't believe it is worth it to bet on these huge underdogs. I also removed any bets on Alternate Totals set at 1.5 goals. The Machine almost always suggests an under bet on those. The performance on those bets was not very good, and that is also a very lame bet. Nobody likes cheering for a game to be that low scoring.
 </p><br></p>
 Most recent date with complete game data for each league:
 </p><br></p>
