@@ -159,7 +159,7 @@ setwd("C:/Users/danie/Desktop/SportsStuff/TheMachine/the-machine")
 #          Side_or_Total = case_when(bet_type %in% c('Alt Spread', 'Draw No Bet', 'ML', 'Spread') ~ "Side",
 #                                    TRUE ~ "Total"))
 
-types <- readRDS("Soccer Machine/PicksHistory_Outcomes.rds") %>%
+types <- readRDS("Soccer Machine/PicksHistory_Outcomes_current_season.rds") %>%
   filter(#Winner != "Push" &
            Kelly_Criteria > 0 &
            Pick_Odds >= -250 &
@@ -204,6 +204,31 @@ types <- readRDS("Soccer Machine/PicksHistory_Outcomes.rds") %>%
          `Graded Profit` = Units*`Graded Risk`,
          `Bet Grade` = factor(`Bet Grade`, levels = c('A+', 'A', 'B', 'C', 'D', 'F')))
 
+season_starts <- fixtures %>% 
+  group_by(League, Season) %>% 
+  summarise(start_date = min(Date)) %>% 
+  group_by(League) %>% 
+  arrange(desc(start_date)) %>% 
+  mutate(row_num = row_number())%>% 
+  ungroup() %>% 
+  filter(row_num == 1) %>% 
+  select(League, start_date)
+
+grades <- types %>% 
+  filter(Pick_Odds > -180) %>%
+  arrange(gamedate, ID, desc(Kelly_Criteria)) %>%
+  group_by(ID) %>%
+  mutate(KC_Rank = row_number()) %>%
+  arrange(gamedate, ID, desc(EV)) %>%
+  group_by(ID) %>%
+  mutate(EV_Rank = row_number(),
+         Rank = (KC_Rank + EV_Rank) / 2) %>%
+  arrange(gamedate, ID, Rank) %>%
+  mutate(Final_Rank = row_number()) %>%
+  filter(Final_Rank == 1) %>% 
+  left_join(season_starts)
+
+
 #### Tiered Grades ####
 
 grades_new <- types %>% 
@@ -218,7 +243,7 @@ grades_new <- types %>%
          `Bet Grade` = factor(`Bet Grade`, levels = c('A+', 'A', 'B', 'C', 'D', 'F')))
 
 grades <- grades_new %>% 
-  filter(Pick_Odds > -220) %>% 
+  filter(Pick_Odds > -180 & League != 'MLS') %>% 
   # filter(Winner != 'Push') %>%
   arrange(gamedate, ID, desc(Kelly_Criteria)) %>%
   group_by(ID) %>%
@@ -227,25 +252,29 @@ grades <- grades_new %>%
   group_by(ID) %>%
   mutate(EV_Rank = row_number(),
          Rank = (KC_Rank + EV_Rank) / 2) %>%
-  arrange(gamedate, ID, Rank) %>%
+  arrange(gamedate, ID, EV_Rank) %>%
   mutate(Final_Rank = row_number()) %>%
   filter(Final_Rank == 1) %>%
   filter(Winner != 'Push')
   
 ass <- grades %>%  
+  mutate(bet_type = gsub('Alt ', '',bet_type)) %>% 
   # filter(`Bet Grade` %in% c('A+', 'A')) %>%
-  group_by(# `Bet Grade`,
+  group_by(#`Bet Grade`,
            # KC_Grade,
-           KC_tier = as.numeric(as.character(KC_tier)),
+    bet_type,
+           # KC_tier = as.numeric(as.character(KC_tier)),
            # EV_Grade,
            EV_tier = as.numeric(as.character(EV_tier)),
            # New_Grade
            # `Bet Grade` = factor(`Bet Grade`, levels = c('A+', 'A', 'B', 'C', 'D', 'F'))
   ) %>%
   dplyr::summarise(total_bets = sum(bets),
+                   Units = sum(Units),
                    ROI = sum(Units) / sum(bets))
 
 email_table_1 <- grades %>%
+  # filter(gamedate >= start_date) %>%
   # filter(gamedate >= as.Date('2022-08-01')) %>%
   group_by(`Bet Grade`,
            # Side_or_Total,

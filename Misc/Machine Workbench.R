@@ -75,31 +75,18 @@ my_books <- odds %>%
   filter(bookmaker_key %in% c('draftkings', 'fanduel', 'williamhill_us', 
                               'pointsbetus', 'betmgm', 'wynnbet', 'betrivers'))
 
-#### Soccer ####
-
-library(worldfootballR)
-
-champ_23 <- fb_match_results(country = "ENG", gender = "M", season_end_year = 2023, tier = "2nd") %>% 
-  select(Day, Date, Time, Home, Home_xG, HomeGoals, AwayGoals, Away_xG, Away, Competition_Name, Season_End_Year) %>% 
-  rename(xG = Home_xG,
-         Home_Score = HomeGoals,
-         Away_Score = AwayGoals,
-         xG.1 = Away_xG,
-         League = Competition_Name,
-         Season = Season_End_Year) %>% 
-  filter(Day != "") %>% 
-  mutate(xG = as.numeric(xG),
-         Home_Score = as.numeric(Home_Score),
-         Away_Score = as.numeric(Away_Score),
-         xG.1 = as.numeric(xG.1),
-         League = "MLS",
-         Season = as.character(Season))
-
 #### College Basketball ####
 
 library(hoopR)
-library(toRvik)
+library(toRvik) ##depricated
 library(reticulate)
+library(cbbdata)
+
+cbbdata::cbd_create_account(username = 'danolen', email = 'dnolen@smu.edu', password = 'P@nyUp2@2@', confirm_password = 'P@nyUp2@2@')
+cbbdata::cbd_login(username = 'danolen', password = 'P@nyUp2@2@')
+
+current_kp_ratings <- kp_pomeroy_ratings(min_year = most_recent_mbb_season(), max_year = most_recent_mbb_season())
+current_torvik_ratings <- cbd_torvik_ratings_archive()
 
 hasla <- read.csv("Haslametrics.csv") %>% 
   mutate(Home = str_trim(gsub('[[:digit:]]+', '', Home)),
