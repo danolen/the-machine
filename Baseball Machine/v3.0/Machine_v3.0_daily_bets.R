@@ -1992,6 +1992,8 @@ Email[["bcc"]] = paste("jamesorler@gmail.com",
                        "dnassar15@gmail.com",
                        "vtloncto@gmail.com",
                        "bcap15@yahoo.com",
+                       "mshin0630@gmail.com",
+                       "chrisjhogan@gmail.com",
                        sep = ";",
                        collapse = NULL)
 Email[["subject"]] = paste0("Baseball Machine Picks: ", Sys.Date())
