@@ -1713,6 +1713,7 @@ Email[["bcc"]] = paste("jamesorler@gmail.com", "asnolen@crimson.ua.edu", "jamest
                        "jordanreticker@gmail.com", "brentcaminiti@gmail.com", "dougmyers4987@gmail.com",
                        "ralphmstudley@gmail.com", "johnpavese@gmail.com", "amishra1293@gmail.com",
                        "rfinstra@gmail.com", "james_bueck@yahoo.com", "jouanscott@gmail.com",
+                       "dnassar15@gmail.com", "mshin0630@gmail.com",
                        sep = ";", collapse = NULL)
 Email[["subject"]] = paste0("Soccer Machine Picks: ", Sys.Date())
 Email[["HTMLbody"]] = sprintf("
