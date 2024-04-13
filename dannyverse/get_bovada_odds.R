@@ -48,6 +48,7 @@ get_bovada_odds <- function(sport) {
                            paste0(AwayTeam, " To Score - 1st Inning"), 
                            paste0(HomeTeam, " To Score - 1st Inning"))) %>%
     unnest(outcomes) %>%
+    distinct() %>% 
     mutate(Odds = as.numeric(price$american),
            SpreadTotal = price$handicap,
            type = case_when(str_detect(bet_type, "To Score - 1st Inning") |

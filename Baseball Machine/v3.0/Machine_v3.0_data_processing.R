@@ -3,6 +3,8 @@
 
 library("pacman")
 p_load("tidyverse", "readr", "DataCombine", "readxl")
+setwd("C:/Users/danie/Desktop/SportsStuff/TheMachine/the-machine")
+source("dannyverse/dannyverse.R")
 team_names <- read.csv("Baseball Machine/team_names.csv") %>% 
   left_join(baseballr::teams_lu_table %>%
               filter(sport.name == "Major League Baseball") %>%

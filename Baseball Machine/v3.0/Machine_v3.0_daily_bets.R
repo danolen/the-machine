@@ -9,7 +9,7 @@ source("dannyverse/dannyverse.R")
 #### Setup ####
 
 ## Season start and end date
-season = 2023
+season = 2024
 season_info = baseballr::mlb_seasons_all()
 startDate = as.Date(season_info[season_info$season_id==as.character(season),"regular_season_start_date"]$regular_season_start_date)
 endDate = as.Date(season_info[season_info$season_id==as.character(season),"regular_season_end_date"]$regular_season_end_date)
@@ -368,8 +368,8 @@ results <- scores_update %>%
            home_team_division_name, away_team_league_name, away_team_division_name) %>%
   inner_join(pks_update %>% 
                filter(status.detailedState %in% c('Final', 'Completed Early') &
-                        is.na(resumeDate) &
-                        is.na(resumedFrom) &
+                        # is.na(resumeDate) &
+                        # is.na(resumedFrom) &
                         seriesDescription == 'Regular Season' &
                         scheduledInnings == 9) %>% 
                select(game_pk, officialDate, doubleHeader, gameNumber, dayNight, scheduledInnings, venue.name)) %>% 
@@ -457,10 +457,10 @@ daily_pitchers <- pitchers_s2d_today %>%
                           Name == "Hyun-Jin Ryu" ~ "Hyun Jin Ryu",
                           TRUE ~ Name))
 
-PECOTA_pitching_23 <- readxl::read_xlsx(paste0("Baseball Machine/PECOTA/",season,"/pecota2023_pitching_mar29.xlsx"), sheet = "50") %>% 
+PECOTA_pitching_24 <- readxl::read_xlsx(paste0("Baseball Machine/PECOTA/",season,"/pecota2024_pitching_mar23.xlsx"), sheet = "50") %>% 
   select(mlbid, name, ip, warp) %>% 
   dplyr::mutate(WARP200 = (warp/ip)*200)
-PECOTA_hitting_23 <- readxl::read_xlsx(paste0("Baseball Machine/PECOTA/",season,"/pecota2023_hitting_mar29.xlsx"), sheet = "50") %>% 
+PECOTA_hitting_24 <- readxl::read_xlsx(paste0("Baseball Machine/PECOTA/",season,"/pecota2024_hitting_mar23.xlsx"), sheet = "50") %>% 
   select(mlbid, name, pa, warp) %>% 
   dplyr::mutate(WARP600 = (as.numeric(warp)/as.numeric(pa))*600)
 
@@ -482,17 +482,17 @@ upcoming_games_today <- bovada_odds %>%
               dplyr::mutate(game_date = as.Date(game_date)),
           by = c("HomeTeam" = "team", "gamedate" = "game_date"),
           suffix = c("_AwaySP", "_HomeSP")) %>% 
-  left_join(PECOTA_pitching_23 %>% 
+  left_join(PECOTA_pitching_24 %>% 
               select(mlbid, WARP200),
             by = c("id_AwaySP" = "mlbid")) %>% 
-  left_join(PECOTA_pitching_23 %>% 
+  left_join(PECOTA_pitching_24 %>% 
             select(mlbid, WARP200),
           by = c("id_HomeSP" = "mlbid"),
           suffix = c("_AwaySP", "_HomeSP")) %>% 
   left_join(rosters_update %>% 
               bind_rows(tmrw_rosters) %>% 
               filter(position_type != "Pitcher") %>% 
-              left_join(PECOTA_hitting_23 %>% 
+              left_join(PECOTA_hitting_24 %>% 
                           select(mlbid, WARP600),
                         by = c("person_id" = "mlbid")) %>% 
               group_by(team_id, date) %>% 
@@ -508,7 +508,7 @@ upcoming_games_today <- bovada_odds %>%
   left_join(rosters_update %>% 
               bind_rows(tmrw_rosters) %>% 
               filter(position_type != "Pitcher") %>% 
-              left_join(PECOTA_hitting_23 %>% 
+              left_join(PECOTA_hitting_24 %>% 
                           select(mlbid, WARP600),
                         by = c("person_id" = "mlbid")) %>% 
               group_by(team_id, date) %>% 
@@ -1994,11 +1994,12 @@ Email[["bcc"]] = paste("jamesorler@gmail.com",
                        "bcap15@yahoo.com",
                        "mshin0630@gmail.com",
                        "chrisjhogan@gmail.com",
+                       "jasonarata@yahoo.com",
                        sep = ";",
                        collapse = NULL)
 Email[["subject"]] = paste0("Baseball Machine Picks: ", Sys.Date())
 Email[["HTMLbody"]] = sprintf("
-The Basebal Machine is now up and running! The Machine will suggest one bet per game, although I wouldn't actually suggest betting on every game. Each bet is given a grade. I am cautiously optimistic about the A+ and A grades, so I would stick to those. We will refine our approach as we see how The Machine performs, so this might change. Here are the results so far grouped by bet grade:
+The Basebal Machine is now up and running! The Machine will suggest one bet per game, although I wouldn't actually suggest betting on every game. Each bet is given a grade. Last season had decent results with the A+ and A grades, so I would stick to those. We will refine our approach as we see how The Machine performs, so this might change. Here are the results so far grouped by bet grade:
 </p><br></p>
 %s
 </p><br></p>

@@ -19,36 +19,62 @@ scrape_fangraphs <- function(position = c("team batting", "starting pitchers", "
     startdate <- case_when(time_frame == "s2d" ~ as.Date(season_info[season_info$season_id==as.character(season),"regular_season_start_date"]$regular_season_start_date),
                            TRUE ~ as.Date(start_date)-delta)
     enddate <- as.Date(start_date)-1
-    urls <- list()
+    df <- data.frame()
     while (enddate < as.Date(end_date)) {
-      url = paste0('https://www.fangraphs.com/leaders-legacy.aspx?pos=all&stats=bat&lg=all&qual=0&type=c,6,11,12,13,21,34,35,40,41,23,37,38,50,61,305,111,203,199,58,43,44,45,47,102,110,308,311&season=',season,'&month=1000&season1=',season,'&ind=0&team=0,ts&rost=0&age=0&filter=&players=0&startdate=',startdate,'&enddate=',enddate)
-      urls[[i]] = url
-      i <- i + 1
+      tbl <- fg_team_batter(qual = 0, startseason = season, endseason = season, startdate = startdate, enddate = enddate, month = "1000")
+      df <- df %>%
+        bind_rows(tbl %>% 
+                    select(team_name,
+                             PA,
+                             HR,
+                             R,
+                             RBI,
+                             SB,
+                             BB_pct,
+                             K_pct,
+                             ISO,
+                             BABIP,
+                             AVG,
+                             OBP,
+                             SLG,
+                             wOBA,
+                             wRC_plus,
+                             EV,
+                             BaseRunning,
+                             Offense,
+                             Defense,
+                             WAR,
+                             LD_pct,
+                             GB_pct,
+                             FB_pct,
+                             HR_FB,
+                             `O-Swing_pct`,
+                             SwStr_pct,
+                             Barrel_pct,
+                             HardHit_pct) %>% 
+                    dplyr::rename(Team = team_name,
+                           BB. = BB_pct,
+                           K. = K_pct,
+                           wRC. = wRC_plus,
+                           BsR = BaseRunning,
+                           Off = Offense,
+                           Def = Defense,
+                           LD. = LD_pct,
+                           GB. = GB_pct,
+                           FB. = FB_pct,
+                           HR.FB = HR_FB,
+                           O.Swing. = `O-Swing_pct`,
+                           SwStr. = SwStr_pct,
+                           Barrel. = Barrel_pct,
+                           HardHit. = HardHit_pct) %>% 
+                    mutate(Date = enddate+1)
+                  )
+
       startdate <- startdate + case_when(time_frame == "s2d" ~ 0,
                                          TRUE ~ 1)
       enddate <- enddate + 1
     }
     
-    tbl <- list()
-    dates <- as.Date(start_date)
-    j = 1
-    for (j in seq_along(urls)) {
-      tbl[[j]] = urls[[j]] %>%
-        read_html() %>%
-        html_nodes("table") %>%
-        .[10] %>%
-        html_table(fill = TRUE) %>%
-        data.frame(stringsAsFactors = FALSE) %>%
-        .[-c(1,3),] %>%
-        .[,-1] %>% row_to_names(row_number = 1)
-      tbl[[j]]$Date = dates
-      tbl[[j]]$url = urls[[j]]
-      print(j)
-      j = j+1
-      dates = dates+1
-    }
-    
-    df <- ldply(tbl, data.frame)
     clms <- c(7,8,21:28)
     for (i in 1:length(clms)) {
       df[,clms[i]] <- substr(df[,clms[i]], 1, nchar(df[,clms[i]])-1)
@@ -64,36 +90,65 @@ scrape_fangraphs <- function(position = c("team batting", "starting pitchers", "
     startdate <- case_when(time_frame == "s2d" ~ as.Date(season_info[season_info$season_id==as.character(season),"regular_season_start_date"]$regular_season_start_date),
                            TRUE ~ as.Date(start_date)-delta)
     enddate <- as.Date(start_date)-1
-    urls <- list()
+    df <- data.frame()
     while (enddate < as.Date(end_date)) {
-      url = paste0('https://www.fangraphs.com/leaders-legacy.aspx?pos=all&stats=pit&lg=all&qual=0&type=c%2C7%2C8%2C13%2C120%2C121%2C40%2C43%2C44%2C48%2C47%2C49%2C51%2C322%2C42%2C6%2C45%2C62%2C122%2C59%2C55%2C57%2C105%2C112%2C113%2C111%2C325%2C328&season=',season,'&month=1000&season1=',season,'&ind=0&team=0&rost=0&age=0&filter=&players=0&startdate=',startdate,'&enddate=',enddate,'&page=1_1000')
-      urls[[i]] = url
-      i <- i + 1
+      tbl <- fg_pitcher_leaders_dn(startseason = season, endseason = season, startdate = startdate, enddate = enddate, month = "1000")
+      df <- df %>%
+        bind_rows(tbl %>% 
+                    select(PlayerNameRoute,
+                           team_name,
+                           G,
+                           GS,
+                           IP,
+                           K_pct,
+                           BB_pct,
+                           HR_9,
+                           BABIP,
+                           LOB_pct,
+                           GB_pct,
+                           LD_pct,
+                           FB_pct,
+                           HR_FB,
+                           EV,
+                           WHIP,
+                           ERA,
+                           FIP,
+                           xFIP,
+                           SIERA,
+                           WAR,
+                           Start_IP,
+                           Relief_IP,
+                           `O-Swing_pct`,
+                           `F-Strike_pct`,
+                           SwStr_pct,
+                           Zone_pct,
+                           Barrel_pct,
+                           HardHit_pct) %>% 
+                    dplyr::rename(Name = PlayerNameRoute,
+                           Team = team_name,
+                           BB. = BB_pct,
+                           K. = K_pct,
+                           HR.9 = HR_9,
+                           LOB. = LOB_pct,
+                           LD. = LD_pct,
+                           GB. = GB_pct,
+                           FB. = FB_pct,
+                           HR.FB = HR_FB,
+                           Start.IP = Start_IP,
+                           Relief.IP = Relief_IP,
+                           O.Swing. = `O-Swing_pct`,
+                           F.Strike. = `F-Strike_pct`,
+                           SwStr. = SwStr_pct,
+                           Zone. = Zone_pct,
+                           Barrel. = Barrel_pct,
+                           HardHit. = HardHit_pct) %>% 
+                    mutate(Date = enddate+1)
+        )
       startdate <- startdate + case_when(time_frame == "s2d" ~ 0,
                                          TRUE ~ 1)
       enddate <- enddate + 1
     }
     
-    tbl <- list()
-    dates <- as.Date(start_date)
-    j = 1
-    for (j in seq_along(urls)) {
-      tbl[[j]] = urls[[j]] %>%
-        read_html() %>%
-        html_nodes("table") %>%
-        .[10] %>%
-        html_table(fill = TRUE) %>%
-        data.frame(stringsAsFactors = FALSE) %>%
-        .[-c(1,3),] %>%
-        .[,-1] %>% row_to_names(row_number = 1)
-      tbl[[j]]$Date = dates
-      tbl[[j]]$url = urls[[j]]
-      print(j)
-      j = j+1
-      dates = dates+1
-    }
-    
-    df <- ldply(tbl, data.frame)
     clms <- c(6:7,10:14,24:29)
     for (i in 1:length(clms)) {
       df[,clms[i]] <- substr(df[,clms[i]], 1, nchar(df[,clms[i]])-1)
@@ -108,36 +163,59 @@ scrape_fangraphs <- function(position = c("team batting", "starting pitchers", "
     startdate <- case_when(time_frame == "s2d" ~ as.Date(season_info[season_info$season_id==as.character(season),"regular_season_start_date"]$regular_season_start_date),
                            TRUE ~ as.Date(start_date)-delta)
     enddate <- as.Date(start_date)-1
-    urls <- list()
+    df <- data.frame()
     while (enddate < as.Date(end_date)) {
-      url = paste0('https://www.fangraphs.com/leaders-legacy.aspx?pos=all&stats=rel&lg=all&qual=0&type=c%2C7%2C13%2C120%2C121%2C40%2C43%2C44%2C48%2C47%2C49%2C51%2C322%2C42%2C6%2C45%2C62%2C122%2C59%2C105%2C112%2C113%2C111%2C325%2C328&season=',season,'&month=1000&season1=',season,'&ind=0&team=0%2Cts&rost=0&age=0&filter=&players=0&startdate=',startdate,'&enddate=',enddate)
-      urls[[i]] = url
-      i <- i + 1
+      tbl <- fg_team_relievers(startseason = season, endseason = season, startdate = startdate, enddate = enddate, month = "1000", qual = "0")
+      df <- df %>%
+        bind_rows(tbl %>% 
+                    select(team_name,
+                           G,
+                           IP,
+                           K_pct,
+                           BB_pct,
+                           HR_9,
+                           BABIP,
+                           LOB_pct,
+                           LD_pct,
+                           GB_pct,
+                           FB_pct,
+                           HR_FB,
+                           EV,
+                           WHIP,
+                           ERA,
+                           FIP,
+                           xFIP,
+                           SIERA,
+                           WAR,
+                           `O-Swing_pct`,
+                           `F-Strike_pct`,
+                           SwStr_pct,
+                           Zone_pct,
+                           Barrel_pct,
+                           HardHit_pct) %>% 
+                    dplyr::rename(Team = team_name,
+                           BB. = BB_pct,
+                           K. = K_pct,
+                           HR.9 = HR_9,
+                           LOB. = LOB_pct,
+                           LD. = LD_pct,
+                           GB. = GB_pct,
+                           FB. = FB_pct,
+                           HR.FB = HR_FB,
+                           O.Swing. = `O-Swing_pct`,
+                           F.Strike. = `F-Strike_pct`,
+                           SwStr. = SwStr_pct,
+                           Zone. = Zone_pct,
+                           Barrel. = Barrel_pct,
+                           HardHit. = HardHit_pct) %>% 
+                    mutate(Date = enddate+1)
+        )
+      
       startdate <- startdate + case_when(time_frame == "s2d" ~ 0,
                                          TRUE ~ 1)
       enddate <- enddate + 1
     }
     
-    tbl <- list()
-    dates <- as.Date(start_date)
-    j = 1
-    for (j in seq_along(urls)) {
-      tbl[[j]] = urls[[j]] %>%
-        read_html() %>%
-        html_nodes("table") %>%
-        .[10] %>%
-        html_table(fill = TRUE) %>%
-        data.frame(stringsAsFactors = FALSE) %>%
-        .[-c(1,3),] %>%
-        .[,-1] %>% row_to_names(row_number = 1)
-      tbl[[j]]$Date = dates
-      tbl[[j]]$url = urls[[j]]
-      print(j)
-      j = j+1
-      dates = dates+1
-    }
-    
-    df <- ldply(tbl, data.frame)
     clms <- c(4,5,8:12,20:25)
     for (i in 1:length(clms)) {
       df[,clms[i]] <- substr(df[,clms[i]], 1, nchar(df[,clms[i]])-1)
