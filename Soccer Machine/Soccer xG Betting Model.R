@@ -19,7 +19,7 @@ intervalStart <- Sys.time()
 
 mls <- fb_match_results(country = "USA",
                           gender = "M",
-                          season_end_year = c(2018, 2019, 2020, 2021, 2022, 2023), tier = "1st") %>% 
+                          season_end_year = c(2018, 2019, 2020, 2021, 2022, 2023, 2024), tier = "1st") %>% 
   select(Day, Date, Time, Home, Home_xG, HomeGoals, AwayGoals, Away_xG, Away,
          Competition_Name, Season_End_Year) %>% 
   rename(xG = Home_xG,
@@ -107,7 +107,7 @@ MX <- fb_match_results(country = "MEX",
          xG.1 = as.numeric(xG.1),
          Season = paste0(Season-1,"-",Season))
 
-Brazil <- fb_match_results(country = "BRA",
+SouthAmerica <- fb_match_results(country = c("BRA","ARG"),
                        gender = "M",
                        season_end_year = c(2019,2020,2021,2022,2023), tier = "1st") %>% 
   select(Day, Date, Time, Home, Home_xG, HomeGoals, AwayGoals, Away_xG, Away,
@@ -122,7 +122,8 @@ Brazil <- fb_match_results(country = "BRA",
          Home_Score = as.numeric(Home_Score),
          Away_Score = as.numeric(Away_Score),
          xG.1 = as.numeric(xG.1),
-         League = "Brasileiro Serie A",
+         League = case_when(startsWith(League,"Campeonato") ~ "Brasileiro Serie A",
+                            startsWith(League,"Argentine") ~ "Argentine Primera Division"),
          Season = paste0(Season-1,"-",Season))
 
 ucl <- fb_match_results(country = "",
@@ -171,7 +172,7 @@ uel <- fb_match_results(country = "",
 intervalEnd <- Sys.time()
 paste("Web scraping took",intervalEnd - intervalStart,attr(intervalEnd - intervalStart,"units"))
 
-fixtures <- bind_rows(Big5, mls, Champ, MX, Brazil, uefa, ucl, uel)
+fixtures <- bind_rows(Big5, mls, Champ, MX, SouthAmerica, uefa, ucl, uel)
 fixtures$Date <- as.Date(fixtures$Date)
 today <- Sys.Date()
 
