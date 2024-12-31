@@ -81,7 +81,7 @@ scrape_fangraphs <- function(position = c("team batting", "starting pitchers", "
     }
     
     df[,2:28] <- lapply(df[,2:28], as.numeric)
-    df[,c(7,8,21:28)] <- df[,c(7,8,21:28)] / 100
+    # df[,c(7,8,21:28)] <- df[,c(7,8,21:28)] / 100
     
   }
   
@@ -155,7 +155,7 @@ scrape_fangraphs <- function(position = c("team batting", "starting pitchers", "
     }
     
     df[,3:29] <- lapply(df[,3:29], as.numeric)
-    df[,c(6:7,10:14,24:29)] <- df[,c(6:7,10:14,24:29)] / 100
+    # df[,c(6:7,10:14,24:29)] <- df[,c(6:7,10:14,24:29)] / 100
   }
   
   if (position == "team bullpen") {
@@ -222,7 +222,7 @@ scrape_fangraphs <- function(position = c("team batting", "starting pitchers", "
     }
     
     df[,2:25] <- lapply(df[,2:25], as.numeric)
-    df[,c(4,5,8:12,20:25)] <- df[,c(4,5,8:12,20:25)] / 100
+    # df[,c(4,5,8:12,20:25)] <- df[,c(4,5,8:12,20:25)] / 100
   }
   
   return(df)

@@ -368,8 +368,8 @@ results <- scores_update %>%
            home_team_division_name, away_team_league_name, away_team_division_name) %>%
   inner_join(pks_update %>% 
                filter(status.detailedState %in% c('Final', 'Completed Early') &
-                        # is.na(resumeDate) &
-                        # is.na(resumedFrom) &
+                        is.na(resumeDate) &
+                        is.na(resumedFrom) &
                         seriesDescription == 'Regular Season' &
                         scheduledInnings == 9) %>% 
                select(game_pk, officialDate, doubleHeader, gameNumber, dayNight, scheduledInnings, venue.name)) %>% 
@@ -454,6 +454,7 @@ daily_pitchers <- pitchers_s2d_today %>%
   dplyr::mutate(Name = case_when(Name == "Luis Garcia" & Team == "HOU" ~ "Luis Garcia (HOU)",
                           # Name == "Luis Castillo" & Team == "DET" ~ "Luis Castillo (DET)",
                           Name == "Luis Ortiz" & Team == "PIT" ~ "Luis Ortiz (PIT)",
+                          Name == "Logan Allen" & Team == "CLE" ~ "Logan Allen (CLE)",
                           Name == "Hyun-Jin Ryu" ~ "Hyun Jin Ryu",
                           TRUE ~ Name))
 
@@ -633,17 +634,17 @@ upcoming_games_tomorrow <- bovada_odds %>%
               dplyr::mutate(game_date = as.Date(game_date)),
             by = c("HomeTeam" = "team", "gamedate" = "game_date"),
             suffix = c("_AwaySP", "_HomeSP")) %>% 
-  left_join(PECOTA_pitching_23 %>% 
+  left_join(PECOTA_pitching_24 %>% 
               select(mlbid, WARP200),
             by = c("id_AwaySP" = "mlbid")) %>% 
-  left_join(PECOTA_pitching_23 %>% 
+  left_join(PECOTA_pitching_24 %>% 
               select(mlbid, WARP200),
             by = c("id_HomeSP" = "mlbid"),
             suffix = c("_AwaySP", "_HomeSP")) %>% 
   left_join(rosters_update %>% 
               bind_rows(tmrw_rosters) %>% 
               filter(position_type != "Pitcher") %>% 
-              left_join(PECOTA_hitting_23 %>% 
+              left_join(PECOTA_hitting_24 %>% 
                           select(mlbid, WARP600),
                         by = c("person_id" = "mlbid")) %>% 
               group_by(team_id, date) %>% 
@@ -659,7 +660,7 @@ upcoming_games_tomorrow <- bovada_odds %>%
   left_join(rosters_update %>% 
               bind_rows(tmrw_rosters) %>% 
               filter(position_type != "Pitcher") %>% 
-              left_join(PECOTA_hitting_23 %>% 
+              left_join(PECOTA_hitting_24 %>% 
                           select(mlbid, WARP600),
                         by = c("person_id" = "mlbid")) %>% 
               group_by(team_id, date) %>% 
@@ -1828,8 +1829,8 @@ grades <- types %>%
                                         New_Grade >= 1.75 ~ 'B',
                                         # New_Grade >= 1 ~ 'C',
                                         New_Grade < 1.75 ~ 'C'),
-                `Bet Grade` = case_when(Kelly_Criteria >= 0.4 ~ 'C',
-                                        TRUE ~ `Bet Grade`),
+                # `Bet Grade` = case_when(Kelly_Criteria >= 0.4 ~ 'C',
+                #                         TRUE ~ `Bet Grade`),
                 `Graded Risk` = case_when(`Bet Grade` == 'A+' ~ 2,
                                           `Bet Grade` == 'A' ~ 1,
                                           `Bet Grade` == 'B' ~ 0,
@@ -1944,8 +1945,8 @@ bets_table <- bets3 %>%
                                         New_Grade >= 1.75 ~ 'B',
                                         # New_Grade >= 1 ~ 'C',
                                         New_Grade < 1.75 ~ 'C'),
-                `Bet Grade` = case_when(as.numeric(as.character(KC)) >= 0.4 ~ 'C',
-                                        TRUE ~ `Bet Grade`),
+                # `Bet Grade` = case_when(as.numeric(as.character(KC)) >= 0.4 ~ 'C',
+                #                         TRUE ~ `Bet Grade`),
                 `Bet Grade` = factor(`Bet Grade`, levels = c('A+', 'A', 'B', 'C', 'D'))) %>% 
   select(-EV_Grade, -KC_Grade, -New_Grade) %>% 
   arrange(`Game Date`, `Bet Grade`, desc(KC)) %>%
@@ -1977,26 +1978,26 @@ Outlook <- COMCreate("Outlook.Application")
 
 Email = Outlook$CreateItem(0)
 Email[["to"]] = "dnolen@smu.edu"
-Email[["bcc"]] = paste("jamesorler@gmail.com",
-                       "asnolen@crimson.ua.edu",
-                       "jamestodd425@gmail.com",
-                       "jordanreticker@gmail.com",
-                       "brentcaminiti@gmail.com",
-                       "dougmyers4987@gmail.com",
-                       "ralphmstudley@gmail.com",
-                       "johnpavese@gmail.com",
-                       # "amishra1293@gmail.com",
-                       "rfinstra@gmail.com",
-                       "james_bueck@yahoo.com",
-                       "mattgodelman@gmail.com",
-                       "dnassar15@gmail.com",
-                       "vtloncto@gmail.com",
-                       "bcap15@yahoo.com",
-                       "mshin0630@gmail.com",
-                       "chrisjhogan@gmail.com",
-                       "jasonarata@yahoo.com",
-                       sep = ";",
-                       collapse = NULL)
+# Email[["bcc"]] = paste("jamesorler@gmail.com",
+#                        "asnolen@crimson.ua.edu",
+#                        "jamestodd425@gmail.com",
+#                        "jordanreticker@gmail.com",
+#                        "brentcaminiti@gmail.com",
+#                        "dougmyers4987@gmail.com",
+#                        "ralphmstudley@gmail.com",
+#                        "johnpavese@gmail.com",
+#                        # "amishra1293@gmail.com",
+#                        "rfinstra@gmail.com",
+#                        "james_bueck@yahoo.com",
+#                        "mattgodelman@gmail.com",
+#                        "dnassar15@gmail.com",
+#                        "vtloncto@gmail.com",
+#                        "bcap15@yahoo.com",
+#                        "mshin0630@gmail.com",
+#                        "chrisjhogan@gmail.com",
+#                        "jasonarata@yahoo.com",
+#                        sep = ";",
+#                        collapse = NULL)
 Email[["subject"]] = paste0("Baseball Machine Picks: ", Sys.Date())
 Email[["HTMLbody"]] = sprintf("
 The Basebal Machine is now up and running! The Machine will suggest one bet per game, although I wouldn't actually suggest betting on every game. Each bet is given a grade. Last season had decent results with the A+ and A grades, so I would stick to those. We will refine our approach as we see how The Machine performs, so this might change. Here are the results so far grouped by bet grade:
