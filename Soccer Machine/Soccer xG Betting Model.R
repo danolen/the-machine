@@ -36,9 +36,9 @@ mls <- fb_match_results(country = "USA",
          League = "MLS",
          Season = as.character(Season))
 
-Big5 <- fb_match_results(country = c("ENG","ESP","ITA","GER","FRA"),
+Big5a <- fb_match_results(country = c("ENG","ESP","ITA","GER","FRA"),
                            gender = "M",
-                           season_end_year = c(2018,2019,2020,2021,2022,2023,2024), tier = "1st") %>% 
+                           season_end_year = c(2018,2019,2020,2021), tier = "1st") %>% 
   select(Day, Date, Time, Home, Home_xG, HomeGoals, AwayGoals, Away_xG, Away,
          Competition_Name, Season_End_Year) %>% 
   rename(xG = Home_xG,
@@ -56,9 +56,29 @@ Big5 <- fb_match_results(country = c("ENG","ESP","ITA","GER","FRA"),
                             TRUE ~ League),
          Season = paste0(Season-1,"-",Season))
 
-uefa <- fb_match_results(country = c("NED","POR","BEL"),
+Big5b <- fb_match_results(country = c("ENG","ESP","ITA","GER","FRA"),
+                          gender = "M",
+                          season_end_year = c(2022,2023,2024,2025), tier = "1st") %>% 
+  select(Day, Date, Time, Home, Home_xG, HomeGoals, AwayGoals, Away_xG, Away,
+         Competition_Name, Season_End_Year) %>% 
+  rename(xG = Home_xG,
+         Home_Score = HomeGoals,
+         Away_Score = AwayGoals,
+         xG.1 = Away_xG,
+         League = Competition_Name,
+         Season = Season_End_Year) %>%
+  mutate(xG = as.numeric(xG),
+         Home_Score = as.numeric(Home_Score),
+         Away_Score = as.numeric(Away_Score),
+         xG.1 = as.numeric(xG.1),
+         League = case_when(League == "Premier League" ~ "EPL",
+                            League == "Fußball-Bundesliga" ~ "Bundesliga",
+                            TRUE ~ League),
+         Season = paste0(Season-1,"-",Season))
+
+uefa1 <- fb_match_results(country = c("NED","POR","BEL"),
                          gender = "M",
-                         season_end_year = c(2019,2020,2021,2022,2023,2024), tier = "1st") %>% 
+                         season_end_year = c(2019,2020,2021,2022), tier = "1st") %>% 
   select(Day, Date, Time, Home, Home_xG, HomeGoals, AwayGoals, Away_xG, Away,
          Competition_Name, Season_End_Year) %>% 
   rename(xG = Home_xG,
@@ -73,9 +93,26 @@ uefa <- fb_match_results(country = c("NED","POR","BEL"),
          xG.1 = as.numeric(xG.1),
          Season = paste0(Season-1,"-",Season))
 
-Champ <- fb_match_results(country = "ENG",
+uefa2 <- fb_match_results(country = c("NED","POR","BEL"),
+                         gender = "M",
+                         season_end_year = c(2023,2024,2025), tier = "1st") %>% 
+  select(Day, Date, Time, Home, Home_xG, HomeGoals, AwayGoals, Away_xG, Away,
+         Competition_Name, Season_End_Year) %>% 
+  rename(xG = Home_xG,
+         Home_Score = HomeGoals,
+         Away_Score = AwayGoals,
+         xG.1 = Away_xG,
+         League = Competition_Name,
+         Season = Season_End_Year) %>%
+  mutate(xG = as.numeric(xG),
+         Home_Score = as.numeric(Home_Score),
+         Away_Score = as.numeric(Away_Score),
+         xG.1 = as.numeric(xG.1),
+         Season = paste0(Season-1,"-",Season))
+
+Div2 <- fb_match_results(country = c("ENG","GER"),
                               gender = "M",
-                              season_end_year = c(2019,2020,2021,2022,2023,2024), tier = "2nd") %>% 
+                              season_end_year = c(2019,2020,2021,2022,2023,2024,2025), tier = "2nd") %>% 
   select(Day, Date, Time, Home, Home_xG, HomeGoals, AwayGoals, Away_xG, Away,
          Competition_Name, Season_End_Year) %>% 
   rename(xG = Home_xG,
@@ -92,7 +129,7 @@ Champ <- fb_match_results(country = "ENG",
 
 MX <- fb_match_results(country = "MEX",
                           gender = "M",
-                          season_end_year = c(2019,2020,2021,2022,2023,2024), tier = "1st") %>% 
+                          season_end_year = c(2019,2020,2021,2022,2023,2024,2025), tier = "1st") %>% 
   select(Day, Date, Time, Home, Home_xG, HomeGoals, AwayGoals, Away_xG, Away,
          Competition_Name, Season_End_Year) %>% 
   rename(xG = Home_xG,
@@ -109,7 +146,7 @@ MX <- fb_match_results(country = "MEX",
 
 SouthAmerica <- fb_match_results(country = c("BRA","ARG"),
                        gender = "M",
-                       season_end_year = c(2019,2020,2021,2022,2023), tier = "1st") %>% 
+                       season_end_year = c(2019,2020,2021,2022,2023,2024), tier = "1st") %>% 
   select(Day, Date, Time, Home, Home_xG, HomeGoals, AwayGoals, Away_xG, Away,
          Competition_Name, Season_End_Year) %>% 
   rename(xG = Home_xG,
@@ -128,7 +165,7 @@ SouthAmerica <- fb_match_results(country = c("BRA","ARG"),
 
 ucl <- fb_match_results(country = "",
                         gender = "M",
-                        season_end_year = c(2018,2019,2020,2021,2022,2023,2024),
+                        season_end_year = c(2018,2019,2020,2021,2022,2023,2024,2025),
                         tier = "",
                         non_dom_league_url = "https://fbref.com/en/comps/8/history/Champions-League-Seasons") %>% 
   select(Day, Date, Time, Home, Home_xG, HomeGoals, AwayGoals, Away_xG, Away,
@@ -149,9 +186,51 @@ ucl <- fb_match_results(country = "",
 
 uel <- fb_match_results(country = "",
                         gender = "M",
-                        season_end_year = c(2018,2019,2020,2021,2022,2023,2024),
+                        season_end_year = c(2018,2019,2020,2021,2022,2023,2024,2025),
                         tier = "",
                         non_dom_league_url = "https://fbref.com/en/comps/19/history/Europa-League-Seasons") %>% 
+  select(Day, Date, Time, Home, Home_xG, HomeGoals, AwayGoals, Away_xG, Away,
+         Competition_Name, Season_End_Year) %>% 
+  rename(xG = Home_xG,
+         Home_Score = HomeGoals,
+         Away_Score = AwayGoals,
+         xG.1 = Away_xG,
+         League = Competition_Name,
+         Season = Season_End_Year) %>%
+  mutate(xG = as.numeric(xG),
+         Home_Score = as.numeric(Home_Score),
+         Away_Score = as.numeric(Away_Score),
+         xG.1 = as.numeric(xG.1),
+         Season = paste0(Season-1,"-",Season)) %>% 
+  mutate(Home = trimws(substr(Home, 1, nchar(Home)-3)),
+         Away = trimws(substr(Away, 4, nchar(Away))))
+
+conf <- fb_match_results(country = "",
+                        gender = "M",
+                        season_end_year = c(2022,2023,2024,2025),
+                        tier = "",
+                        non_dom_league_url = "https://fbref.com/en/comps/882/history/Conference-League-Seasons") %>% 
+  select(Day, Date, Time, Home, Home_xG, HomeGoals, AwayGoals, Away_xG, Away,
+         Competition_Name, Season_End_Year) %>% 
+  rename(xG = Home_xG,
+         Home_Score = HomeGoals,
+         Away_Score = AwayGoals,
+         xG.1 = Away_xG,
+         League = Competition_Name,
+         Season = Season_End_Year) %>%
+  mutate(xG = as.numeric(xG),
+         Home_Score = as.numeric(Home_Score),
+         Away_Score = as.numeric(Away_Score),
+         xG.1 = as.numeric(xG.1),
+         Season = paste0(Season-1,"-",Season)) %>% 
+  mutate(Home = trimws(substr(Home, 1, nchar(Home)-3)),
+         Away = trimws(substr(Away, 4, nchar(Away))))
+
+libertadores <- fb_match_results(country = "",
+                         gender = "M",
+                         season_end_year = c(2019,2020,2021,2022,2023,2024),
+                         tier = "",
+                         non_dom_league_url = "https://fbref.com/en/comps/14/history/Copa-Libertadores-Seasons") %>% 
   select(Day, Date, Time, Home, Home_xG, HomeGoals, AwayGoals, Away_xG, Away,
          Competition_Name, Season_End_Year) %>% 
   rename(xG = Home_xG,
@@ -172,7 +251,8 @@ uel <- fb_match_results(country = "",
 intervalEnd <- Sys.time()
 paste("Web scraping took",intervalEnd - intervalStart,attr(intervalEnd - intervalStart,"units"))
 
-fixtures <- bind_rows(Big5, mls, Champ, MX, SouthAmerica, uefa, ucl, uel)
+fixtures <- bind_rows(Big5a, Big5b, mls, Div2, MX, SouthAmerica,
+                      uefa1, uefa2, ucl, uel, conf, libertadores)
 fixtures$Date <- as.Date(fixtures$Date)
 today <- Sys.Date()
 
@@ -213,7 +293,8 @@ away <- scores %>%
 metrics <- bind_rows(home, away) %>% 
   arrange(Date, Time, League, ID) %>%
   filter(!League %in% c('UEFA Champions League', 'UEFA Europa League',
-                        'Eredivisie', 'Primeira Liga', 'Belgian Pro League')) %>%
+                        'Eredivisie', 'Primeira Liga', 'Belgian Pro League',
+                        'UEFA Europa Conference League','Copa Libertadores')) %>%
   group_by(Team, League, Season, Home_or_Away) %>% 
   dplyr::mutate(SplitxG = cumsum(xG) - xG,
          SplitxGA = cumsum(xGA) - xGA,
@@ -347,7 +428,7 @@ train_df <- metrics %>%
                                      TRUE ~ "Under")))
 
 train <- train_df %>% 
-  filter(SplitGP > 0 & SplitGP_Opp > 0 & Date < today)%>% 
+  filter(SplitGP > 4 & SplitGP_Opp > 4 & Date < today)%>% 
   select(-ID,
          -Date,
          -Day,
@@ -361,12 +442,14 @@ train <- train_df %>%
 
 cup_fixtures <- bind_rows(home, away) %>% 
   arrange(Date, Time, League, ID) %>%
-  filter(League %in% c('UEFA Champions League', 'UEFA Europa League'))
+  filter(League %in% c('UEFA Champions League', 'UEFA Europa League',
+                       'UEFA Europa Conference League', 'Copa Libertadores'))
 
 domestic_leagues <- bind_rows(home, away) %>% 
   arrange(Date, Time, League, ID) %>%
   filter(League %in% c('EPL', 'La Liga', 'Bundesliga', 'Ligue 1', 'Serie A',
-                       'Eredivisie', 'Primeira Liga', 'Belgian Pro League')) %>%
+                       'Eredivisie', 'Primeira Liga', 'Belgian Pro League',
+                       'Brasileiro Serie A', 'Argentine Primera Division')) %>%
   group_by(Team, League, Season, Home_or_Away) %>% 
   dplyr::mutate(SplitxG = cumsum(xG) - xG,
                 SplitxGA = cumsum(xGA) - xGA,
@@ -450,7 +533,8 @@ uefa_metrics <- domestic_leagues %>%
          SeasonGoalsAllowed_roll4 = ifelse(is.na(SeasonGoalsAllowed_roll4), na.locf(SeasonGoalsAllowed_roll4, fromLast = TRUE), SeasonGoalsAllowed_roll4)) %>%
   ungroup() %>% 
   left_join(team_leagues) %>% 
-  filter(League %in% c('UEFA Champions League', 'UEFA Europa League'))
+  filter(League %in% c('UEFA Champions League', 'UEFA Europa League',
+                       'UEFA Europa Conference League', 'Copa Libertadores'))
 
 cup_metrics <- uefa_metrics %>% 
   left_join(uefa_metrics, by = c("ID" = "ID", "Opponent" = "Team"), suffix = c("", "_Opp")) %>% 
