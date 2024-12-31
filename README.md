@@ -1,7 +1,5 @@
 # The Machine
 
-This is The Machine. The Machine wants to help you make money.
-
 The Machine currently offers betting analysis for the following sports and leagues:
   
 ## Soccer
