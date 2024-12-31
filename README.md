@@ -1,6 +1,6 @@
 # The Machine
 
-This is The Machine. The Machine is a degenerate. The Machine wants to help you make money.
+This is The Machine. The Machine wants to help you make money.
 
 The Machine currently offers betting analysis for the following sports and leagues:
   
@@ -13,7 +13,8 @@ The Machine currently offers betting analysis for the following sports and leagu
   - French Ligue 1
   - Italian Serie A
   - Mexican Liga MX
-  - Brazilian Serie A - Coming Soon
+  - Brazilian Serie A
+  - Argentine Liga Profesional - Coming Soon
   
 ## Baseball
   - Major League Baseball
