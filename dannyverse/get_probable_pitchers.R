@@ -6,10 +6,10 @@ get_probable_pitchers <- function(start_date, end_date) {
   
   df = data.frame()
   for (i in seq_along(date_range)) {
-    pks = baseballr::get_game_pks_mlb(date_range[[i]]) %>% 
-      distinct(game_pk)
+    pks = baseballr::get_game_pks_mlb(date_range[[i]]) 
     df = df %>% 
-      bind_rows(pks)
+      bind_rows(pks) %>% 
+      distinct(game_pk)
   }
   
   pk_list = df$game_pk
